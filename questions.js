@@ -1,5 +1,5 @@
-// Banco com 150 questões (compacto para desempenho e organização)
-const QUESTIONS = [
+const QUESTIONS = {
+  ciencias: = [
   // ETAPA 1 (Imunidade/Vacinas) - 37 questões
   {id:1, s:1, d:'f', q:"Anticorpos são:", alt:["Proteínas de defesa","Vírus enfraquecidos","Bactérias boas","Minerais essenciais"], c:0, e:"Anticorpos são proteínas do sistema imune que combatem invasores."},
   {id:2, s:1, d:'f', q:"A vacina serve para:", alt:["Tratar doenças agudas","Prevenir doenças","Substituir antibióticos","Curar ferimentos"], c:1, e:"Vacinas são preventivas. Estimulam a memória imunológica."},
@@ -157,4 +157,7 @@ const QUESTIONS = [
   {id:148, s:4, d:'d', q:"Se um aluno diz 'antibiótico cura dengue', ele:", alt:["Está certo","Confunde agente causal","Só para adultos","Só em hospitais"], c:1, e:"Dengue é viral. Antibiótico não age contra vírus."},
   {id:149, s:4, d:'d', q:"Qual é a melhor forma de evitar fake news?", alt:["Compartilhar sem ler","Verificar fonte oficial/consenso","Acreditar em áudios","Ignorar ciência"], c:1, e:"Checagem de fatos e fontes confiáveis."},
   {id:150, s:4, d:'d', q:"O saneamento básico é a base para:", alt:["Doenças","Prevenção primária e desenvolvimento","Poluição","Isolamento"], c:1, e:"Determinante social de saúde."}
-];
+],
+  matematica: [],
+  portugues: []
+};
