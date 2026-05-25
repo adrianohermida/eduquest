@@ -27,11 +27,11 @@ const AdventureMap = {
 
     // Biomes top → bottom (forest=start at top, citadel=end at bottom)
     _biomes: [
-        { top:    0, bottom:  450, id: 'forest',  name: 'Floresta de Início',  icon: '🌿', bg1: '#fafdf8', bg2: '#f7fee7' },
-        { top:  450, bottom: 1020, id: 'village', name: 'Aldeia do Saber',      icon: '🏡', bg1: '#f7fef4', bg2: '#f0fdf4' },
-        { top: 1020, bottom: 1590, id: 'lab',     name: 'Laboratório Arcano',   icon: '🧪', bg1: '#f0f9ff', bg2: '#e0f2fe' },
-        { top: 1590, bottom: 2160, id: 'tower',   name: 'Torre do Saber',       icon: '🔮', bg1: '#f5f3ff', bg2: '#ede9fe' },
-        { top: 2160, bottom: 2700, id: 'citadel', name: 'Cidadela Final',       icon: '🏰', bg1: '#fffbeb', bg2: '#fef3c7' },
+        { top:    0, bottom:  450, id: 'forest',  name: 'Floresta de Início',  svgIcon: 'compass',    iconColor: 'success', bg1: '#fafdf8', bg2: '#f7fee7' },
+        { top:  450, bottom: 1020, id: 'village', name: 'Aldeia do Saber',      svgIcon: 'home',       iconColor: '',        bg1: '#f7fef4', bg2: '#f0fdf4' },
+        { top: 1020, bottom: 1590, id: 'lab',     name: 'Laboratório Arcano',   svgIcon: 'microscope', iconColor: 'science', bg1: '#f0f9ff', bg2: '#e0f2fe' },
+        { top: 1590, bottom: 2160, id: 'tower',   name: 'Torre do Saber',       svgIcon: 'portal',     iconColor: 'rpg',     bg1: '#f5f3ff', bg2: '#ede9fe' },
+        { top: 2160, bottom: 2700, id: 'citadel', name: 'Cidadela Final',       svgIcon: 'crown',      iconColor: 'final',   bg1: '#fffbeb', bg2: '#fef3c7' },
     ],
 
     _decorations: [
@@ -169,14 +169,14 @@ const AdventureMap = {
 <div class="wm-wrap" id="wm-wrap">
 
     <div class="wm-topstrip" id="wm-topstrip">
-        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mapa">←</button>
+        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mapa">${IconSystem.html('chevron-left',{size:'md'})}</button>
         <div class="wm-zone-pill" id="wm-zone-pill">
-            <span class="wm-zone-icon" id="wm-zone-icon">🌿</span>
+            <span class="wm-zone-icon" id="wm-zone-icon">${IconSystem.html('compass',{size:'sm',color:'success'})}</span>
             <span class="wm-zone-name" id="wm-zone-name">Floresta de Início</span>
         </div>
         <div class="wm-hud-stats">
-            <div class="wm-stat-chip">⚡ ${u.level || 1}</div>
-            <div class="wm-stat-chip">⭐ ${starsProgress}/${this.stages.length}</div>
+            <div class="wm-stat-chip">${IconSystem.html('xp',{size:'xs',color:'xp'})} ${u.level || 1}</div>
+            <div class="wm-stat-chip">${IconSystem.html('star',{size:'xs',color:'final'})} ${starsProgress}/${this.stages.length}</div>
         </div>
     </div>
 
@@ -191,7 +191,7 @@ const AdventureMap = {
 
             <div class="wm-char" id="wm-char"
                  style="left:${this.world.charX}px;top:${this.world.charY}px"
-                 aria-label="Seu personagem">${u.avatar || '🦸'}</div>
+                 aria-label="Seu personagem">${IconSystem.html('char',{size:'xl'})}</div>
 
         </div>
     </div>
@@ -202,25 +202,25 @@ const AdventureMap = {
             ontouchend="AdventureMap.dpad('up',false)"
             onmousedown="AdventureMap.dpad('up',true)"
             onmouseup="AdventureMap.dpad('up',false)"
-            onmouseleave="AdventureMap.dpad('up',false)">↑</button>
+            onmouseleave="AdventureMap.dpad('up',false)">${IconSystem.html('chevron-up',{size:'lg'})}</button>
         <button class="wm-dpad-btn wm-dpad-left"
             ontouchstart="AdventureMap.dpad('left',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('left',false)"
             onmousedown="AdventureMap.dpad('left',true)"
             onmouseup="AdventureMap.dpad('left',false)"
-            onmouseleave="AdventureMap.dpad('left',false)">←</button>
+            onmouseleave="AdventureMap.dpad('left',false)">${IconSystem.html('chevron-left',{size:'lg'})}</button>
         <button class="wm-dpad-btn wm-dpad-right"
             ontouchstart="AdventureMap.dpad('right',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('right',false)"
             onmousedown="AdventureMap.dpad('right',true)"
             onmouseup="AdventureMap.dpad('right',false)"
-            onmouseleave="AdventureMap.dpad('right',false)">→</button>
+            onmouseleave="AdventureMap.dpad('right',false)">${IconSystem.html('chevron-right',{size:'lg'})}</button>
         <button class="wm-dpad-btn wm-dpad-down"
             ontouchstart="AdventureMap.dpad('down',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('down',false)"
             onmousedown="AdventureMap.dpad('down',true)"
             onmouseup="AdventureMap.dpad('down',false)"
-            onmouseleave="AdventureMap.dpad('down',false)">↓</button>
+            onmouseleave="AdventureMap.dpad('down',false)">${IconSystem.html('chevron-down',{size:'lg'})}</button>
     </div>
 
 </div>`;
@@ -240,7 +240,7 @@ const AdventureMap = {
             return `${divider}
             <div class="wm-biome wm-biome-${b.id}"
                  style="top:${b.top}px;height:${h}px;background:linear-gradient(180deg,${b.bg1} 0%,${b.bg2} 100%)">
-                <div class="wm-biome-name" aria-hidden="true">${b.icon} ${b.name}</div>
+                <div class="wm-biome-name" aria-hidden="true">${IconSystem.html(b.svgIcon,{size:'sm',color:b.iconColor||'muted'})} ${b.name}</div>
             </div>`;
         }).join('');
     },
@@ -300,8 +300,21 @@ const AdventureMap = {
             const x          = (s.xPct / 100) * this.WORLD_W;
             const stateClass = s.completed ? 'wm-done' : s.unlocked ? 'wm-active' : 'wm-locked';
             const typeClass  = s.isFinal ? 'wm-final' : s.isBoss ? 'wm-boss' : '';
-            const icon       = s.completed ? '✓' : s.isFinal ? '🎓' : s.isBoss ? '💀' : s.unlocked ? String(s.index) : '🔒';
-            const typeLabel  = s.isFinal ? '✦ FINAL' : s.isBoss ? '💀 CHEFE' : '';
+            const ic = IconSystem;
+            const icon = s.completed
+                ? ic.html('check',  { size: 'lg' })
+                : s.isFinal
+                    ? ic.html('crown',  { size: 'xl', variant: 'glow' })
+                    : s.isBoss
+                        ? ic.html('boss',   { size: 'lg' })
+                        : s.unlocked
+                            ? `<span class="wm-node-num">${s.index}</span>`
+                            : ic.html('lock', { size: 'md' });
+            const typeLabel = s.isFinal
+                ? `${ic.html('star',{size:'xs'})} FINAL`
+                : s.isBoss
+                    ? `${ic.html('boss',{size:'xs'})} CHEFE`
+                    : '';
             const starsHTML  = s.completed
                 ? `<div class="wm-node-stars" aria-label="${s.stars} estrelas">
                      ${[1,2,3].map(n => `<span class="${n <= s.stars ? 'wm-star-lit' : 'wm-star-dim'}">★</span>`).join('')}
@@ -330,7 +343,12 @@ const AdventureMap = {
         return this.stages.map((s, i) => {
             const nodeX     = (s.xPct / 100) * this.WORLD_W;
             const isRight   = s.xPct < 50;  // node on left half → label extends right
-            const statusText = s.completed ? '✓ Concluído' : s.unlocked ? '▶ Disponível' : '🔒 Bloqueado';
+            const ic2 = IconSystem;
+            const statusText = s.completed
+                ? `${ic2.html('check',{size:'xs',color:'success'})} Concluído`
+                : s.unlocked
+                    ? `${ic2.html('chevron-right',{size:'xs',color:'xp'})} Disponível`
+                    : `${ic2.html('lock',{size:'xs'})} Bloqueado`;
             const statusCls  = s.completed ? 'wm-status-done' : s.unlocked ? 'wm-status-active' : 'wm-status-locked';
             const posStyle   = isRight
                 ? `left:${nodeX + 34}px;top:${s.worldY}px;transform:translateY(-50%)`
@@ -479,7 +497,7 @@ const AdventureMap = {
             if (this.world.charY >= b.top && this.world.charY < b.bottom) {
                 if (this._currentBiome !== b.id) {
                     this._currentBiome = b.id;
-                    this._zoneEl.icon.textContent = b.icon;
+                    this._zoneEl.icon.innerHTML = IconSystem.html(b.svgIcon, { size: 'sm', color: b.iconColor || '' });
                     this._zoneEl.name.textContent = b.name;
                     const pill = document.getElementById('wm-zone-pill');
                     if (pill) {

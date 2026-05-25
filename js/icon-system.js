@@ -434,6 +434,23 @@ const ICON_SPRITE = `<svg xmlns="http://www.w3.org/2000/svg"
   <path d="M10.5 10H13.5V11.5L11.5 14.5H13.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
 </symbol>
 
+<symbol id="icon-chevron-up" viewBox="0 0 24 24">
+  <path d="M5 15L12 7L19 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</symbol>
+
+<symbol id="icon-chevron-left" viewBox="0 0 24 24">
+  <path d="M15 5L7 12L15 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</symbol>
+
+<symbol id="icon-char" viewBox="0 0 24 24">
+  <!-- Game hero character on map -->
+  <circle cx="12" cy="7.5" r="4" fill="currentColor"/>
+  <path d="M6 22C6 18 8.7 15 12 15S18 18 18 22" fill="currentColor" opacity="0.88"/>
+  <path d="M7 21C5.5 19.8 4.5 18.2 4.5 17S6 14.8 7.5 16" fill="currentColor" opacity="0.52"/>
+  <path d="M17 21C18.5 19.8 19.5 18.2 19.5 17S18 14.8 16.5 16" fill="currentColor" opacity="0.52"/>
+  <path d="M9.5 5.8C9 6.5 8.5 7.3 8.5 8" stroke="white" stroke-width="1.3" stroke-linecap="round" fill="none" opacity="0.28"/>
+</symbol>
+
 </defs>
 </svg>`;
 
@@ -533,13 +550,16 @@ const IconSystem = {
     for (const [id, cfg] of Object.entries(map)) {
       const btn = document.getElementById(id);
       if (!btn) continue;
-      // Replace first text node (emoji) with SVG icon
+      // Replace first text node (emoji/character) with SVG icon
       const tn = [...btn.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
       if (tn) {
         const iconEl = this.render(cfg.icon, { size: cfg.size, color: cfg.color });
         btn.replaceChild(iconEl, tn);
       }
     }
+    // Also upgrade avatar display inside the dropdown
+    const hadAvatar = document.getElementById('had-avatar');
+    if (hadAvatar) hadAvatar.innerHTML = this.html('avatar', { size: '2xl' });
   },
 
   /**

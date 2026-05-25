@@ -173,10 +173,31 @@ eq-icon {
 }
 
 /* --- Adventure map node overrides --- */
-.wm-node-icon .icon   { width: 24px; height: 24px; }
+.wm-node-icon { display: flex; align-items: center; justify-content: center; }
+.wm-node-icon .icon       { width: 24px; height: 24px; color: white; }
+.wm-node-num              { font-size: 17px; font-weight: 800; color: white; line-height: 1; }
 .wm-boss .wm-node-icon .icon  { width: 30px; height: 30px; }
 .wm-final .wm-node-icon .icon { width: 32px; height: 32px; }
-.wm-done  .icon-check { color: white; }
+
+/* Character on map */
+.wm-char {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wm-char .icon { width: 36px; height: 36px; color: var(--brand, #f97316); }
+
+/* Zone pill icon */
+.wm-zone-icon .icon { width: 16px !important; height: 16px !important; }
+
+/* Stat chip icon */
+.wm-stat-chip .icon { width: 13px !important; height: 13px !important; flex-shrink: 0; }
+
+/* Biome name icon */
+.wm-biome-name .icon { width: 14px !important; height: 14px !important; vertical-align: middle; }
+
+/* Type badge icon */
+.wm-node-type-badge .icon { width: 11px !important; height: 11px !important; vertical-align: middle; }
 
 /* --- Modal overrides --- */
 .modal-icon-lg .icon { width: 56px; height: 56px; }
