@@ -175,6 +175,8 @@ eq-icon {
 /* --- Adventure map node overrides --- */
 .wm-node-icon { display: flex; align-items: center; justify-content: center; }
 .wm-node-icon .icon       { width: 24px; height: 24px; color: white; }
+/* icon-check circle is currentColor; make it transparent so only the white stroke checkmark shows on the green gradient */
+.wm-done .wm-node-icon .icon  { color: transparent; }
 .wm-node-num              { font-size: 17px; font-weight: 800; color: white; line-height: 1; }
 .wm-boss .wm-node-icon .icon  { width: 30px; height: 30px; }
 .wm-final .wm-node-icon .icon { width: 32px; height: 32px; }
