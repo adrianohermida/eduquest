@@ -1,34 +1,121 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduQuest - Ciências Cap. 7</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduQuest - Gamificado</title>
+    <meta name="theme-color" content="#4EC0FF">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    
+    <style>
+        /* CSS CRÍTICO INLINE PARA GARANTIR FUNCIONAMENTO IMEDIATO */
+        :root {
+            --primary: #4EC0FF;
+            --secondary: #2B70C9;
+            --success: #58CC02;
+            --warning: #FFC800;
+            --danger: #FF4B4B;
+            --text: #3C3C3C;
+            --bg: #FFFFFF;
+            --gray: #E5E5E5;
+        }
+        body { margin: 0; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        #app-container { max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Header Gamificado */
+        .gamified-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 2px solid var(--gray); position: sticky; top: 0; z-index: 100; }
+        .user-stats { display: flex; gap: 15px; }
+        .stat-item { font-weight: bold; display: flex; align-items: center; gap: 5px; font-size: 1.1rem; }
+        .stat-item.fire.active { color: var(--danger); animation: pulse 2s infinite; }
+        .avatar img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); }
+
+        /* Path Container */
+        .path-container { padding: 20px; flex: 1; }
+        .section-title { text-align: center; color: var(--secondary); margin-bottom: 30px; }
+        
+        /* Chapter Cards */
+        .chapter-card { background: #fff; border: 2px solid var(--gray); border-radius: 16px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 0 var(--gray); }
+        .chapter-card:active { transform: translateY(4px); box-shadow: none; }
+        .chapter-card:hover { border-color: var(--primary); }
+        .card-icon { font-size: 2.5rem; background: #f0f8ff; padding: 10px; border-radius: 12px; }
+        .card-info { flex: 1; }
+        .card-info h3 { margin: 0 0 10px 0; font-size: 1.2rem; }
+        .progress-track { height: 10px; background: var(--gray); border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s ease; }
+        .progress-text { font-size: 0.8rem; color: #777; margin-top: 5px; display: block; }
+        .card-arrow { font-size: 1.5rem; color: var(--primary); }
+
+        /* Stage Map (Duolingo Style) */
+        .stage-map-container { padding: 20px; text-align: center; }
+        .btn-back { background: none; border: none; font-size: 1rem; color: var(--secondary); cursor: pointer; padding: 10px; margin-bottom: 20px; }
+        .stages-path { display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 20px 0; }
+        
+        .stage-node { position: relative; cursor: pointer; transition: transform 0.2s; }
+        .stage-node.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .stage-node:active:not(.locked) { transform: scale(0.9); }
+        
+        .node-circle { width: 70px; height: 70px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white; box-shadow: 0 6px 0 #46a302; border: 4px solid #fff; }
+        .stage-node.completed .node-circle { background: var(--warning); box-shadow: 0 6px 0 #e5b400; }
+        .stage-node.locked .node-circle { background: var(--gray); box-shadow: 0 6px 0 #cccccc; }
+        
+        .node-stars { margin-top: 5px; color: var(--warning); font-size: 1.2rem; letter-spacing: 2px; }
+        .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        /* Mobile First Adjustments */
+        @media (max-width: 400px) {
+            .node-circle { width: 60px; height: 60px; font-size: 1.2rem; }
+            .chapter-card { padding: 15px; }
+        }
+    </style>
 </head>
 <body>
-  <!-- Top Bar (Hearts, Streak, XP) -->
-  <header class="top-bar">
-    <div class="hearts" id="hearts-display">❤️❤️❤️❤️❤️</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
+
+    <div id="app-container">
+        <!-- Conteúdo injetado via JS -->
+        <div style="text-align:center; padding: 50px;">
+            <h2>Carregando EduQuest...</h2>
+            <div class="loader">🦉</div>
+        </div>
     </div>
-    <div class="streak" id="streak-display">🔥 0</div>
-  </header>
 
-  <!-- Game Area -->
-  <main id="game-container" class="game-container">
-    <!-- Content is injected here by JS -->
-  </main>
+    <!-- SCRIPTS ORDEM CRÍTICA -->
+    <!-- 1. Config & Data -->
+    <script src="js/config.js"></script>
+    <script src="js/data/questions.js"></script>
+    
+    <!-- Dados dos Capítulos (Globais) -->
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/metadata.js"></script>
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/summaries.js"></script>
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_01.js"></script>
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_02.js"></script>
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_03.js"></script>
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_04.js"></script>
+    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_05.js"></script>
 
-  <!-- Footer / Check Button -->
-  <footer class="footer-check">
-    <div id="feedback-area" class="feedback-area hidden">
-      <p id="feedback-text"></p>
-    </div>
-    <button id="check-btn" class="btn btn-primary" disabled>VERIFICAR</button>
-  </footer>
+    <!-- MODELO TEMPLATE (Novo) -->
+    <script src="js/data/MODELO_TEMPLATE/metadata.js"></script>
+    <script src="js/data/MODELO_TEMPLATE/summaries.js"></script>
+    <script src="js/data/MODELO_TEMPLATE/stages/stage_01.js"></script>
+    <script src="js/data/MODELO_TEMPLATE/stages/stage_02.js"></script>
+    <script src="js/data/MODELO_TEMPLATE/stages/stage_03.js"></script>
+    <script src="js/data/MODELO_TEMPLATE/stages/stage_04.js"></script>
+    <script src="js/data/MODELO_TEMPLATE/stages/stage_05.js"></script>
 
-  <script src="app.js"></script>
+    <!-- 2. Core Logic -->
+    <script src="js/state.js"></script>
+    <script src="js/utils.js"></script>
+    
+    <!-- 3. UI & Router (Novos) -->
+    <script src="js/ui-components.js"></script>
+    <script src="js/router.js"></script>
+    
+    <!-- 4. App Entry -->
+    <script src="js/app.js"></script>
 </body>
 </html>
