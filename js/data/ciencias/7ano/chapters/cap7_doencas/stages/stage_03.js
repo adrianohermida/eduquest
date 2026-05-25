@@ -495,6 +495,13 @@ const STAGE_03 = {
 
     spacedReviewEnabled: true
   }
-};
+},
 
-export default STAGE_03;
+if (typeof window !== 'undefined') {
+    window.STAGE_03 = STAGE_03; // Mude o número conforme o arquivo (STAGE_02, STAGE_03...)
+    
+    // Registro opcional no DataLoader se existir
+    if (window.DataLoader) {
+        window.DataLoader.registerStage('cap7_doencas', 3, STAGE_03);
+    }
+}
