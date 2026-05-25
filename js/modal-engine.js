@@ -66,8 +66,9 @@ const ModalEngine = {
             case 'noGems':           html = this._noGemsHTML(data);           break;
             case 'achievement':      html = this._achievementHTML(data);      break;
             case 'streakMilestone':  html = this._streakMilestoneHTML(data);  break;
-            case 'streakFreezeUsed': html = this._streakFreezeUsedHTML(data); break;
-            case 'motivational':     html = this._motivationalHTML(data);     break;
+            case 'streakFreezeUsed':   html = this._streakFreezeUsedHTML(data);   break;
+            case 'motivational':       html = this._motivationalHTML(data);       break;
+            case 'reviewSuggestion':   html = this._reviewSuggestionHTML(data);   break;
             // Dialogs — replaces native browser calls
             case 'missionExit':   html = this._missionExitHTML(data);    break;
             case 'confirm':       html = this._confirmHTML(data);         break;
@@ -300,29 +301,49 @@ const ModalEngine = {
             <div class="modal-motivational-icon">${this._ic(icon || 'xp',{size:'xl',color:'xp'})}</div>
             <h2 class="modal-title" id="modal-title-el">${title || 'Você consegue!'}</h2>
             <p class="modal-subtitle">${msg || 'Continue jogando e alcance novos níveis!'}</p>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">💪 Bora!</button>`;
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('xp',{size:'xs',color:'xp'})} Bora!</button>`;
+    },
+
+    _reviewSuggestionHTML({ days = 1 }) {
+        const daysText = days === 1 ? '1 dia'   : `${days} dias`;
+        const chapters = (typeof CONFIG !== 'undefined' && CONFIG.chapters) ? CONFIG.chapters : [];
+        const weakest  = chapters.reduce((acc, ch) => {
+            const prog = (typeof State !== 'undefined') ? State.getChapterProgress(ch.id) : { percent: 0 };
+            return (!acc || prog.percent < acc.percent) ? { ...prog, ch } : acc;
+        }, null);
+        const suggestion = weakest?.ch
+            ? `Retome <strong>${weakest.ch.subject}</strong> — você está em ${weakest.percent}%.`
+            : 'Continue de onde parou para manter o aprendizado.';
+        return `
+            <div class="modal-motivational-icon">${this._ic('compass',{size:'xl',color:'science'})}</div>
+            <h2 class="modal-title" id="modal-title-el">Bem-vindo de volta!</h2>
+            <p class="modal-subtitle">Você ficou ${daysText} sem jogar. ${suggestion}</p>
+            <div class="modal-chips">
+                <div class="modal-chip chip-xp">${this._ic('xp',{size:'xs',color:'xp'})} Sequência reiniciada</div>
+            </div>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('map',{size:'xs'})} Continuar aprendendo</button>`;
     },
 
     // ── MODAL HTML — Dialogs (native replacements) ────────────────
 
     _missionExitHTML({ context = 'missão' }) {
         const ctxMap = {
-            'missão':    { icon: 'sword',   svg: true,  title: 'Abandonar a Missão?',     sub: 'Seu progresso desta batalha será perdido.' },
-            'memória':   { icon: '🃏',       svg: false, title: 'Sair do Jogo de Memória?', sub: 'Você perderá o progresso atual.'          },
-            'forca':     { icon: '🔤',       svg: false, title: 'Sair do Jogo da Forca?',   sub: 'Você perderá o progresso atual.'          },
-            'aventura':  { icon: 'compass',  svg: true,  title: 'Sair do Mapa Aventura?',  sub: 'Você poderá retornar depois.'              },
-            'caça-palavras': { icon: '🔍',   svg: false, title: 'Sair do Caça-Palavras?',  sub: 'Você perderá o progresso atual.'           },
+            'missão':        { icon: 'sword',      title: 'Abandonar a Missão?',      sub: 'Seu progresso desta batalha será perdido.' },
+            'memória':       { icon: 'backpack',   title: 'Sair do Jogo de Memória?', sub: 'Você perderá o progresso atual.'          },
+            'forca':         { icon: 'scroll',     title: 'Sair do Jogo da Forca?',   sub: 'Você perderá o progresso atual.'          },
+            'aventura':      { icon: 'compass',    title: 'Sair do Mapa Aventura?',   sub: 'Você poderá retornar depois.'              },
+            'caça-palavras': { icon: 'compass',    title: 'Sair do Caça-Palavras?',   sub: 'Você perderá o progresso atual.'           },
         };
         const c = ctxMap[context] || ctxMap['missão'];
         return `
-            <div class="modal-exit-icon">${c.svg ? this._ic(c.icon,{size:'xl'}) : c.icon}</div>
+            <div class="modal-exit-icon">${this._ic(c.icon,{size:'xl'})}</div>
             <h2 class="modal-title" id="modal-title-el">${c.title}</h2>
             <p class="modal-subtitle">${c.sub}</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss(false)">
-                ▶ Continuar ${context === 'aventura' ? 'explorando' : 'jogando'}
+                ${this._ic('check',{size:'xs'})} Continuar ${context === 'aventura' ? 'explorando' : 'jogando'}
             </button>
             <button class="modal-exit-danger-btn" onclick="ModalEngine.dismiss(true)">
-                🚪 Sair da ${context}
+                ${this._ic('logout',{size:'xs'})} Sair da ${context}
             </button>`;
     },
 

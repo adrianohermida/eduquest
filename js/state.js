@@ -263,6 +263,9 @@ const State = {
             }
         } else {
             this.data.user.streak = 1;
+            if (typeof ModalEngine !== 'undefined') {
+                ModalEngine.enqueue('reviewSuggestion', { days: diff });
+            }
         }
 
         this.data.user.lastPlayed = today;
@@ -748,7 +751,16 @@ const State = {
         this.data.user.maxCombo     = Math.max(this.data.user.maxCombo || 0, combo);
         if (victory) {
             this.data.user.totalMissions = (this.data.user.totalMissions || 0) + 1;
-            if (perfect) this.data.user.totalPerfect = (this.data.user.totalPerfect || 0) + 1;
+            if (perfect) {
+                this.data.user.totalPerfect = (this.data.user.totalPerfect || 0) + 1;
+                if (typeof ModalEngine !== 'undefined') {
+                    ModalEngine.enqueue('motivational', {
+                        icon:  'star',
+                        title: 'Pontuação Perfeita!',
+                        msg:   'Você acertou tudo! Continue assim para desbloquear conquistas épicas!',
+                    });
+                }
+            }
         }
         this.save();
         this.checkProgressAchievements();
