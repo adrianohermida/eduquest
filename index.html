@@ -22,6 +22,7 @@
             <div class="hud-chip gem-chip">💎<span id="hud-gems">0</span></div>
             <div class="hud-chip xp-chip">⚡<span id="hud-xp">0</span></div>
             <div class="hud-chip heart-chip">❤️<span id="hud-hearts">5</span></div>
+            <button id="mute-btn" class="hud-mute-btn" onclick="SoundManager.toggle()">🔊</button>
         </div>
     </header>
 
@@ -49,6 +50,7 @@
     </nav>
 
     <!-- Scripts na ordem correta -->
+    <script src="js/sound-manager.js"></script>
     <script src="js/config.js"></script>
     <script src="js/state.js"></script>
     <script src="js/utils.js"></script>

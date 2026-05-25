@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     State.init();
+    if (typeof SoundManager !== 'undefined') SoundManager.init();
     Router.init();
     Router.handleRoute();
 

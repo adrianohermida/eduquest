@@ -210,11 +210,17 @@ const GameEngine = {
             this.state.score   += points;
 
             const btn = document.getElementById(`opt-${selectedIndex}`);
-            if (btn) btn.classList.add('correct');
+            if (btn) {
+                btn.classList.add('correct');
+                this._showXPFloat(points, btn);
+            }
 
+            if (typeof SoundManager !== 'undefined') SoundManager.play('correct');
+            this._updateCombo();
             this._showFeedback(true, q.explanation, points);
         } else {
             this.state.combo = 0;
+            this._removeCombo();
             this.state.lives--;
             this._updateLivesUI();
 
@@ -225,9 +231,9 @@ const GameEngine = {
             const correctBtn = document.getElementById(`opt-${q.correctIndex}`);
             if (correctBtn) correctBtn.classList.add('correct');
 
+            if (typeof SoundManager !== 'undefined') SoundManager.play('wrong');
             this._showFeedback(false, q.explanation, 0);
 
-            // Shake arena on wrong answer
             const arena = document.getElementById('game-arena');
             if (arena) {
                 arena.classList.add('shake');
@@ -274,6 +280,36 @@ const GameEngine = {
 
         this.state.currentIndex++;
         this._loadQuestion();
+    },
+
+    _showXPFloat(points, anchorEl) {
+        const float = document.createElement('div');
+        float.className = 'xp-float';
+        float.textContent = `+${points} ⚡`;
+        if (anchorEl) {
+            const r = anchorEl.getBoundingClientRect();
+            float.style.left = `${r.left + r.width / 2 - 30}px`;
+            float.style.top  = `${r.top - 10}px`;
+        } else {
+            float.style.left = '50%';
+            float.style.top  = '40%';
+        }
+        document.body.appendChild(float);
+        setTimeout(() => float.remove(), 1300);
+    },
+
+    _updateCombo() {
+        this._removeCombo();
+        if (this.state.combo < 2) return;
+        const badge = document.createElement('div');
+        badge.className = 'combo-badge';
+        badge.id = 'combo-badge';
+        badge.textContent = `🔥 ${this.state.combo}x Combo!`;
+        document.body.appendChild(badge);
+    },
+
+    _removeCombo() {
+        document.getElementById('combo-badge')?.remove();
     },
 
     _nextQuestion(isCorrect) {
@@ -346,9 +382,12 @@ const GameEngine = {
                 </div>
             </div>`;
 
-        if (victory && typeof Utils !== 'undefined') {
-            Utils.confetti();
+        if (victory) {
+            if (typeof SoundManager !== 'undefined') SoundManager.play('complete');
+            if (typeof Utils !== 'undefined') Utils.confetti();
         }
+
+        this._removeCombo();
 
         // Restaura HUD e nav
         document.getElementById('top-hud')?.classList.remove('hidden');

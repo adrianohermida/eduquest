@@ -13,7 +13,11 @@ const State = {
             hearts: 5,
             streak: 1,
             lastPlayed: null,
-            achievements: []
+            achievements: [],
+            authenticated: false,
+            onboarded: false,
+            email: null,
+            dailyGoal: 10
         },
         progress: {}
     },
@@ -191,6 +195,40 @@ const State = {
             const el = document.getElementById(id);
             if (el) el.textContent = val;
         }
+    },
+
+    // ── AUTH ─────────────────────────────────────────────
+    isAuthenticated() {
+        return this.data.user.authenticated === true;
+    },
+
+    login(email, password) {
+        const OK_EMAIL = 'jghermidamaia@gmail.com';
+        const OK_PASS  = '180514';
+        if (email === OK_EMAIL && password === OK_PASS) {
+            this.data.user.authenticated = true;
+            this.data.user.email = email;
+            this.save();
+            return { success: true };
+        }
+        return { success: false };
+    },
+
+    logout() {
+        this.data.user.authenticated = false;
+        this.save();
+    },
+
+    // ── ONBOARDING ────────────────────────────────────────
+    isOnboarded() {
+        return this.data.user.onboarded === true;
+    },
+
+    completeOnboarding(name, dailyGoal) {
+        this.data.user.name       = name || 'Herói';
+        this.data.user.dailyGoal  = dailyGoal || 10;
+        this.data.user.onboarded  = true;
+        this.save();
     }
 };
 
