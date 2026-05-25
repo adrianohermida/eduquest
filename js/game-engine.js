@@ -1,61 +1,154 @@
 /**
- * EDUQUEST GAME ENGINE v3.0
- * Battle Arena UI + Learning Phase + RPG Combat System
+ * EDUQUEST GAME ENGINE v4.0
+ * Battle Arena · Learning Phase · V/F · Eliminação · Dicas · Digitação
  */
 
 const GameEngine = {
     state: {
-        chapterId:       null,
-        stageId:         null,
-        stageIndex:      null,
-        stageData:       null,
-        questions:       [],
-        currentIndex:    0,
-        score:           0,
-        lives:           3,
-        timer:           15,
-        timerInterval:   null,
-        isPlaying:       false,
-        combo:           0,
-        pendingFeedback: false,
-        enemyHP:         100,
-        learningCardIdx: 0
+        chapterId:        null,
+        stageId:          null,
+        stageIndex:       null,
+        stageData:        null,
+        questions:        [],
+        currentIndex:     0,
+        score:            0,
+        lives:            3,
+        timer:            15,
+        timerInterval:    null,
+        isPlaying:        false,
+        combo:            0,
+        pendingFeedback:  false,
+        enemyHP:          100,
+        learningCardIdx:  0,
+        eliminationsLeft: 1,
+        hintsLeft:        3,
+        eliminatedIdx:    new Set(),
+        hintShown:        false,
+        typingMode:       false,
+        typingTimeout:    null
     },
+
+    // ── ENTRY POINT ─────────────────────────────────────────────
 
     start(chapterId, stageId, stageIndex) {
         const stageVarName = stageId.toUpperCase();
         const stageData    = window[stageVarName];
-
         if (!stageData) {
             console.error(`GameEngine: ${stageVarName} não encontrado.`);
             Router.navigate(`#chapter/${chapterId}`);
             return;
         }
 
-        this.state.chapterId       = chapterId;
-        this.state.stageId         = stageId;
-        this.state.stageIndex      = parseInt(stageIndex) || 1;
-        this.state.stageData       = stageData;
-        this.state.questions       = this._loadQuestions(stageData);
-        this.state.currentIndex    = 0;
-        this.state.score           = 0;
-        this.state.lives           = CONFIG.lives.gameHearts || 3;
-        this.state.combo           = 0;
-        this.state.isPlaying       = true;
-        this.state.pendingFeedback = false;
-        this.state.enemyHP         = 100;
-        this.state.learningCardIdx = 0;
+        Object.assign(this.state, {
+            chapterId, stageId,
+            stageIndex:       parseInt(stageIndex) || 1,
+            stageData,
+            questions:        this._buildQuestionSet(stageData),
+            currentIndex:     0,
+            score:            0,
+            lives:            CONFIG.lives.gameHearts || 3,
+            combo:            0,
+            isPlaying:        true,
+            pendingFeedback:  false,
+            enemyHP:          100,
+            learningCardIdx:  0,
+            eliminationsLeft: 1,
+            hintsLeft:        3,
+            eliminatedIdx:    new Set(),
+            hintShown:        false,
+            typingMode:       false
+        });
 
         document.getElementById('top-hud')?.classList.add('hidden');
         document.getElementById('bottom-nav')?.classList.add('hidden');
 
         const hasContent = (stageData.summary?.content || []).length > 0;
-        if (hasContent) {
-            this._showLearningPhase(stageData);
+        hasContent ? this._showLearningPhase(stageData) : this._renderArena();
+    },
+
+    // ── QUESTION BUILDING ───────────────────────────────────────
+
+    _buildQuestionSet(stageData) {
+        // 1. Main MC questions (shuffled)
+        let mc = [];
+        if (stageData.questions?.length > 0) {
+            mc = stageData.questions.map(q => this._normalizeQuestion(q));
         } else {
-            this._renderArena();
-            this._startTimer();
+            mc = (window.QUESTIONS_BANK || []).map(q => this._normalizeQuestion(q));
         }
+        mc = [...mc].sort(() => Math.random() - 0.5).slice(0, CONFIG.stages.questionsPerGame || 10);
+
+        // 2. Prepend 2-3 True/False questions from flashcards (if available)
+        const tf = this._generateTFQuestions(stageData);
+
+        // 3. Mix: TF first, then MC (also shuffle options within MC questions)
+        return [...tf, ...mc].map(q => ({
+            ...q,
+            options: q.type === 'tf' ? q.options : this._shuffleOptions(q)
+        }));
+    },
+
+    _shuffleOptions(q) {
+        // Shuffle options but track the new correct index
+        const indexed = q.options.map((text, i) => ({ text, isCorrect: i === q.correctIndex }));
+        indexed.sort(() => Math.random() - 0.5);
+        return {
+            ...q,
+            options:      indexed.map(o => o.text),
+            correctIndex: indexed.findIndex(o => o.isCorrect)
+        };
+    },
+
+    _generateTFQuestions(stageData) {
+        const flashcards = stageData.summary?.flashcards || [];
+        if (flashcards.length < 2) return [];
+
+        const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
+        const count    = Math.min(2, Math.floor(flashcards.length / 2));
+        const result   = [];
+
+        for (let i = 0; i < count; i++) {
+            const fc     = shuffled[i];
+            const isTrue = Math.random() > 0.5;
+            if (isTrue) {
+                result.push({
+                    type:         'tf',
+                    question:     `✅ ou ❌ — Verdadeiro ou Falso?\n\n"${fc.q}\n→ ${fc.a}"`,
+                    options:      ['✅ Verdadeiro', '❌ Falso'],
+                    correctIndex: 0,
+                    explanation:  `Correto! ${fc.a}`
+                });
+            } else {
+                const other = shuffled[(i + count + 1) % shuffled.length];
+                result.push({
+                    type:         'tf',
+                    question:     `✅ ou ❌ — Verdadeiro ou Falso?\n\n"${fc.q}\n→ ${other.a}"`,
+                    options:      ['✅ Verdadeiro', '❌ Falso'],
+                    correctIndex: 1,
+                    explanation:  `Falso! A resposta correta é: ${fc.a}`
+                });
+            }
+        }
+        return result;
+    },
+
+    _normalizeQuestion(q) {
+        if (Array.isArray(q.options) && typeof q.options[0] === 'object') {
+            return {
+                question:     q.prompt || q.question || 'Questão',
+                options:      q.options.map(o => o.text || String(o)),
+                correctIndex: q.options.findIndex(o => o.correct === true),
+                explanation:  q.explanation || '',
+                type:         q.type || 'mc'
+            };
+        }
+        return {
+            question:     q.question || q.prompt || 'Questão',
+            options:      q.options || [],
+            correctIndex: typeof q.correct === 'number' ? q.correct : (q.correctIndex || 0),
+            explanation:  q.explanation || '',
+            type:         q.type || 'mc'
+        };
     },
 
     // ── LEARNING PHASE ──────────────────────────────────────────
@@ -99,23 +192,18 @@ const GameEngine = {
         this._setupLearningSwipe(cards.length);
     },
 
-    _setupLearningSwipe(totalCards) {
+    _setupLearningSwipe(total) {
         const wrap = document.getElementById('learning-phase');
         if (!wrap) return;
         let sx = 0, sy = 0;
         wrap.addEventListener('touchstart', e => {
-            sx = e.touches[0].clientX;
-            sy = e.touches[0].clientY;
+            sx = e.touches[0].clientX; sy = e.touches[0].clientY;
         }, { passive: true });
         wrap.addEventListener('touchend', e => {
             const dx = e.changedTouches[0].clientX - sx;
             const dy = e.changedTouches[0].clientY - sy;
             if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-                if (dx < 0) {
-                    this._nextLearningCard();
-                } else if (this.state.learningCardIdx > 0) {
-                    this._goLearningCard(this.state.learningCardIdx - 1, totalCards);
-                }
+                dx < 0 ? this._nextLearningCard() : (this.state.learningCardIdx > 0 && this._goLearningCard(this.state.learningCardIdx - 1, total));
             }
         }, { passive: true });
     },
@@ -123,11 +211,7 @@ const GameEngine = {
     _nextLearningCard() {
         const cards = this.state.stageData?.summary?.content || [];
         const next  = this.state.learningCardIdx + 1;
-        if (next >= cards.length) {
-            this._startBattle();
-        } else {
-            this._goLearningCard(next, cards.length);
-        }
+        next >= cards.length ? this._startBattle() : this._goLearningCard(next, cards.length);
     },
 
     _goLearningCard(idx, total) {
@@ -135,17 +219,12 @@ const GameEngine = {
         document.querySelectorAll('.learning-card').forEach((el, i) => {
             el.className = `learning-card ${i < idx ? 'prev' : i === idx ? 'active' : 'next'}`;
         });
-        document.querySelectorAll('.ldot').forEach((d, i) =>
-            d.classList.toggle('active', i === idx)
-        );
+        document.querySelectorAll('.ldot').forEach((d, i) => d.classList.toggle('active', i === idx));
         const btn = document.getElementById('learning-next-btn');
-        if (btn) btn.textContent = (idx === total - 1) ? '⚔️ BATALHAR!' : 'Próximo →';
+        if (btn) btn.textContent = idx === total - 1 ? '⚔️ BATALHAR!' : 'Próximo →';
     },
 
-    _startBattle() {
-        this._renderArena();
-        this._startTimer();
-    },
+    _startBattle() { this._renderArena(); this._startTimer(); },
 
     // ── BATTLE ARENA ────────────────────────────────────────────
 
@@ -170,7 +249,6 @@ const GameEngine = {
                     </div>
                     <div class="game-timer" id="game-timer">⏱ 15s</div>
                 </div>
-
                 <div class="battle-scene">
                     <div class="battle-entity battle-enemy-side">
                         <div class="battle-entity-name">${theme.enemy} ${theme.name}</div>
@@ -182,11 +260,9 @@ const GameEngine = {
                         </div>
                         <div class="battle-sprite enemy-sprite" id="enemy-sprite">${theme.enemy}</div>
                     </div>
-
                     <div class="battle-center-info">
                         <div class="battle-combo-zone" id="battle-combo"></div>
                     </div>
-
                     <div class="battle-entity battle-player-side">
                         <div class="battle-sprite player-sprite" id="player-sprite">🦸</div>
                         <div class="battle-hp-wrap">
@@ -200,13 +276,14 @@ const GameEngine = {
                         <div class="battle-entity-name">🦸 Herói</div>
                     </div>
                 </div>
-
                 <div class="question-container" id="question-container"></div>
                 <div class="feedback-overlay" id="feedback-overlay"></div>
             </div>`;
 
         this._loadQuestion();
     },
+
+    // ── HP BARS ──────────────────────────────────────────────────
 
     _updateEnemyHP() {
         const pct = Math.max(0, Math.round(this.state.enemyHP));
@@ -223,26 +300,27 @@ const GameEngine = {
         if (bar) {
             bar.style.width = `${pct}%`;
             bar.classList.remove('low', 'critical');
-            if      (this.state.lives === 1)           bar.classList.add('critical');
-            else if (this.state.lives < maxLives - 1)  bar.classList.add('low');
+            if      (this.state.lives === 1)          bar.classList.add('critical');
+            else if (this.state.lives < maxLives - 1) bar.classList.add('low');
         }
         const hearts = document.getElementById('player-hp-hearts');
         if (hearts) {
-            const alive = Math.max(0, this.state.lives);
-            const dead  = Math.max(0, maxLives - this.state.lives);
-            hearts.textContent = '❤️'.repeat(alive) + '🖤'.repeat(dead);
+            hearts.textContent = '❤️'.repeat(Math.max(0, this.state.lives)) +
+                                 '🖤'.repeat(Math.max(0, maxLives - this.state.lives));
         }
     },
+
+    // ── BATTLE EFFECTS ───────────────────────────────────────────
 
     _showBattleEffect(isCorrect) {
         const enemy  = document.getElementById('enemy-sprite');
         const player = document.getElementById('player-sprite');
         if (isCorrect) {
-            if (player) { player.classList.add('anim-attack'); setTimeout(() => player.classList.remove('anim-attack'), 360); }
-            if (enemy)  { enemy.classList.add('anim-hit');     setTimeout(() => enemy.classList.remove('anim-hit'),     460); }
+            player?.classList.add('anim-attack');   setTimeout(() => player?.classList.remove('anim-attack'),   360);
+            enemy?.classList.add('anim-hit');        setTimeout(() => enemy?.classList.remove('anim-hit'),        460);
             this._spawnFloatText('⚔️ ACERTO!', '.battle-enemy-side', 'hit');
         } else {
-            if (player) { player.classList.add('anim-damage'); setTimeout(() => player.classList.remove('anim-damage'), 460); }
+            player?.classList.add('anim-damage');   setTimeout(() => player?.classList.remove('anim-damage'), 460);
             this._spawnFloatText('💔 -1 vida', '.battle-player-side', 'dmg');
         }
     },
@@ -260,37 +338,213 @@ const GameEngine = {
         setTimeout(() => el.remove(), 950);
     },
 
-    // ── CORE QUIZ LOGIC ──────────────────────────────────────────
+    // ── QUESTION RENDERING ───────────────────────────────────────
 
-    _loadQuestions(stageData) {
-        let questions = [];
-        if (stageData.questions && stageData.questions.length > 0) {
-            questions = stageData.questions.map(q => this._normalizeQuestion(q));
+    _loadQuestion() {
+        if (this.state.currentIndex >= this.state.questions.length) {
+            this._endGame(true);
+            return;
         }
-        if (questions.length === 0) {
-            const bank = window.QUESTIONS_BANK || [];
-            questions  = bank.map(q => this._normalizeQuestion(q));
+
+        this.state.pendingFeedback = false;
+        this.state.isPlaying       = true;
+        this.state.eliminatedIdx   = new Set();
+        this.state.hintShown       = false;
+        this.state.typingMode      = false;
+
+        const q         = this.state.questions[this.state.currentIndex];
+        const container = document.getElementById('question-container');
+        const letters   = ['A', 'B', 'C', 'D'];
+
+        this.state.timer = CONFIG.stages.timePerQuestion || 15;
+        this._updateTimerUI();
+        this._startTimer();
+
+        const pct = (this.state.currentIndex / this.state.questions.length) * 100;
+        document.getElementById('game-progress')?.style.setProperty('width', `${pct}%`);
+
+        this._updateLivesUI();
+
+        const isTF      = q.type === 'tf';
+        const isTyping  = q.type === 'typing';
+
+        // Question type badge
+        const typeBadge = isTF
+            ? `<span class="qtype-badge qtype-tf">V/F</span>`
+            : isTyping
+            ? `<span class="qtype-badge qtype-type">✍️ Digitação</span>`
+            : `<span class="qtype-badge qtype-mc">múltipla escolha</span>`;
+
+        // Options HTML
+        let optionsHTML = '';
+        if (isTyping) {
+            optionsHTML = `
+                <div class="typing-zone">
+                    <input class="typing-input" id="typing-input" type="text"
+                           placeholder="Digite sua resposta..."
+                           autocomplete="off" autocorrect="off" spellcheck="false"
+                           onkeydown="if(event.key==='Enter') GameEngine._submitTyping()">
+                    <button class="btn-primary" style="margin-top:10px"
+                            onclick="GameEngine._submitTyping()">✔ Confirmar</button>
+                </div>`;
+        } else if (isTF) {
+            optionsHTML = `
+                <div class="tf-grid">
+                    ${q.options.map((opt, idx) => `
+                        <button class="tf-btn" id="opt-${idx}" onclick="GameEngine.handleAnswer(${idx})">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>`;
+        } else {
+            optionsHTML = `
+                <div class="options-grid" id="options-grid">
+                    ${q.options.map((opt, idx) => `
+                        <button class="option-btn" id="opt-${idx}"
+                                onclick="GameEngine.handleAnswer(${idx})">
+                            <span class="option-letter">${letters[idx] || idx + 1}</span>
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>`;
         }
-        const shuffled = [...questions].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, CONFIG.stages.questionsPerGame || 10);
+
+        // Action buttons
+        const hintDisabled    = this.state.hintsLeft <= 0;
+        const elimDisabled    = this.state.eliminationsLeft <= 0 || isTF || isTyping;
+        const actionsHTML = `
+            <div class="question-actions">
+                <button class="qa-btn qa-hint ${hintDisabled ? 'qa-spent' : ''}"
+                        id="qa-hint-btn"
+                        onclick="GameEngine.useHint()"
+                        ${hintDisabled ? 'disabled' : ''}>
+                    💡 Dica${this.state.hintsLeft > 0 ? ` (${this.state.hintsLeft})` : ''}
+                </button>
+                <button class="qa-btn qa-elim ${elimDisabled ? 'qa-spent' : ''}"
+                        id="qa-elim-btn"
+                        onclick="GameEngine.eliminate()"
+                        ${elimDisabled ? 'disabled' : ''}>
+                    ❌ Eliminar${this.state.eliminationsLeft > 0 ? ` (${this.state.eliminationsLeft})` : ''}
+                </button>
+            </div>`;
+
+        container.innerHTML = `
+            <div class="question-counter">
+                Questão ${this.state.currentIndex + 1} / ${this.state.questions.length}
+                ${typeBadge}
+            </div>
+            <div class="question-card">
+                <div class="question-text">${q.question.replace(/\n/g, '<br>')}</div>
+            </div>
+            ${optionsHTML}
+            ${actionsHTML}
+            <div class="hint-reveal" id="hint-reveal"></div>`;
+
+        // Focus typing input
+        if (isTyping) setTimeout(() => document.getElementById('typing-input')?.focus(), 100);
     },
 
-    _normalizeQuestion(q) {
-        if (Array.isArray(q.options) && typeof q.options[0] === 'object') {
-            return {
-                question:     q.prompt || q.question || 'Questão',
-                options:      q.options.map(o => o.text || String(o)),
-                correctIndex: q.options.findIndex(o => o.correct === true),
-                explanation:  q.explanation || ''
-            };
+    // ── HINT ─────────────────────────────────────────────────────
+
+    useHint() {
+        if (this.state.hintsLeft <= 0 || this.state.hintShown || this.state.pendingFeedback) return;
+
+        const q          = this.state.questions[this.state.currentIndex];
+        const hintText   = q.explanation
+            ? q.explanation.split('.')[0] + '.'
+            : 'Pense na relação entre os conceitos do estágio.';
+
+        this.state.hintsLeft--;
+        this.state.hintShown = true;
+        this.state.combo     = Math.max(0, this.state.combo - 1); // penaliza combo
+
+        const hintEl = document.getElementById('hint-reveal');
+        if (hintEl) {
+            hintEl.innerHTML = `<div class="hint-bubble">💡 ${hintText}</div>`;
         }
-        return {
-            question:     q.question || q.prompt || 'Questão',
-            options:      q.options || [],
-            correctIndex: typeof q.correct === 'number' ? q.correct : (q.correctIndex || 0),
-            explanation:  q.explanation || ''
-        };
+        const btn = document.getElementById('qa-hint-btn');
+        if (btn) {
+            btn.textContent = this.state.hintsLeft > 0 ? `💡 Dica (${this.state.hintsLeft})` : '💡 Sem dicas';
+            if (this.state.hintsLeft <= 0) { btn.disabled = true; btn.classList.add('qa-spent'); }
+        }
+        this._removeCombo();
+        if (typeof SoundManager !== 'undefined') SoundManager.play('click');
     },
+
+    // ── ELIMINATE ────────────────────────────────────────────────
+
+    eliminate() {
+        if (this.state.eliminationsLeft <= 0 || this.state.pendingFeedback) return;
+
+        const q       = this.state.questions[this.state.currentIndex];
+        const wrong   = q.options
+            .map((_, i) => i)
+            .filter(i => i !== q.correctIndex && !this.state.eliminatedIdx.has(i));
+
+        if (wrong.length === 0) return;
+
+        const toRemove = wrong[Math.floor(Math.random() * wrong.length)];
+        this.state.eliminatedIdx.add(toRemove);
+        this.state.eliminationsLeft = 0;
+
+        const btn = document.getElementById(`opt-${toRemove}`);
+        if (btn) {
+            btn.classList.add('eliminated');
+            btn.disabled = true;
+        }
+        const elimBtn = document.getElementById('qa-elim-btn');
+        if (elimBtn) { elimBtn.textContent = '❌ Usado'; elimBtn.disabled = true; elimBtn.classList.add('qa-spent'); }
+
+        if (typeof SoundManager !== 'undefined') SoundManager.play('click');
+    },
+
+    // ── TYPING SUBMISSION ────────────────────────────────────────
+
+    _submitTyping() {
+        if (this.state.pendingFeedback) return;
+        const input = document.getElementById('typing-input');
+        if (!input) return;
+
+        const answer  = input.value.trim();
+        const q       = this.state.questions[this.state.currentIndex];
+        const correct = q.options[q.correctIndex] || '';
+
+        const sim = this._stringSimilarity(answer, correct);
+        const idx = sim >= 0.55 ? q.correctIndex : -99;
+        this.handleAnswer(idx, answer);
+    },
+
+    _stringSimilarity(a, b) {
+        const norm = s => s.toLowerCase()
+            .normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .replace(/[^a-z0-9\s]/g, '').trim();
+        const s1 = norm(a), s2 = norm(b);
+        if (!s1 || !s2) return 0;
+        if (s1 === s2)   return 1;
+        if (s1.includes(s2) || s2.includes(s1)) return 0.85;
+
+        const words1 = s1.split(/\s+/);
+        const words2 = s2.split(/\s+/);
+        const matched = words1.filter(w =>
+            words2.some(w2 => w === w2 || this._levenshtein(w, w2) <= 2)
+        ).length;
+        return matched / Math.max(words1.length, words2.length);
+    },
+
+    _levenshtein(a, b) {
+        const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+        for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+        for (let i = 1; i <= a.length; i++) {
+            for (let j = 1; j <= b.length; j++) {
+                dp[i][j] = a[i-1] === b[j-1]
+                    ? dp[i-1][j-1]
+                    : Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1;
+            }
+        }
+        return dp[a.length][b.length];
+    },
+
+    // ── TIMER ────────────────────────────────────────────────────
 
     _startTimer() {
         clearInterval(this.state.timerInterval);
@@ -307,7 +561,7 @@ const GameEngine = {
         }, 1000);
     },
 
-    _stopTimer() { clearInterval(this.state.timerInterval); },
+    _stopTimer()  { clearInterval(this.state.timerInterval); },
 
     _updateTimerUI() {
         const el = document.getElementById('game-timer');
@@ -316,54 +570,18 @@ const GameEngine = {
         el.classList.toggle('urgent', this.state.timer <= 5);
     },
 
-    _loadQuestion() {
-        if (this.state.currentIndex >= this.state.questions.length) {
-            this._endGame(true);
-            return;
-        }
-
-        this.state.pendingFeedback = false;
-        this.state.isPlaying       = true;
-
-        const q         = this.state.questions[this.state.currentIndex];
-        const container = document.getElementById('question-container');
-        const letters   = ['A', 'B', 'C', 'D'];
-
-        this.state.timer = CONFIG.stages.timePerQuestion || 15;
-        this._updateTimerUI();
-        this._startTimer();
-
-        const pct = (this.state.currentIndex / this.state.questions.length) * 100;
-        const progressEl = document.getElementById('game-progress');
-        if (progressEl) progressEl.style.width = `${pct}%`;
-
-        this._updateLivesUI();
-
-        container.innerHTML = `
-            <div class="question-counter">Questão ${this.state.currentIndex + 1} / ${this.state.questions.length}</div>
-            <div class="question-card">
-                <div class="question-text">${q.question}</div>
-            </div>
-            <div class="options-grid" id="options-grid">
-                ${q.options.map((opt, idx) => `
-                    <button class="option-btn" id="opt-${idx}" onclick="GameEngine.handleAnswer(${idx})">
-                        <span class="option-letter">${letters[idx] || (idx + 1)}</span>
-                        ${opt}
-                    </button>
-                `).join('')}
-            </div>`;
-    },
-
     _updateLivesUI() {
         this._updatePlayerHP();
-        const el = document.getElementById('game-lives');
+        const el  = document.getElementById('game-lives');
         if (!el) return;
         const max = CONFIG.lives.gameHearts || 3;
         el.innerHTML = '❤️'.repeat(Math.max(0, this.state.lives)) +
                        '🖤'.repeat(Math.max(0, max - this.state.lives));
     },
 
-    handleAnswer(selectedIndex) {
+    // ── ANSWER HANDLING ──────────────────────────────────────────
+
+    handleAnswer(selectedIndex, typedValue) {
         if (!this.state.isPlaying || this.state.pendingFeedback) return;
 
         this._stopTimer();
@@ -372,62 +590,61 @@ const GameEngine = {
 
         const q         = this.state.questions[this.state.currentIndex];
         const isCorrect = selectedIndex === q.correctIndex;
-        const buttons   = document.querySelectorAll('.option-btn');
-        buttons.forEach(btn => btn.disabled = true);
+
+        // Disable all option buttons
+        document.querySelectorAll('.option-btn, .tf-btn').forEach(b => b.disabled = true);
+        document.getElementById('qa-hint-btn')?.setAttribute('disabled', true);
+        document.getElementById('qa-elim-btn')?.setAttribute('disabled', true);
 
         if (isCorrect) {
             this.state.combo++;
-            const timeBonusMax = CONFIG.xp.timeBonusMax || 75;
-            const comboBonus   = (CONFIG.xp.comboBonus || 0) * this.state.combo;
-            const timeBonus    = Math.floor((this.state.timer / 15) * timeBonusMax);
-            const points       = (CONFIG.xp.correct || 10) + comboBonus + timeBonus;
-            this.state.score  += points;
+            const comboBonus = (CONFIG.xp.comboBonus || 0) * this.state.combo;
+            const timeBonus  = Math.floor((this.state.timer / 15) * (CONFIG.xp.timeBonusMax || 75));
+            const points     = (CONFIG.xp.correct || 10) + comboBonus + timeBonus;
+            this.state.score += points;
 
-            const hpDrop = 100 / this.state.questions.length;
-            this.state.enemyHP = Math.max(0, this.state.enemyHP - hpDrop);
+            this.state.enemyHP = Math.max(0, this.state.enemyHP - 100 / this.state.questions.length);
             this._updateEnemyHP();
 
             const btn = document.getElementById(`opt-${selectedIndex}`);
-            if (btn) {
-                btn.classList.add('correct');
-                this._showXPFloat(points, btn);
-            }
+            if (btn) { btn.classList.add('correct'); this._showXPFloat(points, btn); }
+
             if (typeof SoundManager !== 'undefined') SoundManager.play('correct');
             this._showBattleEffect(true);
             this._updateCombo();
-            this._showFeedback(true, q.explanation, points);
+            this._showFeedback(true, q.explanation, points, typedValue);
         } else {
             this.state.combo = 0;
             this._removeCombo();
             this.state.lives--;
             this._updateLivesUI();
 
-            if (selectedIndex !== -1) {
-                const wrongBtn = document.getElementById(`opt-${selectedIndex}`);
-                if (wrongBtn) wrongBtn.classList.add('wrong');
+            if (selectedIndex !== -1 && selectedIndex !== -99) {
+                document.getElementById(`opt-${selectedIndex}`)?.classList.add('wrong');
             }
-            const correctBtn = document.getElementById(`opt-${q.correctIndex}`);
-            if (correctBtn) correctBtn.classList.add('correct');
+            document.getElementById(`opt-${q.correctIndex}`)?.classList.add('correct');
 
             if (typeof SoundManager !== 'undefined') SoundManager.play('wrong');
             this._showBattleEffect(false);
-            this._showFeedback(false, q.explanation, 0);
+            this._showFeedback(false, q.explanation, 0, typedValue);
 
             const arena = document.getElementById('game-arena');
-            if (arena) {
-                arena.classList.add('shake');
-                setTimeout(() => arena.classList.remove('shake'), 500);
-            }
+            if (arena) { arena.classList.add('shake'); setTimeout(() => arena.classList.remove('shake'), 500); }
             if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
         }
     },
 
-    _showFeedback(isCorrect, explanation, points) {
+    // ── FEEDBACK ─────────────────────────────────────────────────
+
+    _showFeedback(isCorrect, explanation, points, typedValue) {
         const overlay = document.getElementById('feedback-overlay');
         if (!overlay) { this._nextQuestion(isCorrect); return; }
 
         const icon  = isCorrect ? '✅' : '❌';
         const label = isCorrect ? `Correto! +${points} pts` : 'Incorreto!';
+        const typingNote = typedValue && !isCorrect
+            ? `<div class="feedback-typed">Você digitou: "${typedValue}"</div>`
+            : '';
 
         overlay.className = `feedback-overlay show ${isCorrect ? 'success-fb' : 'error-fb'}`;
         overlay.innerHTML = `
@@ -435,6 +652,7 @@ const GameEngine = {
             <div class="feedback-body feedback-${isCorrect ? 'success' : 'error'}">
                 <div class="feedback-label">${label}</div>
                 ${explanation ? `<div class="feedback-explanation">${explanation}</div>` : ''}
+                ${typingNote}
             </div>
             <button class="feedback-continue" onclick="GameEngine._dismissFeedback()">
                 ${this.state.lives <= 0 ? 'Ver resultado' : 'Continuar'}
@@ -449,18 +667,22 @@ const GameEngine = {
         this._loadQuestion();
     },
 
+    _nextQuestion(isCorrect) {
+        if (!isCorrect && this.state.lives <= 0) { setTimeout(() => this._endGame(false), 1200); return; }
+        setTimeout(() => { this.state.currentIndex++; this._loadQuestion(); }, isCorrect ? 800 : 1500);
+    },
+
+    // ── XP FLOAT + COMBO ─────────────────────────────────────────
+
     _showXPFloat(points, anchorEl) {
-        const float       = document.createElement('div');
+        const float = document.createElement('div');
         float.className   = 'xp-float';
         float.textContent = `+${points} ⚡`;
         if (anchorEl) {
             const r = anchorEl.getBoundingClientRect();
             float.style.left = `${r.left + r.width / 2 - 30}px`;
             float.style.top  = `${r.top - 10}px`;
-        } else {
-            float.style.left = '50%';
-            float.style.top  = '40%';
-        }
+        } else { float.style.left = '50%'; float.style.top = '40%'; }
         document.body.appendChild(float);
         setTimeout(() => float.remove(), 1300);
     },
@@ -470,9 +692,8 @@ const GameEngine = {
         if (this.state.combo < 2) return;
         const zone = document.getElementById('battle-combo');
         if (zone) zone.textContent = `🔥 ${this.state.combo}x Combo!`;
-        const badge       = document.createElement('div');
-        badge.className   = 'combo-badge';
-        badge.id          = 'combo-badge';
+        const badge = document.createElement('div');
+        badge.className = 'combo-badge'; badge.id = 'combo-badge';
         badge.textContent = `🔥 ${this.state.combo}x Combo!`;
         document.body.appendChild(badge);
     },
@@ -483,36 +704,20 @@ const GameEngine = {
         if (zone) zone.textContent = '';
     },
 
-    _nextQuestion(isCorrect) {
-        if (!isCorrect && this.state.lives <= 0) {
-            setTimeout(() => this._endGame(false), 1200);
-            return;
-        }
-        setTimeout(() => {
-            this.state.currentIndex++;
-            this._loadQuestion();
-        }, isCorrect ? 800 : 1500);
-    },
+    // ── END GAME ─────────────────────────────────────────────────
 
     _endGame(victory) {
         this._stopTimer();
-
-        const stars = victory
-            ? (this.state.lives === 3 ? 3 : this.state.lives === 2 ? 2 : 1)
-            : 0;
+        const stars = victory ? (this.state.lives === 3 ? 3 : this.state.lives === 2 ? 2 : 1) : 0;
 
         if (victory) {
             State.completeStage(this.state.chapterId, this.state.stageIndex, stars);
             const xpGain  = this.state.score + (CONFIG.xp.stageComplete || 0);
             const gemGain = (CONFIG.gems.stageComplete || 0) + (stars === 3 ? (CONFIG.gems.perfect || 0) : 0);
-            State.addXP(xpGain);
-            State.addGems(gemGain);
+            State.addXP(xpGain); State.addGems(gemGain);
         }
 
-        const starsDisplay = victory
-            ? (['⭐', '⭐⭐', '⭐⭐⭐'][stars - 1] || '')
-            : '💀';
-
+        const starsDisplay = victory ? (['⭐', '⭐⭐', '⭐⭐⭐'][stars - 1] || '') : '💀';
         const app = document.getElementById('app-container');
         app.innerHTML = `
             <div class="result-screen">
@@ -521,9 +726,7 @@ const GameEngine = {
                     ${victory ? 'MISSÃO CUMPRIDA!' : 'GAME OVER'}
                 </h1>
                 <p class="result-subtitle">
-                    ${victory
-                        ? 'Você foi incrível, herói!'
-                        : 'Não desista! Cada erro é um aprendizado.'}
+                    ${victory ? 'Você foi incrível, herói!' : 'Não desista! Cada erro é um aprendizado.'}
                 </p>
                 ${victory ? `<div class="result-stars">${starsDisplay}</div>` : ''}
                 <div class="result-stats">
@@ -542,9 +745,11 @@ const GameEngine = {
                     </div>` : ''}
                 </div>
                 <div class="result-actions">
-                    <button class="btn-primary"
-                            onclick="Router.navigate('#chapter/${this.state.chapterId}')">
+                    <button class="btn-primary" onclick="Router.navigate('#chapter/${this.state.chapterId}')">
                         🗺️ Voltar ao Mapa
+                    </button>
+                    <button class="btn-secondary" onclick="Router.navigate('#adventure/${this.state.chapterId}')">
+                        🗺️ Modo Aventura
                     </button>
                     ${!victory ? `
                     <button class="btn-secondary"
@@ -558,7 +763,6 @@ const GameEngine = {
             if (typeof SoundManager !== 'undefined') SoundManager.play('complete');
             if (typeof Utils !== 'undefined') Utils.confetti();
         }
-
         this._removeCombo();
         document.getElementById('top-hud')?.classList.remove('hidden');
         document.getElementById('bottom-nav')?.classList.remove('hidden');

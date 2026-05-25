@@ -33,10 +33,11 @@ const Router = {
             if (!State.isOnboarded())     { this.navigate('#onboarding/1'); return; }
         }
 
-        const isGame = route === 'stage';
-        const isAuth = publicRoutes.includes(route);
-        if (hudEl) hudEl.classList.toggle('hidden', isGame || isAuth);
-        if (navEl) navEl.classList.toggle('hidden', isGame || isAuth);
+        const isGame      = route === 'stage';
+        const isAdventure = route === 'adventure';
+        const isAuth      = publicRoutes.includes(route);
+        if (hudEl) hudEl.classList.toggle('hidden', isGame || isAdventure || isAuth);
+        if (navEl) navEl.classList.toggle('hidden', isGame || isAdventure || isAuth);
 
         container.innerHTML = '';
         if (!isAuth && !isGame) this._updateNavActive(route);
@@ -51,7 +52,8 @@ const Router = {
             case 'stage':      this.renderStagePrep(container, parts[1], parts[2]);      break;
             case 'profile':    this.renderProfile(container);   break;
             case 'shop':       this.renderShop(container);      break;
-            case 'missions':   this.renderMissions(container);  break;
+            case 'missions':   this.renderMissions(container);           break;
+            case 'adventure':  AdventureMap.start(parts[1]);            break;
             default:           this.renderHome(container);
         }
     },
@@ -484,6 +486,11 @@ const Router = {
                 <div class="chapter-map-title">${meta.title}</div>
                 <div class="chapter-map-desc">${meta.description || ''}</div>
             </div>
+
+            <button class="btn-secondary" style="margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px"
+                onclick="Router.navigate('#adventure/${chapterId}')">
+                🗺️ Modo Aventura
+            </button>
 
             <div class="adventure-path">
                 ${pathHTML}
