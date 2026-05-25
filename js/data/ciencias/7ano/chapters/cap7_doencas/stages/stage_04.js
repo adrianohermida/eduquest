@@ -1,6 +1,4 @@
 const STAGE_04 = {
-window.STAGE_04 = STAGE_04;
-const STAGE_04 = {
 
   id: 'stage_04',
 
