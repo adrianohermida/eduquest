@@ -1,5 +1,6 @@
 /**
- * METADATA DO CAPÍTULO 7: DOENÇAS E VÍRUS
+ * METADATA - DADOS DO CAPÍTULO
+ * Sem exports, apenas variável global
  */
 
 const CHAPTER_METADATA = {
@@ -7,18 +8,17 @@ const CHAPTER_METADATA = {
     title: 'Doenças e Vírus',
     subject: 'ciencias',
     grade: '7ano',
-    description: 'Uma jornada perigosa pelo mundo dos microrganismos.',
+    description: 'Explore o mundo microscópico e descubra como vencer vírus e bactérias.',
     totalStages: 5,
     icon: '🦠',
-    color: '#f97316'
+    color: '#f97316',
+    difficulty: 'Médio',
+    estimatedTime: '45 min'
 };
 
-// Registro automático seguro
-if (typeof window !== 'undefined') {
-    window.CHAPTER_METADATA = CHAPTER_METADATA;
-    
-    // Se o DataLoader existir (injetado pelo app), registra aqui
-    if (window.DataLoader && typeof window.DataLoader.registerChapter === 'function') {
-        window.DataLoader.registerChapter('cap7_doencas', { metadata: CHAPTER_METADATA });
-    }
+// Registro automático no loader global (se existir)
+if (typeof window.DataLoader !== 'undefined') {
+    window.DataLoader.registerChapter('cap7_doencas', {
+        metadata: CHAPTER_METADATA
+    });
 }

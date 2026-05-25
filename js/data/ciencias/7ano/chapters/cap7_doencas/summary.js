@@ -1,50 +1,24 @@
 /**
- * RESUMOS DO CAPÍTULO 7
+ * SUMMARIES - RESUMOS DO CAPÍTULO
  */
 
 const CHAPTER_SUMMARIES = {
-    stage1: {
-        title: "Introdução aos Vírus",
-        content: "Vírus são parasitas intracelulares obrigatórios. Eles precisam de uma célula viva para se reproduzir.",
-        flashcards: [
-            { q: "O que é um vírus?", a: "Parasita intracelular obrigatório" },
-            { q: "Vírus são seres vivos?", a: "Discutível, mas agem como parasitas" }
-        ]
+    intro: "Neste capítulo, você aprenderá sobre a diferença entre vírus e bactérias, como as vacinas funcionam e as principais doenças que afetaram a humanidade.",
+    stages: {
+        1: "Introdução aos microrganismos: O que são vírus e bactérias?",
+        2: "O Sistema Imunológico: As defesas do nosso corpo.",
+        3: "Vacinas e Sororos: Prevenção e tratamento.",
+        4: "Epidemias e Pandemias: História e prevenção.",
+        5: "Simulado Final: Teste seus conhecimentos!"
     },
-    stage2: {
-        title: "Bactérias e Doenças",
-        content: "Bactérias são unicelulares e podem ser úteis ou prejudiciais. Antibióticos matam bactérias, não vírus.",
-        flashcards: [
-            { q: "Antibiótico mata vírus?", a: "NÃO! Apenas bactérias." }
-        ]
-    },
-    stage3: {
-        title: "Vacinas e Soros",
-        content: "Vacinas previnem (ensinam o corpo). Soros curam (atacam diretamente a toxina).",
-        flashcards: [
-            { q: "Picada de cobra usa?", a: "Soro antiofídico" },
-            { q: "Gripe usa?", a: "Vacina (prevenção)" }
-        ]
-    },
-    stage4: {
-        title: "Epidemias e Pandemias",
-        content: "Epidemia: surto local. Pandemia: espalhamento mundial. Endemia: constante em uma região.",
-        flashcards: [
-            { q: "COVID-19 foi o quê?", a: "Pandemia" }
-        ]
-    },
-    stage5: {
-        title: "Simulado Final",
-        content: "Hora de testar todo o conhecimento adquirido nesta aventura!",
-        flashcards: []
-    }
+    keyConcepts: [
+        "Vírus são parasitas intracelulares obrigatórios",
+        "Bactérias são seres unicelulares procariontes",
+        "Vacinas estimulam a memória imunológica",
+        "Higiene e saneamento previnem doenças"
+    ]
 };
 
-if (typeof window !== 'undefined') {
-    window.CHAPTER_SUMMARIES = CHAPTER_SUMMARIES;
-    
-    // Se o DataLoader existir (injetado pelo app), registra aqui
-    if (window.DataLoader && typeof window.DataLoader.registerChapter === 'function') {
-        window.DataLoader.registerChapter('cap7_doencas', { summaries: CHAPTER_SUMMARIES });
-    }
+if (typeof window.DataLoader !== 'undefined') {
+    window.DataLoader.registerSummary('cap7_doencas', CHAPTER_SUMMARIES);
 }

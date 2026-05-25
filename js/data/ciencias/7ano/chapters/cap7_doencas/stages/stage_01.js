@@ -372,10 +372,8 @@ const STAGE_01 = {
 },
 
 if (typeof window !== 'undefined') {
-    window.STAGE_01 = STAGE_01; // Mude o número conforme o arquivo (STAGE_02, STAGE_03...)
-    
-    // Registro opcional no DataLoader se existir
-    if (window.DataLoader) {
-        window.DataLoader.registerStage('cap7_doencas', 1, STAGE_01);
-    }
+  window.STAGE_01 = STAGE_01;
+  if (window.DataLoader) {
+    window.DataLoader.registerStage('cap7_doencas', 1, STAGE_01);
+  }
 }
