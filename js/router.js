@@ -47,11 +47,19 @@ const Router = {
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        if (hudEl) hudEl.classList.toggle('hidden', isGame || isAdventure || isAuth);
-        if (navEl) navEl.classList.toggle('hidden', isGame || isAdventure || isAuth);
+        const isFullscreen = isGame || isAdventure || isAuth;
+
+        // Layout mode: full-screen (auth/game) vs app (normal)
+        document.body.dataset.layout = isFullscreen ? 'full' : 'app';
+
+        if (hudEl) hudEl.classList.toggle('hidden', isFullscreen);
+        if (navEl) navEl.classList.toggle('hidden', isFullscreen);
+
+        // Close mobile drawer when navigating
+        if (typeof Sidebar !== 'undefined' && window.innerWidth < 768) Sidebar.close();
 
         container.innerHTML = '';
-        if (!isAuth && !isGame) this._updateNavActive(route);
+        if (!isFullscreen) this._updateNavActive(route);
 
         switch (route) {
             case 'landing':         this.renderLanding(container);                        break;
@@ -71,14 +79,23 @@ const Router = {
             case 'teams':      this.renderTeams(container, parts[1]);   break;
             default:           this.renderHome(container);
         }
+
+        // Refresh right panel content after each app-route render
+        if (!isFullscreen && typeof Sidebar !== 'undefined') {
+            setTimeout(() => Sidebar.refreshRightPanel(), 0);
+        }
     },
 
     _updateNavActive(route) {
-        document.querySelectorAll('.nav-tab').forEach(tab => {
+        // Update both bottom nav tabs AND sidebar items
+        document.querySelectorAll('.nav-tab, .sidebar-item').forEach(tab => {
             const isActive = tab.dataset.route === route ||
                              (route === '' && tab.dataset.route === 'home');
             tab.classList.toggle('active', isActive);
+            tab.setAttribute('aria-current', isActive ? 'page' : 'false');
         });
+        // Sync sidebar user info in case name/level changed
+        if (typeof Sidebar !== 'undefined') Sidebar.updateUser();
     },
 
     // ── LANDING PAGE ─────────────────────────────────────

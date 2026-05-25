@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     State.init();
     if (typeof SoundManager !== 'undefined') SoundManager.init();
+    if (typeof Sidebar !== 'undefined') Sidebar.init();
     Router.init();
     Router.handleRoute();
 

@@ -12,52 +12,85 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/layout.css">
 </head>
-<body>
+<body data-layout="app">
+
+    <!-- Skip navigation (accessibility) -->
+    <a class="skip-nav" href="#app-container">Pular para o conteúdo</a>
+
+    <!-- Sidebar overlay (mobile/tablet drawer backdrop) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" role="presentation" aria-hidden="true"></div>
+
+    <!-- Sidebar (populated by Sidebar.init()) -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal"></aside>
+
     <!-- HUD Superior -->
-    <header class="top-hud" id="top-hud">
+    <header class="top-hud" id="top-hud" role="banner">
         <div class="hud-left">
-            <button id="hud-avatar-btn" class="hud-avatar-btn" onclick="Router.navigate('#profile')" title="Perfil">🦸</button>
-            <span class="hud-level-chip" id="hud-level">Nv.1</span>
+            <button
+                class="hud-menu-btn"
+                id="hud-menu-btn"
+                onclick="Sidebar.toggle()"
+                aria-label="Abrir menu de navegação"
+                aria-controls="sidebar"
+                aria-expanded="false"
+            >☰</button>
+            <button
+                id="hud-avatar-btn"
+                class="hud-avatar-btn"
+                onclick="Router.navigate('#profile')"
+                aria-label="Ver perfil"
+                title="Meu Perfil"
+            >🦸</button>
+            <span class="hud-level-chip" id="hud-level" aria-label="Nível atual">Nv.1</span>
         </div>
-        <div class="hud-stats">
-            <div class="hud-chip streak-chip">🔥<span id="hud-streak">1</span></div>
-            <div class="hud-chip gem-chip">💎<span id="hud-gems">0</span></div>
-            <div class="hud-chip xp-chip">⚡<span id="hud-xp">0</span></div>
-            <div class="hud-chip heart-chip">❤️<span id="hud-hearts">5</span></div>
-            <button id="mute-btn" class="hud-mute-btn" onclick="SoundManager.toggle()">🔊</button>
+        <div class="hud-stats" role="status" aria-label="Estatísticas do jogador">
+            <div class="hud-chip streak-chip" aria-label="Sequência de dias">🔥<span id="hud-streak">1</span></div>
+            <div class="hud-chip gem-chip"    aria-label="Gemas">💎<span id="hud-gems">0</span></div>
+            <div class="hud-chip xp-chip"     aria-label="XP total">⚡<span id="hud-xp">0</span></div>
+            <div class="hud-chip heart-chip"  aria-label="Vidas">❤️<span id="hud-hearts">5</span></div>
+            <button
+                id="mute-btn"
+                class="hud-mute-btn"
+                onclick="SoundManager.toggle()"
+                aria-label="Alternar som"
+                title="Som"
+            >🔊</button>
         </div>
     </header>
 
-    <!-- Container Principal -->
-    <main id="app-container" class="app-container"></main>
+    <!-- Main content -->
+    <main id="app-container" class="app-container" role="main" tabindex="-1" aria-live="polite" aria-atomic="true"></main>
 
-    <!-- Navegação Inferior -->
-    <nav class="bottom-nav" id="bottom-nav">
-        <a href="#home" class="nav-tab" data-route="home">
-            <div class="nav-tab-icon">🗺️</div>
+    <!-- Right Panel (desktop only, populated by Sidebar.init()) -->
+    <aside class="right-panel" id="right-panel" role="complementary" aria-label="Painel de progresso"></aside>
+
+    <!-- Bottom Navigation (mobile only) -->
+    <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Navegação principal">
+        <a href="#home" class="nav-tab" data-route="home" aria-label="Início">
+            <div class="nav-tab-icon" aria-hidden="true">🗺️</div>
             <span class="nav-tab-label">Início</span>
         </a>
-        <a href="#missions" class="nav-tab" data-route="missions">
-            <div class="nav-tab-icon">⚔️</div>
+        <a href="#missions" class="nav-tab" data-route="missions" aria-label="Missões">
+            <div class="nav-tab-icon" aria-hidden="true">⚔️</div>
             <span class="nav-tab-label">Missões</span>
         </a>
-        <a href="#ranking" class="nav-tab" data-route="ranking">
-            <div class="nav-tab-icon">🏆</div>
+        <a href="#ranking" class="nav-tab" data-route="ranking" aria-label="Ranking">
+            <div class="nav-tab-icon" aria-hidden="true">🏆</div>
             <span class="nav-tab-label">Ranking</span>
         </a>
-        <a href="#profile" class="nav-tab" data-route="profile">
-            <div class="nav-tab-icon">🦸</div>
+        <a href="#profile" class="nav-tab" data-route="profile" aria-label="Perfil">
+            <div class="nav-tab-icon" aria-hidden="true">🦸</div>
             <span class="nav-tab-label">Perfil</span>
         </a>
-        <a href="#shop" class="nav-tab" data-route="shop">
-            <div class="nav-tab-icon">🛒</div>
+        <a href="#shop" class="nav-tab" data-route="shop" aria-label="Loja">
+            <div class="nav-tab-icon" aria-hidden="true">🛒</div>
             <span class="nav-tab-label">Loja</span>
         </a>
     </nav>
 
     <!-- Scripts na ordem correta -->
-    <!-- Supabase JS (UMD — expõe window.supabase) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/sound-manager.js"></script>
@@ -83,6 +116,7 @@
     <script src="js/mini-games/memory-game.js"></script>
     <script src="js/mini-games/forca.js"></script>
     <script src="js/adventure-map.js"></script>
+    <script src="js/sidebar.js"></script>
     <script src="js/router.js"></script>
     <script src="js/app.js"></script>
 </body>
