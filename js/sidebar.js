@@ -13,7 +13,7 @@ const Sidebar = {
         { icon: 'sword',    label: 'Arena',   route: 'arena',    hash: '#arena',    soon: true },
         { icon: 'trophy',   label: 'Ranking', route: 'ranking',  hash: '#ranking'   },
         { icon: 'shop',     label: 'Loja',    route: 'shop',     hash: '#shop'      },
-        { icon: 'guild',    label: 'Turmas',  route: 'teams',    hash: '#teams'     },
+        { icon: 'guild',    label: 'Guild',   route: 'guild',    hash: '#guild'     },
         { icon: 'avatar',   label: 'Perfil',  route: 'profile',  hash: '#profile'   },
     ],
 
@@ -767,6 +767,20 @@ const HUD = {
             notifs.push({ icon: _ic('xp',{size:'sm',color:'xp'}), text: `${pendingMissions.length} missão(ões) diária(s) disponível(is)!`, time: 'Hoje', unread: true, href: '#missions' });
         }
         notifs.push({ icon: _ic('boss',{size:'sm',color:'rpg'}), text: 'Boss da semana chegando em breve!', time: 'Esta semana', unread: false, href: '#home' });
+
+        // Social notifications from SocialEngine
+        if (typeof SocialEngine !== 'undefined') {
+            const socialNotifs = SocialEngine.getSocialNotifications();
+            for (const sn of socialNotifs) {
+                notifs.push({
+                    icon:   _ic(sn.icon, {size:'sm', color: sn.color}),
+                    text:   sn.text,
+                    time:   sn.time,
+                    unread: sn.unread,
+                    href:   sn.href,
+                });
+            }
+        }
 
         return notifs;
     },

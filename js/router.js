@@ -77,6 +77,7 @@ const Router = {
             case 'adventure':  AdventureMap.start(parts[1]);            break;
             case 'ranking':       this.renderRanking(container);           break;
             case 'teams':         this.renderTeams(container, parts[1]);   break;
+            case 'guild':         this.renderGuild(container);              break;
             case 'achievements':  this.renderAchievements(container);       break;
             case 'word-search':   this.renderWordSearch(container, parts[1], parts[2]); break;
             default:              this.renderHome(container);
@@ -821,8 +822,12 @@ const Router = {
         const missions  = State.getMissions();
         const calendar  = State.getStreakCalendar();
         const companion = State.getCompanionMessage();
-        const avatarCls = State.getAvatarClass();
-        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const avatarCls   = State.getAvatarClass();
+        const _ic         = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const _social     = typeof SocialEngine !== 'undefined';
+        const liveCount   = _social ? SocialEngine.getLiveCount() : 0;
+        const activityFeed= _social ? SocialEngine.getActivityFeed(5) : [];
+        const userGuild   = _social ? SocialEngine.getUserGuild() : null;
 
         const clsColor = { guerreiro: 'rpg', mago: 'science', ninja: 'final', cientista: 'science' };
         const avatarColor = clsColor[avatarCls] || 'xp';
@@ -935,12 +940,40 @@ const Router = {
             </div>
             <div class="daily-missions-list">${missionsHTML}</div>
 
+            <!-- Live Presence -->
+            ${liveCount ? `
+            <div class="live-presence-bar">
+                <span class="live-dot"></span>
+                <span class="live-count">${liveCount}</span>
+                <span class="live-label">estudantes estudando agora</span>
+                <span class="live-sep"></span>
+                <a class="live-link" href="#ranking" onclick="event.preventDefault();Router.navigate('#ranking')">Ver ranking ›</a>
+            </div>` : ''}
+
             <!-- Chapters -->
             <div class="section-header mt-4">
                 <span class="section-title">${_ic('scroll',{size:'sm'})} Matérias</span>
                 <span class="section-link" onclick="Router.navigate('#missions')" style="cursor:pointer">Ver todas ›</span>
             </div>
             ${chaptersHTML}
+
+            <!-- Social Feed -->
+            ${activityFeed.length ? `
+            <div class="section-header mt-4">
+                <span class="section-title">${_ic('friends',{size:'sm'})} Atividade Recente</span>
+                <span class="section-link" onclick="Router.navigate('#guild')" style="cursor:pointer">${userGuild ? userGuild.name : 'Ver Guildas'} ›</span>
+            </div>
+            <div class="social-feed-list">
+                ${activityFeed.map(a => `
+                <div class="social-feed-item">
+                    <span class="sfi-avatar">${a.avatar}</span>
+                    <div class="sfi-body">
+                        <div class="sfi-text">${a.text}</div>
+                        <div class="sfi-time">${a.timeStr}</div>
+                    </div>
+                    <span class="sfi-icon">${_ic(a.icon,{size:'xs',color:a.color})}</span>
+                </div>`).join('')}
+            </div>` : ''}
 
         </div>`;
     },
@@ -1656,6 +1689,147 @@ const Router = {
             onConfirm:   async () => {
                 await SupaDB.deleteTeam(teamId);
                 this.navigate('#teams');
+            },
+        });
+    },
+
+    // ── GUILD ────────────────────────────────────────────
+    renderGuild(container) {
+        const _ic   = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const SE    = typeof SocialEngine !== 'undefined' ? SocialEngine : null;
+        if (!SE) {
+            container.innerHTML = `<div class="screen"><p style="padding:40px;text-align:center;color:var(--text-muted)">Sistema social carregando...</p></div>`;
+            return;
+        }
+
+        const myGuild = SE.getUserGuild();
+
+        if (myGuild) {
+            this._renderGuildHome(container, myGuild, SE, _ic);
+        } else {
+            this._renderGuildJoin(container, SE, _ic);
+        }
+    },
+
+    _renderGuildHome(container, guild, SE, _ic) {
+        const user  = State.data.user;
+        const feed  = SE.getGuildFeed(guild.id, 6);
+        const lb    = SE.getGuildLeaderboard(guild.id);
+        const preset= SE.GUILD_PRESETS.find(g => g.id === guild.id);
+
+        const myEntry = {
+            name: user.name || 'Você', avatar: user.avatar || '🦸',
+            level: user.level || 1, xp: user.xp || 0, streak: user.streak || 1, isMe: true,
+        };
+        const allMembers = [...lb, myEntry].sort((a, b) => b.xp - a.xp);
+
+        const lbHTML = allMembers.slice(0, 8).map((m, i) => `
+            <div class="guild-lb-row ${m.isMe ? 'is-me' : ''}">
+                <span class="glb-pos">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</span>
+                <span class="glb-avatar">${m.avatar}</span>
+                <span class="glb-name">${m.isMe ? 'Você ✦' : m.name}</span>
+                <span class="glb-streak">${_ic('streak',{size:'xs',color:'xp'})} ${m.streak}</span>
+                <span class="glb-xp">${_ic('xp',{size:'xs',color:'xp'})} ${m.xp.toLocaleString()}</span>
+            </div>`).join('');
+
+        const feedHTML = feed.map(f => `
+            <div class="guild-feed-item">
+                <span class="gfi-avatar">${f.avatar}</span>
+                <div class="gfi-body">
+                    <div class="gfi-text">${f.text}</div>
+                    <div class="gfi-time">${f.timeStr}</div>
+                </div>
+                <span class="gfi-icon">${_ic(f.icon,{size:'xs',color:f.color})}</span>
+            </div>`).join('');
+
+        container.innerHTML = `
+        <div class="guild-screen">
+            <div class="guild-hero" style="background:${guild.banner || '#1e3a5f'}">
+                <div class="guild-hero-icon">${guild.icon}</div>
+                <div class="guild-hero-name">${guild.name}</div>
+                <div class="guild-hero-meta">${allMembers.length} membros</div>
+                <div class="guild-hero-xp">${_ic('xp',{size:'xs'})} ${(preset?.xp || 0).toLocaleString()} XP da guild</div>
+                <div class="guild-hero-badges">
+                    <span class="guild-hero-badge">${_ic('trophy',{size:'xs'})} Liga Bronze</span>
+                    <span class="guild-hero-badge">Ativa</span>
+                </div>
+                <button class="guild-leave-btn" onclick="Router._leaveGuild()">Sair da guild</button>
+            </div>
+
+            <div class="guild-body">
+                <div class="section-header mt-4" style="margin-bottom:var(--sp-3)">
+                    <span class="section-title">${_ic('trophy',{size:'sm'})} Ranking da Guild</span>
+                </div>
+                ${lbHTML}
+
+                <div class="section-header mt-4" style="margin-bottom:var(--sp-3)">
+                    <span class="section-title">${_ic('friends',{size:'sm'})} Atividade</span>
+                </div>
+                ${feedHTML}
+            </div>
+        </div>`;
+    },
+
+    _renderGuildJoin(container, SE, _ic) {
+        const guilds = SE.GUILD_PRESETS;
+        const liveCount = SE.getLiveCount();
+
+        const guildsHTML = guilds.map(g => `
+            <div class="guild-card" onclick="Router._joinGuild('${g.id}')">
+                <span class="guild-card-icon">${g.icon}</span>
+                <div class="guild-card-info">
+                    <div class="guild-card-name">${g.name}</div>
+                    <div class="guild-card-meta">
+                        <span>${_ic('friends',{size:'xs'})} ${g.members} membros</span>
+                        <span>${_ic('xp',{size:'xs',color:'xp'})} ${g.xp.toLocaleString()} XP</span>
+                    </div>
+                </div>
+                <button class="guild-join-btn">Entrar</button>
+            </div>`).join('');
+
+        container.innerHTML = `
+        <div class="guild-screen">
+            <div class="guild-list-section">
+                <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
+
+                <div style="text-align:center;padding:var(--sp-4) 0 var(--sp-3)">
+                    <div style="font-size:2.5rem;margin-bottom:8px">${_ic('guild',{size:'xl',color:'science'})}</div>
+                    <div style="font-size:1.1rem;font-weight:900;color:var(--text)">Entrar em uma Guild</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);font-weight:700;margin-top:4px">
+                        Compita, colabore e suba no ranking com sua equipe
+                    </div>
+                    ${liveCount ? `<div style="font-size:0.72rem;color:#10b981;font-weight:800;margin-top:6px">🟢 ${liveCount} estudantes ativos agora</div>` : ''}
+                </div>
+
+                <div class="guild-list-header">${_ic('flag',{size:'sm'})} Guildas Disponíveis</div>
+                <div class="guild-list-grid">${guildsHTML}</div>
+            </div>
+        </div>`;
+    },
+
+    _joinGuild(guildId) {
+        if (typeof SocialEngine === 'undefined') return;
+        const guild = SocialEngine.joinGuild(guildId);
+        if (!guild) return;
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('motivational', {
+                icon:  'guild',
+                title: `Bem-vindo, ${guild.name}!`,
+                msg:   'Você entrou na guild! Compita com seus colegas e suba no ranking.',
+            });
+        }
+        this.renderGuild(document.getElementById('app-container'));
+    },
+
+    _leaveGuild() {
+        ModalEngine.interrupt('confirm', {
+            title:       'Sair da guild?',
+            message:     'Você poderá entrar em outra guild a qualquer momento.',
+            confirmText: 'Sair',
+            cancelText:  'Cancelar',
+            onConfirm:   () => {
+                if (typeof SocialEngine !== 'undefined') SocialEngine.leaveGuild();
+                this.navigate('#guild');
             },
         });
     },

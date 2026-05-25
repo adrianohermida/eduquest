@@ -1,0 +1,176 @@
+/**
+ * EDUQUEST SOCIAL CSS v1.0
+ * Live presence, social feed, guild screen
+ */
+
+/* ── LIVE PRESENCE BAR ──────────────────────────────────────── */
+.live-presence-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(5,150,105,0.05) 100%);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: var(--radius-lg);
+    padding: 8px var(--sp-3);
+    margin-bottom: var(--sp-3);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+}
+.live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    flex-shrink: 0;
+    animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+    50%       { opacity: 0.85; transform: scale(1.15); box-shadow: 0 0 0 4px rgba(16,185,129,0); }
+}
+.live-count  { color: #10b981; font-weight: 900; }
+.live-label  { color: var(--text-muted); font-size: 0.74rem; }
+.live-sep    { flex: 1; }
+.live-link   { font-size: 0.72rem; color: var(--brand); font-weight: 800; text-decoration: none; }
+
+/* ── SOCIAL FEED ────────────────────────────────────────────── */
+.social-feed-section { margin-bottom: var(--sp-4); }
+.social-feed-list    { display: flex; flex-direction: column; gap: 2px; }
+.social-feed-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-2);
+    padding: 8px var(--sp-3);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    border-left: 3px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+    animation: feedSlideIn 0.3s ease both;
+}
+.social-feed-item:hover { background: var(--surface-2); }
+@keyframes feedSlideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.sfi-avatar {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+.sfi-body  { flex: 1; min-width: 0; }
+.sfi-text  { font-size: 0.78rem; font-weight: 700; color: var(--text); line-height: 1.4; }
+.sfi-time  { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+.sfi-icon  { flex-shrink: 0; display: flex; align-items: center; }
+
+/* ── GUILD SCREEN ───────────────────────────────────────────── */
+.guild-screen {
+    min-height: 100vh;
+    background: var(--bg);
+    padding-bottom: 80px;
+}
+
+/* Hero banner for user's guild */
+.guild-hero {
+    padding: var(--sp-6) var(--sp-4) var(--sp-5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.guild-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    opacity: 0.9;
+}
+.guild-hero-icon    { font-size: 3rem; position: relative; z-index: 1; line-height: 1; }
+.guild-hero-name    { font-size: 1.3rem; font-weight: 900; color: #fff; position: relative; z-index: 1; }
+.guild-hero-meta    { font-size: 0.78rem; color: rgba(255,255,255,0.75); font-weight: 700; position: relative; z-index: 1; }
+.guild-hero-xp      { font-size: 0.82rem; font-weight: 900; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 4px; position: relative; z-index: 1; }
+.guild-hero-badges  { display: flex; gap: 8px; position: relative; z-index: 1; margin-top: 4px; }
+.guild-hero-badge   { background: rgba(255,255,255,0.2); color: #fff; font-size: 0.68rem; font-weight: 900; padding: 3px 10px; border-radius: var(--r-full); border: 1px solid rgba(255,255,255,0.3); }
+.guild-leave-btn    { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 800; padding: 4px 12px; border-radius: var(--r-full); cursor: pointer; position: relative; z-index: 1; margin-top: 4px; }
+.guild-leave-btn:hover { background: rgba(255,255,255,0.25); }
+
+.guild-body { padding: 0 var(--sp-4); }
+
+/* Guild list — join screen */
+.guild-list-section { padding: var(--sp-4); }
+.guild-list-header  { font-size: 1rem; font-weight: 900; color: var(--text); margin-bottom: var(--sp-4); }
+.guild-list-grid    { display: flex; flex-direction: column; gap: var(--sp-2); }
+.guild-card {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+}
+.guild-card:hover   { border-color: var(--brand); transform: translateX(3px); }
+.guild-card-icon    { font-size: 2rem; flex-shrink: 0; }
+.guild-card-info    { flex: 1; min-width: 0; }
+.guild-card-name    { font-size: 0.92rem; font-weight: 900; color: var(--text); }
+.guild-card-meta    { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; display: flex; gap: 8px; }
+.guild-card-xp      { font-size: 0.72rem; font-weight: 900; color: var(--brand); }
+.guild-join-btn {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 7px 14px;
+    font-family: var(--font);
+    font-size: 0.78rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--brand-dark);
+    white-space: nowrap;
+    transition: transform 0.12s, box-shadow 0.12s;
+}
+.guild-join-btn:active { transform: translateY(2px); box-shadow: none; }
+
+/* Guild leaderboard */
+.guild-lb-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    margin-bottom: 4px;
+}
+.guild-lb-row.is-me { background: rgba(249,115,22,0.08); border: 1.5px solid rgba(249,115,22,0.3); }
+.glb-pos    { font-size: 0.75rem; font-weight: 900; color: var(--text-muted); width: 24px; flex-shrink: 0; text-align: center; }
+.glb-avatar { font-size: 1.2rem; flex-shrink: 0; }
+.glb-name   { flex: 1; font-size: 0.82rem; font-weight: 800; color: var(--text); }
+.glb-streak { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 2px; }
+.glb-xp     { font-size: 0.78rem; font-weight: 900; color: var(--brand); display: flex; align-items: center; gap: 3px; }
+
+/* Guild feed */
+.guild-feed-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-2);
+    padding: 7px var(--sp-3);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    margin-bottom: 4px;
+}
+.gfi-avatar { font-size: 1.1rem; flex-shrink: 0; line-height: 1.4; }
+.gfi-body   { flex: 1; min-width: 0; }
+.gfi-text   { font-size: 0.78rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+.gfi-time   { font-size: 0.66rem; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
+.gfi-icon   { flex-shrink: 0; display: flex; align-items: center; opacity: 0.7; }
+
+/* ── DARK MODE ──────────────────────────────────────────────── */
+[data-theme="dark"] .live-presence-bar   { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.15); }
+[data-theme="dark"] .social-feed-item    { background: var(--surface-2); }
+[data-theme="dark"] .guild-card          { background: var(--surface-2); }
+[data-theme="dark"] .guild-lb-row        { background: var(--surface-2); }
+[data-theme="dark"] .guild-feed-item     { background: var(--surface-2); }
