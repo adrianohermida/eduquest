@@ -2,46 +2,61 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EduQuest RPG</title>
+    <!-- CSS Unificado -->
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Critical CSS para evitar flash branco */
+        body { background-color: #fffbeb; margin: 0; font-family: 'Segoe UI', sans-serif; }
+        #app { min-height: 100vh; padding-bottom: 80px; }
+        .loading { display: flex; justify-content: center; align-items: center; height: 100vh; color: #f97316; font-weight: bold; font-size: 1.5rem; }
+    </style>
 </head>
 <body>
 
-    <!-- HUD -->
-    <div class="hud-bar">
-        <div class="stat-badge">⚡ <span id="xp-display">0</span></div>
-        <div class="stat-badge">💎 <span id="gems-display">0</span></div>
-        <div class="stat-badge">❤️ <span id="hearts-display">5</span></div>
-    </div>
+    <!-- HUD Global (Stats) -->
+    <header id="global-hud" class="hud-bar">
+        <div class="stat-badge">⚡ <span id="hud-xp">0</span></div>
+        <div class="stat-badge">💎 <span id="hud-gems">0</span></div>
+        <div class="stat-badge">❤️ <span id="hud-lives">5</span></div>
+    </header>
 
-    <!-- APP -->
+    <!-- Container Principal ÚNICO -->
     <main id="app"></main>
 
-    <!-- MENU MOBILE (Bottom Nav) -->
-    <nav class="bottom-nav" id="bottom-nav">
-        <a href="#home" class="nav-item">🏠</a>
-        <a href="#map" class="nav-item">🗺️</a>
-        <a href="#shop" class="nav-item">🛒</a>
-        <a href="#profile" class="nav-item">👤</a>
+    <!-- Navegação Mobile Bottom Bar -->
+    <nav id="bottom-nav" class="bottom-nav">
+        <a href="#home" class="nav-item active">🏠<span>Início</span></a>
+        <a href="#profile" class="nav-item">👤<span>Perfil</span></a>
+        <a href="#shop" class="nav-item">🛒<span>Loja</span></a>
     </nav>
 
-    <!-- SCRIPTS NA ORDEM CERTA -->
+    <!-- ORDEM CRÍTICA DOS SCRIPTS -->
+    
+    <!-- 1. Núcleo (Sem dependências) -->
     <script src="js/state.js"></script>
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
-    
-    <!-- DADOS DO CAPÍTULO -->
-    <script src="js/questions.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/metadata.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/summaries.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_01.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_02.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_03.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_04.js"></script>
-    <script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_05.js"></script>
 
-    <!-- APP PRINCIPAL -->
+    <!-- 2. Dados (Precisam ser carregados antes do App, mas sem exports) -->
+    <!-- Nota: Se algum arquivo der erro 404, o app deve continuar funcionando com fallback -->
+    <script>
+        // Fallback seguro para dados ausentes
+        window.CHAPTER_DATA = window.CHAPTER_DATA || {};
+        try {
+            document.write('<script src="js/data/ciencias/7ano/chapters/cap7_doencas/metadata.js"><\/script>');
+            document.write('<script src="js/data/ciencias/7ano/chapters/cap7_doencas/summaries.js"><\/script>');
+            document.write('<script src="js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_01.js"><\/script>');
+            // Adicione os outros stages se existirem, ou o app usará dados mockados
+        } catch(e) { console.warn('Dados locais não encontrados, usando modo demonstração.'); }
+    </script>
+    
+    <!-- Banco de Questões Global -->
+    <script src="js/questions.js"></script>
+
+    <!-- 3. Aplicação Principal (Depende de tudo acima) -->
     <script src="js/app.js"></script>
+
 </body>
 </html>
