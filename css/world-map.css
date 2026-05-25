@@ -549,6 +549,9 @@
     position: relative;
     flex-shrink: 0;
     /* fixed-size canvas set inline via JS */
+    background:
+        url('../assets/maps/world-terrain.svg') repeat,
+        linear-gradient(180deg, #fef6e4 0%, #fdf0d5 100%);
 }
 
 /* ── BIOMES ────────────────────────────────────────────────── */
@@ -557,6 +560,7 @@
     position: absolute;
     left: 0;
     right: 0;
+    overflow: hidden;
     /* top/height set inline */
 }
 
@@ -572,6 +576,7 @@
     color: rgba(0, 0, 0, 0.12);
     white-space: nowrap;
     pointer-events: none;
+    z-index: 2;
 }
 
 .wm-biome-divide {
@@ -595,6 +600,41 @@
 .wm-biome-lab     { --biome-accent: #0284c7; }
 .wm-biome-tower   { --biome-accent: #7c3aed; }
 .wm-biome-citadel { --biome-accent: #d97706; }
+
+/* Thematic illustrated backgrounds — SVG overlaid at low opacity */
+.wm-biome::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center top;
+    opacity: 0.32;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.wm-biome-forest::before  {
+    background-image: url('../assets/maps/biome-forest.svg');
+    background-position: center bottom;
+}
+.wm-biome-village::before {
+    background-image: url('../assets/maps/biome-village.svg');
+    background-position: center bottom;
+}
+.wm-biome-lab::before {
+    background-image: url('../assets/maps/biome-lab.svg');
+    background-position: center bottom;
+}
+.wm-biome-tower::before {
+    background-image: url('../assets/maps/biome-tower.svg');
+    background-position: center bottom;
+    opacity: 0.38;
+}
+.wm-biome-citadel::before {
+    background-image: url('../assets/maps/biome-citadel.svg');
+    background-position: center bottom;
+    opacity: 0.35;
+}
 
 /* ── SVG PATHS — cobblestone double layer ──────────────────── */
 
