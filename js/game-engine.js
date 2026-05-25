@@ -289,7 +289,7 @@ const GameEngine = {
                     <div class="game-progress-track">
                         <div class="game-progress-fill" id="game-progress" style="width:0%"></div>
                     </div>
-                    <div class="game-timer" id="game-timer">⏱ 15s</div>
+                    <div class="game-timer" id="game-timer">${(typeof IconSystem !== 'undefined') ? IconSystem.html('warning',{size:'xs'}) : ''} 15s</div>
                 </div>
                 <div class="battle-scene">
                     <div class="battle-entity battle-enemy-side">
@@ -546,13 +546,16 @@ const GameEngine = {
         this.state.hintShown = true;
         this.state.combo     = Math.max(0, this.state.combo - 1); // penaliza combo
 
+        const _ic    = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const hintEl = document.getElementById('hint-reveal');
         if (hintEl) {
-            hintEl.innerHTML = `<div class="hint-bubble">💡 ${hintText}</div>`;
+            hintEl.innerHTML = `<div class="hint-bubble">${_ic('companion',{size:'xs',color:'xp'})} ${hintText}</div>`;
         }
         const btn = document.getElementById('qa-hint-btn');
         if (btn) {
-            btn.textContent = this.state.hintsLeft > 0 ? `💡 Dica (${this.state.hintsLeft})` : '💡 Sem dicas';
+            btn.innerHTML = this.state.hintsLeft > 0
+                ? `${_ic('companion',{size:'xs'})} Dica (${this.state.hintsLeft})`
+                : `${_ic('companion',{size:'xs'})} Sem dicas`;
             if (this.state.hintsLeft <= 0) { btn.disabled = true; btn.classList.add('qa-spent'); }
         }
         this._removeCombo();
@@ -654,7 +657,8 @@ const GameEngine = {
     _updateTimerUI() {
         const el = document.getElementById('game-timer');
         if (!el) return;
-        el.textContent = `⏱ ${this.state.timer}s`;
+        const ic = (typeof IconSystem !== 'undefined') ? IconSystem.html('warning',{size:'xs'}) : '';
+        el.innerHTML = `${ic} ${this.state.timer}s`;
         el.classList.toggle('urgent', this.state.timer <= 5);
     },
 
@@ -815,13 +819,16 @@ const GameEngine = {
         this._removeCombo();
         if (this.state.combo < 2) return;
         const combo = this.state.combo;
-        const zone = document.getElementById('battle-combo');
-        if (zone) zone.textContent = combo >= 10 ? `💜 ${combo}x INSANO!` : combo >= 5 ? `🔥 ${combo}x COMBO!` : `🔥 ${combo}x Combo!`;
+        const _ic   = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const icon  = combo >= 10 ? _ic('crown',{size:'xs',color:'final'}) : _ic('streak',{size:'xs',color:'xp'});
+        const label = combo >= 10 ? `${icon} ${combo}x INSANO!` : combo >= 5 ? `${icon} ${combo}x COMBO!` : `${icon} ${combo}x Combo!`;
+        const zone  = document.getElementById('battle-combo');
+        if (zone) zone.innerHTML = label;
         const badge = document.createElement('div');
         const intensity = combo >= 10 ? 'fire' : combo >= 5 ? 'hot' : '';
         badge.className = intensity ? `combo-badge ${intensity}` : 'combo-badge';
         badge.id = 'combo-badge';
-        badge.textContent = combo >= 10 ? `💜 ${combo}x INSANO!` : combo >= 5 ? `🔥 ${combo}x COMBO!` : `🔥 ${combo}x Combo!`;
+        badge.innerHTML = label;
         document.body.appendChild(badge);
         if (typeof Utils !== 'undefined') {
             Utils.burst(badge, combo >= 10 ? 18 : combo >= 5 ? 14 : 10, combo >= 10 ? '#7c3aed' : '#f97316');
@@ -831,7 +838,7 @@ const GameEngine = {
     _removeCombo() {
         document.getElementById('combo-badge')?.remove();
         const zone = document.getElementById('battle-combo');
-        if (zone) zone.textContent = '';
+        if (zone) zone.innerHTML = '';
     },
 
     // ── END GAME ─────────────────────────────────────────────────

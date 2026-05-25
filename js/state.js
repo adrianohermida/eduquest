@@ -463,10 +463,10 @@ const State = {
     // ── RANK & CLASS ─────────────────────────────────────────
     getRank() {
         const xp = this.data.user.xp || 0;
-        if (xp >= 5000) return { name: 'Platina', icon: '💜', cssClass: 'rank-platinum', min: 5000, next: Infinity };
-        if (xp >= 2000) return { name: 'Ouro',    icon: '🥇', cssClass: 'rank-gold',     min: 2000, next: 5000 };
-        if (xp >= 800)  return { name: 'Prata',   icon: '🥈', cssClass: 'rank-silver',   min: 800,  next: 2000 };
-        return                  { name: 'Bronze',  icon: '🥉', cssClass: 'rank-bronze',   min: 0,    next: 800  };
+        if (xp >= 5000) return { name: 'Platina', iconId: 'crown',       cssClass: 'rank-platinum', iconColor: 'final',   min: 5000, next: Infinity };
+        if (xp >= 2000) return { name: 'Ouro',    iconId: 'star',        cssClass: 'rank-gold',     iconColor: 'xp',      min: 2000, next: 5000 };
+        if (xp >= 800)  return { name: 'Prata',   iconId: 'shield',      cssClass: 'rank-silver',   iconColor: 'science', min: 800,  next: 2000 };
+        return                  { name: 'Bronze',  iconId: 'achievement', cssClass: 'rank-bronze',   iconColor: 'locked',  min: 0,    next: 800  };
     },
 
     getHeroClass() {

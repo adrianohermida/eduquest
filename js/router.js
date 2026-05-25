@@ -1277,7 +1277,7 @@ const Router = {
                     </div>
                     <div class="profile-hero-badges">
                         <span class="hero-class-badge">${_ic(heroClass.icon,{size:'xs'})} ${heroClass.name}</span>
-                        <span class="hero-rank-badge ${rank.cssClass}">${rank.icon} ${rank.name}</span>
+                        <span class="hero-rank-badge ${rank.cssClass}">${_ic(rank.iconId,{size:'xs',color:rank.iconColor})} ${rank.name}</span>
                     </div>
                     <div class="profile-hero-level">Nível ${user.level} · ${user.grade || '7º Ano'}</div>
                 </div>
