@@ -236,7 +236,7 @@ const ModalEngine = {
                     <span class="mrc-label">Bônus Gemas</span>
                 </div>
             </div>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">🔥 Arrasou!</button>`;
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('streak',{size:'xs',color:'xp'})} Arrasou!</button>`;
     },
 
     _noGemsHTML({ needed, have }) {
@@ -244,7 +244,7 @@ const ModalEngine = {
             <div class="modal-no-gems-icon">${this._ic('gem',{size:'xl',color:'gem'})}</div>
             <h2 class="modal-title" id="modal-title-el">Gemas Insuficientes</h2>
             <p class="modal-subtitle">Você tem <strong>${have} ${this._ic('gem',{size:'xs',color:'gem'})}</strong> mas precisa de <strong>${needed} ${this._ic('gem',{size:'xs',color:'gem'})}</strong>.</p>
-            <button class="btn-primary modal-cta" onclick="Router.navigate('#shop'); ModalEngine.dismiss()">🛒 Ir à Loja</button>
+            <button class="btn-primary modal-cta" onclick="Router.navigate('#shop'); ModalEngine.dismiss()">${this._ic('shop',{size:'xs'})} Ir à Loja</button>
             <button class="modal-dismiss-link" onclick="ModalEngine.dismiss()">Fechar</button>`;
     },
 
@@ -284,12 +284,12 @@ const ModalEngine = {
                     <span class="mrc-label">Bônus Gemas</span>
                 </div>
             </div>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">🔥 Continuar!</button>`;
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('streak',{size:'xs',color:'xp'})} Continuar!</button>`;
     },
 
     _streakFreezeUsedHTML({ streak }) {
         return `
-            <div class="modal-freeze-icon">🧊</div>
+            <div class="modal-freeze-icon">${this._ic('shield',{size:'xl',color:'science'})}</div>
             <h2 class="modal-title" id="modal-title-el">Streak Salvo!</h2>
             <p class="modal-subtitle">Seu Freeze de Streak foi usado automaticamente.</p>
             <p class="modal-text">Sua sequência de <strong>${streak} dias</strong> está intacta!</p>

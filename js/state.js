@@ -772,7 +772,7 @@ const State = {
             icon:        'warning',
             title:       'Apagar Progresso?',
             message:     'Todo o progresso local será apagado permanentemente. Esta ação não pode ser desfeita.',
-            confirmText: '🗑️ Apagar tudo',
+            confirmText: 'Apagar tudo',
             cancelText:  'Cancelar',
             onConfirm:   () => { localStorage.removeItem(this.LS_KEY); location.reload(); },
         });
