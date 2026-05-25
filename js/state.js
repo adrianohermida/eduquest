@@ -502,14 +502,15 @@ const State = {
         const hour   = new Date().getHours();
         const missions = this.getMissions();
         const done   = missions.filter(m => m.completed).length;
+        const cls    = this.getAvatarClass();
 
-        if (streak >= 7)      return { face: '🤩', msg: `${streak} dias! Você é imparável!` };
-        if (streak >= 3)      return { face: '😎', msg: `${streak} dias seguidos, continue assim!` };
-        if (done === 3)       return { face: '🥳', msg: 'Todas as missões concluídas! Incrível!' };
-        if (done >= 1)        return { face: '💪', msg: `${done} missão feita! Falta pouco.` };
-        if (hour < 12)        return { face: '☀️', msg: 'Bom dia! Hora de treinar a mente.' };
-        if (hour < 18)        return { face: '⚡', msg: 'Uma missão rápida e você ganha XP!' };
-        return                       { face: '🌙', msg: 'Ainda dá tempo de manter o streak!' };
+        if (streak >= 7) return { mood: 'fire',      cls, msg: `${streak} dias! Você é imparável!`        };
+        if (streak >= 3) return { mood: 'cool',       cls, msg: `${streak} dias seguidos, continue assim!` };
+        if (done === 3)  return { mood: 'celebrate',  cls, msg: 'Todas as missões concluídas! Incrível!'   };
+        if (done >= 1)   return { mood: 'encourage',  cls, msg: `${done} missão feita! Falta pouco.`       };
+        if (hour < 12)   return { mood: 'morning',    cls, msg: 'Bom dia! Hora de treinar a mente.'        };
+        if (hour < 18)   return { mood: 'afternoon',  cls, msg: 'Uma missão rápida e você ganha XP!'       };
+        return                  { mood: 'night',      cls, msg: 'Ainda dá tempo de manter o streak!'       };
     },
 
     showXPFloat(amount) {

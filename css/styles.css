@@ -3322,7 +3322,6 @@ img { max-width: 100%; }
 .home-greeting-hi  { font-size: 1.15rem; font-weight: 900; color: var(--text); }
 .home-greeting-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 .home-greeting-avatar {
-    font-size: 2.2rem;
     cursor: pointer;
     transition: transform var(--dur-fast);
     background: var(--surface-3);
@@ -3509,7 +3508,12 @@ img { max-width: 100%; }
     display: flex;
     align-items: center;
     gap: var(--sp-4);
+    transition: background 0.4s ease;
 }
+.profile-hero-banner--guerreiro { background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 45%, #b91c1c 100%); }
+.profile-hero-banner--mago      { background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 45%, #2563eb 100%); }
+.profile-hero-banner--ninja     { background: linear-gradient(135deg, #111827 0%, #1f2937 45%, #374151 100%); }
+.profile-hero-banner--cientista { background: linear-gradient(135deg, #064e3b 0%, #065f46 45%, #047857 100%); }
 
 .profile-hero-avatar {
     width: 80px; height: 80px;
@@ -3517,10 +3521,10 @@ img { max-width: 100%; }
     border: 3px solid rgba(255,255,255,0.3);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2.8rem;
     flex-shrink: 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.35);
 }
+.profile-hero-avatar .icon { color: rgba(255,255,255,0.9); }
 
 .profile-hero-identity { flex: 1; min-width: 0; }
 
@@ -3995,20 +3999,30 @@ img { max-width: 100%; }
 
 /* ── COMPANION BAR ─────────────────────────────────────── */
 .companion-bar {
+    --companion-color: var(--brand);
     display: flex;
     align-items: center;
     gap: var(--sp-3);
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 2px solid var(--companion-color);
     border-radius: var(--radius-lg);
     padding: var(--sp-3) var(--sp-4);
     margin-bottom: var(--sp-3);
+    transition: border-color 0.3s ease;
 }
+.companion-bar[data-mood="fire"]      { --companion-color: #f97316; }
+.companion-bar[data-mood="cool"]      { --companion-color: #f59e0b; }
+.companion-bar[data-mood="celebrate"] { --companion-color: #10b981; }
+.companion-bar[data-mood="encourage"] { --companion-color: #6366f1; }
+.companion-bar[data-mood="morning"]   { --companion-color: #f59e0b; }
+.companion-bar[data-mood="afternoon"] { --companion-color: #3b82f6; }
+.companion-bar[data-mood="night"]     { --companion-color: #8b5cf6; }
 .companion-face {
-    font-size: 1.6rem;
     flex-shrink: 0;
     line-height: 1;
+    display: flex; align-items: center; justify-content: center;
 }
+.companion-face .icon { color: var(--companion-color); transition: color 0.3s ease; }
 .companion-bubble {
     font-size: 0.82rem;
     font-weight: 700;
@@ -4040,12 +4054,16 @@ img { max-width: 100%; }
 .avatar-class-card.acc-selected {
     border-color: var(--brand);
     background: rgba(249,115,22,0.06);
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
 }
 .acc-icon {
-    font-size: 1.8rem;
+    display: flex; align-items: center; justify-content: center;
+    height: 44px;
     margin-bottom: var(--sp-2);
-    line-height: 1;
 }
+.acc-icon .icon { transition: transform 0.2s ease; }
+.avatar-class-card:hover .acc-icon .icon { transform: scale(1.1); }
+.avatar-class-card.acc-selected .acc-icon .icon { transform: scale(1.15); }
 .acc-name {
     font-size: 0.88rem;
     font-weight: 900;
@@ -4062,6 +4080,7 @@ img { max-width: 100%; }
     position: absolute;
     top: 6px;
     right: 8px;
+    display: flex; align-items: center; gap: 3px;
     font-size: 0.62rem;
     font-weight: 900;
     background: var(--brand);
@@ -4069,6 +4088,7 @@ img { max-width: 100%; }
     padding: 2px 7px;
     border-radius: 20px;
 }
+.acc-active-badge .icon { color: #fff; }
 
 /* ── WORD SEARCH ───────────────────────────────────────── */
 .ws-wrap {

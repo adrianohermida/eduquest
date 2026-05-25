@@ -821,6 +821,11 @@ const Router = {
         const missions  = State.getMissions();
         const calendar  = State.getStreakCalendar();
         const companion = State.getCompanionMessage();
+        const avatarCls = State.getAvatarClass();
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+
+        const clsColor = { guerreiro: 'rpg', mago: 'science', ninja: 'final', cientista: 'science' };
+        const avatarColor = clsColor[avatarCls] || 'xp';
 
         // Find the first unlocked-but-incomplete chapter for "Continue" card
         const activeChapter = chapters.find(ch => {
@@ -832,19 +837,22 @@ const Router = {
 
         const calendarHTML = calendar.map(d => `
             <div class="streak-day ${d.active ? 'active' : ''} ${d.isToday ? 'today' : ''}">
-                <div class="streak-day-dot">${d.active ? '🔥' : '○'}</div>
+                <div class="streak-day-dot">${d.active ? _ic('streak',{size:'sm'}) : ''}</div>
                 <div class="streak-day-label">${d.label}</div>
             </div>`).join('');
 
         const missionsHTML = missions.map(m => `
             <div class="daily-mission ${m.completed ? 'done' : ''}">
-                <div class="dm-icon">${m.icon}</div>
+                <div class="dm-icon">${_ic(m.icon, {size:'md'})}</div>
                 <div class="dm-body">
                     <div class="dm-title">${m.title}</div>
                     <div class="dm-desc">${m.desc}</div>
-                    <div class="dm-rewards"><span>⚡ +${m.xp}</span>${m.gems ? `<span>💎 +${m.gems}</span>` : ''}</div>
+                    <div class="dm-rewards">
+                        <span>${_ic('xp',{size:'xs',color:'xp'})} +${m.xp}</span>
+                        ${m.gems ? `<span>${_ic('gem',{size:'xs',color:'gem'})} +${m.gems}</span>` : ''}
+                    </div>
                 </div>
-                <div class="dm-check">${m.completed ? '✅' : '⬜'}</div>
+                <div class="dm-check">${m.completed ? _ic('check',{size:'sm',color:'success'}) : ''}</div>
             </div>`).join('');
 
         const chaptersHTML = chapters.map(ch => {
@@ -876,7 +884,7 @@ const Router = {
                     <div class="home-greeting-hi">Olá, ${user.name}! 👋</div>
                     <div class="home-greeting-sub">Nível ${user.level} · ${xpProg.current}/${xpProg.needed} XP</div>
                 </div>
-                <div class="home-greeting-avatar" onclick="Router.navigate('#profile')">${user.avatar || '🦸'}</div>
+                <div class="home-greeting-avatar home-greeting-avatar--${avatarCls}" onclick="Router.navigate('#profile')">${_ic('avatar',{size:'lg',color:avatarColor})}</div>
             </div>
 
             <!-- XP bar -->
@@ -885,8 +893,8 @@ const Router = {
             </div>
 
             <!-- Companion Widget -->
-            <div class="companion-bar">
-                <div class="companion-face">${companion.face}</div>
+            <div class="companion-bar" data-mood="${companion.mood}" data-cls="${companion.cls}">
+                <div class="companion-face">${_ic('companion',{size:'xl'})}</div>
                 <div class="companion-bubble">${companion.msg}</div>
             </div>
 
@@ -914,7 +922,7 @@ const Router = {
             <!-- Streak Calendar -->
             <div class="streak-calendar-wrap">
                 <div class="streak-cal-header">
-                    <span class="streak-cal-title">🔥 ${streak} ${streak === 1 ? 'dia' : 'dias'} seguidos</span>
+                    <span class="streak-cal-title">${_ic('streak',{size:'sm',color:'xp'})} ${streak} ${streak === 1 ? 'dia' : 'dias'} seguidos</span>
                     <span class="streak-cal-sub">Mantenha a sequência!</span>
                 </div>
                 <div class="streak-calendar">${calendarHTML}</div>
@@ -922,14 +930,14 @@ const Router = {
 
             <!-- Daily Missions -->
             <div class="section-header">
-                <span class="section-title">⚡ Missões do Dia</span>
+                <span class="section-title">${_ic('missions',{size:'sm'})} Missões do Dia</span>
                 <span class="section-badge">${missions.filter(m=>m.completed).length}/${missions.length}</span>
             </div>
             <div class="daily-missions-list">${missionsHTML}</div>
 
             <!-- Chapters -->
             <div class="section-header mt-4">
-                <span class="section-title">📚 Matérias</span>
+                <span class="section-title">${_ic('scroll',{size:'sm'})} Matérias</span>
                 <span class="section-link" onclick="Router.navigate('#missions')" style="cursor:pointer">Ver todas ›</span>
             </div>
             ${chaptersHTML}
@@ -1208,15 +1216,15 @@ const Router = {
         <div class="profile-screen">
 
             <!-- Hero Banner -->
-            <div class="profile-hero-banner">
-                <div class="profile-hero-avatar">${user.avatar || '🦸'}</div>
+            <div class="profile-hero-banner profile-hero-banner--${avatarCls}">
+                <div class="profile-hero-avatar">${_ic('avatar',{size:'xl',color:avatarCls==='guerreiro'?'rpg':avatarCls==='mago'?'science':avatarCls==='ninja'?'final':'science'})}</div>
                 <div class="profile-hero-identity">
                     <div class="profile-hero-name">
                         ${user.name}
-                        ${premium ? '<span class="premium-badge">👑</span>' : ''}
+                        ${premium ? `<span class="premium-badge">${_ic('crown',{size:'xs',color:'final'})}</span>` : ''}
                     </div>
                     <div class="profile-hero-badges">
-                        <span class="hero-class-badge">${heroClass.icon} ${heroClass.name}</span>
+                        <span class="hero-class-badge">${_ic(heroClass.icon,{size:'xs'})} ${heroClass.name}</span>
                         <span class="hero-rank-badge ${rank.cssClass}">${rank.icon} ${rank.name}</span>
                     </div>
                     <div class="profile-hero-level">Nível ${user.level} · ${user.grade || '7º Ano'}</div>
@@ -1226,7 +1234,7 @@ const Router = {
             <!-- XP Bar -->
             <div class="profile-xp-wrap">
                 <div class="profile-xp-row">
-                    <span style="font-size:0.78rem;font-weight:900;color:var(--brand)">⚡ Nível ${user.level}</span>
+                    <span style="font-size:0.78rem;font-weight:900;color:var(--brand)">${_ic('xp',{size:'xs',color:'xp'})} Nível ${user.level}</span>
                     <span style="font-size:0.72rem;color:var(--text-muted);font-weight:700">${xpProg.current} / ${xpProg.needed} XP</span>
                 </div>
                 <div class="profile-xp-track">
@@ -1238,61 +1246,61 @@ const Router = {
             <div class="profile-body">
 
                 <!-- Stats -->
-                <div class="section-header" style="margin-bottom:var(--sp-3)"><span class="section-title">📊 Estatísticas</span></div>
+                <div class="section-header" style="margin-bottom:var(--sp-3)"><span class="section-title">${_ic('trophy',{size:'sm'})} Estatísticas</span></div>
                 <div class="profile-stats-row">
                     <div class="profile-stat">
-                        <span class="profile-stat-icon">⚡</span>
+                        <span class="profile-stat-icon">${_ic('xp',{size:'md',color:'xp'})}</span>
                         <span class="profile-stat-value">${user.xp}</span>
                         <span class="profile-stat-label">XP</span>
                     </div>
                     <div class="profile-stat">
-                        <span class="profile-stat-icon">💎</span>
+                        <span class="profile-stat-icon">${_ic('gem',{size:'md',color:'gem'})}</span>
                         <span class="profile-stat-value">${user.gems}</span>
                         <span class="profile-stat-label">Gemas</span>
                     </div>
                     <div class="profile-stat">
-                        <span class="profile-stat-icon">🔥</span>
+                        <span class="profile-stat-icon">${_ic('streak',{size:'md',color:'xp'})}</span>
                         <span class="profile-stat-value">${user.streak}</span>
                         <span class="profile-stat-label">Streak</span>
                     </div>
                     <div class="profile-stat">
-                        <span class="profile-stat-icon">❤️</span>
+                        <span class="profile-stat-icon">${_ic('heart',{size:'md',color:'heart'})}</span>
                         <span class="profile-stat-value">${user.hearts}</span>
                         <span class="profile-stat-label">Vidas</span>
                     </div>
                 </div>
 
                 <!-- Avatar Class -->
-                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">⚔️ Classe do Herói</span></div>
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">${_ic('sword',{size:'sm'})} Classe do Herói</span></div>
                 <div class="avatar-class-grid">
                     ${[
-                        { id: 'guerreiro', icon: '⚔️', name: 'Guerreiro', perk: '+1 vida em batalha' },
-                        { id: 'mago',      icon: '🔮', name: 'Mago',      perk: '+1 dica por fase'    },
-                        { id: 'ninja',     icon: '🥷', name: 'Ninja',     perk: '1.5× XP em combos'  },
-                        { id: 'cientista', icon: '🔬', name: 'Cientista', perk: '+1 💎 a cada 5 acertos' },
+                        { id: 'guerreiro', iconId: 'sword',      color: 'rpg',     name: 'Guerreiro', perk: '+1 vida em batalha'        },
+                        { id: 'mago',      iconId: 'portal',     color: 'science', name: 'Mago',      perk: '+1 dica por fase'           },
+                        { id: 'ninja',     iconId: 'star',       color: 'final',   name: 'Ninja',     perk: '1.5× XP em combos'         },
+                        { id: 'cientista', iconId: 'microscope', color: 'science', name: 'Cientista', perk: '+1 gema a cada 5 acertos'   },
                     ].map(cls => `
                         <div class="avatar-class-card ${avatarCls === cls.id ? 'acc-selected' : ''}"
                              onclick="State.setAvatarClass('${cls.id}'); Router.renderProfile(document.getElementById('app-container'))">
-                            <div class="acc-icon">${cls.icon}</div>
+                            <div class="acc-icon">${_ic(cls.iconId, {size:'xl', color: avatarCls === cls.id ? cls.color : 'locked'})}</div>
                             <div class="acc-name">${cls.name}</div>
                             <div class="acc-perk">${cls.perk}</div>
-                            ${avatarCls === cls.id ? '<div class="acc-active-badge">✓ Ativo</div>' : ''}
+                            ${avatarCls === cls.id ? `<div class="acc-active-badge">${_ic('check',{size:'xs'})} Ativo</div>` : ''}
                         </div>`).join('')}
                 </div>
 
                 <!-- Mastery -->
-                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">🧬 Domínio</span></div>
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">${_ic('dna',{size:'sm'})} Domínio</span></div>
                 ${masteryHTML}
 
                 <!-- Achievements -->
                 <div class="section-header mt-3" style="margin-bottom:var(--sp-3)">
-                    <span class="section-title">🏅 Conquistas</span>
+                    <span class="section-title">${_ic('achievement',{size:'sm'})} Conquistas</span>
                     <span class="section-link" onclick="Router.navigate('#achievements')" style="cursor:pointer">Ver todas ›</span>
                 </div>
                 <div class="achievements-grid mb-3">${badgesHTML}</div>
 
                 <!-- Theme -->
-                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">⚙️ Configurações</span></div>
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">${_ic('settings',{size:'sm'})} Configurações</span></div>
                 <div class="theme-toggle-row" style="margin-bottom:var(--sp-3)">
                     <span class="theme-toggle-label">🎨 Aparência</span>
                     <div class="theme-toggle-btns">
@@ -1304,7 +1312,7 @@ const Router = {
 
                 ${!premium ? `
                 <div class="premium-card" onclick="Router._showPremiumModal()" style="margin-bottom:var(--sp-3)">
-                    <div class="premium-card-icon">👑</div>
+                    <div class="premium-card-icon">${_ic('crown',{size:'lg',color:'final'})}</div>
                     <div class="premium-card-text">
                         <div class="premium-card-title">Seja Premium!</div>
                         <div class="premium-card-desc">Vidas ilimitadas, estatísticas avançadas e mais.</div>
@@ -1313,23 +1321,23 @@ const Router = {
                 </div>` : ''}
 
                 <button class="profile-nav-btn" onclick="Router.navigate('#achievements')">
-                    <span class="pnb-icon">🏅</span>
+                    <span class="pnb-icon">${_ic('achievement',{size:'sm'})}</span>
                     <span class="pnb-label">Todas as Conquistas</span>
                     <span class="pnb-count">${(State.data.user.unlockedAchievements || []).length}/${(window.ACHIEVEMENTS || []).length}</span>
                     <span class="pnb-arrow">›</span>
                 </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#ranking')">
-                    <span class="pnb-icon">🏆</span>
+                    <span class="pnb-icon">${_ic('trophy',{size:'sm'})}</span>
                     <span class="pnb-label">Ranking Global</span>
                     <span class="pnb-arrow">›</span>
                 </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#teams')">
-                    <span class="pnb-icon">👥</span>
+                    <span class="pnb-icon">${_ic('friends',{size:'sm'})}</span>
                     <span class="pnb-label">Minhas Turmas</span>
                     <span class="pnb-arrow">›</span>
                 </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#shop')">
-                    <span class="pnb-icon">🛒</span>
+                    <span class="pnb-icon">${_ic('shop',{size:'sm'})}</span>
                     <span class="pnb-label">Loja de Itens</span>
                     <span class="pnb-arrow">›</span>
                 </button>
