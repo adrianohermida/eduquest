@@ -1,0 +1,54 @@
+:root {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --secondary: #f59e0b;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --info: #3b82f6;
+  --purple: #8b5cf6;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --border: #e2e8f0;
+  --sidebar-width: 250px;
+  --right-panel-width: 300px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  margin-right: var(--right-panel-width);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 0px;
+    --right-panel-width: 0px;
+  }
+  .main-content {
+    margin: 0;
+    padding: 1rem;
+  }
+}
