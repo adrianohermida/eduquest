@@ -1,10 +1,11 @@
 /**
- * EDUQUEST SUPABASE CLIENT v1.0
- * Auth + Cloud sync for profiles, progress, and teams
+ * EDUQUEST SUPABASE CLIENT v2.0
+ * Auth + Cloud sync — email/password, magic link, OTP, password reset
  */
 
 const SUPA_URL = 'https://vjnwuowgxyzrfomykdxu.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqbnd1b3dneHl6cmZvbXlrZHh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MTY5NjQsImV4cCI6MjA5NTI5Mjk2NH0.rtgXikCvBUp-eChPue4U_5aDcmj67-NwrhcYD17HFdA';
+const APP_URL  = 'https://adrianohermida.github.io/eduquest/';
 
 let _client = null;
 
@@ -15,7 +16,11 @@ function getClient() {
             return null;
         }
         _client = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
-            auth: { persistSession: true, autoRefreshToken: true }
+            auth: {
+                persistSession:    true,
+                autoRefreshToken:  true,
+                detectSessionInUrl: true,
+            }
         });
     }
     return _client;
@@ -25,12 +30,46 @@ function getClient() {
 const SupaAuth = {
     async signUp(email, password, name) {
         const c = getClient(); if (!c) return { data: null, error: { message: 'offline' } };
-        return c.auth.signUp({ email, password, options: { data: { name } } });
+        return c.auth.signUp({
+            email, password,
+            options: { data: { name }, emailRedirectTo: APP_URL }
+        });
     },
 
     async signIn(email, password) {
         const c = getClient(); if (!c) return { data: null, error: { message: 'offline' } };
         return c.auth.signInWithPassword({ email, password });
+    },
+
+    async sendMagicLink(email) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.auth.signInWithOtp({
+            email,
+            options: { emailRedirectTo: APP_URL }
+        });
+    },
+
+    async sendOTP(email) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.auth.signInWithOtp({
+            email,
+            options: { shouldCreateUser: true }
+        });
+    },
+
+    async verifyOTP(email, token) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.auth.verifyOtp({ email, token, type: 'email' });
+    },
+
+    async resetPassword(email) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.auth.resetPasswordForEmail(email, { redirectTo: APP_URL });
+    },
+
+    async updatePassword(newPassword) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.auth.updateUser({ password: newPassword });
     },
 
     async signOut() {
@@ -42,13 +81,6 @@ const SupaAuth = {
         const c = getClient(); if (!c) return null;
         const { data: { session } } = await c.auth.getSession();
         return session;
-    },
-
-    async resetPassword(email) {
-        const c = getClient(); if (!c) return { error: { message: 'offline' } };
-        return c.auth.resetPasswordForEmail(email, {
-            redirectTo: 'https://adrianohermida.github.io/eduquest/reset-password.html'
-        });
     },
 
     onAuthChange(callback) {

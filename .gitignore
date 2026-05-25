@@ -30,3 +30,6 @@ build/
 tmp/
 temp/
 *.tmp
+
+# MCP config (contains auth tokens — local dev only)
+.mcp.json
