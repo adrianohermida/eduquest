@@ -1,51 +1,128 @@
 /**
- * ADVENTURE MAP — EduQuest
- * Vertical world with character movement: keyboard, mouse-click, D-pad / touch
+ * EDUQUEST WORLD MAP ENGINE v2.0
+ * An exploreable educational world — biomes, organic paths, ambient life.
+ * Architecture: static world render once → only character+UI update per frame.
  */
 
 const AdventureMap = {
 
-    // ── WORLD DIMENSIONS ──────────────────────────────────
-    WORLD_W: 480,
-    WORLD_H: 3200,
+    // ── WORLD DIMENSIONS ─────────────────────────────────────────
+    WORLD_W: 440,
+    WORLD_H: 2700,
 
-    // ── STAGE POSITIONS [xPercent, worldY] — bottom→top ──
+    // ── STAGE POSITIONS [xPercent, worldY] — bottom→top ─────────
+    // Organic zigzag layout: stages meander up the world
     _stagePositions: [
-        [50, 2950],  // stage_01
-        [25, 2720],  // stage_02
-        [75, 2490],  // stage_03
-        [25, 2260],  // stage_04
-        [50, 2030],  // stage_05
-        [75, 1800],  // stage_06
-        [25, 1570],  // stage_07
-        [75, 1340],  // stage_08
-        [25, 1110],  // stage_09
-        [50,  880],  // stage_10
-        [50,  560],  // stage_boss
-        [50,  280],  // stage_final
+        [50,  2520],  //  1 — Forest of Origin (center)
+        [26,  2330],  //  2 — (left)
+        [68,  2150],  //  3 — (right)
+        [22,  1970],  //  4 — (far left)
+        [60,  1800],  //  5 — Village (right)
+        [78,  1620],  //  6 — (far right)
+        [28,  1440],  //  7 — Lab (left)
+        [64,  1260],  //  8 — (right)
+        [32,  1080],  //  9 — Tower (left)
+        [58,   900],  // 10 — (right)
+        [50,   660],  // 11 — BOSS (center dramatic)
+        [50,   380],  // 12 — FINAL (center triumphant)
     ],
 
-    // ── ZONE BANDS ────────────────────────────────────────
-    _zones: [
-        { top:    0, bottom:  500, name: '🏰 Cidadela Final',      bg: '#fef3c7', fg: '#92400e' },
-        { top:  500, bottom: 1000, name: '🔮 Torre do Saber',      bg: '#ede9fe', fg: '#5b21b6' },
-        { top: 1000, bottom: 1600, name: '🧪 Laboratório Arcano',  bg: '#e0f2fe', fg: '#0369a1' },
-        { top: 1600, bottom: 2200, name: '🏙️ Cidade do Saber',    bg: '#f0fdf4', fg: '#15803d' },
-        { top: 2200, bottom: 3200, name: '🌿 Floresta da Origem',  bg: '#fafaf8', fg: '#1e293b' },
+    // ── BIOMES ───────────────────────────────────────────────────
+    _biomes: [
+        {
+            top: 0, bottom: 550,
+            id: 'citadel',
+            name: 'Cidadela Final',
+            icon: '🏰',
+            bg1: '#fffbeb', bg2: '#fef3c7',
+        },
+        {
+            top: 550, bottom: 1100,
+            id: 'tower',
+            name: 'Torre do Saber',
+            icon: '🔮',
+            bg1: '#f5f3ff', bg2: '#ede9fe',
+        },
+        {
+            top: 1100, bottom: 1680,
+            id: 'lab',
+            name: 'Laboratório Arcano',
+            icon: '🧪',
+            bg1: '#f0f9ff', bg2: '#e0f2fe',
+        },
+        {
+            top: 1680, bottom: 2250,
+            id: 'village',
+            name: 'Aldeia do Saber',
+            icon: '🏡',
+            bg1: '#f7fef4', bg2: '#f0fdf4',
+        },
+        {
+            top: 2250, bottom: 2700,
+            id: 'forest',
+            name: 'Floresta de Início',
+            icon: '🌿',
+            bg1: '#fafdf8', bg2: '#f7fee7',
+        },
     ],
 
-    // ── STATE ─────────────────────────────────────────────
+    // ── WORLD DECORATIONS ────────────────────────────────────────
+    _decorations: [
+        // Forest zone
+        { x:  7, y: 2640, emoji: '🌲', cls: 'wm-deco-tree'  },
+        { x: 86, y: 2680, emoji: '🌳', cls: 'wm-deco-tree'  },
+        { x: 14, y: 2480, emoji: '🍄', cls: 'wm-deco-small' },
+        { x: 82, y: 2520, emoji: '🌸', cls: 'wm-deco-small wm-float' },
+        { x:  8, y: 2360, emoji: '🦋', cls: 'wm-deco-small wm-float' },
+        { x: 88, y: 2400, emoji: '🌿', cls: 'wm-deco-small' },
+        { x: 40, y: 2580, emoji: '🪨', cls: 'wm-deco-rock'  },
+
+        // Village zone
+        { x:  9, y: 2200, emoji: '🏠',    cls: 'wm-deco-building' },
+        { x: 84, y: 2170, emoji: '🌻',    cls: 'wm-deco-tree'     },
+        { x: 10, y: 1970, emoji: '🧑‍🌾',  cls: 'wm-deco-npc', label: 'Aldeão'  },
+        { x: 85, y: 1840, emoji: '🛖',    cls: 'wm-deco-building' },
+        { x: 38, y: 1720, emoji: '🌾',    cls: 'wm-deco-small'    },
+        { x: 88, y: 1700, emoji: '🐓',    cls: 'wm-deco-small wm-float' },
+
+        // Lab zone
+        { x:  8, y: 1640, emoji: '🧪',    cls: 'wm-deco-building' },
+        { x: 86, y: 1580, emoji: '🔬',    cls: 'wm-deco-building' },
+        { x: 12, y: 1380, emoji: '👩‍🔬',  cls: 'wm-deco-npc', label: 'Cientista' },
+        { x: 84, y: 1200, emoji: '⚗️',    cls: 'wm-deco-building' },
+        { x: 50, y: 1120, emoji: '🔭',    cls: 'wm-deco-small'    },
+        { x: 10, y: 1120, emoji: '💡',    cls: 'wm-deco-small wm-pulse' },
+
+        // Tower zone
+        { x:  8, y: 1060, emoji: '💠',    cls: 'wm-deco-crystal wm-pulse' },
+        { x: 87, y: 980,  emoji: '🔮',    cls: 'wm-deco-crystal wm-pulse' },
+        { x: 10, y: 780,  emoji: '🧙',    cls: 'wm-deco-npc', label: 'Mago Sábio' },
+        { x: 84, y: 720,  emoji: '✨',    cls: 'wm-deco-small wm-float' },
+        { x: 35, y: 580,  emoji: '📚',    cls: 'wm-deco-building' },
+        { x: 88, y: 570,  emoji: '🌟',    cls: 'wm-deco-small wm-float' },
+
+        // Citadel zone
+        { x: 12, y: 510, emoji: '🚩',    cls: 'wm-deco-small'    },
+        { x: 80, y: 490, emoji: '🏰',    cls: 'wm-deco-building' },
+        { x: 10, y: 300, emoji: '👑',    cls: 'wm-deco-npc', label: 'Rei do Saber' },
+        { x: 85, y: 250, emoji: '⭐',    cls: 'wm-deco-crystal wm-float' },
+        { x: 50, y: 140, emoji: '🎓',    cls: 'wm-deco-crystal wm-pulse' },
+    ],
+
+    // ── STATE ─────────────────────────────────────────────────────
     chapterId:    null,
     stages:       [],
     nearStageIdx: -1,
     running:      false,
     rafId:        null,
     _walkTimer:   null,
+    _currentBiome: '',
 
     world: {
-        charX: 240, charY: 2900,
+        charX: 220, charY: 2480,
         targetX: null, targetY: null,
-        speed: 2.8,
+        speed: 3.2,
+        facing: 1,  // 1=right, -1=left
     },
 
     keys: { up: false, down: false, left: false, right: false },
@@ -55,14 +132,12 @@ const AdventureMap = {
     _boundClick:   null,
     _boundTouch:   null,
 
-    // Cached DOM elements
     _charEl:   null,
     _interEl:  null,
     _zoneEl:   null,
 
-    // ── ENTRY ─────────────────────────────────────────────
+    // ── ENTRY POINT ───────────────────────────────────────────────
     start(chapterId) {
-        // Clean up any previous session
         if (this.running) {
             this.running = false;
             if (this.rafId) cancelAnimationFrame(this.rafId);
@@ -79,9 +154,8 @@ const AdventureMap = {
         const meta = window.CHAPTER_METADATA;
         if (!meta) { Router.navigate(`#chapter/${chapterId}`); return; }
 
-        // Build stage list with state
         this.stages = (meta.stages || []).map((s, i) => {
-            const pos  = this._stagePositions[i] || [50, this.WORLD_H - (i + 1) * 240];
+            const pos  = this._stagePositions[i] || [50, this.WORLD_H - (i + 1) * 220];
             const data = window[s.varName] || {};
             return {
                 id:        s.id,
@@ -109,131 +183,238 @@ const AdventureMap = {
         document.getElementById('top-hud')?.classList.add('hidden');
         document.getElementById('bottom-nav')?.classList.add('hidden');
 
-        this._render();
+        this._renderWorld();
         this._bindEvents();
         this.running = true;
         this._loop();
+        // Smooth scroll to character
+        requestAnimationFrame(() => this._scrollToChar(true));
     },
 
-    // ── RENDER ────────────────────────────────────────────
-    _render() {
+    // ── WORLD RENDER (once) ───────────────────────────────────────
+    _renderWorld() {
         const app = document.getElementById('app-container');
+        const W   = this.WORLD_W;
+        const H   = this.WORLD_H;
+        const u   = State.data.user;
 
-        // Zone backgrounds
-        const zonesHTML = this._zones.map(z => `
-            <div style="position:absolute;left:0;top:${z.top}px;width:100%;height:${z.bottom - z.top}px;background:${z.bg};pointer-events:none">
-                <div class="amap-zone-deco" style="color:${z.fg}">${z.name}</div>
-            </div>`).join('');
-
-        // Stage nodes + path lines
-        let nodesHTML = '';
-        for (let i = 0; i < this.stages.length; i++) {
-            const s   = this.stages[i];
-            const xPx = (s.xPct / 100) * this.WORLD_W;
-
-            // Dashed path line to next stage
-            if (i < this.stages.length - 1) {
-                const n    = this.stages[i + 1];
-                const nx   = (n.xPct / 100) * this.WORLD_W;
-                const dx   = nx - xPx;
-                const dy   = n.worldY - s.worldY;
-                const len  = Math.sqrt(dx * dx + dy * dy);
-                const ang  = Math.atan2(dy, dx) * 180 / Math.PI;
-                const done = s.completed ? ' amap-path-done' : '';
-                nodesHTML += `<div class="amap-path-line${done}" style="left:${xPx}px;top:${s.worldY}px;width:${len.toFixed(1)}px;transform:rotate(${ang.toFixed(2)}deg)"></div>`;
-            }
-
-            const nodeClass = 'amap-node' +
-                (s.isFinal ? ' amap-final' : s.isBoss ? ' amap-boss' : '') +
-                (s.completed ? ' amap-done' : s.unlocked ? ' amap-active' : ' amap-locked');
-
-            const icon = s.completed ? '✓'
-                       : s.unlocked  ? (s.isFinal ? '🎓' : s.isBoss ? '💀' : s.index)
-                       : '🔒';
-
-            const starsHTML = s.completed
-                ? [1,2,3].map(n => `<span style="color:${n<=s.stars?'#f59e0b':'rgba(0,0,0,0.15)'}">${n<=s.stars?'★':'☆'}</span>`).join('')
-                : '';
-
-            nodesHTML += `
-            <div class="${nodeClass}" id="amapn-${i}" style="left:${xPx}px;top:${s.worldY}px" onclick="AdventureMap._clickNode(${i})">
-                <div class="amap-node-icon">${icon}</div>
-                ${starsHTML ? `<div class="amap-node-stars">${starsHTML}</div>` : ''}
-                <div class="amap-node-label">${s.title}</div>
-            </div>`;
-        }
+        const biomesHTML    = this._buildBiomes();
+        const decoHTML      = this._buildDecorations();
+        const pathsSVG      = this._buildPathsSVG();
+        const nodesHTML     = this._buildNodes();
+        const charAvatar    = u.avatar || '🦸';
+        const starsProgress = this.stages.filter(s => s.completed).length;
 
         app.innerHTML = `
-        <div class="amap-wrap" id="amap-wrap">
+<div class="wm-wrap" id="wm-wrap">
 
-            <!-- Top HUD overlay -->
-            <div class="amap-hud">
-                <button class="amap-back-btn" onclick="AdventureMap.exit()">‹ Sair</button>
-                <div class="amap-zone-label" id="amap-zone-lbl">🌿 Floresta da Origem</div>
-            </div>
+    <!-- MINIMAL WORLD HUD -->
+    <header class="wm-hud" id="wm-hud" role="banner">
+        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mundo">
+            <span aria-hidden="true">←</span>
+        </button>
+        <div class="wm-zone-pill" id="wm-zone-pill">
+            <span class="wm-zone-icon" id="wm-zone-icon">🌿</span>
+            <span class="wm-zone-name" id="wm-zone-name">Floresta de Início</span>
+        </div>
+        <div class="wm-hud-stats" role="status" aria-label="Progresso">
+            <div class="wm-stat-chip">⚡ ${u.level}</div>
+            <div class="wm-stat-chip">⭐ ${starsProgress}/${this.stages.length}</div>
+        </div>
+    </header>
 
-            <!-- Interact prompt (shown near unlocked stage) -->
-            <div class="amap-interact hidden" id="amap-interact">
-                <div class="amap-interact-name" id="amap-interact-name">Missão</div>
-                <button class="btn-primary" style="padding:8px 22px;font-size:0.88rem"
-                    onclick="AdventureMap.interactWithNear()">⚡ Entrar</button>
-            </div>
+    <!-- SCROLLABLE WORLD VIEWPORT -->
+    <div class="wm-viewport" id="wm-viewport" role="main">
+        <div class="wm-world" id="wm-world" style="width:${W}px;height:${H}px">
 
-            <!-- Scrollable world viewport -->
-            <div class="amap-viewport" id="amap-viewport">
-                <div id="amap-world" style="position:relative;width:${this.WORLD_W}px;height:${this.WORLD_H}px;overflow:hidden;margin:0 auto">
-                    ${zonesHTML}
-                    ${nodesHTML}
-                    <div class="amap-char" id="amap-char" style="left:${this.world.charX}px;top:${this.world.charY}px">🦸</div>
-                </div>
-            </div>
+            <!-- Biome layers -->
+            ${biomesHTML}
 
-            <!-- D-pad (touch/mouse fallback, auto-hidden on desktop) -->
-            <div class="amap-dpad">
-                <div style="grid-column:2;grid-row:1">
-                    <button class="dpad-btn"
-                        ontouchstart="AdventureMap.dpad('up',true);event.preventDefault()"
-                        ontouchend="AdventureMap.dpad('up',false)"
-                        onmousedown="AdventureMap.dpad('up',true)"
-                        onmouseup="AdventureMap.dpad('up',false)"
-                        onmouseleave="AdventureMap.dpad('up',false)">▲</button>
-                </div>
-                <div style="grid-column:1;grid-row:2">
-                    <button class="dpad-btn"
-                        ontouchstart="AdventureMap.dpad('left',true);event.preventDefault()"
-                        ontouchend="AdventureMap.dpad('left',false)"
-                        onmousedown="AdventureMap.dpad('left',true)"
-                        onmouseup="AdventureMap.dpad('left',false)"
-                        onmouseleave="AdventureMap.dpad('left',false)">◄</button>
-                </div>
-                <div style="grid-column:3;grid-row:2">
-                    <button class="dpad-btn"
-                        ontouchstart="AdventureMap.dpad('right',true);event.preventDefault()"
-                        ontouchend="AdventureMap.dpad('right',false)"
-                        onmousedown="AdventureMap.dpad('right',true)"
-                        onmouseup="AdventureMap.dpad('right',false)"
-                        onmouseleave="AdventureMap.dpad('right',false)">►</button>
-                </div>
-                <div style="grid-column:2;grid-row:3">
-                    <button class="dpad-btn"
-                        ontouchstart="AdventureMap.dpad('down',true);event.preventDefault()"
-                        ontouchend="AdventureMap.dpad('down',false)"
-                        onmousedown="AdventureMap.dpad('down',true)"
-                        onmouseup="AdventureMap.dpad('down',false)"
-                        onmouseleave="AdventureMap.dpad('down',false)">▼</button>
-                </div>
-            </div>
+            <!-- Organic SVG paths -->
+            ${pathsSVG}
 
-        </div>`;
+            <!-- World decorations -->
+            ${decoHTML}
 
-        this._charEl  = document.getElementById('amap-char');
-        this._interEl = document.getElementById('amap-interact');
-        this._zoneEl  = document.getElementById('amap-zone-lbl');
+            <!-- Stage nodes -->
+            ${nodesHTML}
 
-        this._scrollToChar(true);
+            <!-- Player character -->
+            <div class="wm-char" id="wm-char"
+                 style="left:${this.world.charX}px;top:${this.world.charY}px"
+                 aria-label="Seu personagem">${charAvatar}</div>
+
+        </div>
+    </div>
+
+    <!-- INTERACT PANEL (shown near unlocked stage) -->
+    <div class="wm-interact hidden" id="wm-interact" role="dialog" aria-live="polite">
+        <div class="wm-interact-inner">
+            <div class="wm-interact-meta" id="wm-interact-meta">⚔️ MISSÃO</div>
+            <div class="wm-interact-title" id="wm-interact-title">Missão</div>
+            <div class="wm-interact-stars" id="wm-interact-stars"></div>
+            <button class="wm-enter-btn" onclick="AdventureMap.interactWithNear()">
+                Entrar <span class="wm-enter-arrow">→</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- D-PAD (touch/gamepad, hidden on hover-capable devices) -->
+    <div class="wm-dpad" role="group" aria-label="Controles de movimento">
+        <button class="wm-dpad-btn wm-dpad-up"
+            ontouchstart="AdventureMap.dpad('up',true);event.preventDefault()"
+            ontouchend="AdventureMap.dpad('up',false)"
+            onmousedown="AdventureMap.dpad('up',true)"
+            onmouseup="AdventureMap.dpad('up',false)"
+            onmouseleave="AdventureMap.dpad('up',false)"
+            aria-label="Mover para cima">↑</button>
+        <button class="wm-dpad-btn wm-dpad-left"
+            ontouchstart="AdventureMap.dpad('left',true);event.preventDefault()"
+            ontouchend="AdventureMap.dpad('left',false)"
+            onmousedown="AdventureMap.dpad('left',true)"
+            onmouseup="AdventureMap.dpad('left',false)"
+            onmouseleave="AdventureMap.dpad('left',false)"
+            aria-label="Mover para esquerda">←</button>
+        <button class="wm-dpad-btn wm-dpad-right"
+            ontouchstart="AdventureMap.dpad('right',true);event.preventDefault()"
+            ontouchend="AdventureMap.dpad('right',false)"
+            onmousedown="AdventureMap.dpad('right',true)"
+            onmouseup="AdventureMap.dpad('right',false)"
+            onmouseleave="AdventureMap.dpad('right',false)"
+            aria-label="Mover para direita">→</button>
+        <button class="wm-dpad-btn wm-dpad-down"
+            ontouchstart="AdventureMap.dpad('down',true);event.preventDefault()"
+            ontouchend="AdventureMap.dpad('down',false)"
+            onmousedown="AdventureMap.dpad('down',true)"
+            onmouseup="AdventureMap.dpad('down',false)"
+            onmouseleave="AdventureMap.dpad('down',false)"
+            aria-label="Mover para baixo">↓</button>
+    </div>
+
+</div>`;
+
+        this._charEl  = document.getElementById('wm-char');
+        this._interEl = document.getElementById('wm-interact');
+        this._zoneEl  = { icon: document.getElementById('wm-zone-icon'), name: document.getElementById('wm-zone-name') };
     },
 
-    // ── GAME LOOP ─────────────────────────────────────────
+    // ── BIOME LAYERS ──────────────────────────────────────────────
+    _buildBiomes() {
+        return this._biomes.map((b, i) => {
+            const h = b.bottom - b.top;
+            // Add subtle wave divider between biomes using a clip-path gradient overlay
+            const dividerTop = i > 0 ? `<div class="wm-biome-divide" style="top:${b.top}px"></div>` : '';
+            return `
+            ${dividerTop}
+            <div class="wm-biome wm-biome-${b.id}"
+                 style="top:${b.top}px;height:${h}px;background:linear-gradient(180deg,${b.bg1} 0%,${b.bg2} 100%)">
+                <div class="wm-biome-name" aria-hidden="true">${b.icon} ${b.name}</div>
+            </div>`;
+        }).join('');
+    },
+
+    // ── SVG ORGANIC PATHS ─────────────────────────────────────────
+    _buildPathsSVG() {
+        const W = this.WORLD_W;
+        const H = this.WORLD_H;
+        let paths = '';
+
+        for (let i = 0; i < this.stages.length - 1; i++) {
+            const a  = this.stages[i];
+            const b  = this.stages[i + 1];
+            const x1 = (a.xPct / 100) * W;
+            const y1 = a.worldY;
+            const x2 = (b.xPct / 100) * W;
+            const y2 = b.worldY;
+
+            // Deterministic organic curve: alternate which side the bulge goes
+            const sign = (i % 2 === 0) ? 1 : -1;
+            const bulge = 44 * sign;
+            const cp1x  = x1 + bulge;
+            const cp1y  = y1 + (y2 - y1) * 0.38;
+            const cp2x  = x2 - bulge;
+            const cp2y  = y1 + (y2 - y1) * 0.62;
+
+            const isDone = a.completed;
+            paths += `<path class="wm-path ${isDone ? 'wm-path-done' : ''}"
+                d="M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}" />`;
+        }
+
+        return `<svg class="wm-paths-svg"
+            width="${W}" height="${H}"
+            viewBox="0 0 ${W} ${H}"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true">
+            <defs>
+                <linearGradient id="pathDone" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%"   stop-color="#4ade80" />
+                    <stop offset="100%" stop-color="#34d399" />
+                </linearGradient>
+            </defs>
+            ${paths}
+        </svg>`;
+    },
+
+    // ── DECORATION ELEMENTS ───────────────────────────────────────
+    _buildDecorations() {
+        return this._decorations.map(d => {
+            const x = (d.x / 100) * this.WORLD_W;
+            const label = d.label
+                ? `<div class="wm-npc-label">${d.label}</div>`
+                : '';
+            return `<div class="${d.cls} wm-deco"
+                         style="left:${x}px;top:${d.y}px"
+                         aria-hidden="true">${d.emoji}${label}</div>`;
+        }).join('');
+    },
+
+    // ── STAGE NODES ───────────────────────────────────────────────
+    _buildNodes() {
+        return this.stages.map((s, i) => {
+            const x = (s.xPct / 100) * this.WORLD_W;
+
+            const stateClass = s.completed ? 'wm-done'
+                             : s.unlocked  ? 'wm-active'
+                             :               'wm-locked';
+            const typeClass  = s.isFinal ? 'wm-final'
+                             : s.isBoss  ? 'wm-boss'
+                             :              '';
+
+            const icon = s.completed ? '✓'
+                       : s.isFinal   ? '🎓'
+                       : s.isBoss    ? '💀'
+                       : s.unlocked  ? String(s.index)
+                       :               '🔒';
+
+            const starsHTML = s.completed
+                ? `<div class="wm-node-stars" aria-label="${s.stars} estrelas">
+                     ${[1,2,3].map(n => `<span class="${n <= s.stars ? 'wm-star-lit' : 'wm-star-dim'}">★</span>`).join('')}
+                   </div>`
+                : '';
+
+            const typeLabel = s.isFinal ? '✦ FINAL'
+                            : s.isBoss  ? '💀 CHEFE'
+                            :              '';
+
+            return `
+            <div class="wm-node ${stateClass} ${typeClass}"
+                 id="wmn-${i}"
+                 style="left:${x}px;top:${s.worldY}px"
+                 onclick="AdventureMap._clickNode(${i})"
+                 role="button"
+                 aria-label="${s.title}${s.completed ? ' (completo)' : s.unlocked ? ' (disponível)' : ' (bloqueado)'}"
+                 tabindex="${s.unlocked ? 0 : -1}">
+                <div class="wm-node-shadow" aria-hidden="true"></div>
+                <div class="wm-node-body" aria-hidden="true">
+                    <div class="wm-node-icon">${icon}</div>
+                </div>
+                ${starsHTML}
+                ${typeLabel ? `<div class="wm-node-type-badge" aria-hidden="true">${typeLabel}</div>` : ''}
+            </div>`;
+        }).join('');
+    },
+
+    // ── GAME LOOP ─────────────────────────────────────────────────
     _loop() {
         if (!this.running) return;
         this._update();
@@ -244,13 +425,13 @@ const AdventureMap = {
         let dx = 0, dy = 0;
         const sp = this.world.speed;
 
-        // Keyboard
+        // Keyboard input
         if (this.keys.up)    dy -= sp;
         if (this.keys.down)  dy += sp;
-        if (this.keys.left)  dx -= sp;
-        if (this.keys.right) dx += sp;
+        if (this.keys.left)  { dx -= sp; this.world.facing = -1; }
+        if (this.keys.right) { dx += sp; this.world.facing =  1; }
 
-        // Mouse / touch target (only when no key held)
+        // Click/touch target movement
         if (this.world.targetX !== null && dx === 0 && dy === 0) {
             const tdx  = this.world.targetX - this.world.charX;
             const tdy  = this.world.targetY - this.world.charY;
@@ -261,22 +442,26 @@ const AdventureMap = {
             } else {
                 dx = (tdx / dist) * sp;
                 dy = (tdy / dist) * sp;
+                if (dx < 0) this.world.facing = -1;
+                if (dx > 0) this.world.facing =  1;
             }
         }
 
-        // Apply & clamp
         if (dx !== 0 || dy !== 0) {
-            this.world.charX = Math.max(24, Math.min(this.WORLD_W - 24, this.world.charX + dx));
+            this.world.charX = Math.max(20, Math.min(this.WORLD_W - 20, this.world.charX + dx));
             this.world.charY = Math.max(40, Math.min(this.WORLD_H - 40, this.world.charY + dy));
 
             if (this._charEl) {
-                this._charEl.classList.add('walking');
+                this._charEl.classList.add('wm-char-walking');
+                // Flip facing
+                this._charEl.style.transform = `translate(-50%, -50%) scaleX(${this.world.facing})`;
                 clearTimeout(this._walkTimer);
-                this._walkTimer = setTimeout(() => this._charEl?.classList.remove('walking'), 200);
+                this._walkTimer = setTimeout(() => {
+                    this._charEl?.classList.remove('wm-char-walking');
+                }, 200);
             }
         }
 
-        // Update DOM
         if (this._charEl) {
             this._charEl.style.left = this.world.charX + 'px';
             this._charEl.style.top  = this.world.charY + 'px';
@@ -284,34 +469,34 @@ const AdventureMap = {
 
         this._scrollToChar(false);
         this._checkNearStage();
-        this._updateZoneLabel();
+        this._updateBiomeLabel();
     },
 
     _scrollToChar(instant) {
-        const viewport = document.getElementById('amap-viewport');
-        if (!viewport) return;
-        const viewH   = viewport.clientHeight || (window.innerHeight - 56);
-        let   scrollY = this.world.charY - viewH / 2;
+        const vp = document.getElementById('wm-viewport');
+        if (!vp) return;
+        const viewH = vp.clientHeight || window.innerHeight - 52;
+        let scrollY = this.world.charY - viewH / 2;
         scrollY = Math.max(0, Math.min(this.WORLD_H - viewH, scrollY));
+
         if (instant) {
-            viewport.scrollTop = scrollY;
+            vp.scrollTop = scrollY;
         } else {
-            // Lerp scroll for smooth camera
-            const diff = scrollY - viewport.scrollTop;
-            if (Math.abs(diff) > 1) viewport.scrollTop += diff * 0.12;
+            const diff = scrollY - vp.scrollTop;
+            if (Math.abs(diff) > 0.5) vp.scrollTop += diff * 0.10;
         }
     },
 
     _checkNearStage() {
-        const RADIUS = 68;
-        let   nearest = -1, minDist = Infinity;
+        const RADIUS = 72;
+        let nearest = -1, minDist = Infinity;
 
         for (let i = 0; i < this.stages.length; i++) {
-            const s   = this.stages[i];
-            const xPx = (s.xPct / 100) * this.WORLD_W;
-            const dx  = this.world.charX - xPx;
-            const dy  = this.world.charY - s.worldY;
-            const d   = Math.sqrt(dx * dx + dy * dy);
+            const s  = this.stages[i];
+            const sx = (s.xPct / 100) * this.WORLD_W;
+            const dx = this.world.charX - sx;
+            const dy = this.world.charY - s.worldY;
+            const d  = Math.sqrt(dx * dx + dy * dy);
             if (d < RADIUS && d < minDist) { minDist = d; nearest = i; }
         }
 
@@ -320,25 +505,46 @@ const AdventureMap = {
 
         if (!this._interEl) return;
         if (nearest >= 0 && this.stages[nearest].unlocked) {
+            const s = this.stages[nearest];
             this._interEl.classList.remove('hidden');
-            const n = document.getElementById('amap-interact-name');
-            if (n) n.textContent = this.stages[nearest].title;
+
+            const titleEl = document.getElementById('wm-interact-title');
+            const metaEl  = document.getElementById('wm-interact-meta');
+            const starsEl = document.getElementById('wm-interact-stars');
+
+            if (titleEl)  titleEl.textContent  = s.title;
+            if (metaEl)   metaEl.textContent    = s.isFinal ? '✦ MISSÃO FINAL' : s.isBoss ? '💀 CHEFE' : `⚔️ MISSÃO ${s.index}`;
+            if (starsEl) {
+                starsEl.innerHTML = s.completed
+                    ? [1,2,3].map(n => `<span class="${n <= s.stars ? 'wm-star-lit' : 'wm-star-dim'}">★</span>`).join('')
+                    : '';
+            }
         } else {
             this._interEl.classList.add('hidden');
         }
     },
 
-    _updateZoneLabel() {
-        if (!this._zoneEl) return;
-        for (const z of this._zones) {
-            if (this.world.charY >= z.top && this.world.charY < z.bottom) {
-                if (this._zoneEl.textContent !== z.name) this._zoneEl.textContent = z.name;
+    _updateBiomeLabel() {
+        if (!this._zoneEl?.name) return;
+        for (const b of this._biomes) {
+            if (this.world.charY >= b.top && this.world.charY < b.bottom) {
+                if (this._currentBiome !== b.id) {
+                    this._currentBiome = b.id;
+                    this._zoneEl.icon.textContent = b.icon;
+                    this._zoneEl.name.textContent = b.name;
+                    // Flash the zone pill on biome change
+                    const pill = document.getElementById('wm-zone-pill');
+                    if (pill) {
+                        pill.classList.add('wm-zone-flash');
+                        setTimeout(() => pill.classList.remove('wm-zone-flash'), 800);
+                    }
+                }
                 break;
             }
         }
     },
 
-    // ── INTERACTIONS ──────────────────────────────────────
+    // ── INTERACTIONS ──────────────────────────────────────────────
     interactWithNear() {
         if (this.nearStageIdx < 0) return;
         const s = this.stages[this.nearStageIdx];
@@ -349,22 +555,21 @@ const AdventureMap = {
 
     _clickNode(idx) {
         const s = this.stages[idx];
-        // Walk toward the node
         this.world.targetX = (s.xPct / 100) * this.WORLD_W;
         this.world.targetY = s.worldY;
     },
 
-    // ── INPUT ─────────────────────────────────────────────
+    // ── INPUT BINDING ─────────────────────────────────────────────
     _bindEvents() {
-        this._boundKeyDown = (e) => this._onKeyDown(e);
-        this._boundKeyUp   = (e) => this._onKeyUp(e);
+        this._boundKeyDown = e => this._onKeyDown(e);
+        this._boundKeyUp   = e => this._onKeyUp(e);
         window.addEventListener('keydown', this._boundKeyDown);
         window.addEventListener('keyup',   this._boundKeyUp);
 
-        const vp = document.getElementById('amap-viewport');
+        const vp = document.getElementById('wm-viewport');
         if (vp) {
-            this._boundClick = (e) => this._onViewportClick(e);
-            this._boundTouch = (e) => this._onViewportTouch(e);
+            this._boundClick = e => this._onViewportClick(e);
+            this._boundTouch = e => this._onViewportTouch(e);
             vp.addEventListener('click',    this._boundClick);
             vp.addEventListener('touchend', this._boundTouch, { passive: true });
         }
@@ -396,24 +601,23 @@ const AdventureMap = {
     },
 
     _onViewportClick(e) {
-        // Ignore clicks on interactive elements
-        if (e.target.closest('.amap-node,.amap-hud,.amap-interact,.amap-dpad,.btn-primary,.amap-back-btn')) return;
-        const worldEl = document.getElementById('amap-world');
+        if (e.target.closest('.wm-node,.wm-hud,.wm-interact,.wm-dpad,.wm-enter-btn,.wm-back-btn,.wm-deco-npc')) return;
+        const worldEl = document.getElementById('wm-world');
         if (!worldEl) return;
         const r = worldEl.getBoundingClientRect();
         this.world.targetX = e.clientX - r.left;
-        this.world.targetY = e.clientY - r.top;
+        this.world.targetY = e.clientY - r.top + document.getElementById('wm-viewport').scrollTop;
     },
 
     _onViewportTouch(e) {
-        if (e.target.closest('.amap-node,.amap-hud,.amap-interact,.amap-dpad,.btn-primary,.amap-back-btn')) return;
+        if (e.target.closest('.wm-node,.wm-hud,.wm-interact,.wm-dpad,.wm-enter-btn,.wm-back-btn,.wm-deco-npc')) return;
         const t = e.changedTouches[0];
         if (!t) return;
-        const worldEl = document.getElementById('amap-world');
+        const worldEl = document.getElementById('wm-world');
         if (!worldEl) return;
         const r = worldEl.getBoundingClientRect();
         this.world.targetX = t.clientX - r.left;
-        this.world.targetY = t.clientY - r.top;
+        this.world.targetY = t.clientY - r.top + document.getElementById('wm-viewport').scrollTop;
     },
 
     dpad(dir, pressed) {
@@ -421,7 +625,7 @@ const AdventureMap = {
         if (pressed) this.world.targetX = null;
     },
 
-    // ── EXIT ──────────────────────────────────────────────
+    // ── EXIT ──────────────────────────────────────────────────────
     exit() {
         ModalEngine.interrupt('missionExit', {
             context:   'aventura',
