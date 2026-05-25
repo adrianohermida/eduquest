@@ -148,6 +148,10 @@ const AdventureMap = {
         const container = document.getElementById('app-container');
         if (container) container.classList.add('wm-host');
 
+        // Hide global right panel (app layout) — our wm-right-panel replaces it
+        const globalRP = document.getElementById('right-panel');
+        if (globalRP) globalRP.style.display = 'none';
+
         document.getElementById('bottom-nav')?.classList.add('hidden');
 
         this._renderWorld();
@@ -821,6 +825,9 @@ const AdventureMap = {
         document.getElementById('bottom-nav')?.classList.remove('hidden');
         const discWrap = document.getElementById('hud-disc-wrap');
         if (discWrap) discWrap.style.display = 'none';
+        // Restore global right panel
+        const globalRP = document.getElementById('right-panel');
+        if (globalRP) globalRP.style.removeProperty('display');
     },
 
     // ── RIGHT PANEL ───────────────────────────────────────────────
