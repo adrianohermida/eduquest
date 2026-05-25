@@ -429,7 +429,7 @@ const Router = {
         const email    = (document.getElementById('login-email')?.value  || '').trim();
         const password = (document.getElementById('login-password')?.value || '');
         const btn      = document.getElementById('login-submit-btn');
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Entrando...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
 
         const result = await State.loginAsync(email, password);
 
@@ -453,7 +453,7 @@ const Router = {
         const okEl  = document.getElementById('magic-success');
         const btn   = document.getElementById('magic-btn');
         if (!email) { if(errEl){errEl.textContent='Digite seu email.';errEl.classList.add('show');} return; }
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
         if (errEl) errEl.classList.remove('show');
         const { error } = await SupaAuth.sendMagicLink(email);
         if (error) {
@@ -470,7 +470,7 @@ const Router = {
         const errEl = document.getElementById('otp-error');
         const btn   = document.getElementById('otp-send-btn');
         if (!email) { if(errEl){errEl.textContent='Digite seu email.';errEl.classList.add('show');} return; }
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
         if (errEl) errEl.classList.remove('show');
         const { error } = await SupaAuth.sendOTP(email);
         if (error) {
@@ -491,7 +491,7 @@ const Router = {
         const errEl = document.getElementById('otp-verify-error');
         const btn   = document.getElementById('otp-verify-btn');
         if (token.length < 6) { if(errEl){errEl.textContent='Digite o código de 6 dígitos.';errEl.classList.add('show');} return; }
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Verificando...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
         if (errEl) errEl.classList.remove('show');
         const { error } = await SupaAuth.verifyOTP(email, token);
         if (error) {
@@ -559,7 +559,7 @@ const Router = {
         if (pass.length < 6) { errEl.textContent='Senha muito curta (mín. 6 caracteres).'; errEl.classList.add('show'); return; }
         if (pass !== conf)    { errEl.textContent='As senhas não coincidem.';               errEl.classList.add('show'); return; }
         if (errEl) errEl.classList.remove('show');
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
         const { error } = await SupaAuth.updatePassword(pass);
         if (error) {
             errEl.textContent = error.message; errEl.classList.add('show');
@@ -632,7 +632,7 @@ const Router = {
         if (!email)             { if(errEl){errEl.textContent='Digite seu email.';errEl.classList.add('show');} return; }
         if (password.length<6)  { if(errEl){errEl.textContent='Senha muito curta (mínimo 6 caracteres).';errEl.classList.add('show');} return; }
 
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Criando conta...'; }
+        if (btn) { btn.disabled = true; btn.textContent = 'Criando conta...'; }
         if (errEl) errEl.classList.remove('show');
 
         const result = await State.signUpAsync(email, password, name);
@@ -877,7 +877,7 @@ const Router = {
                         <span class="chapter-percent">${prog.percent}%</span>
                     </div>
                 </div>
-                <div class="chapter-arrow">${ch.unlocked ? '›' : '🔒'}</div>
+                <div class="chapter-arrow">${ch.unlocked ? '›' : _ic('lock',{size:'sm',color:'locked'})}</div>
             </div>`;
         }).join('');
 
@@ -982,6 +982,7 @@ const Router = {
     // ── CHAPTER MAP (Adventure Mission Cards) ─────────────
     renderChapterMap(container, chapterId) {
         if (!chapterId) { this.renderHome(container); return; }
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
 
         const meta   = window.CHAPTER_METADATA || { title: 'Capítulo', icon: '📚', description: '', totalStages: 5, stages: [] };
         const stages = meta.stages || [];
@@ -1012,9 +1013,9 @@ const Router = {
             else if (isCurrent) cardClass += ' mc-active';
             else if (!unlocked) cardClass += ' mc-locked';
 
-            const nodeLabel = isFinal ? '🎓' : isBoss ? '💀' : i;
-            const nodeIcon  = completed ? '✓' : (unlocked ? nodeLabel : '🔒');
-            const typeLabel = isFinal ? '🎓 EXAME FINAL · ' : isBoss ? '👑 CHEFE · ' : '';
+            const nodeLabel = isFinal ? _ic('portal',{size:'sm',color:'final'}) : isBoss ? _ic('boss',{size:'sm',color:'rpg'}) : i;
+            const nodeIcon  = completed ? _ic('check',{size:'sm',color:'success'}) : (unlocked ? nodeLabel : _ic('lock',{size:'sm',color:'locked'}));
+            const typeLabel = isFinal ? `${_ic('portal',{size:'xs',color:'final'})} EXAME FINAL · ` : isBoss ? `${_ic('crown',{size:'xs',color:'rpg'})} CHEFE · ` : '';
             const metaLabel = `${typeLabel}MISSÃO ${i} · ${diffLabel.toUpperCase()}`;
 
             let btnHTML = '';
@@ -1028,7 +1029,7 @@ const Router = {
                     const btnClass = isBoss ? 'boss-play' : 'play';
                     btnHTML = `<button class="mission-play-btn ${btnClass}"
                         onclick="event.stopPropagation(); Router.navigate('#stage/${chapterId}/${stageKey}')">
-                        ${isFinal ? '🎓 Exame' : isBoss ? '⚔️ Boss' : 'JOGAR →'}
+                        ${isFinal ? `${_ic('portal',{size:'xs'})} Exame` : isBoss ? `${_ic('sword',{size:'xs'})} Boss` : 'JOGAR →'}
                     </button>`;
                 }
             }
@@ -1068,7 +1069,7 @@ const Router = {
 
             <button class="btn-secondary" style="margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px"
                 onclick="Router.navigate('#adventure/${chapterId}')">
-                🗺️ Modo Aventura
+                ${_ic('map',{size:'sm'})} Modo Aventura
             </button>
 
             <div class="adventure-path">
@@ -1243,7 +1244,7 @@ const Router = {
                     <div class="mastery-name">Matemática · Em breve</div>
                     <div class="mastery-track"><div class="mastery-fill" style="width:0%"></div></div>
                 </div>
-                <div class="mastery-pct" style="color:var(--text-muted)">🔒</div>
+                <div class="mastery-pct" style="color:var(--text-muted)">${_ic('lock',{size:'sm',color:'locked'})}</div>
             </div>`;
 
         container.innerHTML = `
@@ -1395,10 +1396,11 @@ const Router = {
 
     // ── RANKING ───────────────────────────────────────────
     async renderRanking(container) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         container.innerHTML = `
         <div class="screen" style="padding-top:var(--sp-4)">
             <div style="text-align:center;padding:40px 0">
-                <span style="font-size:2.5rem">⏳</span>
+                ${_ic('trophy',{size:'xl',color:'xp'})}
                 <p style="color:var(--text-muted);font-weight:700;margin-top:8px">Carregando ranking...</p>
             </div>
         </div>`;
@@ -1425,7 +1427,7 @@ const Router = {
             }
         }
 
-        const getRankIcon = xp => xp >= 5000 ? '💜' : xp >= 2000 ? '🥇' : xp >= 800 ? '🥈' : '🥉';
+        const getRankIcon = xp => xp >= 5000 ? _ic('crown',{size:'xs',color:'final'}) : xp >= 2000 ? _ic('star',{size:'xs',color:'xp'}) : xp >= 800 ? _ic('shield',{size:'xs',color:'science'}) : _ic('achievement',{size:'xs',color:'locked'});
         const myIdx = players.findIndex(p => p.id === uid);
 
         const top3 = players.slice(0, 3);
@@ -1433,9 +1435,9 @@ const Router = {
 
         // Podium: render in display order [2nd, 1st, 3rd]
         const podiumMap = [
-            { p: top3[1], pos: 2, medal: '🥈', cls: 'second' },
-            { p: top3[0], pos: 1, medal: '🥇', cls: 'first'  },
-            { p: top3[2], pos: 3, medal: '🥉', cls: 'third'  },
+            { p: top3[1], pos: 2, medal: _ic('star',{size:'sm',color:'science'}),  cls: 'second' },
+            { p: top3[0], pos: 1, medal: _ic('crown',{size:'sm',color:'final'}),   cls: 'first'  },
+            { p: top3[2], pos: 3, medal: _ic('shield',{size:'sm',color:'science'}),cls: 'third'  },
         ].filter(item => item.p);
 
         const podiumHTML = podiumMap.map(({ p, medal, cls }) => {
@@ -1512,17 +1514,24 @@ const Router = {
     },
 
     _showPremiumModal() {
-        const perks = ['❤️ Vidas ilimitadas','📊 Estatísticas avançadas','⏱️ Sem pressão de tempo','🌟 Conteúdo exclusivo','💾 Backup na nuvem'];
+        const _ic    = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const perks  = [
+            [_ic('heart',{size:'xs',color:'heart'}),    'Vidas ilimitadas'],
+            [_ic('star',{size:'xs',color:'xp'}),        'Estatísticas avançadas'],
+            [_ic('shield',{size:'xs',color:'science'}), 'Sem pressão de tempo'],
+            [_ic('crown',{size:'xs',color:'final'}),    'Conteúdo exclusivo'],
+            [_ic('gem',{size:'xs',color:'gem'}),        'Backup na nuvem'],
+        ];
         const el = document.createElement('div');
         el.className = 'feedback-overlay show';
         el.style.cssText = 'display:flex;align-items:center;justify-content:center;z-index:999';
         el.innerHTML = `
         <div class="feedback-card" style="max-width:320px;padding:28px 24px;text-align:center">
-            <div style="font-size:2.5rem;margin-bottom:8px">👑</div>
+            <div style="font-size:2.5rem;margin-bottom:8px">${_ic('crown',{size:'xl',color:'final'})}</div>
             <div style="font-size:1.2rem;font-weight:900;color:var(--gold);margin-bottom:4px">EduQuest Premium</div>
             <div style="font-size:0.82rem;color:var(--text-2);margin-bottom:16px">Desbloqueie todo o potencial do app</div>
-            ${perks.map(p=>`<div style="font-size:0.85rem;font-weight:700;padding:6px 0;border-bottom:1px solid var(--border);text-align:left">${p}</div>`).join('')}
-            <div style="margin-top:20px;font-size:0.8rem;color:var(--text-muted)">🚧 Em breve — fique atento!</div>
+            ${perks.map(([icon,label])=>`<div style="font-size:0.85rem;font-weight:700;padding:6px 0;border-bottom:1px solid var(--border);text-align:left;display:flex;align-items:center;gap:8px">${icon}${label}</div>`).join('')}
+            <div style="margin-top:20px;font-size:0.8rem;color:var(--text-muted)">Em breve — fique atento!</div>
             <button class="btn-primary mt-4" onclick="this.closest('.feedback-overlay').remove()">Fechar</button>
         </div>`;
         document.body.appendChild(el);
@@ -1531,9 +1540,10 @@ const Router = {
     // ── TEAMS ─────────────────────────────────────────────
     renderTeams(container, teamId) {
         if (teamId) { this._renderTeamDetail(container, teamId); return; }
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         container.innerHTML = `<div class="screen teams-screen">
             <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
-            <h2 style="font-size:1.1rem;font-weight:900;margin-bottom:16px">👥 Minhas Turmas</h2>
+            <h2 style="font-size:1.1rem;font-weight:900;margin-bottom:16px">${_ic('friends',{size:'sm'})} Minhas Turmas</h2>
 
             <div class="team-section-title">Entrar em uma turma</div>
             <div class="team-join-form">
@@ -1551,21 +1561,22 @@ const Router = {
             </div>
 
             <div class="team-section-title">Suas turmas</div>
-            <div id="teams-list"><div class="team-empty"><span class="team-empty-icon">👥</span>Carregando...</div></div>
+            <div id="teams-list"><div class="team-empty"><span class="team-empty-icon">${_ic('friends',{size:'md'})}</span>Carregando...</div></div>
         </div>`;
         this._loadTeamsList();
     },
 
     async _loadTeamsList() {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const el = document.getElementById('teams-list'); if (!el) return;
         const uid = State.data.user.uid;
         if (!uid || typeof SupaDB === 'undefined') {
-            el.innerHTML = '<div class="team-empty"><span class="team-empty-icon">👥</span>Faça login para ver suas turmas.</div>';
+            el.innerHTML = `<div class="team-empty"><span class="team-empty-icon">${_ic('friends',{size:'md'})}</span>Faça login para ver suas turmas.</div>`;
             return;
         }
         const { data, error } = await SupaDB.getMyTeams(uid);
         if (error || !data?.length) {
-            el.innerHTML = '<div class="team-empty"><span class="team-empty-icon">👥</span>Você ainda não participa de nenhuma turma.</div>';
+            el.innerHTML = `<div class="team-empty"><span class="team-empty-icon">${_ic('friends',{size:'md'})}</span>Você ainda não participa de nenhuma turma.</div>`;
             return;
         }
         el.innerHTML = data.map(m => {
@@ -1573,7 +1584,7 @@ const Router = {
             const isOwner = t.owner_id === uid;
             return `
             <div class="team-card" onclick="Router.navigate('#teams/${t.id}')">
-                <div class="team-card-icon">🏫</div>
+                <div class="team-card-icon">${_ic('shield',{size:'md',color:'science'})}</div>
                 <div class="team-card-body">
                     <div class="team-card-name">${t.name}${isOwner ? '<span class="team-owner-chip">Dono</span>' : ''}</div>
                     <div class="team-card-meta">${m.role === 'owner' ? 'Turma criada por você' : 'Estudante'}</div>
@@ -1586,7 +1597,7 @@ const Router = {
     async _createTeam() {
         const name = (document.getElementById('new-team-name')?.value || '').trim();
         if (!name) {
-            ModalEngine.interrupt('simpleAlert', { icon: '👥', title: 'Nome obrigatório', message: 'Digite o nome da turma.' });
+            ModalEngine.interrupt('simpleAlert', { icon: 'friends', title: 'Nome obrigatório', message: 'Digite o nome da turma.' });
             return;
         }
         const uid = State.data.user.uid;
@@ -1595,7 +1606,7 @@ const Router = {
             return;
         }
         const btn = document.querySelector('[onclick="Router._createTeam()"]');
-        if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+        if (btn) { btn.disabled = true; btn.textContent = '...'; }
         const { data, error } = await SupaDB.createTeam(name, uid);
         if (btn) { btn.disabled = false; btn.textContent = 'Criar'; }
         if (error) {
@@ -1613,7 +1624,7 @@ const Router = {
     async _joinTeam() {
         const code = (document.getElementById('team-code-input')?.value || '').trim();
         if (code.length < 4) {
-            ModalEngine.interrupt('simpleAlert', { icon: '🔑', title: 'Código inválido', message: 'Digite o código da turma (6 letras).' });
+            ModalEngine.interrupt('simpleAlert', { icon: 'lock', title: 'Código inválido', message: 'Digite o código da turma (6 letras).' });
             return;
         }
         const uid = State.data.user.uid;
@@ -1622,7 +1633,7 @@ const Router = {
             return;
         }
         const btn = document.querySelector('[onclick="Router._joinTeam()"]');
-        if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+        if (btn) { btn.disabled = true; btn.textContent = '...'; }
         const { data, error } = await SupaDB.joinTeamByCode(code, uid);
         if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
         if (error) {
@@ -1635,9 +1646,10 @@ const Router = {
     },
 
     async _renderTeamDetail(container, teamId) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         container.innerHTML = `<div class="screen teams-screen">
             <button class="btn-back" onclick="Router.navigate('#teams')">‹ Turmas</button>
-            <div id="team-detail-wrap"><div class="team-empty"><span class="team-empty-icon">⏳</span>Carregando...</div></div>
+            <div id="team-detail-wrap"><div class="team-empty"><span class="team-empty-icon">${_ic('friends',{size:'md'})}</span>Carregando...</div></div>
         </div>`;
         const { data: members, error } = await SupaDB.getTeamMembers(teamId);
         const wrap = document.getElementById('team-detail-wrap'); if (!wrap) return;
@@ -1655,15 +1667,16 @@ const Router = {
                 <button class="btn-secondary" style="padding:10px 14px" onclick="Router._renameTeam('${teamId}')">Renomear</button>
             </div>` : ''}
 
-            <div class="team-section-title">👥 Membros (${members.length})</div>
+            <div class="team-section-title">${_ic('friends',{size:'xs'})} Membros (${members.length})</div>
             ${sorted.map((m, i) => {
-                const p = m.profiles || {};
+                const p     = m.profiles || {};
+                const medal = i === 0 ? _ic('crown',{size:'sm',color:'final'}) : i === 1 ? _ic('star',{size:'sm',color:'xp'}) : i === 2 ? _ic('shield',{size:'sm',color:'science'}) : _ic('avatar',{size:'sm'});
                 return `
                 <div class="team-member-row">
-                    <div class="team-member-avatar">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🦸'}</div>
+                    <div class="team-member-avatar">${medal}</div>
                     <div>
                         <div class="team-member-name">${p.name || '—'}${m.role==='owner'?'<span class="team-owner-chip">Dono</span>':''}</div>
-                        <div class="team-member-level">Nível ${p.level||1} · 🔥 ${p.streak||1}</div>
+                        <div class="team-member-level">Nível ${p.level||1} · ${_ic('streak',{size:'xs',color:'xp'})} ${p.streak||1}</div>
                     </div>
                     <div class="team-member-xp">⚡ ${p.xp||0}</div>
                 </div>`;
@@ -1742,7 +1755,7 @@ const Router = {
 
         const lbHTML = allMembers.slice(0, 8).map((m, i) => `
             <div class="guild-lb-row ${m.isMe ? 'is-me' : ''}">
-                <span class="glb-pos">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</span>
+                <span class="glb-pos">${i === 0 ? _ic('crown',{size:'xs',color:'final'}) : i === 1 ? _ic('star',{size:'xs',color:'xp'}) : i === 2 ? _ic('shield',{size:'xs',color:'science'}) : `#${i+1}`}</span>
                 <span class="glb-avatar">${m.avatar}</span>
                 <span class="glb-name">${m.isMe ? 'Você ✦' : m.name}</span>
                 <span class="glb-streak">${_ic('streak',{size:'xs',color:'xp'})} ${m.streak}</span>
