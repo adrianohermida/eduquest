@@ -254,3 +254,123 @@
 }
 .had-link:hover, .had-link:focus { background: var(--surface-2); outline: none; }
 .had-logout { color: #ef4444; }
+
+/* ══════════════════════════════════════════════════════════
+   MODAL ENGINE v2 — Dialog Modals (native replacements)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Mission Exit ──────────────────────────────────────── */
+.modal-type-missionExit .modal-card {
+    background: var(--surface);
+}
+.modal-exit-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 6px;
+    animation: exitIconIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes exitIconIn {
+    from { transform: scale(0) rotate(-20deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+.modal-exit-danger-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg, 14px);
+    padding: 13px 20px;
+    font-family: var(--font);
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #ef4444;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.modal-exit-danger-btn:hover {
+    background: rgba(239, 68, 68, 0.06);
+    border-color: #ef4444;
+}
+
+/* ── Generic Confirm ───────────────────────────────────── */
+.modal-dialog-icon {
+    font-size: 2.8rem;
+    display: block;
+    margin-bottom: 8px;
+    animation: exitIconIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-danger-icon { filter: drop-shadow(0 2px 8px rgba(239,68,68,0.3)); }
+.modal-warning-icon { filter: drop-shadow(0 2px 8px rgba(245,158,11,0.3)); }
+
+/* ── Danger Confirm ────────────────────────────────────── */
+.modal-type-dangerConfirm .modal-card {
+    border: 1.5px solid rgba(239, 68, 68, 0.2);
+}
+.btn-danger {
+    display: block;
+    width: 100%;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-lg, 14px);
+    padding: 14px 20px;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.15s ease, transform 0.1s ease;
+    box-shadow: 0 4px 0 #b91c1c;
+}
+.btn-danger:hover  { background: #dc2626; }
+.btn-danger:active { transform: translateY(2px); box-shadow: 0 2px 0 #b91c1c; }
+
+/* ── Success Modal ─────────────────────────────────────── */
+.modal-type-success .modal-card {
+    background: var(--surface);
+}
+.modal-success-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 6px;
+    animation: exitIconIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Card animation refinement ─────────────────────────── */
+.modal-overlay {
+    /* Improved backdrop: subtle warmth, not harsh black */
+    background: rgba(0, 0, 0, 0.55);
+}
+.modal-card {
+    /* Smooth, clean — no bounce overshoot on dialog types */
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    opacity: 0;
+}
+.modal-overlay.show .modal-card {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* ── Focus ring for keyboard nav ───────────────────────── */
+.modal-card button:focus-visible {
+    outline: 2px solid var(--brand, #f97316);
+    outline-offset: 2px;
+}
+
+/* ── Dark mode adjustments ─────────────────────────────── */
+[data-theme="dark"] .modal-type-missionExit .modal-card,
+[data-theme="dark"] .modal-type-confirm .modal-card,
+[data-theme="dark"] .modal-type-simpleAlert .modal-card,
+[data-theme="dark"] .modal-type-success .modal-card,
+[data-theme="dark"] .modal-type-warning .modal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+[data-theme="dark"] .modal-exit-danger-btn {
+    border-color: rgba(239,68,68,0.3);
+}
+[data-theme="dark"] .modal-type-dangerConfirm .modal-card {
+    border-color: rgba(239,68,68,0.35);
+    background: var(--surface);
+}

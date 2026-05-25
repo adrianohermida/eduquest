@@ -25,8 +25,13 @@ const MemoryGame = {
 
         const flashcards = stageData.summary?.flashcards || [];
         if (flashcards.length === 0) {
-            alert('Este estágio ainda não tem flashcards para o jogo de memória.');
-            Router.navigate(`#stage/${chapterId}/${stageId}`);
+            ModalEngine.interrupt('simpleAlert', {
+                icon:    '🃏',
+                title:   'Sem flashcards',
+                message: 'Este estágio ainda não tem flashcards para o Jogo de Memória.',
+                onConfirm: () => Router.navigate(`#stage/${chapterId}/${stageId}`),
+                onCancel:  () => Router.navigate(`#stage/${chapterId}/${stageId}`),
+            });
             return;
         }
 
@@ -182,11 +187,14 @@ const MemoryGame = {
     },
 
     exit() {
-        if (confirm('Sair do jogo de memória?')) {
-            document.getElementById('top-hud')?.classList.remove('hidden');
-            document.getElementById('bottom-nav')?.classList.remove('hidden');
-            Router.navigate(`#stage/${this.state.chapterId}/${this.state.stageId}`);
-        }
+        ModalEngine.interrupt('missionExit', {
+            context:   'memória',
+            onConfirm: () => {
+                document.getElementById('top-hud')?.classList.remove('hidden');
+                document.getElementById('bottom-nav')?.classList.remove('hidden');
+                Router.navigate(`#stage/${this.state.chapterId}/${this.state.stageId}`);
+            },
+        });
     }
 };
 

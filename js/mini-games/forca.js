@@ -285,11 +285,14 @@ const Forca = {
     },
 
     exit() {
-        if (confirm('Sair do jogo da forca?')) {
-            document.getElementById('top-hud')?.classList.remove('hidden');
-            document.getElementById('bottom-nav')?.classList.remove('hidden');
-            Router.navigate(`#stage/${this.state.chapterId}/${this.state.stageId}`);
-        }
+        ModalEngine.interrupt('missionExit', {
+            context:   'forca',
+            onConfirm: () => {
+                document.getElementById('top-hud')?.classList.remove('hidden');
+                document.getElementById('bottom-nav')?.classList.remove('hidden');
+                Router.navigate(`#stage/${this.state.chapterId}/${this.state.stageId}`);
+            },
+        });
     }
 };
 

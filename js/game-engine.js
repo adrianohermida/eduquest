@@ -862,15 +862,18 @@ const GameEngine = {
     },
 
     exit() {
-        if (confirm('Deseja sair da missão? Seu progresso será perdido.')) {
-            this._stopTimer();
-            this.state._floats.forEach(el => el.remove());
-            this.state._floats = [];
-            this._removeCombo();
-            document.getElementById('top-hud')?.classList.remove('hidden');
-            document.getElementById('bottom-nav')?.classList.remove('hidden');
-            Router.navigate(`#chapter/${this.state.chapterId}`);
-        }
+        ModalEngine.interrupt('missionExit', {
+            context:   'missão',
+            onConfirm: () => {
+                this._stopTimer();
+                this.state._floats.forEach(el => el.remove());
+                this.state._floats = [];
+                this._removeCombo();
+                document.getElementById('top-hud')?.classList.remove('hidden');
+                document.getElementById('bottom-nav')?.classList.remove('hidden');
+                Router.navigate(`#chapter/${this.state.chapterId}`);
+            },
+        });
     }
 };
 

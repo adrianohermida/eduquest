@@ -490,11 +490,20 @@ const Router = {
 
     _showForgotPassword() {
         const email = (document.getElementById('login-email')?.value || '').trim();
-        if (!email) { alert('Digite seu email no campo acima primeiro.'); return; }
-        if (typeof SupaAuth === 'undefined') { alert('Serviço indisponível no momento.'); return; }
+        if (!email) {
+            ModalEngine.interrupt('simpleAlert', { icon: '📧', title: 'Email necessário', message: 'Digite seu email no campo acima primeiro.' });
+            return;
+        }
+        if (typeof SupaAuth === 'undefined') {
+            ModalEngine.interrupt('warning', { title: 'Serviço indisponível', message: 'Tente novamente mais tarde.' });
+            return;
+        }
         SupaAuth.resetPassword(email).then(({ error }) => {
-            if (error) alert('Erro: ' + error.message);
-            else alert('✅ Email de recuperação enviado! Verifique sua caixa de entrada.');
+            if (error) {
+                ModalEngine.interrupt('warning', { title: 'Erro ao enviar', message: error.message });
+            } else {
+                ModalEngine.interrupt('success', { title: 'Email enviado!', message: 'Verifique sua caixa de entrada para redefinir sua senha.' });
+            }
         });
     },
 
@@ -535,8 +544,12 @@ const Router = {
             errEl.textContent = error.message; errEl.classList.add('show');
             if (btn) { btn.disabled = false; btn.textContent = '✅ Salvar Nova Senha'; }
         } else {
-            alert('✅ Senha atualizada! Você já está logado.');
-            this.navigate(State.isOnboarded() ? '#home' : '#onboarding/1');
+            ModalEngine.interrupt('success', {
+                title:   'Senha atualizada!',
+                message: 'Você já está logado com a nova senha.',
+                onConfirm: () => this.navigate(State.isOnboarded() ? '#home' : '#onboarding/1'),
+                onCancel:  () => this.navigate(State.isOnboarded() ? '#home' : '#onboarding/1'),
+            });
         }
     },
 
@@ -1494,30 +1507,51 @@ const Router = {
 
     async _createTeam() {
         const name = (document.getElementById('new-team-name')?.value || '').trim();
-        if (!name) { alert('Digite o nome da turma.'); return; }
+        if (!name) {
+            ModalEngine.interrupt('simpleAlert', { icon: '👥', title: 'Nome obrigatório', message: 'Digite o nome da turma.' });
+            return;
+        }
         const uid = State.data.user.uid;
-        if (!uid) { alert('Faça login primeiro.'); return; }
+        if (!uid) {
+            ModalEngine.interrupt('warning', { title: 'Login necessário', message: 'Faça login para criar uma turma.' });
+            return;
+        }
         const btn = document.querySelector('[onclick="Router._createTeam()"]');
         if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
         const { data, error } = await SupaDB.createTeam(name, uid);
         if (btn) { btn.disabled = false; btn.textContent = 'Criar'; }
-        if (error) { alert('Erro: ' + error.message); return; }
-        alert(`✅ Turma "${data.name}" criada! Código: ${data.code}`);
+        if (error) {
+            ModalEngine.interrupt('warning', { title: 'Erro ao criar turma', message: error.message });
+            return;
+        }
+        ModalEngine.interrupt('success', {
+            title:   `Turma criada!`,
+            message: `"${data.name}" — Código: ${data.code}`,
+        });
         this._loadTeamsList();
         const inp = document.getElementById('new-team-name'); if (inp) inp.value = '';
     },
 
     async _joinTeam() {
         const code = (document.getElementById('team-code-input')?.value || '').trim();
-        if (code.length < 4) { alert('Digite o código da turma (6 letras).'); return; }
+        if (code.length < 4) {
+            ModalEngine.interrupt('simpleAlert', { icon: '🔑', title: 'Código inválido', message: 'Digite o código da turma (6 letras).' });
+            return;
+        }
         const uid = State.data.user.uid;
-        if (!uid) { alert('Faça login primeiro.'); return; }
+        if (!uid) {
+            ModalEngine.interrupt('warning', { title: 'Login necessário', message: 'Faça login para entrar em uma turma.' });
+            return;
+        }
         const btn = document.querySelector('[onclick="Router._joinTeam()"]');
         if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
         const { data, error } = await SupaDB.joinTeamByCode(code, uid);
         if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
-        if (error) { alert('Erro: ' + error.message); return; }
-        alert(`✅ Você entrou na turma "${data.team.name}"!`);
+        if (error) {
+            ModalEngine.interrupt('warning', { title: 'Erro ao entrar', message: error.message });
+            return;
+        }
+        ModalEngine.interrupt('success', { title: 'Bem-vindo!', message: `Você entrou na turma "${data.team.name}"!` });
         this._loadTeamsList();
         const inp = document.getElementById('team-code-input'); if (inp) inp.value = '';
     },
@@ -1570,16 +1604,32 @@ const Router = {
         this._renderTeamDetail(document.getElementById('app-container'), teamId);
     },
 
-    async _leaveTeam(teamId) {
-        if (!confirm('Sair desta turma?')) return;
-        await SupaDB.leaveTeam(teamId, State.data.user.uid);
-        this.navigate('#teams');
+    _leaveTeam(teamId) {
+        ModalEngine.interrupt('confirm', {
+            icon:        '🚪',
+            title:       'Sair da turma?',
+            message:     'Você será removido desta turma. Pode entrar novamente com o código.',
+            confirmText: '🚪 Sair da turma',
+            cancelText:  'Cancelar',
+            onConfirm:   async () => {
+                await SupaDB.leaveTeam(teamId, State.data.user.uid);
+                this.navigate('#teams');
+            },
+        });
     },
 
-    async _deleteTeam(teamId) {
-        if (!confirm('Excluir a turma permanentemente? Esta ação não pode ser desfeita.')) return;
-        await SupaDB.deleteTeam(teamId);
-        this.navigate('#teams');
+    _deleteTeam(teamId) {
+        ModalEngine.interrupt('dangerConfirm', {
+            icon:        '🗑️',
+            title:       'Excluir turma?',
+            message:     'A turma será excluída permanentemente. Esta ação não pode ser desfeita.',
+            confirmText: '🗑️ Excluir permanentemente',
+            cancelText:  'Cancelar',
+            onConfirm:   async () => {
+                await SupaDB.deleteTeam(teamId);
+                this.navigate('#teams');
+            },
+        });
     },
 
     // ── ACHIEVEMENTS ──────────────────────────────────────

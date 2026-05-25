@@ -1,25 +1,31 @@
 /**
- * EDUQUEST MODAL ENGINE v1.0
- * Centralized overlay modal system — retention loops, rewards, warnings
+ * EDUQUEST MODAL ENGINE v2.0
+ * Centralized overlay system — rewards, confirmations, alerts, dialogs
+ * Replaces ALL native browser alert/confirm/prompt calls.
  */
 
 const ModalEngine = {
-    _queue:   [],
-    _showing: false,
+    _queue:            [],
+    _showing:          false,
+    _currentCallbacks: null,
 
-    // Enqueue: respects current showing modal
+    // ── PUBLIC API ───────────────────────────────────────────────
+
+    // Enqueue: respects currently showing modal
     enqueue(type, data = {}) {
         this._queue.push({ type, data });
         if (!this._showing) this._processQueue();
     },
 
-    // Interrupt: show immediately, discard pending queue
+    // Interrupt: show immediately, pauses any current modal
     interrupt(type, data = {}) {
         this._queue = [{ type, data }];
         const existing = document.getElementById('modal-overlay');
-        if (existing) { existing.remove(); this._showing = false; }
+        if (existing) { existing.remove(); this._showing = false; this._currentCallbacks = null; }
         this._processQueue();
     },
+
+    // ── INTERNAL ─────────────────────────────────────────────────
 
     _processQueue() {
         if (this._queue.length === 0) { this._showing = false; return; }
@@ -32,58 +38,93 @@ const ModalEngine = {
         const existing = document.getElementById('modal-overlay');
         if (existing) existing.remove();
 
+        this._currentCallbacks = {
+            onConfirm: data.onConfirm || null,
+            onCancel:  data.onCancel  || null,
+        };
+
         const overlay = document.createElement('div');
         overlay.id        = 'modal-overlay';
         overlay.className = `modal-overlay modal-type-${type}`;
         overlay.setAttribute('role', 'dialog');
         overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-labelledby', 'modal-title-el');
 
         let html = '';
         switch (type) {
-            case 'levelUp':       html = this._levelUpHTML(data);       break;
-            case 'dailyReward':   html = this._dailyRewardHTML(data);   break;
-            case 'streakRisk':    html = this._streakRiskHTML(data);    break;
-            case 'questComplete': html = this._questCompleteHTML(data); break;
-            case 'allQuestsDone': html = this._allQuestsDoneHTML(data); break;
-            case 'noGems':        html = this._noGemsHTML(data);        break;
+            // Rewards & Progress
+            case 'levelUp':          html = this._levelUpHTML(data);          break;
+            case 'dailyReward':      html = this._dailyRewardHTML(data);      break;
+            case 'streakRisk':       html = this._streakRiskHTML(data);       break;
+            case 'questComplete':    html = this._questCompleteHTML(data);    break;
+            case 'allQuestsDone':    html = this._allQuestsDoneHTML(data);    break;
+            case 'noGems':           html = this._noGemsHTML(data);           break;
             case 'achievement':      html = this._achievementHTML(data);      break;
             case 'streakMilestone':  html = this._streakMilestoneHTML(data);  break;
             case 'streakFreezeUsed': html = this._streakFreezeUsedHTML(data); break;
             case 'motivational':     html = this._motivationalHTML(data);     break;
+            // Dialogs — replaces native browser calls
+            case 'missionExit':   html = this._missionExitHTML(data);    break;
+            case 'confirm':       html = this._confirmHTML(data);         break;
+            case 'dangerConfirm': html = this._dangerConfirmHTML(data);  break;
+            case 'simpleAlert':   html = this._simpleAlertHTML(data);    break;
+            case 'success':       html = this._successHTML(data);        break;
+            case 'warning':       html = this._warningHTML(data);        break;
             default: this._showing = false; return;
         }
 
-        overlay.innerHTML = `<div class="modal-card" id="modal-card">${html}</div>`;
+        overlay.innerHTML = `<div class="modal-card" id="modal-card" role="document">${html}</div>`;
         document.body.appendChild(overlay);
 
-        // Double rAF to ensure transition fires
+        // Double rAF — ensures CSS transition fires
         requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('show')));
 
-        // Tap outside closes (except streak risk — must be confirmed)
-        if (type !== 'streakRisk') {
-            overlay.addEventListener('click', e => { if (e.target === overlay) this.dismiss(); });
+        // Tap outside — never on destructive confirms or streakRisk
+        const lockOutside = ['streakRisk', 'missionExit', 'dangerConfirm'];
+        if (!lockOutside.includes(type)) {
+            overlay.addEventListener('click', e => { if (e.target === overlay) this.dismiss(false); });
         }
 
-        // ESC closes
-        this._escHandler = e => { if (e.key === 'Escape') this.dismiss(); };
+        // ESC = dismiss(false) = cancel
+        this._escHandler = e => { if (e.key === 'Escape') this.dismiss(false); };
         document.addEventListener('keydown', this._escHandler, { once: true });
 
+        // Keyboard focus trap — auto-focus first button
+        requestAnimationFrame(() => {
+            const btn = overlay.querySelector('.modal-cta, .btn-primary, button');
+            if (btn) btn.focus();
+        });
+
         // Post-render effects
-        if (type === 'levelUp')    setTimeout(() => this._levelUpFX(data), 200);
-        if (type === 'dailyReward' || type === 'allQuestsDone' || type === 'streakMilestone') {
+        if (type === 'levelUp') setTimeout(() => this._levelUpFX(data), 200);
+        if (['dailyReward', 'allQuestsDone', 'streakMilestone'].includes(type)) {
             if (typeof Utils !== 'undefined') setTimeout(() => Utils.confetti(), 400);
         }
     },
 
-    dismiss() {
+    /**
+     * dismiss(confirmed = false)
+     *   confirmed=true  → fires onConfirm (user accepted)
+     *   confirmed=false → fires onCancel  (user rejected/closed)
+     */
+    dismiss(confirmed = false) {
         document.removeEventListener('keydown', this._escHandler);
         const overlay = document.getElementById('modal-overlay');
-        if (!overlay) { this._showing = false; this._processQueue(); return; }
+        const cbs     = this._currentCallbacks;
+        this._currentCallbacks = null;
+
+        const proceed = () => {
+            if (confirmed && cbs?.onConfirm) cbs.onConfirm();
+            else if (!confirmed && cbs?.onCancel) cbs.onCancel();
+            this._processQueue();
+        };
+
+        if (!overlay) { this._showing = false; proceed(); return; }
         overlay.classList.remove('show');
-        setTimeout(() => { overlay.remove(); this._processQueue(); }, 320);
+        setTimeout(() => { overlay.remove(); proceed(); }, 300);
     },
 
-    // ── MODAL HTML ────────────────────────────────────────────
+    // ── MODAL HTML — Rewards & Progress ──────────────────────────
 
     _levelUpHTML({ level, rank, prevRank }) {
         const rankChanged = rank?.name !== prevRank?.name;
@@ -91,7 +132,7 @@ const ModalEngine = {
             <div class="modal-levelup-glow"></div>
             <div class="modal-levelup-badge">⚡</div>
             <div class="modal-levelup-num">${level}</div>
-            <h2 class="modal-title">NÍVEL ${level}!</h2>
+            <h2 class="modal-title" id="modal-title-el">NÍVEL ${level}!</h2>
             ${rankChanged ? `
             <div class="modal-rank-change">
                 <span>${prevRank?.icon || ''} ${prevRank?.name || ''}</span>
@@ -112,14 +153,14 @@ const ModalEngine = {
 
     _dailyRewardHTML({ streak, xp, gems }) {
         const milestones = [3, 7, 14, 30, 60, 100];
-        const next = milestones.find(m => m > streak) || streak + 1;
+        const next   = milestones.find(m => m > streak) || streak + 1;
         const toNext = next - streak;
         return `
             <div class="modal-daily-header">
                 <div class="modal-daily-fire">🔥</div>
                 <div class="modal-daily-streak-badge">${streak}</div>
             </div>
-            <h2 class="modal-title">Login Diário!</h2>
+            <h2 class="modal-title" id="modal-title-el">Login Diário!</h2>
             <p class="modal-subtitle">Dia ${streak} de sequência${streak >= 7 ? ' 🏆' : streak >= 3 ? ' ⭐' : ''}</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip">
@@ -143,7 +184,7 @@ const ModalEngine = {
                 <div class="modal-streak-risk-fire">🔥</div>
                 <div class="modal-streak-risk-warn">⚠️</div>
             </div>
-            <h2 class="modal-title modal-title-warn">Sequência em Risco!</h2>
+            <h2 class="modal-title modal-title-warn" id="modal-title-el">Sequência em Risco!</h2>
             <p class="modal-subtitle">Você tem <strong>${streak} dia${streak !== 1 ? 's' : ''}</strong> de sequência.</p>
             <p class="modal-text">Complete pelo menos 1 missão hoje para não perder!</p>
             <button class="btn-primary modal-cta" onclick="Router.navigate('#missions'); ModalEngine.dismiss()">
@@ -155,7 +196,7 @@ const ModalEngine = {
     _questCompleteHTML({ icon, title, xp, gems }) {
         return `
             <div class="modal-quest-icon">${icon || '⚡'}</div>
-            <h2 class="modal-title">Missão Completa!</h2>
+            <h2 class="modal-title" id="modal-title-el">Missão Completa!</h2>
             <p class="modal-subtitle">${title}</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip">
@@ -175,7 +216,7 @@ const ModalEngine = {
     _allQuestsDoneHTML({ bonusXP, bonusGems }) {
         return `
             <div class="modal-crown">👑</div>
-            <h2 class="modal-title">Todas as Missões!</h2>
+            <h2 class="modal-title" id="modal-title-el">Todas as Missões!</h2>
             <p class="modal-subtitle">Você completou <strong>todas</strong> as missões de hoje!</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip modal-reward-gold">
@@ -195,7 +236,7 @@ const ModalEngine = {
     _noGemsHTML({ needed, have }) {
         return `
             <div class="modal-no-gems-icon">💎</div>
-            <h2 class="modal-title">Gemas Insuficientes</h2>
+            <h2 class="modal-title" id="modal-title-el">Gemas Insuficientes</h2>
             <p class="modal-subtitle">Você tem <strong>${have} 💎</strong> mas precisa de <strong>${needed} 💎</strong>.</p>
             <button class="btn-primary modal-cta" onclick="Router.navigate('#shop'); ModalEngine.dismiss()">🛒 Ir à Loja</button>
             <button class="modal-dismiss-link" onclick="ModalEngine.dismiss()">Fechar</button>`;
@@ -206,17 +247,18 @@ const ModalEngine = {
         return `
             <div class="modal-ach-badge modal-ach-${rarity}"><span class="modal-ach-icon">${icon}</span></div>
             <div class="modal-ach-ribbon">${labels[rarity] || '🏅 Conquista'}</div>
-            <h2 class="modal-title">${name}</h2>
+            <h2 class="modal-title" id="modal-title-el">${name}</h2>
             <p class="modal-subtitle">${description}</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">🏅 Incrível!</button>`;
     },
+
     _streakMilestoneHTML({ streak, gems }) {
-        const icons = { 3: '🔥', 7: '🏅', 14: '💪', 30: '👑' };
-        const titles = { 3: 'Semana em Chamas!', 7: 'Semana de Fogo!', 14: 'Duas Semanas!', 30: 'Um Mês Incrível!' };
+        const icons  = { 3: '🔥', 7: '🏅', 14: '💪', 30: '👑' };
+        const titles = { 3: '3 dias seguidos!', 7: 'Semana de Fogo!', 14: 'Duas Semanas!', 30: 'Um Mês Incrível!' };
         return `
             <div class="modal-milestone-icon">${icons[streak] || '🔥'}</div>
             <div class="modal-milestone-badge">${streak} dias</div>
-            <h2 class="modal-title">${titles[streak] || `${streak} dias!`}</h2>
+            <h2 class="modal-title" id="modal-title-el">${titles[streak] || `${streak} dias!`}</h2>
             <p class="modal-subtitle">Você atingiu um marco de sequência incrível!</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip modal-reward-gold">
@@ -231,7 +273,7 @@ const ModalEngine = {
     _streakFreezeUsedHTML({ streak }) {
         return `
             <div class="modal-freeze-icon">🧊</div>
-            <h2 class="modal-title">Streak Salvo!</h2>
+            <h2 class="modal-title" id="modal-title-el">Streak Salvo!</h2>
             <p class="modal-subtitle">Seu Freeze de Streak foi usado automaticamente.</p>
             <p class="modal-text">Sua sequência de <strong>${streak} dias</strong> está intacta!</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">✅ Ótimo!</button>`;
@@ -240,9 +282,74 @@ const ModalEngine = {
     _motivationalHTML({ title, msg, icon }) {
         return `
             <div class="modal-motivational-icon">${icon || '⚡'}</div>
-            <h2 class="modal-title">${title || 'Você consegue!'}</h2>
+            <h2 class="modal-title" id="modal-title-el">${title || 'Você consegue!'}</h2>
             <p class="modal-subtitle">${msg || 'Continue jogando e alcance novos níveis!'}</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">💪 Bora!</button>`;
+    },
+
+    // ── MODAL HTML — Dialogs (native replacements) ────────────────
+
+    _missionExitHTML({ context = 'missão' }) {
+        const ctxMap = {
+            'missão':    { icon: '⚔️', title: 'Abandonar a Missão?',     sub: 'Seu progresso desta batalha será perdido.' },
+            'memória':   { icon: '🃏', title: 'Sair do Jogo de Memória?', sub: 'Você perderá o progresso atual.'          },
+            'forca':     { icon: '🔤', title: 'Sair do Jogo da Forca?',   sub: 'Você perderá o progresso atual.'          },
+            'aventura':  { icon: '🗺️', title: 'Sair do Mapa Aventura?',  sub: 'Você poderá retornar depois.'             },
+            'caça-palavras': { icon: '🔍', title: 'Sair do Caça-Palavras?', sub: 'Você perderá o progresso atual.'       },
+        };
+        const c = ctxMap[context] || ctxMap['missão'];
+        return `
+            <div class="modal-exit-icon">${c.icon}</div>
+            <h2 class="modal-title" id="modal-title-el">${c.title}</h2>
+            <p class="modal-subtitle">${c.sub}</p>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss(false)">
+                ▶ Continuar ${context === 'aventura' ? 'explorando' : 'jogando'}
+            </button>
+            <button class="modal-exit-danger-btn" onclick="ModalEngine.dismiss(true)">
+                🚪 Sair da ${context}
+            </button>`;
+    },
+
+    _confirmHTML({ title = 'Confirmar ação?', message = '', confirmText = 'Confirmar', cancelText = 'Cancelar', icon = '❓' }) {
+        return `
+            <div class="modal-dialog-icon">${icon}</div>
+            <h2 class="modal-title" id="modal-title-el">${title}</h2>
+            ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss(true)">${confirmText}</button>
+            <button class="modal-dismiss-link" onclick="ModalEngine.dismiss(false)">${cancelText}</button>`;
+    },
+
+    _dangerConfirmHTML({ title = 'Tem certeza?', message = '', confirmText = 'Confirmar', cancelText = 'Cancelar', icon = '⚠️' }) {
+        return `
+            <div class="modal-dialog-icon modal-danger-icon">${icon}</div>
+            <h2 class="modal-title modal-title-warn" id="modal-title-el">${title}</h2>
+            ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
+            <button class="btn-danger modal-cta" onclick="ModalEngine.dismiss(true)">${confirmText}</button>
+            <button class="modal-dismiss-link" onclick="ModalEngine.dismiss(false)">${cancelText}</button>`;
+    },
+
+    _simpleAlertHTML({ title = 'Aviso', message = '', icon = 'ℹ️' }) {
+        return `
+            <div class="modal-dialog-icon">${icon}</div>
+            <h2 class="modal-title" id="modal-title-el">${title}</h2>
+            ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">OK</button>`;
+    },
+
+    _successHTML({ title = 'Sucesso!', message = '', icon = '✅' }) {
+        return `
+            <div class="modal-success-icon">${icon}</div>
+            <h2 class="modal-title" id="modal-title-el">${title}</h2>
+            ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">Ótimo!</button>`;
+    },
+
+    _warningHTML({ title = 'Atenção!', message = '', icon = '⚠️' }) {
+        return `
+            <div class="modal-dialog-icon modal-warning-icon">${icon}</div>
+            <h2 class="modal-title" id="modal-title-el">${title}</h2>
+            ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">Entendido</button>`;
     },
 };
 

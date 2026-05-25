@@ -730,9 +730,14 @@ const State = {
 
     // ── RESET (dev only) ─────────────────────────────────────
     hardReset() {
-        if (!confirm('⚠️ Apagar TODO o progresso local?')) return;
-        localStorage.removeItem(this.LS_KEY);
-        location.reload();
+        ModalEngine.interrupt('dangerConfirm', {
+            icon:        '⚠️',
+            title:       'Apagar Progresso?',
+            message:     'Todo o progresso local será apagado permanentemente. Esta ação não pode ser desfeita.',
+            confirmText: '🗑️ Apagar tudo',
+            cancelText:  'Cancelar',
+            onConfirm:   () => { localStorage.removeItem(this.LS_KEY); location.reload(); },
+        });
     }
 };
 

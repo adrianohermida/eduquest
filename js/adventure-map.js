@@ -423,9 +423,13 @@ const AdventureMap = {
 
     // ── EXIT ──────────────────────────────────────────────
     exit() {
-        if (!window.confirm('Sair do Mapa Aventura?')) return;
-        this._doExit();
-        Router.navigate(`#chapter/${this.chapterId}`);
+        ModalEngine.interrupt('missionExit', {
+            context:   'aventura',
+            onConfirm: () => {
+                this._doExit();
+                Router.navigate(`#chapter/${this.chapterId}`);
+            },
+        });
     },
 
     _doExit() {
