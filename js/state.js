@@ -27,10 +27,12 @@ const State = {
             premiumUntil: null,
             theme:        'light',
             // v4 additions
-            avatar:       '🦸',
-            grade:        '7ano',
+            avatar:          '🦸',
+            grade:           '7ano',
             // v5 additions
-            goal:         'compete',
+            goal:            'compete',
+            // v6 additions
+            lastLoginDate:   null,
         },
         progress: {},
         dailyMissions: { date: null, completed: [] },
@@ -105,7 +107,8 @@ const State = {
                 theme:        parsed.user.theme         ?? 'light',
                 avatar:       parsed.user.avatar        ?? '🦸',
                 grade:        parsed.user.grade         ?? '7ano',
-                goal:         parsed.user.goal          ?? 'compete',
+                goal:          parsed.user.goal          ?? 'compete',
+                lastLoginDate: parsed.user.lastLoginDate ?? null,
             };
         }
         this.data.progress      = parsed.progress || {};
@@ -296,19 +299,64 @@ const State = {
     },
 
     _checkLevelUp() {
-        const needed = this.getXPForLevel(this.data.user.level);
-        if (this.data.user.xp >= needed) {
+        let leveled = false;
+        const prevRank = this.getRank();
+        while (this.data.user.xp >= this.getXPForLevel(this.data.user.level)) {
             this.data.user.level++;
-            if (typeof Utils !== 'undefined') setTimeout(() => Utils.confetti(), 100);
+            leveled = true;
+        }
+        if (!leveled) return;
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('levelUp', {
+                level:    this.data.user.level,
+                rank:     this.getRank(),
+                prevRank
+            });
+        } else if (typeof Utils !== 'undefined') {
+            setTimeout(() => Utils.confetti(), 100);
+        }
+    },
+
+    checkDailyLogin() {
+        if (typeof ModalEngine === 'undefined') return;
+        const today     = new Date().toDateString();
+        const lastLogin = this.data.user.lastLoginDate;
+        if (lastLogin === today) return;
+
+        const streak = this.data.user.streak || 1;
+
+        // Tiered daily reward
+        const xp   = streak >= 30 ? 200 : streak >= 14 ? 150 : streak >= 7 ? 100 : streak >= 3 ? 50 : 25;
+        const gems  = streak >= 14 ? 25  : streak >= 7  ? 15  : streak >= 3 ? 10  : 5;
+
+        this.data.user.xp   += xp;
+        this.data.user.gems += gems;
+        this.data.user.lastLoginDate = today;
+        this._checkLevelUp();
+        this.save();
+
+        ModalEngine.enqueue('dailyReward', { streak, xp, gems });
+
+        // Queue streak risk if no missions done yet today
+        const missions  = this.getMissions();
+        const anyDone   = missions.some(m => m.completed);
+        if (!anyDone && streak > 1) {
+            ModalEngine.enqueue('streakRisk', { streak });
         }
     },
 
     // ── HUD ──────────────────────────────────────────────────
     updateHUD() {
         const u = this.data.user;
-        const map = { 'hud-streak': u.streak || 1, 'hud-gems': u.gems, 'hud-xp': u.xp, 'hud-hearts': u.hearts };
-        for (const [id, val] of Object.entries(map)) {
-            const el = document.getElementById(id); if (el) el.textContent = val;
+        const chips = { 'hud-streak': u.streak || 1, 'hud-gems': u.gems, 'hud-xp': u.xp, 'hud-hearts': u.hearts };
+        for (const [id, val] of Object.entries(chips)) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            if (el.textContent !== String(val)) {
+                el.textContent = val;
+                const chip = el.closest('.hud-chip');
+                if (chip) { chip.classList.remove('hud-pulse'); void chip.offsetWidth; chip.classList.add('hud-pulse'); }
+            }
         }
         const avatarEl = document.getElementById('hud-avatar-btn');
         if (avatarEl) avatarEl.textContent = u.avatar || '🦸';
@@ -374,9 +422,30 @@ const State = {
         if (!this.data.dailyMissions || this.data.dailyMissions.date !== today) {
             this.data.dailyMissions = { date: today, completed: [] };
         }
-        if (!this.data.dailyMissions.completed.includes(missionId)) {
-            this.data.dailyMissions.completed.push(missionId);
-            this.save();
+        if (this.data.dailyMissions.completed.includes(missionId)) return;
+
+        this.data.dailyMissions.completed.push(missionId);
+        this.save();
+
+        if (typeof ModalEngine === 'undefined') return;
+        const missions = this.getMissions();
+        const mission  = missions.find(m => m.id === missionId);
+        if (!mission) return;
+
+        // Give the mission reward
+        this.addXP(mission.xp);
+        if (mission.gems) this.addGems(mission.gems);
+
+        ModalEngine.enqueue('questComplete', { icon: mission.icon, title: mission.title, xp: mission.xp, gems: mission.gems || 0 });
+
+        // Check if ALL missions just completed
+        const allDone = missions.every(m => m.completed || m.id === missionId);
+        if (allDone) {
+            const bonusXP   = Math.round(missions.reduce((s, m) => s + m.xp, 0) * 0.25);
+            const bonusGems = Math.round(missions.reduce((s, m) => s + (m.gems || 0), 0) * 0.5) + 10;
+            this.addXP(bonusXP);
+            this.addGems(bonusGems);
+            ModalEngine.enqueue('allQuestsDone', { bonusXP, bonusGems });
         }
     },
 

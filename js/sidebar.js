@@ -262,3 +262,53 @@ const Sidebar = {
 };
 
 window.Sidebar = Sidebar;
+
+// ── HUD AVATAR DROPDOWN ───────────────────────────────────
+const HUD = {
+    _open: false,
+
+    toggleAvatarDropdown() {
+        this._open ? this.closeAvatarDropdown() : this.openAvatarDropdown();
+    },
+
+    openAvatarDropdown() {
+        const dd  = document.getElementById('hud-avatar-dropdown');
+        const btn = document.getElementById('hud-avatar-btn');
+        if (!dd) return;
+        this._open = true;
+        dd.classList.add('open');
+        dd.setAttribute('aria-hidden', 'false');
+        btn?.setAttribute('aria-expanded', 'true');
+        this._updateDropdown();
+        setTimeout(() => document.addEventListener('click', this._outside, { once: true }), 10);
+    },
+
+    closeAvatarDropdown() {
+        const dd  = document.getElementById('hud-avatar-dropdown');
+        const btn = document.getElementById('hud-avatar-btn');
+        if (!dd) return;
+        this._open = false;
+        dd.classList.remove('open');
+        dd.setAttribute('aria-hidden', 'true');
+        btn?.setAttribute('aria-expanded', 'false');
+    },
+
+    _outside(e) {
+        if (!e.target.closest('#hud-avatar-wrap')) HUD.closeAvatarDropdown();
+    },
+
+    _updateDropdown() {
+        if (typeof State === 'undefined') return;
+        const u    = State.data.user;
+        const rank = State.getRank();
+        const el   = id => document.getElementById(id);
+        if (el('had-avatar'))   el('had-avatar').textContent   = u.avatar || '🦸';
+        if (el('had-name'))     el('had-name').textContent     = u.name   || 'Herói';
+        if (el('had-lvl-txt'))  el('had-lvl-txt').textContent  = `Nível ${u.level} · ${rank.icon} ${rank.name}`;
+        if (el('had-xp-val'))   el('had-xp-val').textContent   = `${u.xp} XP`;
+        if (el('had-streak-val')) el('had-streak-val').textContent = `${u.streak || 1} dias 🔥`;
+        if (el('had-gems-val')) el('had-gems-val').textContent  = `${u.gems} 💎`;
+    },
+};
+
+window.HUD = HUD;

@@ -611,6 +611,9 @@ const GameEngine = {
 
         if (isCorrect) {
             this.state.combo++;
+            if (this.state.combo >= 5) State.completeMission('combo_5');
+            const timeLimit = CONFIG.stages.timePerQuestion || 15;
+            if (this.state.timer > timeLimit - 5) State.completeMission('fast_answer');
             const comboBonus = (CONFIG.xp.comboBonus || 0) * this.state.combo;
             const timeBonus  = Math.floor((this.state.timer / 15) * (CONFIG.xp.timeBonusMax || 75));
             const points     = (CONFIG.xp.correct || 10) + comboBonus + timeBonus;
@@ -729,6 +732,10 @@ const GameEngine = {
             const xpGain  = this.state.score + (CONFIG.xp.stageComplete || 0);
             const gemGain = (CONFIG.gems.stageComplete || 0) + (stars === 3 ? (CONFIG.gems.perfect || 0) : 0);
             State.addXP(xpGain); State.addGems(gemGain);
+            // Mission hooks
+            State.completeMission('complete_stage');
+            State.completeMission('streak_day');
+            if (stars === 3) State.completeMission('perfect_score');
         }
 
         const starsDisplay = victory ? (['⭐', '⭐⭐', '⭐⭐⭐'][stars - 1] || '') : '💀';

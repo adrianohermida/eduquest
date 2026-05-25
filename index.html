@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/modal-hud.css">
 </head>
 <body data-layout="app">
 
@@ -36,13 +37,37 @@
                 aria-controls="sidebar"
                 aria-expanded="false"
             >☰</button>
-            <button
-                id="hud-avatar-btn"
-                class="hud-avatar-btn"
-                onclick="Router.navigate('#profile')"
-                aria-label="Ver perfil"
-                title="Meu Perfil"
-            >🦸</button>
+            <div class="hud-avatar-wrap" id="hud-avatar-wrap">
+                <button
+                    id="hud-avatar-btn"
+                    class="hud-avatar-btn"
+                    onclick="HUD.toggleAvatarDropdown()"
+                    aria-label="Ver perfil"
+                    aria-expanded="false"
+                    aria-controls="hud-avatar-dropdown"
+                    title="Meu Perfil"
+                >🦸</button>
+                <div class="hud-avatar-dropdown" id="hud-avatar-dropdown" aria-hidden="true" role="menu">
+                    <div class="had-user">
+                        <span class="had-avatar" id="had-avatar">🦸</span>
+                        <div class="had-info">
+                            <div class="had-name" id="had-name">Herói</div>
+                            <div class="had-lvl" id="had-lvl-txt">Nível 1</div>
+                        </div>
+                    </div>
+                    <div class="had-stats-row">
+                        <div class="had-stat"><span>⚡</span><span id="had-xp-val">0 XP</span></div>
+                        <div class="had-stat"><span>🔥</span><span id="had-streak-val">1 dias</span></div>
+                        <div class="had-stat"><span>💎</span><span id="had-gems-val">0</span></div>
+                    </div>
+                    <div class="had-divider"></div>
+                    <a class="had-link" href="#profile"  onclick="HUD.closeAvatarDropdown()" role="menuitem">🦸 Meu Perfil</a>
+                    <a class="had-link" href="#shop"     onclick="HUD.closeAvatarDropdown()" role="menuitem">🛒 Loja</a>
+                    <a class="had-link" href="#ranking"  onclick="HUD.closeAvatarDropdown()" role="menuitem">🏆 Ranking</a>
+                    <div class="had-divider"></div>
+                    <button class="had-link had-logout" onclick="State.logoutAsync()" role="menuitem">🚪 Sair</button>
+                </div>
+            </div>
             <span class="hud-level-chip" id="hud-level" aria-label="Nível atual">Nv.1</span>
         </div>
         <div class="hud-stats" role="status" aria-label="Estatísticas do jogador">
@@ -117,6 +142,7 @@
     <script src="js/mini-games/forca.js"></script>
     <script src="js/adventure-map.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/modal-engine.js"></script>
     <script src="js/router.js"></script>
     <script src="js/app.js"></script>
 </body>

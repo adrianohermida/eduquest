@@ -22,5 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
         Router.handleRoute();
     });
 
+    // Daily login reward + streak risk — delayed so route renders first
+    if (State.isOnboarded()) {
+        setTimeout(() => State.checkDailyLogin(), 800);
+    }
+
     console.log('✅ EduQuest v2.0 pronto!');
 });
