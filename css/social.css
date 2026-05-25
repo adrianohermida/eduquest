@@ -253,6 +253,77 @@
 .challenge-result-badge.won  { background: rgba(16,185,129,0.15); color: #10b981; }
 .challenge-result-badge.lost { background: rgba(239,68,68,0.10); color: #ef4444; }
 
+/* ── GUILD BOSS BATTLE ──────────────────────────────────────── */
+.guild-boss-card {
+    background: linear-gradient(135deg, rgba(220,38,38,0.08) 0%, rgba(124,58,237,0.05) 100%);
+    border: 1.5px solid rgba(220,38,38,0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-3);
+    margin-bottom: var(--sp-4);
+    margin-top: var(--sp-4);
+}
+.gbc-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: 10px;
+}
+.gbc-icon  { font-size: 2rem; flex-shrink: 0; line-height: 1; }
+.gbc-info  { flex: 1; min-width: 0; }
+.gbc-name  { font-size: 0.9rem; font-weight: 900; color: var(--text); }
+.gbc-meta  { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+.gbc-attack-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 12px;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: var(--r-md);
+    font-family: var(--font);
+    font-size: 0.78rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #991b1b;
+    white-space: nowrap;
+    transition: transform 0.12s, box-shadow 0.12s;
+    animation: bossPulse 2s ease-in-out infinite;
+}
+.gbc-attack-btn:active { transform: translateY(2px); box-shadow: none; }
+@keyframes bossPulse {
+    0%, 100% { box-shadow: 0 2px 0 #991b1b, 0 0 0 0 rgba(220,38,38,0.4); }
+    50%       { box-shadow: 0 2px 0 #991b1b, 0 0 0 6px rgba(220,38,38,0); }
+}
+.gbc-attacked-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #10b981;
+}
+.gbc-hp-track {
+    height: 10px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+.gbc-hp-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s ease;
+}
+.gbc-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    align-items: center;
+}
+
 /* ── DARK MODE ──────────────────────────────────────────────── */
 [data-theme="dark"] .live-presence-bar   { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.15); }
 [data-theme="dark"] .social-feed-item    { background: var(--surface-2); }

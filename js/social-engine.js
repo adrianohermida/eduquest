@@ -195,6 +195,60 @@ const SocialEngine = {
         return members;
     },
 
+    // ── BOSS BATTLE ASYNC ───────────────────────────────────────
+    BOSS_PRESETS: [
+        { id: 'virus_mutante',  name: 'Vírus Mutante V1',   icon: '🦠', color: '#dc2626', maxHP: 1000 },
+        { id: 'bacteria_rex',   name: 'Bactéria Rex',        icon: '🧫', color: '#7c3aed', maxHP: 800  },
+        { id: 'prion_sombra',   name: 'Príon das Sombras',   icon: '💀', color: '#1e3a5f', maxHP: 1200 },
+    ],
+
+    getGuildBoss(guildId) {
+        const today    = new Date().toDateString();
+        const seed     = (guildId + today).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+        const preset   = this.BOSS_PRESETS[seed % this.BOSS_PRESETS.length];
+        const stored   = this._loadBossState(guildId, today);
+        const hourSeed = Math.floor(Date.now() / 3600000);
+
+        // Ghost damage reduces HP over hours (2-4% per hour, from 20 ghost players)
+        const ghostDmg = ((hourSeed * 7 + seed * 3) % 30) + (hourSeed * 2.5);
+        const userDmg  = stored.userDamage || 0;
+        const totalDmg = Math.min(ghostDmg + userDmg, preset.maxHP * 0.95);
+        const hp       = Math.round(((preset.maxHP - totalDmg) / preset.maxHP) * 100);
+
+        return {
+            ...preset,
+            hp:           Math.max(hp, 5),
+            canAttack:    !stored.attacked,
+            totalDamage:  Math.round(totalDmg),
+            ghostDamage:  Math.round(ghostDmg),
+            userDamage,
+        };
+    },
+
+    attackBoss(guildId) {
+        const today = new Date().toDateString();
+        const state = this._loadBossState(guildId, today);
+        if (state.attacked) return false;
+        const userLevel = (typeof State !== 'undefined') ? (State.data?.user?.level || 1) : 1;
+        const dmg = 20 + userLevel * 5;
+        state.attacked   = true;
+        state.userDamage = (state.userDamage || 0) + dmg;
+        this._saveBossState(guildId, today, state);
+        return dmg;
+    },
+
+    _loadBossState(guildId, date) {
+        try {
+            const saved = JSON.parse(localStorage.getItem(`eq_boss_${guildId}`) || '{}');
+            if (saved.date !== date) return { date, attacked: false, userDamage: 0 };
+            return saved;
+        } catch { return { date, attacked: false, userDamage: 0 }; }
+    },
+
+    _saveBossState(guildId, date, state) {
+        localStorage.setItem(`eq_boss_${guildId}`, JSON.stringify({ ...state, date }));
+    },
+
     // ── FRIENDS ─────────────────────────────────────────────────
     getFriends() {
         try { return JSON.parse(localStorage.getItem('eq_friends') || '[]'); } catch { return []; }

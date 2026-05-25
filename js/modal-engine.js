@@ -69,6 +69,7 @@ const ModalEngine = {
             case 'streakFreezeUsed':   html = this._streakFreezeUsedHTML(data);   break;
             case 'motivational':       html = this._motivationalHTML(data);       break;
             case 'reviewSuggestion':   html = this._reviewSuggestionHTML(data);   break;
+            case 'story':              html = this._storyHTML(data);              break;
             // Dialogs — replaces native browser calls
             case 'missionExit':   html = this._missionExitHTML(data);    break;
             case 'confirm':       html = this._confirmHTML(data);         break;
@@ -322,6 +323,18 @@ const ModalEngine = {
                 <div class="modal-chip chip-xp">${this._ic('xp',{size:'xs',color:'xp'})} Sequência reiniciada</div>
             </div>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('map',{size:'xs'})} Continuar aprendendo</button>`;
+    },
+
+    _storyHTML({ icon = 'scroll', title = '', lore = '', chapter = '' }) {
+        const paragraphs = lore.split('\n').filter(p => p.trim()).map(p => {
+            const formatted = p.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            return `<p class="story-paragraph">${formatted}</p>`;
+        }).join('');
+        return `
+            <div class="story-icon">${this._ic(icon,{size:'xl',color:'science'})}</div>
+            <h2 class="modal-title story-title" id="modal-title-el">${title}</h2>
+            <div class="story-body">${paragraphs}</div>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('sword',{size:'xs',color:'rpg'})} Iniciar Jornada</button>`;
     },
 
     // ── MODAL HTML — Dialogs (native replacements) ────────────────

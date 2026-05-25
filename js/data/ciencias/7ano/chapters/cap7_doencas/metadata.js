@@ -12,6 +12,14 @@ const CHAPTER_METADATA = {
     description: 'Combata os vilões microscópicos! Aprenda sobre imunidade, vacinas, doenças virais e bacterianas, e como o saneamento protege a vida.',
     totalStages: 12,
 
+    lore: {
+        intro: `No coração do **Reino de EduQuest**, um vírus mutante está se espalhando pelas terras. As forças da doença — Vírus, Bactérias, Protistas e Fungos — avançam sobre os habitantes. Apenas um Herói com conhecimento pode detê-los.\n\nSua missão: dominar as Ciências da Saúde e derrotar o **Vírus Mutante V1** antes que ele destrua a Academia. Cada missão que você completa enfraquece as hostes inimigas. A Ciência é sua arma.`,
+        boss:    `⚠️ **ALERTA DE BATALHA** — O Vírus Mutante V1 emergiu das Profundezas Celulares! Este ser microscópico já infectou 3 regiões do mapa. Somente quem domina imunidade, anticorpos e mecanismos de defesa pode detê-lo. Use tudo que aprendeu — é agora ou nunca!`,
+        victory: `🏆 **VITÓRIA!** O Vírus Mutante V1 foi derrotado! O Reino de EduQuest está salvo. Graças ao seu conhecimento sobre doenças infecciosas, imunidade e saúde pública, as forças da doença recuaram para as sombras. Você é agora um **Mestre das Ciências da Vida**!`,
+    },
+
+    totalStages: 12,
+
     // Registry completo das 12 etapas
     stages: [
         { index: 1,  id: 'stage_01',    varName: 'STAGE_01',    isBoss: false, isFinal: false },

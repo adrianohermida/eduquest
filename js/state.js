@@ -73,9 +73,12 @@ const State = {
             // v8 additions
             avatarClass:          'guerreiro',
             lastStreakMilestone:  0,
+            // v9 additions (Sprint 4)
+            loreSeenChapters:     [],
         },
         progress: {},
         dailyMissions: { date: null, completed: [] },
+        wrongAnswers:  {},
     },
 
     _syncTimer:  null,
@@ -157,10 +160,12 @@ const State = {
                 maxCombo:             parsed.user.maxCombo             || 0,
                 avatarClass:          parsed.user.avatarClass          || 'guerreiro',
                 lastStreakMilestone:  parsed.user.lastStreakMilestone  || 0,
+                loreSeenChapters:     parsed.user.loreSeenChapters     || [],
             };
         }
         this.data.progress      = parsed.progress || {};
         this.data.dailyMissions = parsed.dailyMissions || { date: null, completed: [] };
+        this.data.wrongAnswers  = parsed.wrongAnswers  || {};
         this.data.schemaVersion = this.SCHEMA_VERSION;
     },
 
@@ -764,6 +769,93 @@ const State = {
         }
         this.save();
         this.checkProgressAchievements();
+    },
+
+    // ── MASTERY & SMART REVIEW ───────────────────────────────
+    recordWrongAnswer(chapterId, stageId, qIdx, topic) {
+        if (!this.data.wrongAnswers) this.data.wrongAnswers = {};
+        const key = `${chapterId}/${stageId}/${qIdx}`;
+        if (!this.data.wrongAnswers[key]) {
+            this.data.wrongAnswers[key] = { chapterId, stageId, qIdx, topic: topic || 'Geral', count: 0, last: 0 };
+        }
+        this.data.wrongAnswers[key].count++;
+        this.data.wrongAnswers[key].last = Date.now();
+        this.save();
+    },
+
+    getWeakTopics() {
+        const wa = this.data.wrongAnswers || {};
+        const topicMap = {};
+        for (const item of Object.values(wa)) {
+            const t = item.topic || 'Geral';
+            if (!topicMap[t]) topicMap[t] = { topic: t, count: 0, chapterId: item.chapterId };
+            topicMap[t].count += item.count;
+        }
+        return Object.values(topicMap).sort((a, b) => b.count - a.count);
+    },
+
+    getWrongAnswerCount() {
+        return Object.keys(this.data.wrongAnswers || {}).length;
+    },
+
+    getReviewQuestions(n = 5) {
+        const wa = Object.values(this.data.wrongAnswers || {})
+            .sort((a, b) => b.count - a.count)
+            .slice(0, n * 3);
+        const questions = [];
+        for (const item of wa) {
+            const stageVar = window[item.stageId?.toUpperCase()];
+            if (stageVar?.questions?.[item.qIdx]) {
+                questions.push({
+                    ...stageVar.questions[item.qIdx],
+                    _chapterId:  item.chapterId,
+                    _stageId:    item.stageId,
+                    _qIdx:       item.qIdx,
+                    _wrongCount: item.count,
+                    _topic:      item.topic,
+                });
+            }
+            if (questions.length >= n) break;
+        }
+        return questions;
+    },
+
+    getMasteryData() {
+        const chapters  = window.CONFIG?.chapters || [];
+        const meta      = window.CHAPTER_METADATA;
+        const result    = [];
+
+        for (const ch of chapters) {
+            const prog    = this.getChapterProgress(ch.id);
+            const stages  = meta?.id === ch.id ? (meta.stages || []) : [];
+            const totalStars  = stages.reduce((sum, s) => sum + this.getStageStars(ch.id, s.index), 0);
+            const maxStars    = stages.length * 3;
+            const starPct     = maxStars > 0 ? Math.round((totalStars / maxStars) * 100) : 0;
+            const topics      = (this.getWeakTopics() || []).filter(t => t.chapterId === ch.id);
+            result.push({
+                id:       ch.id,
+                subject:  ch.subject,
+                title:    ch.title,
+                icon:     ch.icon,
+                prog,
+                starPct,
+                weakTopics: topics.slice(0, 3),
+            });
+        }
+        return result;
+    },
+
+    // ── STORY MODE ───────────────────────────────────────────
+    hasSeenLore(chapterId) {
+        return (this.data.user.loreSeenChapters || []).includes(chapterId);
+    },
+
+    markLoreSeen(chapterId) {
+        if (!this.data.user.loreSeenChapters) this.data.user.loreSeenChapters = [];
+        if (!this.data.user.loreSeenChapters.includes(chapterId)) {
+            this.data.user.loreSeenChapters.push(chapterId);
+            this.save();
+        }
     },
 
     // ── RESET (dev only) ─────────────────────────────────────

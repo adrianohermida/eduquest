@@ -79,6 +79,8 @@ const Router = {
             case 'teams':         this.renderTeams(container, parts[1]);   break;
             case 'guild':         this.renderGuild(container);              break;
             case 'friends':       this.renderFriends(container);            break;
+            case 'mastery':       this.renderMastery(container);            break;
+            case 'review':        this.renderReview(container);             break;
             case 'achievements':  this.renderAchievements(container);       break;
             case 'word-search':   this.renderWordSearch(container, parts[1], parts[2]); break;
             default:              this.renderHome(container);
@@ -987,6 +989,21 @@ const Router = {
         const meta   = window.CHAPTER_METADATA || { title: 'Capítulo', icon: '📚', description: '', totalStages: 5, stages: [] };
         const stages = meta.stages || [];
 
+        // Story Mode: show lore intro on first visit
+        if (meta.lore?.intro && typeof State !== 'undefined' && !State.hasSeenLore(chapterId)) {
+            State.markLoreSeen(chapterId);
+            setTimeout(() => {
+                if (typeof ModalEngine !== 'undefined') {
+                    ModalEngine.interrupt('story', {
+                        icon:    'scroll',
+                        title:   meta.title,
+                        lore:    meta.lore.intro,
+                        chapter: chapterId,
+                    });
+                }
+            }, 400);
+        }
+
         let pathHTML = '';
         for (const stage of stages) {
             const i         = stage.index;
@@ -1355,6 +1372,12 @@ const Router = {
                     <div style="font-size:0.8rem;font-weight:900;color:var(--gold)">Ver →</div>
                 </div>` : ''}
 
+                <button class="profile-nav-btn" onclick="Router.navigate('#mastery')">
+                    <span class="pnb-icon">${_ic('microscope',{size:'sm',color:'science'})}</span>
+                    <span class="pnb-label">Mapa de Domínio</span>
+                    ${(() => { const wc = typeof State !== 'undefined' ? State.getWrongAnswerCount() : 0; return wc > 0 ? `<span class="pnb-count" style="color:#ef4444">${wc} para revisar</span>` : `<span class="pnb-count" style="color:var(--text-muted)">Sem pendências</span>`; })()}
+                    <span class="pnb-arrow">›</span>
+                </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#achievements')">
                     <span class="pnb-icon">${_ic('achievement',{size:'sm'})}</span>
                     <span class="pnb-label">Todas as Conquistas</span>
@@ -1787,6 +1810,35 @@ const Router = {
             </div>
 
             <div class="guild-body">
+
+                <!-- Boss Battle Async -->
+                ${(() => {
+                    const boss = SE.getGuildBoss(guild.id);
+                    const hpColor = boss.hp > 60 ? '#ef4444' : boss.hp > 30 ? '#f97316' : '#10b981';
+                    return `
+                <div class="guild-boss-card">
+                    <div class="gbc-header">
+                        <span class="gbc-icon">${boss.icon}</span>
+                        <div class="gbc-info">
+                            <div class="gbc-name">${boss.name}</div>
+                            <div class="gbc-meta">Boss Global da Guild · ${boss.hp}% HP restante</div>
+                        </div>
+                        ${boss.canAttack ? `
+                        <button class="gbc-attack-btn" onclick="Router._attackGuildBoss('${guild.id}')">
+                            ${_ic('sword',{size:'xs',color:'rpg'})} Atacar!
+                        </button>` : `
+                        <span class="gbc-attacked-badge">${_ic('check',{size:'xs',color:'success'})} Atacado hoje</span>`}
+                    </div>
+                    <div class="gbc-hp-track">
+                        <div class="gbc-hp-fill" style="width:${boss.hp}%;background:${hpColor}"></div>
+                    </div>
+                    <div class="gbc-stats">
+                        <span>${_ic('friends',{size:'xs'})} Dano da guild: ${boss.ghostDamage} pts</span>
+                        ${boss.userDamage ? `<span>${_ic('xp',{size:'xs',color:'xp'})} Seu dano: ${boss.userDamage} pts</span>` : ''}
+                    </div>
+                </div>`;
+                })()}
+
                 <div class="section-header mt-4" style="margin-bottom:var(--sp-3)">
                     <span class="section-title">${_ic('trophy',{size:'sm'})} Ranking da Guild</span>
                 </div>
@@ -1851,6 +1903,15 @@ const Router = {
         this.renderGuild(document.getElementById('app-container'));
     },
 
+    _attackGuildBoss(guildId) {
+        if (typeof SocialEngine === 'undefined') return;
+        const dmg = SocialEngine.attackBoss(guildId);
+        if (dmg === false) { if (typeof HUD !== 'undefined') HUD._toast('Você já atacou hoje!'); return; }
+        if (typeof State !== 'undefined') State.addXP(dmg);
+        if (typeof HUD !== 'undefined') HUD._toast(`Ataque! ${dmg} dano causado ao Boss. +${dmg} XP`);
+        this.renderGuild(document.getElementById('app-container'));
+    },
+
     _leaveGuild() {
         ModalEngine.interrupt('confirm', {
             title:       'Sair da guild?',
@@ -1862,6 +1923,242 @@ const Router = {
                 this.navigate('#guild');
             },
         });
+    },
+
+    // ── MASTERY SCREEN ───────────────────────────────────
+    renderMastery(container) {
+        const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const mastery  = typeof State !== 'undefined' ? State.getMasteryData() : [];
+        const weakAll  = typeof State !== 'undefined' ? State.getWeakTopics()  : [];
+        const wrongCnt = typeof State !== 'undefined' ? State.getWrongAnswerCount() : 0;
+
+        const barColor = pct => pct >= 70 ? 'fill-green' : pct >= 40 ? 'fill-yellow' : 'fill-red';
+
+        // SVG Radar chart — pentagon axes for up to 5 chapters
+        const axes   = mastery.slice(0, 5);
+        const cx = 110, cy = 110, r = 80;
+        const angleStep = (Math.PI * 2) / Math.max(axes.length, 3);
+        const toXY = (i, pct) => {
+            const a = -Math.PI / 2 + i * angleStep;
+            const d = (pct / 100) * r;
+            return { x: cx + d * Math.cos(a), y: cy + d * Math.sin(a) };
+        };
+        const gridLevels = [25, 50, 75, 100];
+        const gridHTML = gridLevels.map(lvl => {
+            const pts = axes.map((_, i) => {
+                const a = -Math.PI / 2 + i * angleStep;
+                const d = (lvl / 100) * r;
+                return `${cx + d * Math.cos(a)},${cy + d * Math.sin(a)}`;
+            }).join(' ');
+            return `<polygon points="${pts}" fill="none" stroke="var(--border)" stroke-width="${lvl === 100 ? 1.5 : 0.7}"/>`;
+        }).join('');
+        const axisLines = axes.map((_, i) => {
+            const a = -Math.PI / 2 + i * angleStep;
+            return `<line x1="${cx}" y1="${cy}" x2="${cx + r * Math.cos(a)}" y2="${cy + r * Math.sin(a)}" stroke="var(--border)" stroke-width="0.7"/>`;
+        }).join('');
+        const dataPoints = axes.map((ch, i) => toXY(i, ch.prog.percent));
+        const dataPoly   = dataPoints.map(p => `${p.x},${p.y}`).join(' ');
+        const labelHTML  = axes.map((ch, i) => {
+            const a  = -Math.PI / 2 + i * angleStep;
+            const lx = cx + (r + 22) * Math.cos(a);
+            const ly = cy + (r + 22) * Math.sin(a);
+            return `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle"
+                style="font-size:9px;font-weight:900;fill:var(--text-muted);font-family:var(--font)">${ch.subject.slice(0,8)}</text>`;
+        }).join('');
+        const radarSVG = axes.length >= 3 ? `
+        <div class="radar-wrap">
+            <svg class="radar-svg" width="220" height="220" viewBox="0 0 220 220">
+                ${gridHTML}${axisLines}
+                <polygon points="${dataPoly}" fill="rgba(249,115,22,0.15)" stroke="var(--brand)" stroke-width="2"/>
+                ${dataPoints.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--brand)"/>`).join('')}
+                ${labelHTML}
+            </svg>
+        </div>` : '';
+
+        const masteryCardsHTML = mastery.map(ch => `
+        <div class="mastery-card">
+            <div class="mastery-card-header">
+                <span class="mastery-card-icon">${ch.icon}</span>
+                <div class="mastery-card-info">
+                    <div class="mastery-card-title">${ch.title}</div>
+                    <div class="mastery-card-sub">${ch.subject} · ${ch.prog.stagesCompleted}/${ch.prog.totalStages} missões</div>
+                </div>
+                <span class="mastery-card-pct">${ch.prog.percent}%</span>
+            </div>
+            <div class="mastery-bar-track">
+                <div class="mastery-bar-fill ${barColor(ch.prog.percent)}" style="width:${ch.prog.percent}%"></div>
+            </div>
+            ${ch.weakTopics.length ? `
+            <div style="margin-top:8px;font-size:0.7rem;color:#ef4444;font-weight:800">
+                ${_ic('warning',{size:'xs',color:'danger'})} Fraco em: ${ch.weakTopics.map(t=>t.topic).join(', ')}
+            </div>` : ''}
+        </div>`).join('');
+
+        const weakHTML = weakAll.slice(0, 5).map(t => `
+        <div class="weak-topic-row">
+            <span class="wt-icon">${_ic('warning',{size:'xs',color:'danger'})}</span>
+            <span class="wt-name">${t.topic}</span>
+            <span class="wt-count">${t.count}× errado</span>
+        </div>`).join('');
+
+        container.innerHTML = `
+        <div class="screen mastery-screen">
+            <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
+
+            <div class="mastery-header">
+                <span class="mastery-header-icon">${_ic('microscope',{size:'lg',color:'science'})}</span>
+                <div>
+                    <div class="mastery-header-title">Mapa de Domínio</div>
+                    <div class="mastery-header-sub">Sua performance por tópico</div>
+                </div>
+            </div>
+
+            ${radarSVG}
+
+            ${wrongCnt > 0 ? `
+            <div class="review-cta-wrap">
+                <span class="review-cta-icon">${_ic('compass',{size:'lg',color:'xp'})}</span>
+                <div class="review-cta-info">
+                    <div class="review-cta-title">Revisão Inteligente disponível</div>
+                    <div class="review-cta-sub">${wrongCnt} questão${wrongCnt > 1 ? 'ões' : ''} para reforçar</div>
+                </div>
+                <button class="fr-accept-btn" onclick="Router.navigate('#review')">
+                    ${_ic('scroll',{size:'xs'})} Revisar
+                </button>
+            </div>` : ''}
+
+            <div class="mastery-section">
+                <div class="mastery-section-title">${_ic('scroll',{size:'xs',color:'science'})} Por Matéria</div>
+                ${masteryCardsHTML || `<p style="color:var(--text-muted);font-size:0.85rem;font-weight:700;padding:16px">Complete missões para ver seu domínio aqui.</p>`}
+            </div>
+
+            ${weakAll.length ? `
+            <div class="mastery-section">
+                <div class="mastery-section-title">${_ic('warning',{size:'xs',color:'danger'})} Tópicos Fracos</div>
+                <div class="weak-topics-list">${weakHTML}</div>
+            </div>` : ''}
+        </div>`;
+    },
+
+    // ── SMART REVIEW ─────────────────────────────────────
+    renderReview(container) {
+        const _ic   = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const questions = typeof State !== 'undefined' ? State.getReviewQuestions(8) : [];
+
+        if (!questions.length) {
+            container.innerHTML = `
+            <div class="screen review-screen">
+                <button class="btn-back" onclick="Router.navigate('#mastery')">‹ Domínio</button>
+                <div class="review-header">
+                    <span class="review-header-icon">${_ic('compass',{size:'lg',color:'science'})}</span>
+                    <div>
+                        <div class="review-header-title">Revisão Inteligente</div>
+                        <div class="review-header-sub">Sem questões para revisar ainda</div>
+                    </div>
+                </div>
+                <div class="review-empty">
+                    ${_ic('check',{size:'xl',color:'success'})}
+                    <p style="margin-top:12px">Você não errou nenhuma questão ainda.</p>
+                    <p>Complete missões para construir sua fila de revisão!</p>
+                    <button class="btn-primary mt-4" onclick="Router.navigate('#home')">Jogar agora</button>
+                </div>
+            </div>`;
+            return;
+        }
+
+        // In-page mini quiz state
+        const state = { idx: 0, correct: 0, answered: false };
+        window._reviewState = state;
+        window._reviewQuestions = questions;
+
+        const renderQ = () => {
+            const q   = window._reviewQuestions[window._reviewState.idx];
+            const s   = window._reviewState;
+            const pct = Math.round((s.idx / window._reviewQuestions.length) * 100);
+            const letters = ['A','B','C','D'];
+            const optHTML = (q.options || []).map((opt, i) => `
+                <button class="review-option" id="rv-opt-${i}" onclick="window._reviewAnswer(${i})">
+                    <span class="review-option-letter">${letters[i] || i+1}</span>${opt}
+                </button>`).join('');
+
+            const wrap = document.getElementById('review-quiz-wrap');
+            if (!wrap) return;
+            wrap.innerHTML = `
+                <div class="review-progress">
+                    <span>${s.idx + 1}/${window._reviewQuestions.length}</span>
+                    <div class="review-progress-track"><div class="review-progress-fill" style="width:${pct}%"></div></div>
+                    <span>${s.correct} certas</span>
+                </div>
+                <div class="review-question-card">
+                    <div class="review-q-meta">${_ic('warning',{size:'xs',color:'danger'})} Errado ${q._wrongCount || 1}× · Tópico: ${q._topic || 'Geral'}</div>
+                    <div class="review-q-text">${q.question}</div>
+                    <div class="review-options" id="rv-options">${optHTML}</div>
+                </div>`;
+        };
+
+        window._reviewAnswer = (selectedIdx) => {
+            const q = window._reviewQuestions[window._reviewState.idx];
+            const s = window._reviewState;
+            if (s.answered) return;
+            s.answered = true;
+
+            const opts = document.querySelectorAll('.review-option');
+            opts.forEach((el, i) => {
+                el.disabled = true;
+                if (i === q.correctIndex) el.classList.add('correct');
+                else if (i === selectedIdx) el.classList.add('wrong');
+            });
+
+            if (selectedIdx === q.correctIndex) s.correct++;
+
+            const nextBtn = document.getElementById('rv-next-btn');
+            if (nextBtn) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent   = s.idx + 1 < window._reviewQuestions.length ? 'Próxima →' : 'Finalizar';
+            }
+        };
+
+        window._reviewNext = () => {
+            const s = window._reviewState;
+            s.idx++;
+            s.answered = false;
+            const nextBtn = document.getElementById('rv-next-btn');
+            if (nextBtn) nextBtn.style.display = 'none';
+
+            if (s.idx >= window._reviewQuestions.length) {
+                const xpEarned = s.correct * 10;
+                if (typeof State !== 'undefined' && xpEarned > 0) State.addXP(xpEarned);
+                const wrap = document.getElementById('review-quiz-wrap');
+                if (wrap) wrap.innerHTML = `
+                    <div style="text-align:center;padding:32px 16px">
+                        ${_ic('achievement',{size:'xl',color:'xp'})}
+                        <div style="font-size:1.1rem;font-weight:900;margin-top:12px">Revisão Concluída!</div>
+                        <div style="color:var(--text-muted);font-size:0.85rem;font-weight:700;margin-top:4px">${s.correct}/${window._reviewQuestions.length} corretas · +${xpEarned} XP</div>
+                        <button class="btn-primary mt-4" onclick="Router.navigate('#mastery')">Ver Domínio</button>
+                        <button class="btn-secondary mt-2" onclick="Router.renderReview(document.getElementById('app-container'))">Revisar Novamente</button>
+                    </div>`;
+                return;
+            }
+            renderQ();
+        };
+
+        container.innerHTML = `
+        <div class="screen review-screen">
+            <button class="btn-back" onclick="Router.navigate('#mastery')">‹ Domínio</button>
+            <div class="review-header">
+                <span class="review-header-icon">${_ic('compass',{size:'lg',color:'science'})}</span>
+                <div>
+                    <div class="review-header-title">Revisão Inteligente</div>
+                    <div class="review-header-sub">${questions.length} questões das suas fraquezas</div>
+                </div>
+            </div>
+            <div id="review-quiz-wrap"></div>
+            <div style="padding:0 var(--sp-4)">
+                <button class="btn-primary" id="rv-next-btn" style="display:none;width:100%" onclick="window._reviewNext()">Próxima →</button>
+            </div>
+        </div>`;
+
+        renderQ();
     },
 
     // ── FRIENDS ──────────────────────────────────────────

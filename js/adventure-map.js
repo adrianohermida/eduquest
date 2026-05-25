@@ -6,70 +6,74 @@
 
 const AdventureMap = {
 
-    WORLD_W: 440,
+    WORLD_W: 520,
     WORLD_H: 2700,
+    _layoutMode: 'vertical',
 
-    // Stage 1 at TOP (y≈180), final boss at BOTTOM (y≈2530)
-    _stagePositions: [
-        [50,  180],  //  1 — Forest of Origin (center, top)
-        [28,  380],  //  2 — (left)
-        [72,  580],  //  3 — (right)
-        [22,  790],  //  4 — (far left)
-        [65,  990],  //  5 — Village (right)
-        [30, 1170],  //  6 — (left)
-        [68, 1370],  //  7 — Lab (right)
-        [28, 1570],  //  8 — (left)
-        [62, 1770],  //  9 — Tower (right)
-        [36, 1970],  // 10 — (left)
-        [50, 2210],  // 11 — BOSS (center dramatic)
-        [50, 2540],  // 12 — FINAL (center triumphant)
-    ],
+    _worldLayouts: {
+        vertical: {
+            minWidth: 0,
+            width: 520,
+            height: 2780,
+            modeLabel: 'Rota vertical',
+            positions: [
+                [50, 0.07], [28, 0.15], [72, 0.23], [24, 0.31],
+                [66, 0.39], [30, 0.47], [70, 0.55], [26, 0.63],
+                [64, 0.71], [36, 0.79], [50, 0.88], [50, 0.96],
+            ],
+        },
+        hybrid: {
+            minWidth: 720,
+            width: 900,
+            height: 2200,
+            modeLabel: 'Rota livre',
+            positions: [
+                [22, 0.08], [45, 0.15], [72, 0.22], [62, 0.32],
+                [32, 0.39], [18, 0.51], [49, 0.57], [76, 0.64],
+                [68, 0.74], [38, 0.80], [22, 0.90], [50, 0.97],
+            ],
+        },
+        horizontal: {
+            minWidth: 1100,
+            width: 1180,
+            height: 1680,
+            modeLabel: 'Rota panorâmica',
+            positions: [
+                [14, 0.12], [29, 0.21], [48, 0.15], [69, 0.25],
+                [84, 0.39], [63, 0.49], [40, 0.42], [20, 0.58],
+                [34, 0.73], [58, 0.66], [78, 0.82], [88, 0.94],
+            ],
+        },
+    },
 
     // Biomes top → bottom (forest=start at top, citadel=end at bottom)
     _biomes: [
-        { top:    0, bottom:  450, id: 'forest',  name: 'Floresta de Início',  svgIcon: 'compass',    iconColor: 'success', bg1: '#d1fae5', bg2: '#a7f3d0' },
-        { top:  450, bottom: 1020, id: 'village', name: 'Aldeia do Saber',      svgIcon: 'home',       iconColor: '',        bg1: '#fef9c3', bg2: '#fde68a' },
-        { top: 1020, bottom: 1590, id: 'lab',     name: 'Laboratório Arcano',   svgIcon: 'microscope', iconColor: 'science', bg1: '#dbeafe', bg2: '#bfdbfe' },
-        { top: 1590, bottom: 2160, id: 'tower',   name: 'Torre do Saber',       svgIcon: 'portal',     iconColor: 'rpg',     bg1: '#ede9fe', bg2: '#ddd6fe' },
-        { top: 2160, bottom: 2700, id: 'citadel', name: 'Cidadela Final',       svgIcon: 'crown',      iconColor: 'final',   bg1: '#fef3c7', bg2: '#fde68a' },
+        { topPct: 0.00, bottomPct: 0.19, id: 'forest',  name: 'Floresta de Início',  svgIcon: 'compass',    iconColor: 'success', bg1: '#d1fae5', bg2: '#a7f3d0' },
+        { topPct: 0.19, bottomPct: 0.39, id: 'village', name: 'Aldeia do Saber',      svgIcon: 'home',       iconColor: '',        bg1: '#fef9c3', bg2: '#fde68a' },
+        { topPct: 0.39, bottomPct: 0.60, id: 'lab',     name: 'Laboratório Arcano',   svgIcon: 'microscope', iconColor: 'science', bg1: '#dbeafe', bg2: '#bfdbfe' },
+        { topPct: 0.60, bottomPct: 0.80, id: 'tower',   name: 'Torre do Saber',       svgIcon: 'portal',     iconColor: 'rpg',     bg1: '#ede9fe', bg2: '#ddd6fe' },
+        { topPct: 0.80, bottomPct: 1.00, id: 'citadel', name: 'Cidadela Final',       svgIcon: 'crown',      iconColor: 'final',   bg1: '#fef3c7', bg2: '#fde68a' },
     ],
 
     _decorations: [
-        // Forest zone (y 0–450)
-        { x:  7, y: 100, emoji: '🌲', cls: 'wm-deco-tree' },
-        { x: 86, y:  80, emoji: '🌳', cls: 'wm-deco-tree' },
-        { x: 14, y: 290, emoji: '🍄', cls: 'wm-deco-small' },
-        { x: 82, y: 260, emoji: '🌸', cls: 'wm-deco-small wm-float' },
-        { x:  8, y: 380, emoji: '🦋', cls: 'wm-deco-small wm-float' },
-        { x: 88, y: 350, emoji: '🌿', cls: 'wm-deco-small' },
-        { x: 42, y: 160, emoji: '🪨', cls: 'wm-deco-rock' },
-        // Village zone (y 450–1020)
-        { x:  9, y: 520, emoji: '🏠',   cls: 'wm-deco-building' },
-        { x: 84, y: 490, emoji: '🌻',   cls: 'wm-deco-tree' },
-        { x: 10, y: 720, emoji: '🧑‍🌾', cls: 'wm-deco-npc', label: 'Aldeão' },
-        { x: 85, y: 790, emoji: '🛖',   cls: 'wm-deco-building' },
-        { x: 38, y: 920, emoji: '🌾',   cls: 'wm-deco-small' },
-        { x: 88, y: 950, emoji: '🐓',   cls: 'wm-deco-small wm-float' },
-        // Lab zone (y 1020–1590)
-        { x:  8, y: 1090, emoji: '🧪',   cls: 'wm-deco-building' },
-        { x: 86, y: 1070, emoji: '🔬',   cls: 'wm-deco-building' },
-        { x: 12, y: 1290, emoji: '👩‍🔬', cls: 'wm-deco-npc', label: 'Cientista' },
-        { x: 84, y: 1440, emoji: '⚗️',   cls: 'wm-deco-building' },
-        { x: 50, y: 1510, emoji: '🔭',   cls: 'wm-deco-small' },
-        { x: 10, y: 1545, emoji: '💡',   cls: 'wm-deco-small wm-pulse' },
-        // Tower zone (y 1590–2160)
-        { x:  8, y: 1660, emoji: '💠',   cls: 'wm-deco-crystal wm-pulse' },
-        { x: 87, y: 1710, emoji: '🔮',   cls: 'wm-deco-crystal wm-pulse' },
-        { x: 10, y: 1870, emoji: '🧙',   cls: 'wm-deco-npc', label: 'Mago Sábio' },
-        { x: 84, y: 1955, emoji: '✨',   cls: 'wm-deco-small wm-float' },
-        { x: 35, y: 2080, emoji: '📚',   cls: 'wm-deco-building' },
-        { x: 88, y: 2110, emoji: '🌟',   cls: 'wm-deco-small wm-float' },
-        // Citadel zone (y 2160–2700)
-        { x: 12, y: 2230, emoji: '🚩',   cls: 'wm-deco-small' },
-        { x: 80, y: 2200, emoji: '🏰',   cls: 'wm-deco-building' },
-        { x: 10, y: 2370, emoji: '👑',   cls: 'wm-deco-npc', label: 'Rei do Saber' },
-        { x: 85, y: 2460, emoji: '⭐',   cls: 'wm-deco-crystal wm-float' },
-        { x: 50, y: 2630, emoji: '🎓',   cls: 'wm-deco-crystal wm-pulse' },
+        { x: 12, yPct: 0.06, icon: 'tree', cls: 'wm-deco-tree' },
+        { x: 84, yPct: 0.05, icon: 'tree', cls: 'wm-deco-tree wm-deco-lg' },
+        { x: 40, yPct: 0.11, icon: 'stone', cls: 'wm-deco-rock' },
+        { x: 82, yPct: 0.16, icon: 'spark', cls: 'wm-deco-small wm-float' },
+        { x: 14, yPct: 0.22, icon: 'mushroom', cls: 'wm-deco-small' },
+        { x: 12, yPct: 0.28, icon: 'home', cls: 'wm-deco-building' },
+        { x: 84, yPct: 0.30, icon: 'sunflower', cls: 'wm-deco-tree' },
+        { x: 18, yPct: 0.38, icon: 'npc', cls: 'wm-deco-npc', label: 'Mentor' },
+        { x: 86, yPct: 0.43, icon: 'lab', cls: 'wm-deco-building wm-deco-lg' },
+        { x: 13, yPct: 0.49, icon: 'flask', cls: 'wm-deco-building' },
+        { x: 50, yPct: 0.56, icon: 'lens', cls: 'wm-deco-small wm-pulse' },
+        { x: 84, yPct: 0.62, icon: 'crystal', cls: 'wm-deco-crystal wm-pulse' },
+        { x: 13, yPct: 0.69, icon: 'portal', cls: 'wm-deco-crystal wm-pulse' },
+        { x: 34, yPct: 0.76, icon: 'book', cls: 'wm-deco-building' },
+        { x: 84, yPct: 0.80, icon: 'star', cls: 'wm-deco-small wm-float' },
+        { x: 80, yPct: 0.86, icon: 'castle', cls: 'wm-deco-building wm-deco-xl' },
+        { x: 14, yPct: 0.91, icon: 'flag', cls: 'wm-deco-small' },
+        { x: 50, yPct: 0.97, icon: 'crown', cls: 'wm-deco-crystal wm-pulse' },
     ],
 
     // ── STATE ────────────────────────────────────────────────────
@@ -93,9 +97,60 @@ const AdventureMap = {
 
     _boundKeyDown: null,
     _boundKeyUp:   null,
+    _boundResize:  null,
+    _resizeTimer:  null,
     _audioCtx:     null,
     _charEl:       null,
     _zoneEl:       null,
+
+    _configureResponsiveWorld() {
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        const layouts = Object.values(this._worldLayouts)
+            .sort((a, b) => a.minWidth - b.minWidth);
+        const layout = layouts.reduce((current, item) => vw >= item.minWidth ? item : current, layouts[0]);
+        this.WORLD_W = layout.width;
+        this.WORLD_H = layout.height;
+        this._layoutMode = Object.keys(this._worldLayouts).find(k => this._worldLayouts[k] === layout) || 'vertical';
+        return layout;
+    },
+
+    _stagePointAt(index) {
+        const layout = this._worldLayouts[this._layoutMode] || this._worldLayouts.vertical;
+        const pos = layout.positions[index] || [50, 0.1 + index * 0.07];
+        return {
+            xPct: pos[0],
+            worldY: Math.round(pos[1] * this.WORLD_H),
+        };
+    },
+
+    _biomeBounds(biome) {
+        const top = Number.isFinite(biome.top) ? biome.top : Math.round(biome.topPct * this.WORLD_H);
+        const bottom = Number.isFinite(biome.bottom) ? biome.bottom : Math.round(biome.bottomPct * this.WORLD_H);
+        return { top, bottom, height: bottom - top };
+    },
+
+    _decoGlyph(icon) {
+        const glyphs = {
+            tree: '🌲',
+            stone: '🪨',
+            spark: '✨',
+            mushroom: '🍄',
+            home: '🏠',
+            sunflower: '🌻',
+            npc: '🧑‍🏫',
+            lab: '🏥',
+            flask: '🧪',
+            lens: '🔬',
+            crystal: '💠',
+            portal: '🔮',
+            book: '📚',
+            star: '🌟',
+            castle: '🏰',
+            flag: '🚩',
+            crown: '👑',
+        };
+        return glyphs[icon] || icon || '';
+    },
 
     // ── ENTRY POINT ──────────────────────────────────────────────
     start(chapterId) {
@@ -106,6 +161,7 @@ const AdventureMap = {
         if (this._boundKeyDown) {
             window.removeEventListener('keydown', this._boundKeyDown);
             window.removeEventListener('keyup',   this._boundKeyUp);
+            window.removeEventListener('resize',  this._boundResize);
         }
 
         this.chapterId     = chapterId;
@@ -117,8 +173,10 @@ const AdventureMap = {
         const meta = window.CHAPTER_METADATA;
         if (!meta) { Router.navigate(`#chapter/${chapterId}`); return; }
 
+        const layout = this._configureResponsiveWorld();
+
         this.stages = (meta.stages || []).map((s, i) => {
-            const pos  = this._stagePositions[i] || [50, (i + 1) * 220];
+            const pos  = this._stagePointAt(i);
             const data = window[s.varName] || {};
             return {
                 id:        s.id,
@@ -126,8 +184,8 @@ const AdventureMap = {
                 isBoss:    s.isBoss  || false,
                 isFinal:   s.isFinal || false,
                 title:     data.title || `Missão ${s.index}`,
-                xPct:      pos[0],
-                worldY:    pos[1],
+                xPct:      pos.xPct,
+                worldY:    pos.worldY,
                 unlocked:  State.isStageUnlocked(chapterId, s.index),
                 completed: State.isStageCompleted(chapterId, s.index),
                 stars:     State.getStageStars(chapterId, s.index),
@@ -140,13 +198,19 @@ const AdventureMap = {
             this.world.charX = (firstActive.xPct / 100) * this.WORLD_W;
             this.world.charY = firstActive.worldY - 55;
         } else {
-            this.world.charX = 220;
+            this.world.charX = this.WORLD_W / 2;
             this.world.charY = 120;
         }
 
         // Mark app-container so CSS can make it a proper flex scroll host
         const container = document.getElementById('app-container');
-        if (container) container.classList.add('wm-host');
+        if (container) {
+            container.classList.add('wm-host');
+            container.dataset.mapMode = this._layoutMode;
+            container.style.setProperty('--wm-world-w', `${this.WORLD_W}px`);
+            container.style.setProperty('--wm-world-h', `${this.WORLD_H}px`);
+            container.style.setProperty('--wm-mode-label', `"${layout.modeLabel}"`);
+        }
 
         // Hide global right panel (app layout) — our wm-right-panel replaces it
         const globalRP = document.getElementById('right-panel');
@@ -269,11 +333,11 @@ const AdventureMap = {
     // ── BIOMES ───────────────────────────────────────────────────
     _buildBiomes() {
         return this._biomes.map((b, i) => {
-            const h       = b.bottom - b.top;
-            const divider = i > 0 ? `<div class="wm-biome-divide" style="top:${b.top}px"></div>` : '';
+            const bounds  = this._biomeBounds(b);
+            const divider = i > 0 ? `<div class="wm-biome-divide" style="top:${bounds.top}px"></div>` : '';
             return `${divider}
             <div class="wm-biome wm-biome-${b.id}"
-                 style="top:${b.top}px;height:${h}px;background:linear-gradient(180deg,${b.bg1} 0%,${b.bg2} 100%)">
+                 style="top:${bounds.top}px;height:${bounds.height}px;background:linear-gradient(180deg,${b.bg1} 0%,${b.bg2} 100%)">
                 <div class="wm-biome-name" aria-hidden="true">${IconSystem.html(b.svgIcon,{size:'sm',color:b.iconColor||'muted'})} ${b.name}</div>
             </div>`;
         }).join('');
@@ -323,8 +387,9 @@ const AdventureMap = {
     _buildDecorations() {
         return this._decorations.map(d => {
             const x     = (d.x / 100) * this.WORLD_W;
+            const y     = Number.isFinite(d.y) ? d.y : d.yPct * this.WORLD_H;
             const label = d.label ? `<div class="wm-npc-label">${d.label}</div>` : '';
-            return `<div class="${d.cls} wm-deco" style="left:${x}px;top:${d.y}px" aria-hidden="true">${d.emoji}${label}</div>`;
+            return `<div class="${d.cls} wm-deco" style="left:${x}px;top:${y}px" aria-hidden="true">${d.emoji || this._decoGlyph(d.icon)}${label}</div>`;
         }).join('');
     },
 
@@ -376,7 +441,7 @@ const AdventureMap = {
     _buildLabels() {
         return this.stages.map((s, i) => {
             const nodeX     = (s.xPct / 100) * this.WORLD_W;
-            const isRight   = s.xPct < 50;  // node on left half → label extends right
+            const isRight   = s.xPct < 52;  // node on left half -> label extends right
             const ic2 = IconSystem;
             const statusText = s.completed
                 ? `${ic2.html('check',{size:'xs',color:'success'})} Concluído`
@@ -384,9 +449,10 @@ const AdventureMap = {
                     ? `${ic2.html('chevron-right',{size:'xs',color:'xp'})} Disponível`
                     : `${ic2.html('lock',{size:'xs'})} Bloqueado`;
             const statusCls  = s.completed ? 'wm-status-done' : s.unlocked ? 'wm-status-active' : 'wm-status-locked';
-            const posStyle   = isRight
-                ? `left:${nodeX + 34}px;top:${s.worldY}px;transform:translateY(-50%)`
-                : `left:${nodeX - 34}px;top:${s.worldY}px;transform:translate(-100%,-50%)`;
+            const labelW = this.WORLD_W < 620 ? 138 : 168;
+            let labelX = isRight ? nodeX + 38 : nodeX - 38 - labelW;
+            labelX = Math.max(12, Math.min(this.WORLD_W - labelW - 12, labelX));
+            const posStyle = `left:${labelX}px;top:${s.worldY}px;--wm-label-w:${labelW}px`;
 
             return `
             <div class="wm-label ${isRight ? 'wm-label-right' : 'wm-label-left'}" id="wml-${i}" style="${posStyle}">
@@ -434,6 +500,10 @@ const AdventureMap = {
         if (this.keys.down)  dy += sp;
         if (this.keys.left)  { dx -= sp; this.world.facing = -1; }
         if (this.keys.right) { dx += sp; this.world.facing =  1; }
+        if (dx !== 0 && dy !== 0) {
+            dx *= 0.7071;
+            dy *= 0.7071;
+        }
 
         if (dx !== 0 || dy !== 0) {
             this.world.charX = Math.max(20, Math.min(this.WORLD_W - 20, this.world.charX + dx));
@@ -486,13 +556,19 @@ const AdventureMap = {
     _scrollToChar(instant) {
         const vp = document.getElementById('wm-viewport');
         if (!vp) return;
+        const viewW = vp.clientWidth || window.innerWidth;
         const viewH = vp.clientHeight || window.innerHeight - 100;
+        let scrollX = this.world.charX - viewW / 2;
         let scrollY = this.world.charY - viewH / 2;
+        scrollX = Math.max(0, Math.min(this.WORLD_W - viewW, scrollX));
         scrollY = Math.max(0, Math.min(this.WORLD_H - viewH, scrollY));
         if (instant) {
+            vp.scrollLeft = scrollX;
             vp.scrollTop = scrollY;
         } else {
+            const diffX = scrollX - vp.scrollLeft;
             const diff = scrollY - vp.scrollTop;
+            if (Math.abs(diffX) > 0.5) vp.scrollLeft += diffX * 0.09;
             if (Math.abs(diff) > 0.5) vp.scrollTop += diff * 0.09;
         }
     },
@@ -528,7 +604,8 @@ const AdventureMap = {
     _updateBiomeLabel() {
         if (!this._zoneEl?.name) return;
         for (const b of this._biomes) {
-            if (this.world.charY >= b.top && this.world.charY < b.bottom) {
+            const bounds = this._biomeBounds(b);
+            if (this.world.charY >= bounds.top && this.world.charY < bounds.bottom) {
                 if (this._currentBiome !== b.id) {
                     this._currentBiome = b.id;
                     this._zoneEl.icon.innerHTML = IconSystem.html(b.svgIcon, { size: 'sm', color: b.iconColor || '' });
@@ -762,8 +839,20 @@ const AdventureMap = {
     _bindEvents() {
         this._boundKeyDown = e => this._onKeyDown(e);
         this._boundKeyUp   = e => this._onKeyUp(e);
+        this._boundResize  = () => this._onResize();
         window.addEventListener('keydown', this._boundKeyDown);
         window.addEventListener('keyup',   this._boundKeyUp);
+        window.addEventListener('resize',  this._boundResize);
+    },
+
+    _onResize() {
+        clearTimeout(this._resizeTimer);
+        this._resizeTimer = setTimeout(() => {
+            if (!this.running) return;
+            const previous = this._layoutMode;
+            this._configureResponsiveWorld();
+            if (previous !== this._layoutMode) this.start(this.chapterId);
+        }, 220);
     },
 
     _onKeyDown(e) {
@@ -816,12 +905,21 @@ const AdventureMap = {
         if (this._boundKeyDown) {
             window.removeEventListener('keydown', this._boundKeyDown);
             window.removeEventListener('keyup',   this._boundKeyUp);
+            window.removeEventListener('resize',  this._boundResize);
         }
+        clearTimeout(this._resizeTimer);
         if (this._audioCtx) {
             try { this._audioCtx.close(); } catch {}
             this._audioCtx = null;
         }
-        document.getElementById('app-container')?.classList.remove('wm-host');
+        const container = document.getElementById('app-container');
+        if (container) {
+            container.classList.remove('wm-host');
+            delete container.dataset.mapMode;
+            container.style.removeProperty('--wm-world-w');
+            container.style.removeProperty('--wm-world-h');
+            container.style.removeProperty('--wm-mode-label');
+        }
         document.getElementById('bottom-nav')?.classList.remove('hidden');
         const discWrap = document.getElementById('hud-disc-wrap');
         if (discWrap) discWrap.style.display = 'none';

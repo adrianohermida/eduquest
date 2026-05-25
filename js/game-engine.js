@@ -421,7 +421,7 @@ const GameEngine = {
         const typeBadge = isTF
             ? `<span class="qtype-badge qtype-tf">V/F</span>`
             : isTyping
-            ? `<span class="qtype-badge qtype-type">✍️ Digitação</span>`
+            ? `<span class="qtype-badge qtype-type">${_ic('scroll',{size:'xs'})} Digitação</span>`
             : `<span class="qtype-badge qtype-mc">múltipla escolha</span>`;
 
         // Options HTML
@@ -434,7 +434,7 @@ const GameEngine = {
                            autocomplete="off" autocorrect="off" spellcheck="false"
                            onkeydown="if(event.key==='Enter') GameEngine._submitTyping()">
                     <button class="btn-primary" style="margin-top:10px"
-                            onclick="GameEngine._submitTyping()">✔ Confirmar</button>
+                            onclick="GameEngine._submitTyping()">${_ic('check',{size:'xs'})} Confirmar</button>
                 </div>`;
         } else if (isTF) {
             optionsHTML = `
@@ -459,6 +459,7 @@ const GameEngine = {
         }
 
         // Action buttons
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const hintDisabled    = this.state.hintsLeft <= 0;
         const elimDisabled    = this.state.eliminationsLeft <= 0 || isTF || isTyping;
         const actionsHTML = `
@@ -467,17 +468,27 @@ const GameEngine = {
                         id="qa-hint-btn"
                         onclick="GameEngine.useHint()"
                         ${hintDisabled ? 'disabled' : ''}>
-                    💡 Dica${this.state.hintsLeft > 0 ? ` (${this.state.hintsLeft})` : ''}
+                    ${_ic('companion',{size:'xs'})} Dica${this.state.hintsLeft > 0 ? ` (${this.state.hintsLeft})` : ''}
                 </button>
                 <button class="qa-btn qa-elim ${elimDisabled ? 'qa-spent' : ''}"
                         id="qa-elim-btn"
                         onclick="GameEngine.eliminate()"
                         ${elimDisabled ? 'disabled' : ''}>
-                    ❌ Eliminar${this.state.eliminationsLeft > 0 ? ` (${this.state.eliminationsLeft})` : ''}
+                    ${_ic('warning',{size:'xs'})} Eliminar${this.state.eliminationsLeft > 0 ? ` (${this.state.eliminationsLeft})` : ''}
                 </button>
             </div>`;
 
+        // AI Tutor tip (shown for weak topics or first question)
+        const tutorTip = this._getTutorTip(q);
+        const tutorHTML = tutorTip ? `
+            <div class="tutor-tip" id="tutor-tip">
+                <span class="tutor-tip-face">${_ic('companion',{size:'sm',color:'xp'})}</span>
+                <span class="tutor-tip-text">${tutorTip}</span>
+                <button class="tutor-tip-close" onclick="document.getElementById('tutor-tip')?.remove()" aria-label="Fechar dica">×</button>
+            </div>` : '';
+
         container.innerHTML = `
+            ${tutorHTML}
             <div class="question-counter">
                 Questão ${this.state.currentIndex + 1} / ${this.state.questions.length}
                 ${typeBadge}
@@ -491,6 +502,32 @@ const GameEngine = {
 
         // Focus typing input
         if (isTyping) setTimeout(() => document.getElementById('typing-input')?.focus(), 100);
+    },
+
+    // ── AI TUTOR TIP ─────────────────────────────────────────────
+
+    _getTutorTip(q) {
+        if (!q) return null;
+        const idx   = this.state.currentIndex;
+        const total = this.state.questions.length;
+        const topic = q.topic || q.tags?.[0] || '';
+
+        // Only show on first question, last question, or weak topics
+        const weakTopics = (typeof State !== 'undefined') ? State.getWeakTopics() : [];
+        const isWeak     = weakTopics.some(t => t.topic === topic && t.count >= 2);
+        const isFirst    = idx === 0;
+        const isLast     = idx === total - 1;
+        const isBoss     = this.state.stageData?.isBoss;
+        const isFinal    = this.state.stageData?.isFinal;
+
+        if (!isFirst && !isLast && !isWeak && !isBoss) return null;
+
+        if (isBoss && isFirst)    return 'Você está no BOSS! Mantenha o foco e use suas dicas com sabedoria.';
+        if (isFinal && isFirst)   return 'Exame final! Esta é sua chance de mostrar todo o conhecimento acumulado.';
+        if (isWeak && topic)      return `Você errou questões sobre "${topic}" antes. Atenção redobrada aqui!`;
+        if (isFirst && topic)     return `Começando com "${topic}". Respire fundo e confie no que estudou!`;
+        if (isLast)               return 'Última questão! Você chegou até aqui, pode ir além!';
+        return null;
     },
 
     // ── HINT ─────────────────────────────────────────────────────
@@ -696,6 +733,14 @@ const GameEngine = {
             document.getElementById(`opt-${q.correctIndex}`)?.classList.add('correct');
 
             if (typeof SoundManager !== 'undefined') SoundManager.play('wrong');
+            if (typeof State !== 'undefined') {
+                State.recordWrongAnswer(
+                    this.state.chapterId,
+                    this.state.stageId,
+                    this.state.currentIndex,
+                    q.topic || q.tags?.[0] || 'Geral'
+                );
+            }
             this._showBattleEffect(false);
             this._showFeedback(false, q.explanation, 0, typedValue);
 
