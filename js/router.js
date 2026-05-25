@@ -54,6 +54,7 @@ const Router = {
             case 'shop':       this.renderShop(container);      break;
             case 'missions':   this.renderMissions(container);           break;
             case 'adventure':  AdventureMap.start(parts[1]);            break;
+            case 'teams':      this.renderTeams(container, parts[1]);   break;
             default:           this.renderHome(container);
         }
     },
@@ -85,7 +86,12 @@ const Router = {
                         placeholder="••••••" autocomplete="current-password">
                 </div>
                 <div class="auth-error" id="login-error">Email ou senha incorretos.</div>
-                <button class="btn-primary mt-4" onclick="Router._doLogin()">⚡ Entrar</button>
+                <button class="btn-primary mt-4" id="login-submit-btn" onclick="Router._doLogin()">⚡ Entrar</button>
+                <div style="text-align:center;margin-top:10px">
+                    <span onclick="Router._showForgotPassword()" style="cursor:pointer;font-size:0.8rem;color:var(--text-muted);font-weight:700">
+                        Esqueci minha senha
+                    </span>
+                </div>
                 <div class="auth-footer mt-3">
                     Não tem conta?
                     <span onclick="Router.navigate('#register')" style="cursor:pointer">
@@ -106,19 +112,38 @@ const Router = {
         }, 150);
     },
 
-    _doLogin() {
-        const email    = (document.getElementById('login-email')?.value || '').trim();
+    async _doLogin() {
+        const email    = (document.getElementById('login-email')?.value  || '').trim();
         const password = (document.getElementById('login-password')?.value || '');
-        const result   = State.login(email, password);
+        const btn      = document.getElementById('login-submit-btn');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Entrando...'; }
+
+        const result = await State.loginAsync(email, password);
+
         if (result.success) {
             if (typeof SoundManager !== 'undefined') SoundManager.play('click');
-            State.isOnboarded() ? this.navigate('#home') : this.navigate('#onboarding/1');
+            // onAuthChange in state.js handles navigation after loading cloud profile
+            if (!State.data.user.uid) {
+                // offline/legacy fallback
+                State.isOnboarded() ? this.navigate('#home') : this.navigate('#onboarding/1');
+            }
         } else {
             const err = document.getElementById('login-error');
-            if (err) err.classList.add('show');
+            if (err) { err.textContent = result.message || 'Email ou senha incorretos.'; err.classList.add('show'); }
             document.getElementById('login-password')?.classList.add('shake');
             setTimeout(() => document.getElementById('login-password')?.classList.remove('shake'), 500);
+            if (btn) { btn.disabled = false; btn.textContent = '⚡ Entrar'; }
         }
+    },
+
+    _showForgotPassword() {
+        const email = (document.getElementById('login-email')?.value || '').trim();
+        if (!email) { alert('Digite seu email primeiro.'); return; }
+        if (typeof SupaAuth === 'undefined') { alert('Serviço indisponível no momento.'); return; }
+        SupaAuth.resetPassword(email).then(({ error }) => {
+            if (error) alert('Erro: ' + error.message);
+            else alert('✅ Email de recuperação enviado! Verifique sua caixa de entrada.');
+        });
     },
 
     renderRegister(container) {
@@ -129,20 +154,26 @@ const Router = {
             <div class="auth-card">
                 <div class="auth-title">Criar Conta</div>
                 <div class="auth-field">
+                    <label class="auth-label">Seu nome</label>
+                    <input class="auth-input" type="text" id="reg-name"
+                        placeholder="Como você quer ser chamado?" autocomplete="name">
+                </div>
+                <div class="auth-field">
                     <label class="auth-label">Email</label>
                     <input class="auth-input" type="email" id="reg-email"
-                        placeholder="seu@email.com">
+                        placeholder="seu@email.com" autocomplete="email">
                 </div>
                 <div class="auth-field">
                     <label class="auth-label">Senha</label>
                     <input class="auth-input" type="password" id="reg-password"
-                        placeholder="mínimo 6 caracteres">
+                        placeholder="mínimo 6 caracteres" autocomplete="new-password">
                 </div>
-                <div class="auth-error show" id="reg-info"
-                    style="color:var(--text-muted); display:block;">
-                    Demo: jghermidamaia@gmail.com / 180514
+                <div class="auth-error" id="reg-error"></div>
+                <div class="auth-success hidden" id="reg-success"
+                    style="color:var(--success);font-size:0.82rem;font-weight:700;padding:8px 0;display:none">
+                    ✅ Conta criada! Verifique seu email para confirmar.
                 </div>
-                <button class="btn-primary mt-4" onclick="Router._doLogin()">🚀 Entrar</button>
+                <button class="btn-primary mt-4" id="reg-submit-btn" onclick="Router._doRegister()">🚀 Criar Conta</button>
                 <div class="auth-footer mt-3">
                     Já tem conta?
                     <span onclick="Router.navigate('#login')" style="cursor:pointer">
@@ -151,6 +182,45 @@ const Router = {
                 </div>
             </div>
         </div>`;
+        setTimeout(() => document.getElementById('reg-name')?.focus(), 100);
+        setTimeout(() => {
+            ['reg-name','reg-email','reg-password'].forEach(id => {
+                document.getElementById(id)?.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') Router._doRegister();
+                });
+            });
+        }, 150);
+    },
+
+    async _doRegister() {
+        const name     = (document.getElementById('reg-name')?.value  || '').trim();
+        const email    = (document.getElementById('reg-email')?.value || '').trim();
+        const password = (document.getElementById('reg-password')?.value || '');
+        const btn      = document.getElementById('reg-submit-btn');
+        const errEl    = document.getElementById('reg-error');
+        const okEl     = document.getElementById('reg-success');
+
+        if (!name)              { if(errEl){errEl.textContent='Digite seu nome.';errEl.classList.add('show');} return; }
+        if (!email)             { if(errEl){errEl.textContent='Digite seu email.';errEl.classList.add('show');} return; }
+        if (password.length<6)  { if(errEl){errEl.textContent='Senha muito curta (mínimo 6 caracteres).';errEl.classList.add('show');} return; }
+
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Criando conta...'; }
+        if (errEl) errEl.classList.remove('show');
+
+        const result = await State.signUpAsync(email, password, name);
+
+        if (result.success) {
+            if (result.needsConfirmation) {
+                if (okEl) { okEl.style.display = 'block'; }
+                if (btn)  { btn.disabled = false; btn.textContent = '🚀 Criar Conta'; }
+            } else {
+                // auto-confirmed — onAuthChange will navigate
+                State.data.user.name = name;
+            }
+        } else {
+            if (errEl) { errEl.textContent = result.message || 'Erro ao criar conta.'; errEl.classList.add('show'); }
+            if (btn)   { btn.disabled = false; btn.textContent = '🚀 Criar Conta'; }
+        }
     },
 
     // ── ONBOARDING ────────────────────────────────────────
@@ -612,6 +682,8 @@ const Router = {
     renderProfile(container) {
         const user   = State.data.user;
         const xpProg = State.getXPProgress();
+        const theme  = user.theme || 'light';
+        const premium = State.isPremium();
 
         const badges = [
             { icon: '🛡️', name: 'Guardião',    locked: false },
@@ -623,20 +695,21 @@ const Router = {
             { icon: '💎', name: 'Colecionador', locked: user.gems < 100 },
             { icon: '🧠', name: 'Gênio',        locked: user.level < 15 }
         ];
-
         const badgesHTML = badges.map(b => `
             <div class="achievement-item ${b.locked ? 'locked' : ''}">
                 <span class="achievement-icon">${b.icon}</span>
                 <span class="achievement-name">${b.name}</span>
-            </div>`
-        ).join('');
+            </div>`).join('');
 
         container.innerHTML = `
         <div class="screen">
             <div class="profile-hero">
                 <span class="profile-avatar">🦸</span>
-                <div class="profile-name">${user.name}</div>
-                <div class="profile-level">Nível ${user.level} · Aprendiz</div>
+                <div class="profile-name">
+                    ${user.name}
+                    ${premium ? '<span class="premium-badge" style="margin-left:8px">👑 Premium</span>' : ''}
+                </div>
+                <div class="profile-level">Nível ${user.level} · ${user.email || ''}</div>
             </div>
 
             <div class="xp-level-card mb-3">
@@ -644,45 +717,218 @@ const Router = {
                     <span class="level-badge">⚡ Nível ${user.level}</span>
                     <span class="xp-text-small">${xpProg.current} / ${xpProg.needed} XP</span>
                 </div>
-                <div class="xp-track">
-                    <div class="xp-fill" style="width:${xpProg.percent}%"></div>
-                </div>
+                <div class="xp-track"><div class="xp-fill" style="width:${xpProg.percent}%"></div></div>
             </div>
 
             <div class="stats-grid-2x2 mb-3">
-                <div class="stat-box-card">
-                    <span class="stat-box-icon">⚡</span>
-                    <span class="stat-box-value">${user.xp}</span>
-                    <span class="stat-box-label">XP Total</span>
+                <div class="stat-box-card"><span class="stat-box-icon">⚡</span><span class="stat-box-value">${user.xp}</span><span class="stat-box-label">XP Total</span></div>
+                <div class="stat-box-card"><span class="stat-box-icon">💎</span><span class="stat-box-value">${user.gems}</span><span class="stat-box-label">Gemas</span></div>
+                <div class="stat-box-card"><span class="stat-box-icon">🔥</span><span class="stat-box-value">${user.streak}</span><span class="stat-box-label">Sequência</span></div>
+                <div class="stat-box-card"><span class="stat-box-icon">❤️</span><span class="stat-box-value">${user.hearts}</span><span class="stat-box-label">Vidas</span></div>
+            </div>
+
+            ${!premium ? `
+            <div class="premium-card" onclick="Router._showPremiumModal()">
+                <div class="premium-card-icon">👑</div>
+                <div class="premium-card-text">
+                    <div class="premium-card-title">Seja Premium!</div>
+                    <div class="premium-card-desc">Vidas ilimitadas, estatísticas avançadas e muito mais.</div>
                 </div>
-                <div class="stat-box-card">
-                    <span class="stat-box-icon">💎</span>
-                    <span class="stat-box-value">${user.gems}</span>
-                    <span class="stat-box-label">Gemas</span>
+                <div style="font-size:0.8rem;font-weight:900;color:var(--gold)">Ver →</div>
+            </div>` : `
+            <div class="premium-card">
+                <div class="premium-card-icon">👑</div>
+                <div class="premium-card-text">
+                    <div class="premium-card-title">Conta Premium Ativa</div>
+                    <div class="premium-card-desc">Aproveite todos os benefícios exclusivos!</div>
                 </div>
-                <div class="stat-box-card">
-                    <span class="stat-box-icon">🔥</span>
-                    <span class="stat-box-value">${user.streak}</span>
-                    <span class="stat-box-label">Sequência</span>
-                </div>
-                <div class="stat-box-card">
-                    <span class="stat-box-icon">❤️</span>
-                    <span class="stat-box-value">${user.hearts}</span>
-                    <span class="stat-box-label">Vidas</span>
+            </div>`}
+
+            <!-- Theme toggle -->
+            <div class="theme-toggle-row">
+                <span class="theme-toggle-label">🎨 Aparência</span>
+                <div class="theme-toggle-btns">
+                    <button class="theme-btn ${theme==='light'?'active':''}" onclick="State.setTheme('light'); Router.renderProfile(document.getElementById('app-container'))">☀️ Claro</button>
+                    <button class="theme-btn ${theme==='dark'?'active':''}"  onclick="State.setTheme('dark');  Router.renderProfile(document.getElementById('app-container'))">🌙 Escuro</button>
+                    <button class="theme-btn ${theme==='auto'?'active':''}"  onclick="State.setTheme('auto');  Router.renderProfile(document.getElementById('app-container'))">🔄 Auto</button>
                 </div>
             </div>
 
-            <div class="section-header">
-                <span class="section-title">🏅 Conquistas</span>
-            </div>
-            <div class="achievements-grid mb-3">
-                ${badgesHTML}
-            </div>
+            <!-- Teams shortcut -->
+            <button class="btn-secondary" style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:12px"
+                onclick="Router.navigate('#teams')">
+                <span>👥 Minhas Turmas</span><span style="opacity:0.5">›</span>
+            </button>
 
-            <button class="btn-secondary mt-3" onclick="State.logout(); Router.navigate('#login')">
+            <div class="section-header"><span class="section-title">🏅 Conquistas</span></div>
+            <div class="achievements-grid mb-3">${badgesHTML}</div>
+
+            <button class="btn-secondary mt-3" onclick="State.logoutAsync()">
                 Sair da conta
             </button>
         </div>`;
+    },
+
+    _showPremiumModal() {
+        const perks = ['❤️ Vidas ilimitadas','📊 Estatísticas avançadas','⏱️ Sem pressão de tempo','🌟 Conteúdo exclusivo','💾 Backup na nuvem'];
+        const el = document.createElement('div');
+        el.className = 'feedback-overlay show';
+        el.style.cssText = 'display:flex;align-items:center;justify-content:center;z-index:999';
+        el.innerHTML = `
+        <div class="feedback-card" style="max-width:320px;padding:28px 24px;text-align:center">
+            <div style="font-size:2.5rem;margin-bottom:8px">👑</div>
+            <div style="font-size:1.2rem;font-weight:900;color:var(--gold);margin-bottom:4px">EduQuest Premium</div>
+            <div style="font-size:0.82rem;color:var(--text-2);margin-bottom:16px">Desbloqueie todo o potencial do app</div>
+            ${perks.map(p=>`<div style="font-size:0.85rem;font-weight:700;padding:6px 0;border-bottom:1px solid var(--border);text-align:left">${p}</div>`).join('')}
+            <div style="margin-top:20px;font-size:0.8rem;color:var(--text-muted)">🚧 Em breve — fique atento!</div>
+            <button class="btn-primary mt-4" onclick="this.closest('.feedback-overlay').remove()">Fechar</button>
+        </div>`;
+        document.body.appendChild(el);
+    },
+
+    // ── TEAMS ─────────────────────────────────────────────
+    renderTeams(container, teamId) {
+        if (teamId) { this._renderTeamDetail(container, teamId); return; }
+        container.innerHTML = `<div class="screen teams-screen">
+            <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
+            <h2 style="font-size:1.1rem;font-weight:900;margin-bottom:16px">👥 Minhas Turmas</h2>
+
+            <div class="team-section-title">Entrar em uma turma</div>
+            <div class="team-join-form">
+                <input class="team-code-input" id="team-code-input" maxlength="6"
+                    placeholder="CÓDIGO" oninput="this.value=this.value.toUpperCase()">
+                <button class="btn-primary" style="padding:12px 18px;white-space:nowrap"
+                    onclick="Router._joinTeam()">Entrar</button>
+            </div>
+
+            <div class="team-section-title">Criar nova turma</div>
+            <div style="display:flex;gap:10px;margin-bottom:20px">
+                <input class="auth-input" id="new-team-name" placeholder="Nome da turma" style="flex:1;margin:0">
+                <button class="btn-primary" style="padding:12px 18px;white-space:nowrap"
+                    onclick="Router._createTeam()">Criar</button>
+            </div>
+
+            <div class="team-section-title">Suas turmas</div>
+            <div id="teams-list"><div class="team-empty"><span class="team-empty-icon">👥</span>Carregando...</div></div>
+        </div>`;
+        this._loadTeamsList();
+    },
+
+    async _loadTeamsList() {
+        const el = document.getElementById('teams-list'); if (!el) return;
+        const uid = State.data.user.uid;
+        if (!uid || typeof SupaDB === 'undefined') {
+            el.innerHTML = '<div class="team-empty"><span class="team-empty-icon">👥</span>Faça login para ver suas turmas.</div>';
+            return;
+        }
+        const { data, error } = await SupaDB.getMyTeams(uid);
+        if (error || !data?.length) {
+            el.innerHTML = '<div class="team-empty"><span class="team-empty-icon">👥</span>Você ainda não participa de nenhuma turma.</div>';
+            return;
+        }
+        el.innerHTML = data.map(m => {
+            const t = m.teams;
+            const isOwner = t.owner_id === uid;
+            return `
+            <div class="team-card" onclick="Router.navigate('#teams/${t.id}')">
+                <div class="team-card-icon">🏫</div>
+                <div class="team-card-body">
+                    <div class="team-card-name">${t.name}${isOwner ? '<span class="team-owner-chip">Dono</span>' : ''}</div>
+                    <div class="team-card-meta">${m.role === 'owner' ? 'Turma criada por você' : 'Estudante'}</div>
+                </div>
+                <div class="team-card-code">${t.code}</div>
+            </div>`;
+        }).join('');
+    },
+
+    async _createTeam() {
+        const name = (document.getElementById('new-team-name')?.value || '').trim();
+        if (!name) { alert('Digite o nome da turma.'); return; }
+        const uid = State.data.user.uid;
+        if (!uid) { alert('Faça login primeiro.'); return; }
+        const btn = document.querySelector('[onclick="Router._createTeam()"]');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+        const { data, error } = await SupaDB.createTeam(name, uid);
+        if (btn) { btn.disabled = false; btn.textContent = 'Criar'; }
+        if (error) { alert('Erro: ' + error.message); return; }
+        alert(`✅ Turma "${data.name}" criada! Código: ${data.code}`);
+        this._loadTeamsList();
+        const inp = document.getElementById('new-team-name'); if (inp) inp.value = '';
+    },
+
+    async _joinTeam() {
+        const code = (document.getElementById('team-code-input')?.value || '').trim();
+        if (code.length < 4) { alert('Digite o código da turma (6 letras).'); return; }
+        const uid = State.data.user.uid;
+        if (!uid) { alert('Faça login primeiro.'); return; }
+        const btn = document.querySelector('[onclick="Router._joinTeam()"]');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+        const { data, error } = await SupaDB.joinTeamByCode(code, uid);
+        if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+        if (error) { alert('Erro: ' + error.message); return; }
+        alert(`✅ Você entrou na turma "${data.team.name}"!`);
+        this._loadTeamsList();
+        const inp = document.getElementById('team-code-input'); if (inp) inp.value = '';
+    },
+
+    async _renderTeamDetail(container, teamId) {
+        container.innerHTML = `<div class="screen teams-screen">
+            <button class="btn-back" onclick="Router.navigate('#teams')">‹ Turmas</button>
+            <div id="team-detail-wrap"><div class="team-empty"><span class="team-empty-icon">⏳</span>Carregando...</div></div>
+        </div>`;
+        const { data: members, error } = await SupaDB.getTeamMembers(teamId);
+        const wrap = document.getElementById('team-detail-wrap'); if (!wrap) return;
+        if (error || !members) { wrap.innerHTML = '<p style="color:var(--danger)">Erro ao carregar.</p>'; return; }
+
+        const uid     = State.data.user.uid;
+        const myRow   = members.find(m => m.profiles?.id === uid);
+        const isOwner = myRow?.role === 'owner';
+        const sorted  = [...members].sort((a,b) => (b.profiles?.xp||0) - (a.profiles?.xp||0));
+
+        wrap.innerHTML = `
+            ${isOwner ? `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                <input class="auth-input" id="team-rename-input" placeholder="Renomear turma" style="flex:1;margin:0">
+                <button class="btn-secondary" style="padding:10px 14px" onclick="Router._renameTeam('${teamId}')">Renomear</button>
+            </div>` : ''}
+
+            <div class="team-section-title">👥 Membros (${members.length})</div>
+            ${sorted.map((m, i) => {
+                const p = m.profiles || {};
+                return `
+                <div class="team-member-row">
+                    <div class="team-member-avatar">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🦸'}</div>
+                    <div>
+                        <div class="team-member-name">${p.name || '—'}${m.role==='owner'?'<span class="team-owner-chip">Dono</span>':''}</div>
+                        <div class="team-member-level">Nível ${p.level||1} · 🔥 ${p.streak||1}</div>
+                    </div>
+                    <div class="team-member-xp">⚡ ${p.xp||0}</div>
+                </div>`;
+            }).join('')}
+            ${isOwner ? `
+            <button class="btn-secondary mt-4" style="color:var(--danger);border-color:var(--danger)"
+                onclick="Router._deleteTeam('${teamId}')">🗑️ Excluir turma</button>` : `
+            <button class="btn-secondary mt-4"
+                onclick="Router._leaveTeam('${teamId}')">🚪 Sair da turma</button>`}`;
+    },
+
+    async _renameTeam(teamId) {
+        const name = (document.getElementById('team-rename-input')?.value || '').trim();
+        if (!name) return;
+        await SupaDB.renameTeam(teamId, name);
+        this._renderTeamDetail(document.getElementById('app-container'), teamId);
+    },
+
+    async _leaveTeam(teamId) {
+        if (!confirm('Sair desta turma?')) return;
+        await SupaDB.leaveTeam(teamId, State.data.user.uid);
+        this.navigate('#teams');
+    },
+
+    async _deleteTeam(teamId) {
+        if (!confirm('Excluir a turma permanentemente? Esta ação não pode ser desfeita.')) return;
+        await SupaDB.deleteTeam(teamId);
+        this.navigate('#teams');
     },
 
     // ── SHOP ──────────────────────────────────────────────

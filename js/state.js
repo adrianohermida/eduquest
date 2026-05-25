@@ -1,142 +1,249 @@
 /**
- * EDUQUEST STATE MANAGER v2.0
- * Gestão completa de estado com persistência e métodos para todos os componentes
+ * EDUQUEST STATE MANAGER v3.0
+ * localStorage + Supabase cloud sync · Premium · Teams · Schema migration · Dark mode
  */
 
 const State = {
+    SCHEMA_VERSION: 6,
+    LS_KEY: 'eduquest_v5',
+
     data: {
+        schemaVersion: 6,
         user: {
-            name: 'Herói',
-            level: 1,
-            xp: 0,
-            gems: 0,
-            hearts: 5,
-            streak: 1,
-            lastPlayed: null,
-            achievements: [],
+            name:         'Herói',
+            level:        1,
+            xp:           0,
+            gems:         0,
+            hearts:       5,
+            streak:       1,
+            lastPlayed:   null,
             authenticated: false,
-            onboarded: false,
-            email: null,
-            dailyGoal: 10
+            onboarded:    false,
+            email:        null,
+            dailyGoal:    10,
+            // v3 additions
+            uid:          null,
+            isPremium:    false,
+            premiumUntil: null,
+            theme:        'light',
         },
         progress: {}
     },
 
+    _syncTimer:  null,
+    _syncBusy:   false,
+    _isOnline:   true,
+
+    // ── INIT ─────────────────────────────────────────────────
     init() {
-        const saved = localStorage.getItem('eduquest_v5');
+        this._isOnline = navigator.onLine;
+
+        const saved = localStorage.getItem(this.LS_KEY);
         if (saved) {
             try {
-                const parsed = JSON.parse(saved);
-                // Merge preservando defaults para campos novos
-                this.data.user = { ...this.data.user, ...parsed.user };
-                this.data.progress = parsed.progress || {};
-            } catch (e) {
-                console.warn('State: erro ao carregar save, usando padrão.');
+                this._migrate(JSON.parse(saved));
+            } catch(e) {
+                console.warn('State: save corrompido, usando padrão.');
             }
         }
+
+        this._applyTheme(this.data.user.theme || 'light');
         this.checkStreak();
         this.updateHUD();
+
+        window.addEventListener('online',  () => { this._isOnline = true;  this._syncToCloud(); });
+        window.addEventListener('offline', () => { this._isOnline = false; });
+
+        // Supabase auth listener (fires asynchronously on load)
+        if (typeof SupaAuth !== 'undefined') {
+            SupaAuth.onAuthChange(async (event, session) => {
+                if (session?.user) {
+                    this.data.user.uid           = session.user.id;
+                    this.data.user.email         = session.user.email;
+                    this.data.user.authenticated = true;
+                    await this._loadFromCloud(session.user.id);
+                    this.save();
+                    this.updateHUD();
+                    // If on login/register page, navigate home
+                    const r = window.location.hash.replace('#', '').split('/')[0];
+                    if (r === 'login' || r === 'register' || r === '') {
+                        Router.navigate(this.data.user.onboarded ? '#home' : '#onboarding/1');
+                    }
+                } else if (event === 'SIGNED_OUT') {
+                    this.data.user.uid           = null;
+                    this.data.user.authenticated = false;
+                    this.save();
+                }
+            });
+        }
+
         return this;
     },
 
-    save() {
-        localStorage.setItem('eduquest_v5', JSON.stringify(this.data));
-        this.updateHUD();
+    // ── SCHEMA MIGRATION ─────────────────────────────────────
+    _migrate(parsed) {
+        // Never wipe — always merge, adding new fields with defaults
+        if (parsed.user) {
+            this.data.user = {
+                ...this.data.user,          // defaults for new fields
+                ...parsed.user,             // existing saved values
+                // Force new fields to have safe defaults if missing
+                uid:          parsed.user.uid          ?? null,
+                isPremium:    parsed.user.isPremium     ?? false,
+                premiumUntil: parsed.user.premiumUntil  ?? null,
+                theme:        parsed.user.theme         ?? 'light',
+            };
+        }
+        this.data.progress      = parsed.progress || {};
+        this.data.schemaVersion = this.SCHEMA_VERSION;
     },
 
+    // ── PERSISTENCE ──────────────────────────────────────────
+    save() {
+        this.data.schemaVersion = this.SCHEMA_VERSION;
+        localStorage.setItem(this.LS_KEY, JSON.stringify(this.data));
+        this.updateHUD();
+        this._queueCloudSync();
+    },
+
+    _queueCloudSync() {
+        if (!this.data.user.uid || !this._isOnline || this._syncBusy) return;
+        clearTimeout(this._syncTimer);
+        this._syncTimer = setTimeout(() => this._syncToCloud(), 1800);
+    },
+
+    async _syncToCloud() {
+        if (!this.data.user.uid || !this._isOnline) return;
+        if (typeof SupaDB === 'undefined') return;
+        this._syncBusy = true;
+        const u = this.data.user;
+        await SupaDB.saveProfile(u.uid, {
+            name:          u.name,
+            level:         u.level,
+            xp:            u.xp,
+            gems:          u.gems,
+            hearts:        u.hearts,
+            streak:        u.streak,
+            last_played:   u.lastPlayed,
+            daily_goal:    u.dailyGoal,
+            is_premium:    u.isPremium,
+            premium_until: u.premiumUntil,
+            onboarded:     u.onboarded,
+        });
+        this._syncBusy = false;
+    },
+
+    async _loadFromCloud(userId) {
+        if (typeof SupaDB === 'undefined') return;
+
+        const [{ data: profile }, { data: progressRows }] = await Promise.all([
+            SupaDB.loadProfile(userId),
+            SupaDB.loadProgress(userId),
+        ]);
+
+        if (profile) {
+            const u = this.data.user;
+            Object.assign(this.data.user, {
+                name:         profile.name          || u.name,
+                level:        Math.max(profile.level    || 1, u.level),
+                xp:           Math.max(profile.xp        || 0, u.xp),
+                gems:         Math.max(profile.gems       || 0, u.gems),
+                hearts:       profile.hearts         ?? u.hearts,
+                streak:       Math.max(profile.streak     || 1, u.streak),
+                lastPlayed:   profile.last_played    || u.lastPlayed,
+                dailyGoal:    profile.daily_goal     || u.dailyGoal,
+                isPremium:    profile.is_premium     || u.isPremium,
+                premiumUntil: profile.premium_until  || u.premiumUntil,
+                onboarded:    profile.onboarded      || u.onboarded,
+            });
+        }
+
+        if (progressRows?.length) {
+            for (const row of progressRows) {
+                if (!this.data.progress[row.chapter_id]) {
+                    this.data.progress[row.chapter_id] = { stages: {} };
+                }
+                const local = this.data.progress[row.chapter_id].stages[row.stage_index];
+                if (!local || row.stars > (local.stars || 0)) {
+                    this.data.progress[row.chapter_id].stages[row.stage_index] = {
+                        completed:   row.completed,
+                        stars:       row.stars,
+                        completedAt: row.completed_at,
+                    };
+                }
+            }
+        }
+    },
+
+    // ── STREAK ───────────────────────────────────────────────
     checkStreak() {
         const today = new Date().toDateString();
         const last  = this.data.user.lastPlayed;
-
-        if (!last) {
-            this.data.user.streak = 1;
-            this.data.user.lastPlayed = today;
-            return;
-        }
+        if (!last) { this.data.user.streak = 1; this.data.user.lastPlayed = today; return; }
         if (last === today) return;
-
-        const lastDate = new Date(last);
-        const todayDate = new Date(today);
-        const diff = Math.round((todayDate - lastDate) / 86400000);
-
-        if (diff === 1) {
-            this.data.user.streak = (this.data.user.streak || 0) + 1;
-        } else {
-            this.data.user.streak = 1;
-        }
+        const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
+        this.data.user.streak    = diff === 1 ? (this.data.user.streak || 0) + 1 : 1;
         this.data.user.lastPlayed = today;
         this.save();
     },
 
-    // ── GETTERS ──────────────────────────────────────────
-    getUserName()   { return this.data.user.name; },
-    getUserLevel()  { return this.data.user.level; },
-    getUserXP()     { return this.data.user.xp; },
-    getUserGems()   { return this.data.user.gems; },
-    getUserHearts() { return this.data.user.hearts; },
-    getUserStreak() { return this.data.user.streak || 1; },
-
-    getXPForLevel(level) {
-        return level * 500;
+    // ── GETTERS ──────────────────────────────────────────────
+    getUserName()    { return this.data.user.name; },
+    getUserLevel()   { return this.data.user.level; },
+    getUserXP()      { return this.data.user.xp; },
+    getUserGems()    { return this.data.user.gems; },
+    getUserHearts()  { return this.data.user.hearts; },
+    getUserStreak()  { return this.data.user.streak || 1; },
+    isPremium()      {
+        if (this.data.user.isPremium) return true;
+        if (this.data.user.premiumUntil) return new Date(this.data.user.premiumUntil) > new Date();
+        return false;
     },
 
+    getXPForLevel(level) { return level * 500; },
+
     getXPProgress() {
-        const level    = this.data.user.level;
-        const totalXP  = this.data.user.xp;
-        const prevReq  = level > 1 ? this.getXPForLevel(level - 1) : 0;
-        const nextReq  = this.getXPForLevel(level);
-        const current  = totalXP - prevReq;
-        const needed   = nextReq - prevReq;
-        return {
-            current,
-            needed,
-            percent: Math.min(100, Math.max(0, Math.round((current / needed) * 100)))
-        };
+        const level   = this.data.user.level;
+        const totalXP = this.data.user.xp;
+        const prev    = level > 1 ? this.getXPForLevel(level - 1) : 0;
+        const next    = this.getXPForLevel(level);
+        const current = totalXP - prev;
+        const needed  = next - prev;
+        return { current, needed, percent: Math.min(100, Math.max(0, Math.round((current / needed) * 100))) };
     },
 
     getChapterProgress(chapterId) {
-        const chProgress  = this.data.progress[chapterId];
+        const chProg      = this.data.progress[chapterId];
         const totalStages = this._getChapterTotalStages(chapterId);
-
-        if (!chProgress || !chProgress.stages) {
-            return { stagesCompleted: 0, totalStages, completed: false, percent: 0 };
-        }
-
-        const stages       = chProgress.stages;
-        const completedCount = Object.values(stages).filter(s => s && s.completed).length;
-
-        return {
-            stagesCompleted: completedCount,
-            totalStages,
-            completed: completedCount >= totalStages,
-            percent: Math.round((completedCount / totalStages) * 100)
-        };
+        if (!chProg?.stages) return { stagesCompleted: 0, totalStages, completed: false, percent: 0 };
+        const done = Object.values(chProg.stages).filter(s => s?.completed).length;
+        return { stagesCompleted: done, totalStages, completed: done >= totalStages, percent: Math.round((done / totalStages) * 100) };
     },
 
     _getChapterTotalStages(chapterId) {
         const meta = window.CHAPTER_METADATA;
-        if (meta && meta.id === chapterId) return meta.totalStages;
-        const cfg = (window.CONFIG && window.CONFIG.chapters || []).find(c => c.id === chapterId);
-        if (cfg) return cfg.totalStages;
-        return 5;
+        if (meta?.id === chapterId) return meta.totalStages;
+        const cfg = (window.CONFIG?.chapters || []).find(c => c.id === chapterId);
+        return cfg?.totalStages || 5;
     },
 
     isStageUnlocked(chapterId, stageIndex) {
         if (stageIndex <= 1) return true;
-        return this.isStageCompleted(chapterId, stageIndex - 1);
+        if (!this.isStageCompleted(chapterId, stageIndex - 1)) return false;
+        const minStars = window.CONFIG?.stages?.minStarsToAdvance ?? 1;
+        if (minStars <= 0) return true;
+        return this.getStageStars(chapterId, stageIndex - 1) >= minStars;
     },
 
     isStageCompleted(chapterId, stageIndex) {
-        const stages = this.data.progress[chapterId]?.stages || {};
-        return !!(stages[stageIndex]?.completed);
+        return !!(this.data.progress[chapterId]?.stages?.[stageIndex]?.completed);
     },
 
     getStageStars(chapterId, stageIndex) {
-        const stages = this.data.progress[chapterId]?.stages || {};
-        return stages[stageIndex]?.stars || 0;
+        return this.data.progress[chapterId]?.stages?.[stageIndex]?.stars || 0;
     },
 
-    // ── ACTIONS ──────────────────────────────────────────
+    // ── ACTIONS ──────────────────────────────────────────────
     addXP(amount) {
         this.data.user.xp += amount;
         this._checkLevelUp();
@@ -149,24 +256,21 @@ const State = {
     },
 
     useHeart() {
-        if (this.data.user.hearts > 0) {
-            this.data.user.hearts--;
-            this.save();
-        }
+        if (this.data.user.hearts > 0) this.data.user.hearts--;
+        this.save();
         return this.data.user.hearts;
     },
 
     completeStage(chapterId, stageIndex, stars) {
-        if (!this.data.progress[chapterId]) {
-            this.data.progress[chapterId] = { stages: {} };
-        }
+        if (!this.data.progress[chapterId]) this.data.progress[chapterId] = { stages: {} };
         const existing = this.data.progress[chapterId].stages[stageIndex];
         if (!existing || stars > (existing.stars || 0)) {
-            this.data.progress[chapterId].stages[stageIndex] = {
-                completed: true,
-                stars: stars,
-                completedAt: new Date().toISOString()
-            };
+            const completedAt = new Date().toISOString();
+            this.data.progress[chapterId].stages[stageIndex] = { completed: true, stars, completedAt };
+            // Cloud sync of this specific stage
+            if (this.data.user.uid && this._isOnline && typeof SupaDB !== 'undefined') {
+                SupaDB.upsertProgress(this.data.user.uid, chapterId, stageIndex, stars, completedAt);
+            }
         }
         this.save();
     },
@@ -175,33 +279,59 @@ const State = {
         const needed = this.getXPForLevel(this.data.user.level);
         if (this.data.user.xp >= needed) {
             this.data.user.level++;
-            // Trigger visual de level up se disponível
-            if (typeof Utils !== 'undefined') {
-                setTimeout(() => Utils.confetti(), 100);
-            }
+            if (typeof Utils !== 'undefined') setTimeout(() => Utils.confetti(), 100);
         }
     },
 
-    // ── HUD UPDATE ───────────────────────────────────────
+    // ── HUD ──────────────────────────────────────────────────
     updateHUD() {
         const u = this.data.user;
-        const map = {
-            'hud-streak': u.streak || 1,
-            'hud-gems':   u.gems,
-            'hud-xp':     u.xp,
-            'hud-hearts': u.hearts
-        };
+        const map = { 'hud-streak': u.streak || 1, 'hud-gems': u.gems, 'hud-xp': u.xp, 'hud-hearts': u.hearts };
         for (const [id, val] of Object.entries(map)) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = val;
+            const el = document.getElementById(id); if (el) el.textContent = val;
         }
     },
 
-    // ── AUTH ─────────────────────────────────────────────
-    isAuthenticated() {
-        return this.data.user.authenticated === true;
+    // ── THEME ────────────────────────────────────────────────
+    setTheme(theme) {
+        this.data.user.theme = theme;
+        this._applyTheme(theme);
+        this.save();
     },
 
+    _applyTheme(theme) {
+        const html = document.documentElement;
+        html.removeAttribute('data-theme');
+        if (theme === 'dark' || theme === 'auto') html.setAttribute('data-theme', theme);
+    },
+
+    // ── AUTH (Supabase-backed) ────────────────────────────────
+    isAuthenticated() { return this.data.user.authenticated === true; },
+    isOnboarded()     { return this.data.user.onboarded === true; },
+
+    async loginAsync(email, password) {
+        if (typeof SupaAuth === 'undefined') return this.login(email, password);
+        const { error } = await SupaAuth.signIn(email, password);
+        if (error) return { success: false, message: error.message };
+        return { success: true };
+    },
+
+    async signUpAsync(email, password, name) {
+        if (typeof SupaAuth === 'undefined') return { success: false, message: 'Supabase não disponível' };
+        const { data, error } = await SupaAuth.signUp(email, password, name);
+        if (error) return { success: false, message: error.message };
+        return { success: true, needsConfirmation: !data.session };
+    },
+
+    async logoutAsync() {
+        if (typeof SupaAuth !== 'undefined') await SupaAuth.signOut();
+        this.data.user.authenticated = false;
+        this.data.user.uid           = null;
+        this.save();
+        if (typeof Router !== 'undefined') Router.navigate('#login');
+    },
+
+    // Legacy fallback (dev/offline)
     login(email, password) {
         const OK_EMAIL = 'jghermidamaia@gmail.com';
         const OK_PASS  = '180514';
@@ -211,7 +341,7 @@ const State = {
             this.save();
             return { success: true };
         }
-        return { success: false };
+        return { success: false, message: 'Email ou senha incorretos.' };
     },
 
     logout() {
@@ -219,19 +349,21 @@ const State = {
         this.save();
     },
 
-    // ── ONBOARDING ────────────────────────────────────────
-    isOnboarded() {
-        return this.data.user.onboarded === true;
+    // ── ONBOARDING ────────────────────────────────────────────
+    completeOnboarding(name, dailyGoal) {
+        this.data.user.name      = name || 'Herói';
+        this.data.user.dailyGoal = dailyGoal || 10;
+        this.data.user.onboarded = true;
+        this.save();
     },
 
-    completeOnboarding(name, dailyGoal) {
-        this.data.user.name       = name || 'Herói';
-        this.data.user.dailyGoal  = dailyGoal || 10;
-        this.data.user.onboarded  = true;
-        this.save();
+    // ── RESET (dev only) ─────────────────────────────────────
+    hardReset() {
+        if (!confirm('⚠️ Apagar TODO o progresso local?')) return;
+        localStorage.removeItem(this.LS_KEY);
+        location.reload();
     }
 };
 
-// Dual export para compatibilidade
 window.State = State;
-window.STATE = State;
+window.STATE  = State;

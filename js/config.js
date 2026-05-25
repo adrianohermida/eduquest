@@ -144,8 +144,16 @@ const CONFIG = {
     },
 
     stages: {
-        questionsPerGame: 10,
-        timePerQuestion:  15
+        questionsPerGame:   10,
+        timePerQuestion:    15,
+        minStarsToAdvance:  1,   // minimum stars on current stage to unlock next (0 = disabled)
+    },
+
+    premium: {
+        unlimitedHearts:  true,
+        noTimer:          false,
+        advancedStats:    true,
+        badge:            '👑',
     },
 
     difficulty: {

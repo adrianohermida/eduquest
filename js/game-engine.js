@@ -108,14 +108,19 @@ const GameEngine = {
         const result   = [];
 
         for (let i = 0; i < count; i++) {
-            const fc     = shuffled[i];
-            const isTrue = Math.random() > 0.5;
+            const fc      = shuffled[i];
+            const isTrue  = Math.random() > 0.5;
+            // Randomly swap button order so True isn't always first
+            const trueFirst = Math.random() > 0.5;
+            const opts    = trueFirst
+                ? ['✅ Verdadeiro', '❌ Falso']
+                : ['❌ Falso',      '✅ Verdadeiro'];
             if (isTrue) {
                 result.push({
                     type:         'tf',
                     question:     `✅ ou ❌ — Verdadeiro ou Falso?\n\n"${fc.q}\n→ ${fc.a}"`,
-                    options:      ['✅ Verdadeiro', '❌ Falso'],
-                    correctIndex: 0,
+                    options:      opts,
+                    correctIndex: trueFirst ? 0 : 1,
                     explanation:  `Correto! ${fc.a}`
                 });
             } else {
@@ -123,8 +128,8 @@ const GameEngine = {
                 result.push({
                     type:         'tf',
                     question:     `✅ ou ❌ — Verdadeiro ou Falso?\n\n"${fc.q}\n→ ${other.a}"`,
-                    options:      ['✅ Verdadeiro', '❌ Falso'],
-                    correctIndex: 1,
+                    options:      opts,
+                    correctIndex: trueFirst ? 1 : 0,
                     explanation:  `Falso! A resposta correta é: ${fc.a}`
                 });
             }
