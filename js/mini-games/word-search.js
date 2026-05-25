@@ -281,10 +281,10 @@ const WordSearch = {
         overlay.className = 'ws-result-overlay';
         overlay.innerHTML = `
             <div class="ws-result-card">
-                <div class="ws-result-icon">⏰</div>
+                <div class="ws-result-icon">${this._ic('warning',{size:'xl',color:'rpg'})}</div>
                 <h2 class="ws-result-title">Tempo esgotado!</h2>
                 <p class="ws-result-sub">${found.size}/${placed.length} palavras encontradas</p>
-                <button class="btn-primary" onclick="WordSearch.start('${chapterId}', ${this._state.stageIndex}, document.getElementById('app-container'))">🔄 Tentar novamente</button>
+                <button class="btn-primary" onclick="WordSearch.start('${chapterId}', ${this._state.stageIndex}, document.getElementById('app-container'))">${this._ic('xp',{size:'sm'})} Tentar novamente</button>
                 <button class="btn-secondary" style="margin-top:8px" onclick="Router.navigate('#chapter/${chapterId}')">Voltar</button>
             </div>`;
         wrap.appendChild(overlay);

@@ -2325,7 +2325,8 @@ img { max-width: 100%; }
 }
 .minigame-btn:active { transform: translateY(2px); box-shadow: none; }
 .minigame-btn:hover  { border-color: var(--brand-light); }
-.mg-icon { font-size: 1.5rem; flex-shrink: 0; }
+.mg-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; }
+.mg-icon .icon { color: var(--brand); }
 .mg-info { display: flex; flex-direction: column; gap: 1px; flex: 1; }
 .mg-name { font-size: 0.9rem; font-weight: 900; color: var(--text); }
 .mg-desc { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); }
