@@ -383,15 +383,5 @@ const STAGE_02 = {
   }
 },
 
-if (typeof window !== 'undefined') {
-  window.STAGE_02 = STAGE_02;
-  if (window.DataLoader) {
-    window.DataLoader.registerStage('cap7_doencas', 2, STAGE_02);
-  }
-}
 window.STAGE_02 = STAGE_02;
-  window.STAGE_02 = STAGE_02;
-  if (window.DataLoader) {
-    window.DataLoader.registerStage('cap7_doencas', 2, STAGE_02);
-  }
 }

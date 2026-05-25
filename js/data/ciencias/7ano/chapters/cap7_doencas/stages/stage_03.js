@@ -1,3 +1,4 @@
+window.STAGE_03 = STAGE_03;
 const STAGE_03 = {
 
   id: 'stage_03',
