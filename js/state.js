@@ -3,6 +3,36 @@
  * localStorage + Supabase cloud sync · Premium · Teams · Schema migration · Dark mode
  */
 
+const ACHIEVEMENTS = [
+    // Common
+    { id:'first_step',    icon:'🛡️', name:'Primeiros Passos',    desc:'Complete sua primeira missão',            rarity:'common'    },
+    { id:'streak_3',      icon:'🔥', name:'3 em Sequência',      desc:'Mantenha 3 dias de sequência',            rarity:'common'    },
+    { id:'gems_10',       icon:'💎', name:'Caçador de Gemas',    desc:'Colete 10 gemas',                         rarity:'common'    },
+    { id:'level_3',       icon:'⚡', name:'Guerreiro',            desc:'Alcance o nível 3',                       rarity:'common'    },
+    { id:'questions_10',  icon:'🎯', name:'Aprendiz',            desc:'Responda 10 questões corretamente',        rarity:'common'    },
+    { id:'perfect_first', icon:'⭐', name:'Estrela de Ouro',     desc:'Ganhe 3 estrelas em uma missão',           rarity:'common'    },
+    // Rare
+    { id:'stage_3',       icon:'⚔️', name:'Bom de Missões',     desc:'Complete 3 missões diferentes',            rarity:'rare'      },
+    { id:'streak_7',      icon:'📅', name:'Semana de Fogo',      desc:'Mantenha 7 dias de sequência',             rarity:'rare'      },
+    { id:'level_5',       icon:'🌟', name:'Herói',               desc:'Alcance o nível 5',                        rarity:'rare'      },
+    { id:'combo_5',       icon:'💥', name:'Combo Devastador',    desc:'Acerte 5 questões em sequência',           rarity:'rare'      },
+    { id:'gems_50',       icon:'💰', name:'Colecionador',        desc:'Acumule 50 gemas',                         rarity:'rare'      },
+    { id:'questions_50',  icon:'🧠', name:'Estudioso',           desc:'Responda 50 questões corretamente',        rarity:'rare'      },
+    // Epic
+    { id:'streak_14',     icon:'🏅', name:'Quinzena',            desc:'Mantenha 14 dias de sequência',            rarity:'epic'      },
+    { id:'level_10',      icon:'💜', name:'Mestre',              desc:'Alcance o nível 10',                       rarity:'epic'      },
+    { id:'perfect_5',     icon:'⭐', name:'Perfeccionista',      desc:'Ganhe 3 estrelas em 5 missões',            rarity:'epic'      },
+    { id:'questions_100', icon:'📚', name:'Devorador de Livros', desc:'Responda 100 questões corretamente',       rarity:'epic'      },
+    { id:'gems_100',      icon:'💎', name:'Magnata',             desc:'Acumule 100 gemas',                        rarity:'epic'      },
+    { id:'stage_10',      icon:'🏆', name:'Caçador de Fases',    desc:'Complete 10 missões diferentes',           rarity:'epic'      },
+    // Legendary
+    { id:'streak_30',     icon:'🔥', name:'Dedicação Total',     desc:'30 dias de sequência ininterrupta',        rarity:'legendary' },
+    { id:'level_15',      icon:'🌟', name:'Lendário',            desc:'Alcance o nível 15',                       rarity:'legendary' },
+    { id:'perfect_10',    icon:'⭐', name:'Supremo',             desc:'Ganhe 3 estrelas em 10 missões',           rarity:'legendary' },
+    { id:'questions_500', icon:'🧬', name:'Sábio',               desc:'Responda 500 questões corretamente',       rarity:'legendary' },
+];
+window.ACHIEVEMENTS = ACHIEVEMENTS;
+
 const State = {
     SCHEMA_VERSION: 7,
     LS_KEY: 'eduquest_v5',
@@ -33,6 +63,13 @@ const State = {
             goal:            'compete',
             // v6 additions
             lastLoginDate:   null,
+            // v7 additions
+            inventory:            {},
+            unlockedAchievements: [],
+            totalCorrect:         0,
+            totalMissions:        0,
+            totalPerfect:         0,
+            maxCombo:             0,
         },
         progress: {},
         dailyMissions: { date: null, completed: [] },
@@ -107,8 +144,14 @@ const State = {
                 theme:        parsed.user.theme         ?? 'light',
                 avatar:       parsed.user.avatar        ?? '🦸',
                 grade:        parsed.user.grade         ?? '7ano',
-                goal:          parsed.user.goal          ?? 'compete',
-                lastLoginDate: parsed.user.lastLoginDate ?? null,
+                goal:                 parsed.user.goal                 ?? 'compete',
+                lastLoginDate:        parsed.user.lastLoginDate        ?? null,
+                inventory:            parsed.user.inventory            || {},
+                unlockedAchievements: parsed.user.unlockedAchievements || [],
+                totalCorrect:         parsed.user.totalCorrect         || 0,
+                totalMissions:        parsed.user.totalMissions        || 0,
+                totalPerfect:         parsed.user.totalPerfect         || 0,
+                maxCombo:             parsed.user.maxCombo             || 0,
             };
         }
         this.data.progress      = parsed.progress || {};
@@ -207,6 +250,7 @@ const State = {
         this.data.user.streak    = diff === 1 ? (this.data.user.streak || 0) + 1 : 1;
         this.data.user.lastPlayed = today;
         this.save();
+        this.checkProgressAchievements();
     },
 
     // ── GETTERS ──────────────────────────────────────────────
@@ -276,6 +320,7 @@ const State = {
     addGems(amount) {
         this.data.user.gems += amount;
         this.save();
+        if (amount > 0) this.checkProgressAchievements();
     },
 
     useHeart() {
@@ -306,6 +351,7 @@ const State = {
             leveled = true;
         }
         if (!leveled) return;
+        this.checkProgressAchievements();
         if (typeof ModalEngine !== 'undefined') {
             ModalEngine.enqueue('levelUp', {
                 level:    this.data.user.level,
@@ -526,6 +572,87 @@ const State = {
         this.data.user.goal      = goal      || 'compete';
         this.data.user.onboarded = true;
         this.save();
+    },
+
+    // ── INVENTORY ────────────────────────────────────────────
+    addItem(action, qty = 1) {
+        if (!this.data.user.inventory) this.data.user.inventory = {};
+        this.data.user.inventory[action] = (this.data.user.inventory[action] || 0) + qty;
+        this.save();
+    },
+
+    hasItem(action) {
+        return (this.data.user.inventory?.[action] || 0) > 0;
+    },
+
+    useItem(action) {
+        if (!this.hasItem(action)) return false;
+        this.data.user.inventory[action]--;
+        this.save();
+        return true;
+    },
+
+    getInventory() {
+        return this.data.user.inventory || {};
+    },
+
+    // ── ACHIEVEMENTS ─────────────────────────────────────────
+    unlockAchievement(id) {
+        if (!this.data.user.unlockedAchievements) this.data.user.unlockedAchievements = [];
+        if (this.data.user.unlockedAchievements.includes(id)) return;
+        this.data.user.unlockedAchievements.push(id);
+        this.save();
+        const ach = ACHIEVEMENTS.find(a => a.id === id);
+        if (!ach) return;
+        if (typeof SoundManager !== 'undefined') SoundManager.play('complete');
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('achievement', { icon: ach.icon, name: ach.name, description: ach.desc, rarity: ach.rarity });
+        }
+    },
+
+    checkProgressAchievements() {
+        const u = this.data.user;
+        if (!u.unlockedAchievements) u.unlockedAchievements = [];
+        const checks = {
+            first_step:    (u.totalMissions   || 0) >= 1,
+            streak_3:      (u.streak          || 0) >= 3,
+            gems_10:       (u.gems            || 0) >= 10,
+            level_3:       (u.level           || 1) >= 3,
+            questions_10:  (u.totalCorrect    || 0) >= 10,
+            perfect_first: (u.totalPerfect    || 0) >= 1,
+            stage_3:       (u.totalMissions   || 0) >= 3,
+            streak_7:      (u.streak          || 0) >= 7,
+            level_5:       (u.level           || 1) >= 5,
+            combo_5:       (u.maxCombo        || 0) >= 5,
+            gems_50:       (u.gems            || 0) >= 50,
+            questions_50:  (u.totalCorrect    || 0) >= 50,
+            streak_14:     (u.streak          || 0) >= 14,
+            level_10:      (u.level           || 1) >= 10,
+            perfect_5:     (u.totalPerfect    || 0) >= 5,
+            questions_100: (u.totalCorrect    || 0) >= 100,
+            gems_100:      (u.gems            || 0) >= 100,
+            stage_10:      (u.totalMissions   || 0) >= 10,
+            streak_30:     (u.streak          || 0) >= 30,
+            level_15:      (u.level           || 1) >= 15,
+            perfect_10:    (u.totalPerfect    || 0) >= 10,
+            questions_500: (u.totalCorrect    || 0) >= 500,
+        };
+        for (const ach of ACHIEVEMENTS) {
+            if (!u.unlockedAchievements.includes(ach.id) && checks[ach.id]) {
+                this.unlockAchievement(ach.id);
+            }
+        }
+    },
+
+    recordGameEnd({ correct = 0, perfect = false, combo = 0, victory = true } = {}) {
+        this.data.user.totalCorrect = (this.data.user.totalCorrect || 0) + correct;
+        this.data.user.maxCombo     = Math.max(this.data.user.maxCombo || 0, combo);
+        if (victory) {
+            this.data.user.totalMissions = (this.data.user.totalMissions || 0) + 1;
+            if (perfect) this.data.user.totalPerfect = (this.data.user.totalPerfect || 0) + 1;
+        }
+        this.save();
+        this.checkProgressAchievements();
     },
 
     // ── RESET (dev only) ─────────────────────────────────────

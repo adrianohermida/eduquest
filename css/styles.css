@@ -3479,3 +3479,97 @@ img { max-width: 100%; }
     65%  { transform: scale(1.08); opacity: 1; }
     100% { transform: scale(1); }
 }
+
+/* ── APP TOAST ────────────────────────────────────────── */
+.app-toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: #1e293b;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 950;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.app-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── SHOP OWNED BADGE ─────────────────────────────────── */
+.shop-item-owned {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--success);
+    background: var(--success-light);
+    border-radius: 99px;
+    padding: 2px 8px;
+    margin-bottom: 4px;
+}
+
+/* ── PROFILE NAV COUNT ────────────────────────────────── */
+.pnb-count {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border-radius: 99px;
+    padding: 3px 8px;
+    margin-left: auto;
+    margin-right: 4px;
+}
+
+/* ── ACHIEVEMENTS SCREEN ──────────────────────────────── */
+.screen-ach { padding-bottom: 40px; }
+.ach-header { text-align: center; margin: 4px 0 20px; }
+.ach-header-title { font-size: 1.4rem; font-weight: 900; color: var(--text); }
+.ach-header-count { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin: 4px 0 10px; }
+.ach-progress-wrap {
+    height: 6px; background: var(--surface-3); border-radius: 99px;
+    overflow: hidden; max-width: 180px; margin: 0 auto;
+}
+.ach-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), var(--gold));
+    border-radius: 99px;
+    transition: width 0.8s ease;
+}
+.ach-rarity-section { margin-bottom: 24px; }
+.ach-rarity-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+}
+.ach-rarity-label { font-size: 0.88rem; font-weight: 900; color: var(--text); }
+.ach-rarity-count {
+    font-size: 0.75rem; font-weight: 800; color: var(--text-muted);
+    background: var(--surface-2); padding: 3px 10px; border-radius: 99px;
+}
+.ach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ach-item {
+    text-align: center; padding: 12px 6px 10px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; transition: transform 0.15s;
+}
+.ach-item:not(.ach-locked) { border-color: rgba(249,115,22,0.25); background: var(--brand-light); }
+.ach-locked { opacity: 0.45; }
+.ach-badge {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 7px;
+}
+.ach-badge.ach-common    { background: linear-gradient(135deg,#f97316,#fbbf24); box-shadow: 0 3px 10px rgba(249,115,22,0.35); }
+.ach-badge.ach-rare      { background: linear-gradient(135deg,#3b82f6,#60a5fa); box-shadow: 0 3px 10px rgba(59,130,246,0.35); }
+.ach-badge.ach-epic      { background: linear-gradient(135deg,#8b5cf6,#ec4899); box-shadow: 0 3px 10px rgba(139,92,246,0.35); }
+.ach-badge.ach-legendary { background: linear-gradient(135deg,#f59e0b,#ef4444); box-shadow: 0 3px 10px rgba(245,158,11,0.4); }
+.ach-badge.ach-badge-locked { background: var(--surface-3); box-shadow: none; }
+.ach-icon { font-size: 1.4rem; }
+.ach-name { font-size: 0.68rem; font-weight: 900; color: var(--text); line-height: 1.2; }
+.ach-desc { font-size: 0.58rem; color: var(--text-muted); font-weight: 600; margin-top: 3px; line-height: 1.3; }

@@ -26,7 +26,12 @@ const GameEngine = {
         hintShown:        false,
         typingMode:       false,
         typingTimeout:    null,
-        _floats:          []
+        _floats:          [],
+        xpMultiplier:     1,
+        hasShield:        false,
+        extraTime:        0,
+        hasStarGuarantee: false,
+        correctCount:     0,
     },
 
     // ── ENTRY POINT ─────────────────────────────────────────────
@@ -57,8 +62,22 @@ const GameEngine = {
             hintsLeft:        3,
             eliminatedIdx:    new Set(),
             hintShown:        false,
-            typingMode:       false
+            typingMode:       false,
+            xpMultiplier:     1,
+            hasShield:        false,
+            extraTime:        0,
+            hasStarGuarantee: false,
+            correctCount:     0,
+            peakCombo:        0,
         });
+
+        // Apply purchased inventory items
+        if (State.useItem('heart'))  this.state.lives = Math.min(this.state.lives + 1, 5);
+        if (State.useItem('hint'))   this.state.hintsLeft++;
+        if (State.useItem('xp2x'))   this.state.xpMultiplier = 2;
+        if (State.useItem('shield')) this.state.hasShield = true;
+        if (State.useItem('time'))   this.state.extraTime = 10;
+        if (State.useItem('star'))   this.state.hasStarGuarantee = true;
 
         document.getElementById('top-hud')?.classList.add('hidden');
         document.getElementById('bottom-nav')?.classList.add('hidden');
@@ -561,7 +580,7 @@ const GameEngine = {
 
     _startTimer() {
         clearInterval(this.state.timerInterval);
-        this.state.timer = CONFIG.stages.timePerQuestion || 15;
+        this.state.timer = (CONFIG.stages.timePerQuestion || 15) + (this.state.extraTime || 0);
         this._updateTimerUI();
         this.state.timerInterval = setInterval(() => {
             if (this.state.pendingFeedback) return;
@@ -611,12 +630,14 @@ const GameEngine = {
 
         if (isCorrect) {
             this.state.combo++;
+            this.state.correctCount = (this.state.correctCount || 0) + 1;
+            if (this.state.combo > (this.state.peakCombo || 0)) this.state.peakCombo = this.state.combo;
             if (this.state.combo >= 5) State.completeMission('combo_5');
             const timeLimit = CONFIG.stages.timePerQuestion || 15;
             if (this.state.timer > timeLimit - 5) State.completeMission('fast_answer');
             const comboBonus = (CONFIG.xp.comboBonus || 0) * this.state.combo;
             const timeBonus  = Math.floor((this.state.timer / 15) * (CONFIG.xp.timeBonusMax || 75));
-            const points     = (CONFIG.xp.correct || 10) + comboBonus + timeBonus;
+            const points     = Math.round(((CONFIG.xp.correct || 10) + comboBonus + timeBonus) * (this.state.xpMultiplier || 1));
             this.state.score += points;
 
             this.state.enemyHP = Math.max(0, this.state.enemyHP - 100 / this.state.questions.length);
@@ -632,7 +653,11 @@ const GameEngine = {
         } else {
             this.state.combo = 0;
             this._removeCombo();
-            this.state.lives--;
+            if (this.state.hasShield) {
+                this.state.hasShield = false;
+            } else {
+                this.state.lives--;
+            }
             this._updateLivesUI();
 
             if (selectedIndex !== -1 && selectedIndex !== -99) {
@@ -725,7 +750,8 @@ const GameEngine = {
 
     _endGame(victory) {
         this._stopTimer();
-        const stars = victory ? (this.state.lives === 3 ? 3 : this.state.lives === 2 ? 2 : 1) : 0;
+        let stars = victory ? (this.state.lives === 3 ? 3 : this.state.lives === 2 ? 2 : 1) : 0;
+        if (victory && this.state.hasStarGuarantee) stars = Math.max(1, stars);
 
         if (victory) {
             State.completeStage(this.state.chapterId, this.state.stageIndex, stars);
@@ -737,6 +763,13 @@ const GameEngine = {
             State.completeMission('streak_day');
             if (stars === 3) State.completeMission('perfect_score');
         }
+
+        State.recordGameEnd({
+            correct: this.state.correctCount || 0,
+            perfect: victory && stars === 3,
+            combo:   this.state.peakCombo || 0,
+            victory,
+        });
 
         const starsDisplay = victory ? (['⭐', '⭐⭐', '⭐⭐⭐'][stars - 1] || '') : '💀';
         const app = document.getElementById('app-container');

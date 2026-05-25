@@ -75,9 +75,10 @@ const Router = {
             case 'shop':       this.renderShop(container);      break;
             case 'missions':   this.renderMissions(container);           break;
             case 'adventure':  AdventureMap.start(parts[1]);            break;
-            case 'ranking':    this.renderRanking(container);           break;
-            case 'teams':      this.renderTeams(container, parts[1]);   break;
-            default:           this.renderHome(container);
+            case 'ranking':       this.renderRanking(container);           break;
+            case 'teams':         this.renderTeams(container, parts[1]);   break;
+            case 'achievements':  this.renderAchievements(container);       break;
+            default:              this.renderHome(container);
         }
 
         // Refresh right panel content after each app-route render
@@ -1130,7 +1131,10 @@ const Router = {
                 ${masteryHTML}
 
                 <!-- Achievements -->
-                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">🏅 Conquistas</span></div>
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)">
+                    <span class="section-title">🏅 Conquistas</span>
+                    <span class="section-link" onclick="Router.navigate('#achievements')" style="cursor:pointer">Ver todas ›</span>
+                </div>
                 <div class="achievements-grid mb-3">${badgesHTML}</div>
 
                 <!-- Theme -->
@@ -1154,6 +1158,12 @@ const Router = {
                     <div style="font-size:0.8rem;font-weight:900;color:var(--gold)">Ver →</div>
                 </div>` : ''}
 
+                <button class="profile-nav-btn" onclick="Router.navigate('#achievements')">
+                    <span class="pnb-icon">🏅</span>
+                    <span class="pnb-label">Todas as Conquistas</span>
+                    <span class="pnb-count">${(State.data.user.unlockedAchievements || []).length}/${(window.ACHIEVEMENTS || []).length}</span>
+                    <span class="pnb-arrow">›</span>
+                </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#ranking')">
                     <span class="pnb-icon">🏆</span>
                     <span class="pnb-label">Ranking Global</span>
@@ -1451,29 +1461,85 @@ const Router = {
         this.navigate('#teams');
     },
 
+    // ── ACHIEVEMENTS ──────────────────────────────────────
+    renderAchievements(container) {
+        const unlocked  = State.data.user.unlockedAchievements || [];
+        const allAchs   = window.ACHIEVEMENTS || [];
+        const rarities  = ['common', 'rare', 'epic', 'legendary'];
+        const rLabels   = { common: '🏅 Comum', rare: '⭐ Raro', epic: '💜 Épico', legendary: '👑 Lendário' };
+
+        let sectionsHTML = '';
+        for (const rarity of rarities) {
+            const group    = allAchs.filter(a => a.rarity === rarity);
+            const doneCount = group.filter(a => unlocked.includes(a.id)).length;
+
+            const itemsHTML = group.map(ach => {
+                const done = unlocked.includes(ach.id);
+                return `
+                <div class="ach-item ${done ? '' : 'ach-locked'}" title="${done ? ach.desc : '???'}">
+                    <div class="ach-badge ach-${rarity}${done ? '' : ' ach-badge-locked'}">
+                        <span class="ach-icon">${done ? ach.icon : '🔒'}</span>
+                    </div>
+                    <div class="ach-name">${done ? ach.name : '???'}</div>
+                    ${done ? `<div class="ach-desc">${ach.desc}</div>` : ''}
+                </div>`;
+            }).join('');
+
+            sectionsHTML += `
+            <div class="ach-rarity-section">
+                <div class="ach-rarity-header">
+                    <span class="ach-rarity-label">${rLabels[rarity]}</span>
+                    <span class="ach-rarity-count">${doneCount}/${group.length}</span>
+                </div>
+                <div class="ach-grid">${itemsHTML}</div>
+            </div>`;
+        }
+
+        const pct = allAchs.length ? Math.round((unlocked.length / allAchs.length) * 100) : 0;
+
+        container.innerHTML = `
+        <div class="screen screen-ach">
+            <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
+
+            <div class="ach-header">
+                <div class="ach-header-title">🏅 Conquistas</div>
+                <div class="ach-header-count">${unlocked.length} / ${allAchs.length} desbloqueadas</div>
+                <div class="ach-progress-wrap">
+                    <div class="ach-progress-fill" style="width:${pct}%"></div>
+                </div>
+            </div>
+
+            ${sectionsHTML}
+        </div>`;
+    },
+
     // ── SHOP ──────────────────────────────────────────────
     renderShop(container) {
-        const gems = State.getUserGems();
+        const gems      = State.getUserGems();
+        const inventory = State.getInventory();
 
         const items = [
-            { icon: '❤️', name: 'Vida Extra',     desc: 'Recupere uma vida',           price: 20, action: 'heart'  },
-            { icon: '⏱️', name: 'Mais Tempo',     desc: '+10s em cada questão',        price: 30, action: 'time'   },
-            { icon: '🔑', name: 'Dica Mágica',    desc: 'Elimina 2 opções erradas',   price: 40, action: 'hint'   },
-            { icon: '🛡️', name: 'Escudo',         desc: 'Protege 1 vida por fase',    price: 50, action: 'shield' },
-            { icon: '⚡', name: 'XP Duplo',        desc: 'Dobra XP na próxima fase',   price: 80, action: 'xp2x'  },
-            { icon: '🌟', name: 'Estrela Grátis',  desc: 'Garante 1 estrela mínima',   price: 100, action: 'star' }
+            { icon: '❤️', name: 'Vida Extra',     desc: 'Recupere uma vida',          price: 20,  action: 'heart'  },
+            { icon: '⏱️', name: 'Mais Tempo',     desc: '+10s em cada questão',       price: 30,  action: 'time'   },
+            { icon: '🔑', name: 'Dica Mágica',    desc: 'Dica extra na próxima fase', price: 40,  action: 'hint'   },
+            { icon: '🛡️', name: 'Escudo',         desc: 'Protege 1 vida por fase',   price: 50,  action: 'shield' },
+            { icon: '⚡', name: 'XP Duplo',        desc: 'Dobra XP na próxima fase',  price: 80,  action: 'xp2x'  },
+            { icon: '🌟', name: 'Estrela Grátis',  desc: 'Garante 1 estrela mínima',  price: 100, action: 'star'  }
         ];
 
-        const itemsHTML = items.map(item => `
+        const itemsHTML = items.map(item => {
+            const owned = inventory[item.action] || 0;
+            return `
             <div class="shop-item-card">
                 <span class="shop-item-icon">${item.icon}</span>
                 <div class="shop-item-name">${item.name}</div>
                 <div class="shop-item-desc">${item.desc}</div>
+                ${owned > 0 ? `<div class="shop-item-owned">Você tem: ${owned}</div>` : ''}
                 <button class="shop-buy-btn" onclick="Router._shopBuy('${item.action}', ${item.price})">
                     💎 ${item.price}
                 </button>
-            </div>`
-        ).join('');
+            </div>`;
+        }).join('');
 
         container.innerHTML = `
         <div class="screen">
@@ -1501,13 +1567,26 @@ const Router = {
     },
 
     _shopBuy(action, price) {
-        if (State.getUserGems() < price) {
-            alert('Gemas insuficientes! Continue jogando para ganhar mais. 💎');
+        const have = State.getUserGems();
+        if (have < price) {
+            if (typeof ModalEngine !== 'undefined') {
+                ModalEngine.enqueue('noGems', { needed: price, have });
+            }
             return;
         }
         State.addGems(-price);
-        alert('✅ Item comprado! Disponível na próxima missão.');
+        State.addItem(action);
+        this._toast(`✅ Item comprado! Disponível na próxima missão.`);
         this.renderShop(document.getElementById('app-container'));
+    },
+
+    _toast(msg, ms = 2800) {
+        const t = document.createElement('div');
+        t.className = 'app-toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); }, ms);
     },
 
     // ── MISSIONS ──────────────────────────────────────────
