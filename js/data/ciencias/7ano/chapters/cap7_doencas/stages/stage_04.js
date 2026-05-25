@@ -1,450 +1,269 @@
+/**
+ * STAGE 04 — Dengue, Zika e Chikungunya
+ * O trio do Aedes aegypti — prevenção é poder!
+ */
+
 const STAGE_04 = {
-
   id: 'stage_04',
-
-  title: 'Revisão Final e Interpretação',
-
-  icon: '📚',
-
-  difficulty: 'hard',
-
-  estimatedTime: 55,
+  title: 'Dengue, Zika e Chikungunya',
+  icon: '🦟',
+  difficulty: 'medium',
+  estimatedTime: 14,
 
   learningObjectives: [
-    'Revisar conceitos fundamentais de imunologia',
-    'Interpretar cenários epidemiológicos',
-    'Diferenciar doenças virais e bacterianas',
-    'Aplicar pensamento crítico em saúde pública',
-    'Reconhecer fake news e desinformação',
-    'Integrar prevenção, vacinação e saneamento'
+    'Identificar o Aedes aegypti como vetor das três doenças',
+    'Diferenciar os sintomas de dengue, zika e chikungunya',
+    'Reconhecer os sinais de alerta da dengue hemorrágica',
+    'Entender as medidas de prevenção e controle do vetor',
+    'Conhecer os riscos específicos do zika na gestação'
   ],
-
-  skills: [
-    'interpretação',
-    'epidemiologia',
-    'pensamento_critico',
-    'saude_publica',
-    'imunologia',
-    'prevenção_integrada'
-  ],
-
-  rewards: {
-    xp: 400,
-    badge: 'Mestre da Saúde Pública'
-  },
-
-  adaptiveRules: {
-    failTwice: 'show_master_review',
-    failThreeTimes: 'unlock_guided_revision',
-    scoreAbove90: 'unlock_final_certificate'
-  },
-
-  nextStage: null,
 
   summary: {
-
-    readTime: 120,
-
+    readTime: 5,
     content: [
-
       {
-        icon: '🧠',
-        title: 'Revisão Integrada',
-        text: 'A saúde pública depende da integração entre vacinação, saneamento, higiene, educação e prevenção coletiva.'
+        icon: '🦟',
+        title: 'O Vilão: Aedes aegypti',
+        text: 'O mosquito Aedes aegypti transmite DENGUE, ZIKA, CHIKUNGUNYA e FEBRE AMARELA.\n\nCaracterísticas do Aedes:\n• Pica durante o DIA (diferente do mosquito da malária)\n• Cria em água parada e LIMPA (pneu, garrafa, vaso de flor)\n• Listras brancas no corpo\n• Voo baixo e silencioso\n\n💡 Macete: "Aedes = A pior notícia do verão!"'
       },
-
       {
-        icon: '📰',
-        title: 'Fake News',
-        text: 'Desinformação em saúde reduz vacinação, aumenta doenças evitáveis e prejudica campanhas públicas.'
+        icon: '🤒',
+        title: 'Dengue: Sintomas e Alerta',
+        text: 'Sintomas clássicos (3-14 dias após picada):\n• Febre alta súbita (39-40°C)\n• Dor muscular e nas articulações\n• Dor atrás dos olhos\n• Manchas avermelhadas na pele\n\n⚠️ SINAIS DE ALERTA (dengue grave):\n• Dor abdominal intensa\n• Vômitos persistentes\n• Sangramento (gengiva, nariz)\n• Queda rápida da febre com piora do estado geral\n\n🚨 Atenção: NUNCA tomar AAS ou ibuprofeno na dengue — risco de hemorragia!'
       },
-
       {
-        icon: '🌎',
-        title: 'Saúde Coletiva',
-        text: 'Doenças transmissíveis são controladas com ações comunitárias e políticas públicas.'
+        icon: '🤰',
+        title: 'Zika: O Perigo na Gestação',
+        text: 'Na maioria dos adultos: febre baixa, manchas na pele (exantema), conjuntivite, dor nas articulações.\n\nPerigo REAL:\n⚠️ Em grávidas: causa MICROCEFALIA no bebê (cérebro menor que o normal)\n⚠️ Associado à Síndrome de Guillain-Barré (fraqueza muscular progressiva)\n\nZika foi emergência global em 2016 pela OMS.'
       },
-
+      {
+        icon: '🦴',
+        title: 'Chikungunya: A Dor que Dobra',
+        text: 'Nome significa "aquele que se dobra" em idioma africano — referência à DOR ARTICULAR INTENSA.\n\nSintomas marcantes:\n• Febre alta repentina\n• Dor articular MUITO intensa (cotovelos, joelhos, tornozelos)\n• A dor pode durar semanas ou meses\n\nDiferença key: na dengue a dor é muscular; na chikungunya é predominantemente ARTICULAR.'
+      },
       {
         icon: '🛡️',
-        title: 'Prevenção',
-        text: 'Vacinas, higiene, saneamento e educação em saúde formam barreiras complementares.'
+        title: 'Prevenção: Elimine os Criadouros!',
+        text: 'Regra dos 3 D:\n1. DESTAMPAR: cobrir caixas d\'água e tonéis\n2. DESCARTAR: jogar fora objetos que acumulam água\n3. DRENAR: esvaziar semanalmente pratos de vaso, bebedouros\n\nOutras medidas:\n• Repelente com DEET\n• Telas e mosquiteiros\n• Roupas que cubram o corpo\n• Agente comunitário de saúde: busca ativa'
       }
-
     ],
 
     flashcards: [
+      { q: 'Qual mosquito transmite dengue, zika e chikungunya?', a: 'Aedes aegypti.' },
+      { q: 'Em que período do dia o Aedes aegypti pica?',         a: 'Durante o DIA (diferente do mosquito da malária, que pica à noite).' },
+      { q: 'Qual o risco do zika para grávidas?',                 a: 'Microcefalia no bebê — desenvolvimento cerebral comprometido.' },
+      { q: 'O nome "chikungunya" significa:',                     a: '"Aquele que se dobra" — pela dor articular intensa.' },
+      { q: 'Por que não tomar AAS na dengue?',                    a: 'Aumenta risco de hemorragia na dengue grave.' },
+      { q: 'O Aedes cria em água parada e ___?',                  a: 'Limpa (pneu, garrafa, vaso de flor, piscina abandonada).' },
+      { q: 'Qual sinal de alerta grave na dengue?',               a: 'Dor abdominal intensa, sangramento ou queda rápida da febre com piora.' },
+      { q: 'O que é a Síndrome de Guillain-Barré?',               a: 'Fraqueza muscular progressiva associada ao zika.' }
+    ],
 
-      {
-        q: 'Vacina previne ou trata?',
-        a: 'Previne.'
-      },
-
-      {
-        q: 'Antibiótico funciona contra vírus?',
-        a: 'Não.'
-      },
-
-      {
-        q: 'Qual mosquito transmite dengue?',
-        a: 'Aedes aegypti.'
-      }
-
+    mnemonics: [
+      { trigger: 'Aedes aegypti',     memory: '"A = água parada limpa, E = Ele pica de dia, D = Dengue/Zika/Chikungunya/Febre Amarela"' },
+      { trigger: 'Dengue vs Chik',    memory: '"Dengue = dor nos Músculos. Chikungunya = dor nas Articulações (C = Curva de dor)"' },
+      { trigger: 'Zika na gravidez',  memory: '"Z de Zika = Z de cabeça Zelada (microcefalia) no bebê"' },
+      { trigger: '3 D prevenção',     memory: '"Destampar, Descartar, Drenar — os 3 D eliminam o criadouro!"' }
     ],
 
     miniReview: [
-
-      {
-        q: 'Fake news podem prejudicar campanhas de vacinação?',
-        a: 'Sim'
-      },
-
-      {
-        q: 'Saneamento reduz doenças?',
-        a: 'Sim'
-      },
-
-      {
-        q: 'Imunidade coletiva protege vulneráveis?',
-        a: 'Sim'
-      }
-
-    ],
-
-    visualMemoryHooks: [
-      '📰 Fake news = perigo coletivo',
-      '💉 Vacina = proteção social',
-      '🚰 Saneamento = prevenção estrutural',
-      '🧼 Higiene = defesa diária'
+      { q: 'Qual mosquito transmite dengue, zika e chikungunya?', a: 'Aedes aegypti.' },
+      { q: 'Qual o perigo do zika para gestantes?',               a: 'Microcefalia — bebê nasce com desenvolvimento cerebral comprometido.' },
+      { q: 'Por que não usar AAS na dengue?',                     a: 'Risco de hemorragia interna na dengue grave.' },
+      { q: 'Onde o Aedes se reproduz?',                           a: 'Água parada e limpa: pneu, vasos, garrafas, caixas d\'água destampadas.' }
     ]
   },
 
-  questions: [
-
+  warmup: [
     {
-      id: 116,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'antibióticos',
-      theme: 'especificidade',
-
-      prompt: 'Antibiótico cura gripe?',
-
+      prompt: 'O mosquito que transmite dengue, zika e chikungunya é o:',
       options: [
-        { text: 'Sim, sempre', correct: false },
-        { text: 'Não, gripe é viral', correct: true },
-        { text: 'Depende da cepa', correct: false },
-        { text: 'Só em crianças', correct: false }
+        { text: 'Aedes aegypti',      correct: true  },
+        { text: 'Anopheles gambiae',  correct: false },
+        { text: 'Culex quinquefasciatus', correct: false },
+        { text: 'Simulium damnosum', correct: false }
       ],
-
-      explanation: 'Antibióticos não funcionam contra vírus.'
+      explanation: 'O Aedes aegypti é o principal vetor das arboviroses no Brasil.'
     },
-
     {
-      id: 117,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'febre_amarela',
-      theme: 'mito',
-
-      prompt: 'Macacos transmitem febre amarela para humanos?',
-
+      prompt: 'O Aedes aegypti pica principalmente:',
       options: [
-        { text: 'Sim', correct: false },
-        { text: 'Não, mosquitos transmitem', correct: true },
-        { text: 'Só bugios transmitem', correct: false },
-        { text: 'Só saguis transmitem', correct: false }
+        { text: 'Durante o dia',       correct: true  },
+        { text: 'Só à noite',          correct: false },
+        { text: 'Apenas ao amanhecer', correct: false },
+        { text: 'Só no inverno',       correct: false }
       ],
-
-      explanation: 'Macacos são vítimas e sentinelas epidemiológicas.'
+      explanation: 'Diferente do mosquito da malária (Anopheles, que pica à noite), o Aedes pica durante o dia.'
     },
-
     {
-      id: 118,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'higiene',
-      theme: 'mãos',
-
-      prompt: 'Lavar as mãos previne:',
-
+      prompt: 'Na dengue, qual analgésico NÃO deve ser usado?',
       options: [
-        { text: 'Só gripe', correct: false },
-        { text: 'Várias doenças', correct: true },
-        { text: 'Nenhuma doença', correct: false },
-        { text: 'Apenas alergias', correct: false }
+        { text: 'AAS (Aspirina)',     correct: true  },
+        { text: 'Paracetamol',        correct: false },
+        { text: 'Dipirona',           correct: false },
+        { text: 'Nenhum dos três',    correct: false }
       ],
-
-      explanation: 'Higienização das mãos reduz múltiplas infecções.'
-    },
-
-    {
-      id: 119,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'dengue',
-      theme: 'criadouro',
-
-      prompt: 'Água parada favorece:',
-
-      options: [
-        { text: 'Tuberculose', correct: false },
-        { text: 'Mosquito Aedes aegypti', correct: true },
-        { text: 'Hanseníase', correct: false },
-        { text: 'Cólera', correct: false }
-      ],
-
-      explanation: 'Água parada cria ambiente ideal para o mosquito.'
-    },
-
-    {
-      id: 120,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'fake_news',
-      theme: 'característica',
-
-      prompt: 'Fake news geralmente:',
-
-      options: [
-        { text: 'Usa fontes verificáveis', correct: false },
-        { text: 'Usa sensacionalismo', correct: true },
-        { text: 'É técnica e científica', correct: false },
-        { text: 'Demora para circular', correct: false }
-      ],
-
-      explanation: 'Fake news exploram medo e urgência.'
-    },
-
-    {
-      id: 121,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'interpretação',
-      theme: 'cenário',
-
-      prompt: 'Alta dengue e baixa cólera indicam:',
-
-      options: [
-        { text: 'Falta de água tratada', correct: false },
-        { text: 'Problema com água parada e vetores urbanos', correct: true },
-        { text: 'Somente clima tropical', correct: false },
-        { text: 'Somente pobreza', correct: false }
-      ],
-
-      explanation: 'Dengue relaciona-se ao Aedes aegypti.'
-    },
-
-    {
-      id: 122,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'prevenção',
-      theme: 'zoonose',
-
-      prompt: 'Vacinar animais previne principalmente:',
-
-      options: [
-        { text: 'Dengue', correct: false },
-        { text: 'Raiva', correct: true },
-        { text: 'Cólera', correct: false },
-        { text: 'Malária', correct: false }
-      ],
-
-      explanation: 'Vacinação animal interrompe transmissão da raiva.'
-    },
-
-    {
-      id: 123,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'leptospirose',
-      theme: 'prevenção',
-
-      prompt: 'Qual medida NÃO previne leptospirose diretamente?',
-
-      options: [
-        { text: 'Eliminar água parada', correct: true },
-        { text: 'Usar botas em enchentes', correct: false },
-        { text: 'Controle de ratos', correct: false },
-        { text: 'Evitar água contaminada', correct: false }
-      ],
-
-      explanation: 'Eliminar água parada previne dengue.'
-    },
-
-    {
-      id: 124,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'epidemiologia',
-      theme: 'diferença',
-
-      prompt: 'O que diferencia epidemia de endemia?',
-
-      options: [
-        { text: 'Padrão temporal e geográfico', correct: true },
-        { text: 'Agente causal', correct: false },
-        { text: 'Tratamento', correct: false },
-        { text: 'Faixa etária', correct: false }
-      ],
-
-      explanation: 'Epidemia é aumento súbito; endemia é constante.'
-    },
-
-    {
-      id: 125,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'soro',
-      theme: 'indicação',
-
-      prompt: 'Soro é indicado quando:',
-
-      options: [
-        { text: 'Precisa de prevenção futura', correct: false },
-        { text: 'Há necessidade de ação imediata', correct: true },
-        { text: 'Para gripe leve', correct: false },
-        { text: 'Para vacinação', correct: false }
-      ],
-
-      explanation: 'Soro fornece anticorpos prontos.'
-    },
-
-    {
-      id: 126,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'febre_amarela',
-      theme: 'sentinela',
-
-      prompt: 'Macacos morrem de febre amarela porque:',
-
-      options: [
-        { text: 'São imunes', correct: false },
-        { text: 'São sensíveis ao vírus', correct: true },
-        { text: 'São vetores', correct: false },
-        { text: 'Comem mosquitos', correct: false }
-      ],
-
-      explanation: 'Funcionam como sentinelas epidemiológicas.'
-    },
-
-    {
-      id: 127,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'saneamento',
-      theme: 'impacto',
-
-      prompt: 'Saneamento básico:',
-
-      options: [
-        { text: 'Evita apenas doenças bacterianas', correct: false },
-        { text: 'Reduz múltiplas doenças', correct: true },
-        { text: 'Só é útil em cidades grandes', correct: false },
-        { text: 'Não afeta saúde', correct: false }
-      ],
-
-      explanation: 'Saneamento melhora saúde coletiva.'
-    },
-
-    {
-      id: 128,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'vetores',
-      theme: 'especificidade',
-
-      prompt: 'Aedes aegypti NÃO transmite:',
-
-      options: [
-        { text: 'Dengue', correct: false },
-        { text: 'Zika', correct: false },
-        { text: 'Malária', correct: true },
-        { text: 'Chikungunya', correct: false }
-      ],
-
-      explanation: 'Malária é transmitida pelo mosquito Anopheles.'
-    },
-
-    {
-      id: 129,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'higiene',
-      theme: 'vinagre',
-
-      prompt: 'Vinagre na higienização de alimentos:',
-
-      options: [
-        { text: 'É mais eficaz que cloro', correct: false },
-        { text: 'Tem ação limitada', correct: true },
-        { text: 'É proibido', correct: false },
-        { text: 'Substitui hipoclorito', correct: false }
-      ],
-
-      explanation: 'Hipoclorito é mais eficaz contra microrganismos.'
-    },
-
-    {
-      id: 130,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'vacinas',
-      theme: 'especificidade',
-
-      prompt: 'A tríplice viral NÃO protege contra:',
-
-      options: [
-        { text: 'Caxumba', correct: false },
-        { text: 'Sarampo', correct: false },
-        { text: 'Rubéola', correct: false },
-        { text: 'Dengue', correct: true }
-      ],
-
-      explanation: 'Tríplice viral protege sarampo, caxumba e rubéola.'
+      explanation: 'O AAS aumenta o risco de hemorragia na dengue grave. Usar paracetamol para febre e dor.'
     }
-
   ],
 
-  completion: {
-
-    title: '🏆 Curso Finalizado!',
-
-    message: 'Parabéns! Você concluiu todas as etapas do capítulo.',
-
-    unlocked: [
-      'Interpretação epidemiológica',
-      'Combate à fake news',
-      'Prevenção integrada',
-      'Saúde coletiva',
-      'Raciocínio crítico em saúde pública'
-    ],
-
-    certificate: {
-      enabled: true,
-      title: 'Especialista em Prevenção e Saúde Pública'
+  guidedPractice: [
+    {
+      prompt: '🔍 DICA: O nome "chikungunya" vem de um idioma africano e descreve o sintoma mais marcante.\n\nA principal diferença da chikungunya para a dengue é:',
+      options: [
+        { text: 'Dor articular muito intensa (articulações)',   correct: true  },
+        { text: 'Febre mais alta que na dengue',                correct: false },
+        { text: 'Manchas na pele mais intensas',               correct: false },
+        { text: 'Transmissão por mosquito diferente',          correct: false }
+      ],
+      explanation: 'Chikungunya = dor articular intensa que pode durar semanas. Dengue = dor muscular ("quebra-ossos").'
+    },
+    {
+      prompt: '🔍 DICA: Zika em adultos é leve, mas em grávidas é muito perigoso.\n\nQual o principal risco do zika para bebês?',
+      options: [
+        { text: 'Microcefalia — desenvolvimento cerebral comprometido', correct: true  },
+        { text: 'Hemorragia interna grave',                             correct: false },
+        { text: 'Dengue hemorrágica neonatal',                         correct: false },
+        { text: 'Paralisia permanente dos membros',                    correct: false }
+      ],
+      explanation: 'O vírus Zika atravessa a placenta e interfere no desenvolvimento cerebral do feto, causando microcefalia.'
     }
+  ],
+
+  questions: [
+    {
+      prompt: 'Qual mosquito é responsável pela transmissão de dengue, zika e chikungunya?',
+      options: [
+        { text: 'Aedes aegypti',           correct: true  },
+        { text: 'Anopheles gambiae',       correct: false },
+        { text: 'Culex pipiens',           correct: false },
+        { text: 'Mansonia uniformis',      correct: false }
+      ],
+      explanation: 'O Aedes aegypti é o principal vetor das três arboviroses no Brasil e nas Américas.'
+    },
+    {
+      prompt: 'A chikungunya se diferencia da dengue principalmente pela:',
+      options: [
+        { text: 'Dor articular intensa e prolongada',    correct: true  },
+        { text: 'Febre muito mais alta (acima de 41°C)', correct: false },
+        { text: 'Transmissão por contato direto',        correct: false },
+        { text: 'Ausência completa de febre',            correct: false }
+      ],
+      explanation: 'O nome chikungunya significa "aquele que se dobra" — referência à dor articular intensa.'
+    },
+    {
+      prompt: 'O vírus Zika representa risco especial para:',
+      options: [
+        { text: 'Gestantes — pode causar microcefalia no bebê',   correct: true  },
+        { text: 'Idosos — causa insuficiência renal grave',        correct: false },
+        { text: 'Crianças menores de 2 anos — causa convulsões',  correct: false },
+        { text: 'Homens adultos — causa infertilidade',            correct: false }
+      ],
+      explanation: 'O vírus Zika atravessa a placenta e compromete o desenvolvimento cerebral do feto.'
+    },
+    {
+      prompt: 'Para prevenir a dengue, a principal ação é:',
+      options: [
+        { text: 'Eliminar criadouros de água parada',       correct: true  },
+        { text: 'Usar antibióticos preventivos',            correct: false },
+        { text: 'Vacinar toda a população anualmente',      correct: false },
+        { text: 'Usar repelente só à noite',                correct: false }
+      ],
+      explanation: 'Sem água parada, o Aedes não se reproduz. Eliminar criadouros é a medida mais eficaz.'
+    },
+    {
+      prompt: 'Na dengue hemorrágica (grave), um sinal de alerta importante é:',
+      options: [
+        { text: 'Queda rápida da febre com dor abdominal intensa', correct: true  },
+        { text: 'Febre que sobe gradualmente por 10 dias',          correct: false },
+        { text: 'Tosse seca e coriza',                               correct: false },
+        { text: 'Manchas brancas na garganta',                      correct: false }
+      ],
+      explanation: 'A queda brusca da febre com piora do estado geral indica dengue grave — procurar UPA imediatamente.'
+    },
+    {
+      prompt: 'O Aedes aegypti se reproduz em:',
+      options: [
+        { text: 'Água parada e limpa (pneus, vasos, garrafas)', correct: true  },
+        { text: 'Água corrente de rios e riachos',               correct: false },
+        { text: 'Água salgada do mar',                           correct: false },
+        { text: 'Solo úmido e folhas em decomposição',           correct: false }
+      ],
+      explanation: 'Diferente de outros mosquitos, o Aedes prefere água parada E limpa para depositar seus ovos.'
+    },
+    {
+      prompt: 'Por que o AAS (Aspirina) não deve ser usado na dengue?',
+      options: [
+        { text: 'Aumenta risco de hemorragia interna na dengue grave', correct: true  },
+        { text: 'Não tem efeito sobre a febre da dengue',               correct: false },
+        { text: 'Causa alergia em todos os pacientes com dengue',       correct: false },
+        { text: 'É antibiótico e não tem efeito em vírus',             correct: false }
+      ],
+      explanation: 'O AAS interfere na coagulação sanguínea, potencializando hemorragias na dengue hemorrágica.'
+    },
+    {
+      prompt: 'Qual das alternativas é um criadouro potencial para o Aedes aegypti?',
+      options: [
+        { text: 'Prato de vaso de planta com água acumulada', correct: true  },
+        { text: 'Rio com correnteza forte',                    correct: false },
+        { text: 'Piscina com cloro e circulação',              correct: false },
+        { text: 'Caixa d\'água tampada adequadamente',         correct: false }
+      ],
+      explanation: 'Pratos de vasos, pneus, garrafas e calhas entupidas são criadouros comuns do Aedes.'
+    },
+    {
+      prompt: 'A Síndrome de Guillain-Barré, associada ao vírus Zika, caracteriza-se por:',
+      options: [
+        { text: 'Fraqueza muscular progressiva que pode levar à paralisia', correct: true  },
+        { text: 'Febre muito alta com convulsões',                           correct: false },
+        { text: 'Inflamação do fígado (hepatite)',                           correct: false },
+        { text: 'Manchas hemorrágicas na pele',                              correct: false }
+      ],
+      explanation: 'A Síndrome de Guillain-Barré é uma complicação neurológica rara mas grave associada ao Zika.'
+    },
+    {
+      prompt: 'As "listras brancas" no corpo ajudam a identificar o:',
+      options: [
+        { text: 'Aedes aegypti',       correct: true  },
+        { text: 'Anopheles gambiae',   correct: false },
+        { text: 'Culex quinquefasciatus', correct: false },
+        { text: 'Borrachudo',          correct: false }
+      ],
+      explanation: 'O Aedes aegypti tem marcas brancas no corpo e nas patas — característica visual distintiva.'
+    }
+  ],
+
+  adaptiveReview: [
+    {
+      prompt: 'DIFÍCIL: Por que uma pessoa pode ter dengue mais de uma vez ao longo da vida?',
+      options: [
+        { text: 'Existem 4 sorotipos do vírus dengue — imunidade a um não protege dos outros', correct: true  },
+        { text: 'O sistema imune perde a memória da dengue rapidamente',                       correct: false },
+        { text: 'O vírus muta toda temporada como a gripe',                                    correct: false },
+        { text: 'Não é possível ter dengue mais de uma vez',                                   correct: false }
+      ],
+      explanation: 'Existem 4 sorotipos (DENV 1, 2, 3, 4). A imunidade é sorotipo-específica, não cruzada.'
+    },
+    {
+      prompt: 'DIFÍCIL: A dengue hemorrágica (grave) ocorre mais frequentemente em:',
+      options: [
+        { text: 'Pessoas que estão sendo infectadas por um segundo sorotipo diferente do primeiro', correct: true  },
+        { text: 'Crianças na primeira infecção',                                                    correct: false },
+        { text: 'Idosos vacinados contra a dengue',                                                correct: false },
+        { text: 'Pacientes que tomaram antibióticos desnecessariamente',                           correct: false }
+      ],
+      explanation: 'Na segunda infecção por sorotipo diferente, anticorpos da primeira infecção podem amplificar a resposta — fenômeno ADE (Antibody-Dependent Enhancement).'
+    }
+  ],
+
+  rewards: {
+    xp:    175,
+    gems:  18,
+    badge: '🦟 Caçador do Aedes'
   },
 
-  analytics: {
-
-    masteryThreshold: 0.85,
-
-    minimumCorrectAnswers: 80,
-
-    trackResponseTime: true,
-
-    spacedReviewEnabled: true,
-
-    generateFinalReport: true
-  }
+  completionMessage: '🦟 Fantástico! Você conhece o trio mortal do Aedes. Agora elimine os criadouros!',
+  nextStage: 'stage_05'
 };
 
-if (typeof window !== 'undefined') {
-  window.STAGE_04 = STAGE_04;
-}
-if (window.DataLoader) {
-  window.DataLoader.registerStage('cap7_doencas', 4, STAGE_04);
-}
+window.STAGE_04 = STAGE_04;

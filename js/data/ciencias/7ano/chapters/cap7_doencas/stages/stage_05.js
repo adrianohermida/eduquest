@@ -1,360 +1,269 @@
+/**
+ * STAGE 05 — COVID-19 e Gripe (Influenza)
+ * Coronavírus, variantes e a pandemia mais recente
+ */
+
 const STAGE_05 = {
-
   id: 'stage_05',
-
-  title: 'Simulado Oficial e Revisão Estratégica',
-
-  icon: '🎯',
-
-  difficulty: 'hard',
-
-  estimatedTime: 60,
+  title: 'COVID-19 e Gripe',
+  icon: '😷',
+  difficulty: 'medium',
+  estimatedTime: 14,
 
   learningObjectives: [
-    'Aplicar conhecimentos em cenários reais',
-    'Interpretar situações epidemiológicas',
-    'Resolver questões contextualizadas',
-    'Revisar prevenção de doenças transmissíveis',
-    'Reconhecer fake news em saúde',
-    'Consolidar conhecimentos do capítulo'
+    'Compreender o vírus SARS-CoV-2 e suas variantes',
+    'Diferenciar COVID-19 de gripe (Influenza)',
+    'Entender a transmissão aérea e aerossóis',
+    'Conhecer as vacinas de RNA mensageiro (mRNA)',
+    'Saber quando usar PCR e teste rápido de antígeno'
   ],
-
-  skills: [
-    'interpretação',
-    'epidemiologia',
-    'pensamento_critico',
-    'prevenção',
-    'saude_publica',
-    'análise_contextual'
-  ],
-
-  rewards: {
-    xp: 500,
-    badge: 'Campeão do Simulado Oficial'
-  },
-
-  adaptiveRules: {
-    failTwice: 'show_targeted_revision',
-    failThreeTimes: 'unlock_guided_mode',
-    scoreAbove90: 'unlock_master_certificate'
-  },
-
-  nextStage: null,
 
   summary: {
-
-    readTime: 120,
-
+    readTime: 5,
     content: [
-
       {
-        icon: '🎯',
-        title: 'Aplicação Prática',
-        text: 'Nesta etapa você aplicará todos os conhecimentos adquiridos em situações reais e questões contextualizadas.'
+        icon: '🦠',
+        title: 'SARS-CoV-2: O Coronavírus',
+        text: 'O COVID-19 é causado pelo vírus SARS-CoV-2, um betacoronavírus identificado em dezembro de 2019 em Wuhan, China.\n\nFamília dos coronavírus: chamados assim pela "coroa" de proteínas spike ao redor do vírus.\n\nTransmissão: principalmente por aerossóis e gotículas (falar, tossir, espirrar) — por isso máscaras e ventilação são fundamentais.\n\n💡 COVID-19 é o nome da DOENÇA. SARS-CoV-2 é o nome do VÍRUS.'
       },
-
       {
-        icon: '🧠',
-        title: 'Interpretação',
-        text: 'O foco agora é interpretar cenários epidemiológicos e reconhecer padrões de prevenção.'
+        icon: '🔄',
+        title: 'Variantes do Coronavírus',
+        text: 'Vírus RNA mutam constantemente. As principais variantes do SARS-CoV-2:\n\n• Alpha (B.1.1.7) — mais transmissível\n• Delta (B.1.617.2) — muito transmissível, mais grave\n• Ômicron (B.1.1.529) — altamente transmissível, menos grave em vacinados\n\nAs variantes recebem letras do alfabeto grego pela OMS.\n\n⚠️ Por que importa: variantes podem escapar parcialmente da imunidade existente.'
       },
-
       {
-        icon: '📰',
-        title: 'Pensamento Crítico',
-        text: 'Identificar fake news e compreender evidências científicas são habilidades essenciais.'
+        icon: '🤧',
+        title: 'COVID-19 vs Gripe: as Diferenças',
+        text: 'GRIPE (Influenza):\n• Sintomas em horas (início rápido)\n• Febre alta, dor muscular intensa\n• Vírus Influenza A, B, C\n• Transmissão por gotículas maiores\n\nCOVID-19:\n• Perda de olfato/paladar (específico)\n• Sintomas em 2-14 dias após exposição\n• Mais variabilidade: de assintomático a grave\n• Maior risco de complicações pulmonares\n\n🧠 Ambas: vacinas anuais/atualizadas recomendadas'
       },
-
       {
-        icon: '🌎',
-        title: 'Saúde Coletiva',
-        text: 'A prevenção depende de ações individuais, comunitárias e políticas públicas.'
+        icon: '💉',
+        title: 'Vacinas mRNA: Uma Revolução',
+        text: 'As vacinas de RNA mensageiro (Pfizer, Moderna) funcionam assim:\n\n1. mRNA entra nas células\n2. Célula produz a proteína spike do vírus\n3. Sistema imune aprende a reconhecer o spike\n4. mRNA se degrada em dias — NÃO entra no DNA\n\n✅ Vantagem: desenvolvimento rápido (meses vs anos)\n✅ Tecnologia usada antes em pesquisas de câncer\n\n❌ Mito: "a vacina mRNA muda o DNA" — FALSO. mRNA não entra no núcleo celular.'
+      },
+      {
+        icon: '🔬',
+        title: 'Diagnóstico: PCR, Antígeno e Sorologia',
+        text: 'PCR (RT-PCR):\n✅ Padrão ouro — muito preciso\n✅ Detecta o vírus em fase aguda (primeiros dias)\n⏱️ Resultado: 24-48 horas\n\nTeste rápido de antígeno:\n✅ Resultado em 15-30 minutos\n✅ Bom para sintomáticos\n⚠️ Menos sensível que o PCR\n\nSorologia:\n✅ Detecta anticorpos (contato passado com vírus ou vacina)'
       }
-
     ],
 
     flashcards: [
+      { q: 'Qual o agente causador do COVID-19?',             a: 'SARS-CoV-2 — um betacoronavírus.' },
+      { q: 'Por que coronavírus tem esse nome?',              a: 'Pela "coroa" de proteínas spike ao redor do vírus.' },
+      { q: 'Qual sintoma é específico do COVID-19?',          a: 'Perda de olfato e paladar (anosmia/ageusia).' },
+      { q: 'O que são vacinas mRNA?',                         a: 'Instruem células a produzir proteína spike — sistema imune aprende a combatê-la.' },
+      { q: 'A vacina mRNA muda o DNA?',                       a: 'NÃO. O mRNA se degrada em dias e nunca entra no núcleo celular.' },
+      { q: 'Qual teste é o padrão ouro para COVID-19?',       a: 'RT-PCR — detecta o material genético do vírus.' },
+      { q: 'A gripe é causada por qual vírus?',               a: 'Influenza (tipos A, B e C).' },
+      { q: 'O que são as variantes do SARS-CoV-2?',           a: 'Versões mutadas do vírus com diferenças na transmissibilidade ou gravidade.' }
+    ],
 
-      {
-        q: 'Leptospirose está relacionada a quê?',
-        a: 'Contato com água contaminada por urina de ratos.'
-      },
-
-      {
-        q: 'Antibióticos funcionam contra gripe?',
-        a: 'Não.'
-      },
-
-      {
-        q: 'Qual mosquito transmite dengue?',
-        a: 'Aedes aegypti.'
-      }
-
+    mnemonics: [
+      { trigger: 'COVID vs Gripe',      memory: '"COVID = Cheiro some (olfato). Gripe = Dói Geral (muscular rápido)"' },
+      { trigger: 'mRNA',                memory: '"mRNA = Mensagem que ensina. Lê, aprende, some. NÃO mexe no DNA!"' },
+      { trigger: 'Variantes gregas',    memory: '"Alpha, Delta, Ômicron — como capítulos de um livro em grego"' },
+      { trigger: 'SARS-CoV-2',         memory: '"SARS = Síndrome Respiratória Aguda Grave. CoV = Coronavírus. 2 = segunda cepa SARS"' }
     ],
 
     miniReview: [
-
-      {
-        q: 'Vacinação coletiva reduz transmissão?',
-        a: 'Sim'
-      },
-
-      {
-        q: 'Fake news prejudicam saúde pública?',
-        a: 'Sim'
-      },
-
-      {
-        q: 'Saneamento reduz doenças?',
-        a: 'Sim'
-      }
-
-    ],
-
-    visualMemoryHooks: [
-      '🎯 Simulado = aplicação prática',
-      '📰 Fake news = risco coletivo',
-      '💉 Vacina = proteção comunitária',
-      '🚰 Saneamento = prevenção estrutural'
+      { q: 'Qual o nome do vírus que causa COVID-19?',          a: 'SARS-CoV-2.' },
+      { q: 'A vacina mRNA muda o DNA humano?',                  a: 'NÃO — o mRNA se degrada em dias sem entrar no núcleo.' },
+      { q: 'O que diferencia COVID-19 da gripe clinicamente?',  a: 'Perda de olfato/paladar é específica do COVID.' },
+      { q: 'Qual o padrão ouro para diagnóstico de COVID?',     a: 'RT-PCR — teste molecular que detecta o RNA viral.' }
     ]
   },
 
-  questions: [
-
+  warmup: [
     {
-      id: 151,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'interpretação',
-      theme: 'leptospirose_enchente',
-
-      prompt: 'Após enchentes, aumentaram casos relacionados à água contaminada por urina de ratos. A doença mais associada é:',
-
+      prompt: 'O COVID-19 é causado pelo vírus:',
       options: [
-        { text: 'Dengue', correct: false },
-        { text: 'Covid-19', correct: false },
-        { text: 'Leptospirose', correct: true },
-        { text: 'Sarampo', correct: false },
-        { text: 'Catapora', correct: false }
+        { text: 'SARS-CoV-2',     correct: true  },
+        { text: 'Influenza A',    correct: false },
+        { text: 'MERS-CoV',      correct: false },
+        { text: 'Rhinovirus',    correct: false }
       ],
-
-      explanation: 'Leptospirose está associada a enchentes e contato com água contaminada.'
+      explanation: 'O SARS-CoV-2 é o betacoronavírus identificado em 2019 e causador da pandemia de COVID-19.'
     },
-
     {
-      id: 152,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'epidemiologia',
-      theme: 'epidemia',
-
-      prompt: 'Aumento rápido de casos em apenas uma região caracteriza:',
-
+      prompt: 'Um sintoma específico do COVID-19 (menos comum na gripe) é:',
       options: [
-        { text: 'Pandemia', correct: false },
-        { text: 'Mutação', correct: false },
-        { text: 'Endemia mundial', correct: false },
-        { text: 'Epidemia', correct: true },
-        { text: 'Imunização', correct: false }
+        { text: 'Perda de olfato e paladar',  correct: true  },
+        { text: 'Febre acima de 38°C',        correct: false },
+        { text: 'Dor de cabeça',              correct: false },
+        { text: 'Tosse seca',                 correct: false }
       ],
-
-      explanation: 'Epidemia é aumento localizado e rápido de casos.'
+      explanation: 'A anosmia (perda de olfato) e ageusia (perda de paladar) são marcadores relativamente específicos do COVID-19.'
     },
-
     {
-      id: 153,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'dengue',
-      theme: 'prevenção_vetor',
-
-      prompt: 'Eliminar água parada combate dengue porque:',
-
+      prompt: 'As vacinas de mRNA (Pfizer, Moderna) funcionam:',
       options: [
-        { text: 'Elimina o vírus', correct: false },
-        { text: 'Impede reprodução do mosquito', correct: true },
-        { text: 'Mata bactérias', correct: false },
-        { text: 'Substitui vacinas', correct: false },
-        { text: 'Reduz poluição', correct: false }
+        { text: 'Ensinando as células a produzir a proteína spike do vírus', correct: true  },
+        { text: 'Inserindo o vírus atenuado no organismo',                    correct: false },
+        { text: 'Fornecendo anticorpos prontos contra o vírus',              correct: false },
+        { text: 'Modificando o DNA para resistir ao vírus',                  correct: false }
       ],
-
-      explanation: 'O Aedes aegypti utiliza água parada para reprodução.'
-    },
-
-    {
-      id: 154,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'raiva',
-      theme: 'emergência',
-
-      prompt: 'Pessoa mordida por cão suspeito de raiva deve:',
-
-      options: [
-        { text: 'Esperar sintomas', correct: false },
-        { text: 'Tomar antibióticos em casa', correct: false },
-        { text: 'Procurar atendimento médico imediato', correct: true },
-        { text: 'Apenas lavar o local', correct: false },
-        { text: 'Ignorar o ferimento', correct: false }
-      ],
-
-      explanation: 'A profilaxia pós-exposição salva vidas.'
-    },
-
-    {
-      id: 155,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'fake_news',
-      theme: 'identificação',
-
-      prompt: 'Mensagem afirmando que vacina altera DNA humano provavelmente é:',
-
-      options: [
-        { text: 'Pesquisa validada', correct: false },
-        { text: 'Consenso médico', correct: false },
-        { text: 'Fake news', correct: true },
-        { text: 'Campanha oficial', correct: false },
-        { text: 'Publicidade hospitalar', correct: false }
-      ],
-
-      explanation: 'Vacinas não alteram DNA humano.'
-    },
-
-    {
-      id: 156,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'vacinas',
-      theme: 'imunidade_coletiva',
-
-      prompt: 'Uma vantagem da vacinação coletiva é:',
-
-      options: [
-        { text: 'Eliminar totalmente doenças', correct: false },
-        { text: 'Proteger apenas vacinados', correct: false },
-        { text: 'Reduzir circulação do agente infeccioso', correct: true },
-        { text: 'Substituir higiene', correct: false },
-        { text: 'Eliminar médicos', correct: false }
-      ],
-
-      explanation: 'Imunidade coletiva reduz transmissão.'
-    },
-
-    {
-      id: 157,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'dengue',
-      theme: 'sintomas',
-
-      prompt: 'Febre alta, dores no corpo e manchas vermelhas após picada de mosquito sugerem:',
-
-      options: [
-        { text: 'Tuberculose', correct: false },
-        { text: 'Hanseníase', correct: false },
-        { text: 'Dengue', correct: true },
-        { text: 'Tétano', correct: false },
-        { text: 'Cólera', correct: false }
-      ],
-
-      explanation: 'Esses são sintomas clássicos de dengue.'
-    },
-
-    {
-      id: 158,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'antibióticos',
-      theme: 'especificidade',
-
-      prompt: 'A frase “antibióticos tratam gripe” está:',
-
-      options: [
-        { text: 'Correta', correct: false },
-        { text: 'Correta apenas em crianças', correct: false },
-        { text: 'Incorreta, gripe é viral', correct: true },
-        { text: 'Correta apenas em idosos', correct: false },
-        { text: 'Correta em casos graves', correct: false }
-      ],
-
-      explanation: 'Antibióticos não atuam contra vírus.'
-    },
-
-    {
-      id: 159,
-      type: 'select',
-      difficulty: 'easy',
-      category: 'saneamento',
-      theme: 'impacto',
-
-      prompt: 'Falta de saneamento aumenta risco de:',
-
-      options: [
-        { text: 'Prevenção de epidemias', correct: false },
-        { text: 'Doenças transmissíveis', correct: true },
-        { text: 'Imunidade coletiva', correct: false },
-        { text: 'Redução de infecções', correct: false },
-        { text: 'Eliminação de bactérias', correct: false }
-      ],
-
-      explanation: 'Saneamento inadequado favorece doenças.'
-    },
-
-    {
-      id: 160,
-      type: 'select',
-      difficulty: 'medium',
-      category: 'síntese',
-      theme: 'afirmativas',
-
-      prompt: 'Quais afirmativas estão corretas? I-Vacinas previnem doenças. II-Aedes transmite dengue. III-Saneamento previne doenças. IV-Antibióticos funcionam contra vírus.',
-
-      options: [
-        { text: 'Apenas I e II', correct: false },
-        { text: 'Apenas III e IV', correct: false },
-        { text: 'Apenas I, II e III', correct: true },
-        { text: 'Apenas IV', correct: false },
-        { text: 'Todas', correct: false }
-      ],
-
-      explanation: 'Antibióticos não funcionam contra vírus.'
+      explanation: 'O mRNA instrui as células a produzir a proteína spike; o sistema imune aprende a neutralizá-la.'
     }
-
   ],
 
-  completion: {
-
-    title: '🏆 Simulado Oficial Concluído!',
-
-    message: 'Parabéns! Você finalizou todas as etapas do capítulo e concluiu o Simulado Oficial.',
-
-    unlocked: [
-      'Interpretação epidemiológica avançada',
-      'Análise crítica em saúde pública',
-      'Combate à desinformação',
-      'Síntese de conhecimentos',
-      'Certificação final'
-    ],
-
-    certificate: {
-      enabled: true,
-      title: 'Especialista em Doenças Transmissíveis e Saúde Pública'
+  guidedPractice: [
+    {
+      prompt: '🔍 DICA: mRNA = mensagem temporária. Se degrada em dias. NÃO tem como acessar o DNA no núcleo.\n\nA afirmação "a vacina mRNA modifica o DNA humano" é:',
+      options: [
+        { text: 'Falsa — mRNA se degrada sem entrar no núcleo celular', correct: true  },
+        { text: 'Verdadeira — a vacina altera alguns genes',             correct: false },
+        { text: 'Parcialmente verdadeira em crianças',                  correct: false },
+        { text: 'Verdadeira apenas para doses de reforço',              correct: false }
+      ],
+      explanation: 'O mRNA não entra no núcleo da célula (onde está o DNA) e se degrada em poucos dias.'
+    },
+    {
+      prompt: '🔍 DICA: PCR detecta o vírus agora. Use nos primeiros dias.\n\nQual teste é mais indicado para diagnóstico nos primeiros 5 dias de sintomas?',
+      options: [
+        { text: 'PCR (RT-PCR)',        correct: true  },
+        { text: 'Sorologia de IgG',    correct: false },
+        { text: 'Hemograma completo',  correct: false },
+        { text: 'Radiografia de tórax', correct: false }
+      ],
+      explanation: 'O RT-PCR detecta o RNA viral em fase aguda — padrão ouro para diagnóstico ativo de COVID-19.'
     }
+  ],
+
+  questions: [
+    {
+      prompt: 'O agente causador do COVID-19 é:',
+      options: [
+        { text: 'SARS-CoV-2',      correct: true  },
+        { text: 'Influenza A H1N1', correct: false },
+        { text: 'Adenovírus tipo 5', correct: false },
+        { text: 'Rhinovirus C',     correct: false }
+      ],
+      explanation: 'SARS-CoV-2 é o betacoronavírus responsável pela pandemia iniciada em 2019.'
+    },
+    {
+      prompt: 'A principal via de transmissão do SARS-CoV-2 é:',
+      options: [
+        { text: 'Aerossóis e gotículas respiratórias',  correct: true  },
+        { text: 'Contato com animais infectados',        correct: false },
+        { text: 'Água contaminada',                      correct: false },
+        { text: 'Picada de mosquito',                    correct: false }
+      ],
+      explanation: 'O vírus se transmite principalmente por aerossóis e gotículas ao falar, tossir ou espirrar.'
+    },
+    {
+      prompt: 'A vacina mRNA NÃO modifica o DNA humano porque:',
+      options: [
+        { text: 'O mRNA se degrada em dias sem entrar no núcleo celular',  correct: true  },
+        { text: 'O vírus da vacina não é patogênico',                       correct: false },
+        { text: 'A ANVISA proíbe vacinas que alteram DNA',                 correct: false },
+        { text: 'O sistema imune bloqueia qualquer alteração genética',    correct: false }
+      ],
+      explanation: 'mRNA é degradado no citoplasma em poucos dias. Não tem acesso ao núcleo celular onde fica o DNA.'
+    },
+    {
+      prompt: 'A gripe (Influenza) diferencia-se do COVID-19 porque:',
+      options: [
+        { text: 'Os sintomas surgem mais rapidamente (horas), com forte dor muscular', correct: true  },
+        { text: 'A gripe não tem vacina disponível',                                    correct: false },
+        { text: 'A gripe nunca causa febre acima de 38°C',                              correct: false },
+        { text: 'A gripe só afeta idosos',                                              correct: false }
+      ],
+      explanation: 'A gripe tem início abrupto com febre alta e mialgia intensa em poucas horas após infecção.'
+    },
+    {
+      prompt: 'As variantes do SARS-CoV-2 (Alpha, Delta, Ômicron) recebem nomes do:',
+      options: [
+        { text: 'Alfabeto grego — sistema adotado pela OMS',       correct: true  },
+        { text: 'País onde foram detectadas pela primeira vez',    correct: false },
+        { text: 'Cientista que as descobriu',                      correct: false },
+        { text: 'Número de mutações que possuem',                  correct: false }
+      ],
+      explanation: 'A OMS adotou o alfabeto grego para nomear variantes de preocupação e evitar estigmatização geográfica.'
+    },
+    {
+      prompt: 'O teste RT-PCR para COVID-19 detecta:',
+      options: [
+        { text: 'O RNA do vírus SARS-CoV-2 — infecção ativa',  correct: true  },
+        { text: 'Anticorpos IgG produzidos pelo paciente',       correct: false },
+        { text: 'Anticorpos IgM de infecção recente',           correct: false },
+        { text: 'Fragmentos de proteína spike no sangue',       correct: false }
+      ],
+      explanation: 'RT-PCR = Reação em Cadeia da Polimerase com Transcriptase Reversa — detecta o RNA viral diretamente.'
+    },
+    {
+      prompt: 'O nome "coronavírus" vem de:',
+      options: [
+        { text: 'Projeções de proteína spike que parecem uma coroa',  correct: true  },
+        { text: 'Ter sido descoberto durante uma eclipse solar',       correct: false },
+        { text: 'Ser o "rei" das infecções virais',                   correct: false },
+        { text: 'Formato circular do RNA viral',                      correct: false }
+      ],
+      explanation: 'Ao microscópio eletrônico, as proteínas spike formam uma "coroa" (corona em latim) ao redor do vírus.'
+    },
+    {
+      prompt: 'A perda de olfato (anosmia) é sintoma mais característico de:',
+      options: [
+        { text: 'COVID-19',   correct: true  },
+        { text: 'Gripe',      correct: false },
+        { text: 'Dengue',     correct: false },
+        { text: 'Resfriado',  correct: false }
+      ],
+      explanation: 'Anosmia e ageusia (perda de paladar) são sintomas relativamente específicos do COVID-19.'
+    },
+    {
+      prompt: 'A variante Ômicron do SARS-CoV-2 foi marcante por ser:',
+      options: [
+        { text: 'Mais transmissível, com doença geralmente menos grave em vacinados', correct: true  },
+        { text: 'Menos transmissível mas muito mais letal que as anteriores',          correct: false },
+        { text: 'A primeira variante a escapar completamente das vacinas',             correct: false },
+        { text: 'Menos contagiosa que as variantes anteriores',                        correct: false }
+      ],
+      explanation: 'Ômicron mostrou alta transmissibilidade mas, em vacinados, menor taxa de hospitalização e óbito.'
+    },
+    {
+      prompt: 'O teste rápido de antígeno para COVID-19 é preferido quando:',
+      options: [
+        { text: 'É necessário resultado rápido (15-30 min) em paciente sintomático', correct: true  },
+        { text: 'Se deseja o resultado mais preciso possível',                        correct: false },
+        { text: 'O paciente já se recuperou há 3 meses',                             correct: false },
+        { text: 'Se quer verificar se a vacina foi eficaz',                          correct: false }
+      ],
+      explanation: 'O teste de antígeno é menos sensível que o PCR, mas muito mais rápido — útil para triagem ágil.'
+    }
+  ],
+
+  adaptiveReview: [
+    {
+      prompt: 'DIFÍCIL: Por que as vacinas contra o Influenza (gripe) precisam ser reformuladas anualmente, diferente de outras vacinas?',
+      options: [
+        { text: 'O Influenza sofre deriva e deslocamento antigênico frequentes, alterando as proteínas de superfície', correct: true  },
+        { text: 'A imunidade gerada pela vacina da gripe dura exatamente 365 dias',                                    correct: false },
+        { text: 'A ANVISA exige reformulação anual por precaução legal',                                               correct: false },
+        { text: 'O vírus Influenza morre fora do hospedeiro após 1 ano',                                               correct: false }
+      ],
+      explanation: 'A deriva antigênica (mutações graduais) e o deslocamento antigênico (recombinação de cepas) do Influenza tornam necessárias vacinas atualizadas todo ano.'
+    },
+    {
+      prompt: 'DIFÍCIL: Uma pessoa vacinada contra COVID-19 pode ainda transmitir o vírus. Por quê?',
+      options: [
+        { text: 'A vacina protege principalmente contra doença grave, mas não bloqueia completamente a replicação nasal', correct: true  },
+        { text: 'A vacina tem eficácia zero na transmissão',                                                              correct: false },
+        { text: 'Pessoas vacinadas são imunes mas portadoras crônicas',                                                  correct: false },
+        { text: 'A vacina só funciona em crianças',                                                                      correct: false }
+      ],
+      explanation: 'Vacinas reduzem drasticamente a carga viral, mas especialmente as variantes mais novas podem replicar parcialmente nas vias aéreas superiores.'
+    }
+  ],
+
+  rewards: {
+    xp:    180,
+    gems:  18,
+    badge: '😷 Especialista COVID'
   },
 
-  analytics: {
-
-    masteryThreshold: 0.9,
-
-    minimumCorrectAnswers: 85,
-
-    trackResponseTime: true,
-
-    spacedReviewEnabled: true,
-
-    generateFinalReport: true
-  }
+  completionMessage: '😷 Parabéns! Você dominou COVID-19 e gripe. Ciência salva vidas!',
+  nextStage: 'stage_06'
 };
 
 window.STAGE_05 = STAGE_05;

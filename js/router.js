@@ -402,21 +402,23 @@ const Router = {
     renderChapterMap(container, chapterId) {
         if (!chapterId) { this.renderHome(container); return; }
 
-        const meta        = window.CHAPTER_METADATA || { title: 'Capítulo', icon: '📚', description: '', totalStages: 5 };
-        const totalStages = meta.totalStages || 5;
+        const meta   = window.CHAPTER_METADATA || { title: 'Capítulo', icon: '📚', description: '', totalStages: 5, stages: [] };
+        const stages = meta.stages || [];
 
         let pathHTML = '';
-        for (let i = 1; i <= totalStages; i++) {
+        for (const stage of stages) {
+            const i         = stage.index;
             const unlocked  = State.isStageUnlocked(chapterId, i);
             const completed = State.isStageCompleted(chapterId, i);
             const stars     = State.getStageStars(chapterId, i);
             const isCurrent = unlocked && !completed;
-            const isBoss    = i === totalStages;
-            const stageData = window[`STAGE_0${i}`];
+            const isBoss    = stage.isBoss || false;
+            const isFinal   = stage.isFinal || false;
+            const stageData = window[stage.varName];
             const stageName = stageData?.title || `Missão ${i}`;
-            const stageDiff = stageData?.difficulty || 'easy';
+            const stageDiff = stageData?.difficulty || (isBoss ? 'boss' : 'easy');
             const diffLabel = CONFIG.difficulty?.[stageDiff]?.label || stageDiff;
-            const stageKey  = `stage_0${i}`;
+            const stageKey  = stage.id;
 
             const starsHTML = [1,2,3].map(s =>
                 `<span style="color:${s <= stars ? 'var(--gold)' : 'var(--border)'}">${s <= stars ? '★' : '☆'}</span>`
@@ -424,12 +426,15 @@ const Router = {
 
             let cardClass = 'mission-card';
             if (isBoss)    cardClass += ' mc-boss';
+            if (isFinal)   cardClass += ' mc-final';
             if (completed) cardClass += ' mc-completed';
             else if (isCurrent) cardClass += ' mc-active';
             else if (!unlocked) cardClass += ' mc-locked';
 
-            const nodeIcon  = completed ? '✓' : isBoss ? '💀' : (unlocked ? i : '🔒');
-            const metaLabel = `${isBoss ? '👑 CHEFE · ' : ''}MISSÃO ${i} · ${diffLabel.toUpperCase()}`;
+            const nodeLabel = isFinal ? '🎓' : isBoss ? '💀' : i;
+            const nodeIcon  = completed ? '✓' : (unlocked ? nodeLabel : '🔒');
+            const typeLabel = isFinal ? '🎓 EXAME FINAL · ' : isBoss ? '👑 CHEFE · ' : '';
+            const metaLabel = `${typeLabel}MISSÃO ${i} · ${diffLabel.toUpperCase()}`;
 
             let btnHTML = '';
             if (unlocked) {
@@ -442,7 +447,7 @@ const Router = {
                     const btnClass = isBoss ? 'boss-play' : 'play';
                     btnHTML = `<button class="mission-play-btn ${btnClass}"
                         onclick="event.stopPropagation(); Router.navigate('#stage/${chapterId}/${stageKey}')">
-                        ${isBoss ? '⚔️ Boss' : 'JOGAR →'}
+                        ${isFinal ? '🎓 Exame' : isBoss ? '⚔️ Boss' : 'JOGAR →'}
                     </button>`;
                 }
             }
@@ -506,11 +511,13 @@ const Router = {
             return;
         }
 
-        const stageIndex  = parseInt(stageId.replace('stage_0', '')) || 1;
+        const stageEntry  = (window.CHAPTER_METADATA?.stages || []).find(s => s.id === stageId);
+        const stageIndex  = stageEntry?.index || 1;
         const isUnlocked  = State.isStageUnlocked(chapterId, stageIndex);
         if (!isUnlocked)  { this.renderChapterMap(container, chapterId); return; }
 
-        const isBoss     = stageIndex === (window.CHAPTER_METADATA?.totalStages || 5);
+        const isBoss     = stageEntry?.isBoss || false;
+        const isFinal    = stageEntry?.isFinal || false;
         const rewards    = stageData.rewards || {};
         const difficulty = stageData.difficulty || 'easy';
         const diffData   = CONFIG.difficulty?.[difficulty] || CONFIG.difficulty.easy;
@@ -527,13 +534,13 @@ const Router = {
         <div class="prep-screen">
             <button class="btn-back" onclick="Router.navigate('#chapter/${chapterId}')">‹ Mapa</button>
 
-            ${isBoss ? `<div style="text-align:center; margin-bottom:var(--sp-2)">
+            ${(isBoss || isFinal) ? `<div style="text-align:center; margin-bottom:var(--sp-2)">
                 <span style="background:var(--gold-light);color:#92400e;font-size:0.8rem;font-weight:900;padding:4px 12px;border-radius:var(--r-full);border:2px solid var(--gold)">
-                    👑 MISSÃO FINAL
+                    ${isFinal ? '🎓 EXAME FINAL' : '👑 MISSÃO CHEFE'}
                 </span>
             </div>` : ''}
 
-            <div class="prep-icon-wrap" style="${isBoss ? 'background:var(--gold-light);box-shadow:0 4px 18px rgba(245,158,11,0.4)' : ''}">
+            <div class="prep-icon-wrap" style="${(isBoss || isFinal) ? 'background:var(--gold-light);box-shadow:0 4px 18px rgba(245,158,11,0.4)' : ''}">
                 ${stageData.icon || '⚡'}
             </div>
             <div class="prep-title">${stageData.title}</div>
@@ -559,10 +566,10 @@ const Router = {
                 Dificuldade: ${diffData.label}
             </div>
 
-            <button class="btn-primary ${isBoss ? '' : ''}"
-                style="${isBoss ? 'background:var(--gold);box-shadow:0 5px 0 #92400e' : ''}"
+            <button class="btn-primary"
+                style="${(isBoss || isFinal) ? 'background:var(--gold);box-shadow:0 5px 0 #92400e' : ''}"
                 onclick="GameEngine.start('${chapterId}', '${stageId}', ${stageIndex})">
-                ${isBoss ? '⚔️ Enfrentar o Chefe!' : '⚡ Iniciar Missão!'}
+                ${isFinal ? '🎓 Iniciar Exame Final!' : isBoss ? '⚔️ Enfrentar o Chefe!' : '⚡ Iniciar Missão!'}
             </button>
         </div>`;
     },
