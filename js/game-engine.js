@@ -79,6 +79,13 @@ const GameEngine = {
         if (State.useItem('time'))   this.state.extraTime = 10;
         if (State.useItem('star'))   this.state.hasStarGuarantee = true;
 
+        // Apply avatar class perks
+        const perk = State.getAvatarClassPerk();
+        if (perk.extraHeart) this.state.lives = Math.min(this.state.lives + 1, 5);
+        if (perk.extraHint)  this.state.hintsLeft++;
+        if (perk.xpMult > 1 && this.state.xpMultiplier === 1) this.state.xpMultiplier = perk.xpMult;
+        this.state.cientistGemCount = 0;
+
         document.getElementById('top-hud')?.classList.add('hidden');
         document.getElementById('bottom-nav')?.classList.add('hidden');
 
@@ -645,6 +652,12 @@ const GameEngine = {
 
             const btn = document.getElementById(`opt-${selectedIndex}`);
             if (btn) { btn.classList.add('correct'); this._showXPFloat(points, btn); }
+
+            // Cientista class: +1 gem every 5 correct answers
+            if (State.getAvatarClass() === 'cientista') {
+                this.state.cientistGemCount = (this.state.cientistGemCount || 0) + 1;
+                if (this.state.cientistGemCount % 5 === 0) State.addGems(1);
+            }
 
             if (typeof SoundManager !== 'undefined') SoundManager.play('correct');
             this._showBattleEffect(true);

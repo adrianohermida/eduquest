@@ -78,6 +78,7 @@ const Router = {
             case 'ranking':       this.renderRanking(container);           break;
             case 'teams':         this.renderTeams(container, parts[1]);   break;
             case 'achievements':  this.renderAchievements(container);       break;
+            case 'word-search':   this.renderWordSearch(container, parts[1], parts[2]); break;
             default:              this.renderHome(container);
         }
 
@@ -781,12 +782,13 @@ const Router = {
 
     // ── HOME ─────────────────────────────────────────────
     renderHome(container) {
-        const user     = State.data.user;
-        const xpProg   = State.getXPProgress();
-        const streak   = State.getUserStreak();
-        const chapters = CONFIG.chapters || [];
-        const missions = State.getMissions();
-        const calendar = State.getStreakCalendar();
+        const user      = State.data.user;
+        const xpProg    = State.getXPProgress();
+        const streak    = State.getUserStreak();
+        const chapters  = CONFIG.chapters || [];
+        const missions  = State.getMissions();
+        const calendar  = State.getStreakCalendar();
+        const companion = State.getCompanionMessage();
 
         // Find the first unlocked-but-incomplete chapter for "Continue" card
         const activeChapter = chapters.find(ch => {
@@ -848,6 +850,12 @@ const Router = {
             <!-- XP bar -->
             <div class="home-xp-bar">
                 <div class="home-xp-fill" style="width:${xpProg.percent}%"></div>
+            </div>
+
+            <!-- Companion Widget -->
+            <div class="companion-bar">
+                <div class="companion-face">${companion.face}</div>
+                <div class="companion-bubble">${companion.msg}</div>
             </div>
 
             <!-- Continue Journey -->
@@ -1101,19 +1109,28 @@ const Router = {
                         <span class="mg-desc">Adivinhe termos do capítulo · ${mnemonics.length} palavras</span>
                     </div>
                 </button>` : ''}
+                <button class="minigame-btn"
+                        onclick="Router.navigate('#word-search/${chapterId}/${stageIndex}')">
+                    <span class="mg-icon">🔍</span>
+                    <div class="mg-info">
+                        <span class="mg-name">Caça-Palavras</span>
+                        <span class="mg-desc">Encontre os termos do capítulo no grid</span>
+                    </div>
+                </button>
             </div>` : ''}
         </div>`;
     },
 
     // ── PROFILE ───────────────────────────────────────────
     renderProfile(container) {
-        const user    = State.data.user;
-        const xpProg  = State.getXPProgress();
-        const rank    = State.getRank();
-        const heroClass = State.getHeroClass();
-        const theme   = user.theme || 'light';
-        const premium = State.isPremium();
-        const chapters = CONFIG.chapters || [];
+        const user       = State.data.user;
+        const xpProg     = State.getXPProgress();
+        const rank       = State.getRank();
+        const heroClass  = State.getHeroClass();
+        const theme      = user.theme || 'light';
+        const premium    = State.isPremium();
+        const chapters   = CONFIG.chapters || [];
+        const avatarCls  = State.getAvatarClass();
 
         const badges = [
             { icon: '🛡️', name: 'Guardião',    locked: false },
@@ -1210,6 +1227,24 @@ const Router = {
                         <span class="profile-stat-value">${user.hearts}</span>
                         <span class="profile-stat-label">Vidas</span>
                     </div>
+                </div>
+
+                <!-- Avatar Class -->
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">⚔️ Classe do Herói</span></div>
+                <div class="avatar-class-grid">
+                    ${[
+                        { id: 'guerreiro', icon: '⚔️', name: 'Guerreiro', perk: '+1 vida em batalha' },
+                        { id: 'mago',      icon: '🔮', name: 'Mago',      perk: '+1 dica por fase'    },
+                        { id: 'ninja',     icon: '🥷', name: 'Ninja',     perk: '1.5× XP em combos'  },
+                        { id: 'cientista', icon: '🔬', name: 'Cientista', perk: '+1 💎 a cada 5 acertos' },
+                    ].map(cls => `
+                        <div class="avatar-class-card ${avatarCls === cls.id ? 'acc-selected' : ''}"
+                             onclick="State.setAvatarClass('${cls.id}'); Router.renderProfile(document.getElementById('app-container'))">
+                            <div class="acc-icon">${cls.icon}</div>
+                            <div class="acc-name">${cls.name}</div>
+                            <div class="acc-perk">${cls.perk}</div>
+                            ${avatarCls === cls.id ? '<div class="acc-active-badge">✓ Ativo</div>' : ''}
+                        </div>`).join('')}
                 </div>
 
                 <!-- Mastery -->
@@ -1605,12 +1640,13 @@ const Router = {
         const inventory = State.getInventory();
 
         const items = [
-            { icon: '❤️', name: 'Vida Extra',     desc: 'Recupere uma vida',          price: 20,  action: 'heart'  },
-            { icon: '⏱️', name: 'Mais Tempo',     desc: '+10s em cada questão',       price: 30,  action: 'time'   },
-            { icon: '🔑', name: 'Dica Mágica',    desc: 'Dica extra na próxima fase', price: 40,  action: 'hint'   },
-            { icon: '🛡️', name: 'Escudo',         desc: 'Protege 1 vida por fase',   price: 50,  action: 'shield' },
-            { icon: '⚡', name: 'XP Duplo',        desc: 'Dobra XP na próxima fase',  price: 80,  action: 'xp2x'  },
-            { icon: '🌟', name: 'Estrela Grátis',  desc: 'Garante 1 estrela mínima',  price: 100, action: 'star'  }
+            { icon: '❤️', name: 'Vida Extra',       desc: 'Recupere uma vida',              price: 20,  action: 'heart'       },
+            { icon: '⏱️', name: 'Mais Tempo',       desc: '+10s em cada questão',           price: 30,  action: 'time'        },
+            { icon: '🔑', name: 'Dica Mágica',      desc: 'Dica extra na próxima fase',     price: 40,  action: 'hint'        },
+            { icon: '🛡️', name: 'Escudo',           desc: 'Protege 1 vida por fase',       price: 50,  action: 'shield'      },
+            { icon: '⚡', name: 'XP Duplo',          desc: 'Dobra XP na próxima fase',      price: 80,  action: 'xp2x'       },
+            { icon: '🌟', name: 'Estrela Grátis',    desc: 'Garante 1 estrela mínima',      price: 100, action: 'star'        },
+            { icon: '🧊', name: 'Freeze de Streak',  desc: 'Protege sua sequência por 1 dia', price: 25, action: 'streakFreeze' },
         ];
 
         const itemsHTML = items.map(item => {
@@ -1728,7 +1764,16 @@ const Router = {
             </div>
             ${comingSoonHTML}
         </div>`;
-    }
+    },
+
+    // ── WORD SEARCH ───────────────────────────────────────
+    renderWordSearch(container, chapterId, stageIndex) {
+        if (typeof WordSearch !== 'undefined') {
+            WordSearch.start(chapterId, parseInt(stageIndex) || 1, container);
+        } else {
+            container.innerHTML = `<div class="screen"><p style="padding:40px;text-align:center;color:var(--text-muted)">Caça-palavras não disponível.</p></div>`;
+        }
+    },
 };
 
 window.Router = Router;

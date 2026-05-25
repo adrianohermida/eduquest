@@ -46,7 +46,10 @@ const ModalEngine = {
             case 'questComplete': html = this._questCompleteHTML(data); break;
             case 'allQuestsDone': html = this._allQuestsDoneHTML(data); break;
             case 'noGems':        html = this._noGemsHTML(data);        break;
-            case 'achievement':   html = this._achievementHTML(data);   break;
+            case 'achievement':      html = this._achievementHTML(data);      break;
+            case 'streakMilestone':  html = this._streakMilestoneHTML(data);  break;
+            case 'streakFreezeUsed': html = this._streakFreezeUsedHTML(data); break;
+            case 'motivational':     html = this._motivationalHTML(data);     break;
             default: this._showing = false; return;
         }
 
@@ -67,7 +70,7 @@ const ModalEngine = {
 
         // Post-render effects
         if (type === 'levelUp')    setTimeout(() => this._levelUpFX(data), 200);
-        if (type === 'dailyReward' || type === 'allQuestsDone') {
+        if (type === 'dailyReward' || type === 'allQuestsDone' || type === 'streakMilestone') {
             if (typeof Utils !== 'undefined') setTimeout(() => Utils.confetti(), 400);
         }
     },
@@ -206,6 +209,40 @@ const ModalEngine = {
             <h2 class="modal-title">${name}</h2>
             <p class="modal-subtitle">${description}</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">🏅 Incrível!</button>`;
+    },
+    _streakMilestoneHTML({ streak, gems }) {
+        const icons = { 3: '🔥', 7: '🏅', 14: '💪', 30: '👑' };
+        const titles = { 3: 'Semana em Chamas!', 7: 'Semana de Fogo!', 14: 'Duas Semanas!', 30: 'Um Mês Incrível!' };
+        return `
+            <div class="modal-milestone-icon">${icons[streak] || '🔥'}</div>
+            <div class="modal-milestone-badge">${streak} dias</div>
+            <h2 class="modal-title">${titles[streak] || `${streak} dias!`}</h2>
+            <p class="modal-subtitle">Você atingiu um marco de sequência incrível!</p>
+            <div class="modal-rewards-row">
+                <div class="modal-reward-chip modal-reward-gold">
+                    <span class="mrc-icon">💎</span>
+                    <span class="mrc-value">+${gems}</span>
+                    <span class="mrc-label">Bônus Gemas</span>
+                </div>
+            </div>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">🔥 Continuar!</button>`;
+    },
+
+    _streakFreezeUsedHTML({ streak }) {
+        return `
+            <div class="modal-freeze-icon">🧊</div>
+            <h2 class="modal-title">Streak Salvo!</h2>
+            <p class="modal-subtitle">Seu Freeze de Streak foi usado automaticamente.</p>
+            <p class="modal-text">Sua sequência de <strong>${streak} dias</strong> está intacta!</p>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">✅ Ótimo!</button>`;
+    },
+
+    _motivationalHTML({ title, msg, icon }) {
+        return `
+            <div class="modal-motivational-icon">${icon || '⚡'}</div>
+            <h2 class="modal-title">${title || 'Você consegue!'}</h2>
+            <p class="modal-subtitle">${msg || 'Continue jogando e alcance novos níveis!'}</p>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">💪 Bora!</button>`;
     },
 };
 

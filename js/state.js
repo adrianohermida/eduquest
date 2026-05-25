@@ -34,11 +34,11 @@ const ACHIEVEMENTS = [
 window.ACHIEVEMENTS = ACHIEVEMENTS;
 
 const State = {
-    SCHEMA_VERSION: 7,
+    SCHEMA_VERSION: 8,
     LS_KEY: 'eduquest_v5',
 
     data: {
-        schemaVersion: 7,
+        schemaVersion: 8,
         user: {
             name:         'Herói',
             level:        1,
@@ -70,6 +70,9 @@ const State = {
             totalMissions:        0,
             totalPerfect:         0,
             maxCombo:             0,
+            // v8 additions
+            avatarClass:          'guerreiro',
+            lastStreakMilestone:  0,
         },
         progress: {},
         dailyMissions: { date: null, completed: [] },
@@ -152,6 +155,8 @@ const State = {
                 totalMissions:        parsed.user.totalMissions        || 0,
                 totalPerfect:         parsed.user.totalPerfect         || 0,
                 maxCombo:             parsed.user.maxCombo             || 0,
+                avatarClass:          parsed.user.avatarClass          || 'guerreiro',
+                lastStreakMilestone:  parsed.user.lastStreakMilestone  || 0,
             };
         }
         this.data.progress      = parsed.progress || {};
@@ -247,10 +252,38 @@ const State = {
         if (!last) { this.data.user.streak = 1; this.data.user.lastPlayed = today; return; }
         if (last === today) return;
         const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
-        this.data.user.streak    = diff === 1 ? (this.data.user.streak || 0) + 1 : 1;
+
+        if (diff === 1) {
+            this.data.user.streak = (this.data.user.streak || 0) + 1;
+        } else if (diff === 2 && this.hasItem('streakFreeze')) {
+            // Streak freeze saves a 1-day gap
+            this.useItem('streakFreeze');
+            this.data.user.streak = (this.data.user.streak || 0) + 1;
+            if (typeof ModalEngine !== 'undefined') {
+                ModalEngine.enqueue('streakFreezeUsed', { streak: this.data.user.streak });
+            }
+        } else {
+            this.data.user.streak = 1;
+        }
+
         this.data.user.lastPlayed = today;
+        this._checkStreakMilestone(this.data.user.streak);
         this.save();
         this.checkProgressAchievements();
+    },
+
+    _checkStreakMilestone(streak) {
+        const milestones = [3, 7, 14, 30];
+        const last = this.data.user.lastStreakMilestone || 0;
+        const reached = milestones.filter(m => m <= streak && m > last);
+        if (!reached.length) return;
+        const milestone = reached[reached.length - 1];
+        this.data.user.lastStreakMilestone = milestone;
+        const gemBonus = milestone;
+        this.data.user.gems += gemBonus;
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('streakMilestone', { streak: milestone, gems: gemBonus });
+        }
     },
 
     // ── GETTERS ──────────────────────────────────────────────
@@ -428,6 +461,46 @@ const State = {
             compete:   { name: 'Campeão',    icon: '🏆', desc: 'Nascido para vencer'    },
         };
         return classes[goal] || classes.compete;
+    },
+
+    // ── AVATAR CLASS ─────────────────────────────────────────
+    getAvatarClass() {
+        return this.data.user.avatarClass || 'guerreiro';
+    },
+
+    setAvatarClass(cls) {
+        const valid = ['guerreiro', 'mago', 'ninja', 'cientista'];
+        if (!valid.includes(cls)) return;
+        this.data.user.avatarClass = cls;
+        this.save();
+    },
+
+    getAvatarClassPerk() {
+        const cls = this.getAvatarClass();
+        const perks = {
+            guerreiro: { extraHeart: true,  extraHint: false, xpMult: 1,   gemBonus: false, desc: '+1 vida em batalha' },
+            mago:      { extraHeart: false, extraHint: true,  xpMult: 1,   gemBonus: false, desc: '+1 dica por fase'    },
+            ninja:     { extraHeart: false, extraHint: false, xpMult: 1.5, gemBonus: false, desc: '1.5× XP em combos'  },
+            cientista: { extraHeart: false, extraHint: false, xpMult: 1,   gemBonus: true,  desc: '+1 gema a cada 5 acertos' },
+        };
+        return perks[cls] || perks.guerreiro;
+    },
+
+    // ── COMPANION ────────────────────────────────────────────
+    getCompanionMessage() {
+        const u      = this.data.user;
+        const streak = u.streak || 1;
+        const hour   = new Date().getHours();
+        const missions = this.getMissions();
+        const done   = missions.filter(m => m.completed).length;
+
+        if (streak >= 7)      return { face: '🤩', msg: `${streak} dias! Você é imparável!` };
+        if (streak >= 3)      return { face: '😎', msg: `${streak} dias seguidos, continue assim!` };
+        if (done === 3)       return { face: '🥳', msg: 'Todas as missões concluídas! Incrível!' };
+        if (done >= 1)        return { face: '💪', msg: `${done} missão feita! Falta pouco.` };
+        if (hour < 12)        return { face: '☀️', msg: 'Bom dia! Hora de treinar a mente.' };
+        if (hour < 18)        return { face: '⚡', msg: 'Uma missão rápida e você ganha XP!' };
+        return                       { face: '🌙', msg: 'Ainda dá tempo de manter o streak!' };
     },
 
     showXPFloat(amount) {
