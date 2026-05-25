@@ -2892,7 +2892,7 @@ img { max-width: 100%; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--sp-4) var(--sp-5) var(--sp-2);
+    padding-bottom: var(--sp-2);
 }
 .home-greeting-hi  { font-size: 1.15rem; font-weight: 900; color: var(--text); }
 .home-greeting-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
@@ -2912,7 +2912,7 @@ img { max-width: 100%; }
     height: 5px;
     background: var(--surface-3);
     border-radius: var(--r-full);
-    margin: 0 var(--sp-5) var(--sp-4);
+    margin-bottom: var(--sp-4);
     overflow: hidden;
 }
 .home-xp-fill {
@@ -2924,7 +2924,7 @@ img { max-width: 100%; }
 
 /* Continue Journey card */
 .continue-card {
-    margin: 0 var(--sp-5) var(--sp-4);
+    margin-bottom: var(--sp-4);
     background: linear-gradient(135deg, #1e1b4b 0%, var(--brand) 100%);
     border-radius: var(--r-2xl);
     padding: var(--sp-4) var(--sp-5);
@@ -2954,7 +2954,7 @@ img { max-width: 100%; }
 
 /* Streak Calendar */
 .streak-calendar-wrap {
-    margin: 0 var(--sp-5) var(--sp-4);
+    margin-bottom: var(--sp-4);
     background: var(--surface);
     border: 1.5px solid var(--border);
     border-radius: var(--r-xl);
@@ -2986,7 +2986,7 @@ img { max-width: 100%; }
 .streak-day.active .streak-day-label { color: var(--brand); }
 
 /* Daily Missions */
-.daily-missions-list { padding: 0 var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.daily-missions-list { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-4); }
 .daily-mission {
     display: flex;
     align-items: center;

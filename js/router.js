@@ -5,7 +5,7 @@
 
 const Router = {
     currentRoute: null,
-    _onboardData: { goal: null, dailyGoal: null, name: '' },
+    _onboardData: { goal: null, dailyGoal: null, name: '', grade: '7ano', avatar: '🦸' },
 
     init() {},
 
