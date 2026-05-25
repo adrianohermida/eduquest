@@ -527,8 +527,12 @@ const Router = {
             `<div class="objective-item">${obj}</div>`
         ).join('');
 
-        const xpReward  = rewards.xp  || CONFIG.xp.correct * 10;
-        const gemReward = Math.floor(xpReward / 10);
+        const xpReward     = rewards.xp  || CONFIG.xp.correct * 10;
+        const gemReward    = Math.floor(xpReward / 10);
+        const flashcards   = stageData.summary?.flashcards || [];
+        const mnemonics    = stageData.summary?.mnemonics  || [];
+        const hasFlashcards = flashcards.length > 0;
+        const hasMnemonics  = mnemonics.length  > 0;
 
         container.innerHTML = `
         <div class="prep-screen">
@@ -571,6 +575,29 @@ const Router = {
                 onclick="GameEngine.start('${chapterId}', '${stageId}', ${stageIndex})">
                 ${isFinal ? '🎓 Iniciar Exame Final!' : isBoss ? '⚔️ Enfrentar o Chefe!' : '⚡ Iniciar Missão!'}
             </button>
+
+            ${(hasFlashcards || hasMnemonics) ? `
+            <div class="minigame-select">
+                <div class="minigame-select-title">ou pratique com</div>
+                ${hasFlashcards ? `
+                <button class="minigame-btn"
+                        onclick="MemoryGame.start('${chapterId}', '${stageId}', ${stageIndex})">
+                    <span class="mg-icon">🃏</span>
+                    <div class="mg-info">
+                        <span class="mg-name">Jogo da Memória</span>
+                        <span class="mg-desc">Combine termos e definições · ${flashcards.length} pares</span>
+                    </div>
+                </button>` : ''}
+                ${hasMnemonics ? `
+                <button class="minigame-btn"
+                        onclick="Forca.start('${chapterId}', '${stageId}', ${stageIndex})">
+                    <span class="mg-icon">🔤</span>
+                    <div class="mg-info">
+                        <span class="mg-name">Jogo da Forca</span>
+                        <span class="mg-desc">Adivinhe termos do capítulo · ${mnemonics.length} palavras</span>
+                    </div>
+                </button>` : ''}
+            </div>` : ''}
         </div>`;
     },
 
