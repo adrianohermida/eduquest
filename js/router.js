@@ -1708,7 +1708,7 @@ const Router = {
             <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
 
             <div class="ach-header">
-                <div class="ach-header-title">🏅 Conquistas</div>
+                <div class="ach-header-title">${_ic('achievement',{size:'sm'})} Conquistas</div>
                 <div class="ach-header-count">${unlocked.length} / ${allAchs.length} desbloqueadas</div>
                 <div class="ach-progress-wrap">
                     <div class="ach-progress-fill" style="width:${pct}%"></div>
@@ -1723,27 +1723,28 @@ const Router = {
     renderShop(container) {
         const gems      = State.getUserGems();
         const inventory = State.getInventory();
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
 
         const items = [
-            { icon: '❤️', name: 'Vida Extra',       desc: 'Recupere uma vida',              price: 20,  action: 'heart'       },
-            { icon: '⏱️', name: 'Mais Tempo',       desc: '+10s em cada questão',           price: 30,  action: 'time'        },
-            { icon: '🔑', name: 'Dica Mágica',      desc: 'Dica extra na próxima fase',     price: 40,  action: 'hint'        },
-            { icon: '🛡️', name: 'Escudo',           desc: 'Protege 1 vida por fase',       price: 50,  action: 'shield'      },
-            { icon: '⚡', name: 'XP Duplo',          desc: 'Dobra XP na próxima fase',      price: 80,  action: 'xp2x'       },
-            { icon: '🌟', name: 'Estrela Grátis',    desc: 'Garante 1 estrela mínima',      price: 100, action: 'star'        },
-            { icon: '🧊', name: 'Freeze de Streak',  desc: 'Protege sua sequência por 1 dia', price: 25, action: 'streakFreeze' },
+            { iconId: 'heart',       color: 'heart',   name: 'Vida Extra',        desc: 'Recupere uma vida',               price: 20,  action: 'heart'        },
+            { iconId: 'booster',     color: 'xp',      name: 'Mais Tempo',        desc: '+10s em cada questão',            price: 30,  action: 'time'         },
+            { iconId: 'lock',        color: 'science',  name: 'Dica Mágica',       desc: 'Dica extra na próxima fase',      price: 40,  action: 'hint'         },
+            { iconId: 'shield',      color: 'rpg',     name: 'Escudo',            desc: 'Protege 1 vida por fase',         price: 50,  action: 'shield'       },
+            { iconId: 'xp',          color: 'xp',      name: 'XP Duplo',          desc: 'Dobra XP na próxima fase',        price: 80,  action: 'xp2x'        },
+            { iconId: 'star',        color: 'final',   name: 'Estrela Grátis',    desc: 'Garante 1 estrela mínima',        price: 100, action: 'star'         },
+            { iconId: 'premium',     color: 'science', name: 'Freeze de Streak',  desc: 'Protege sua sequência por 1 dia', price: 25,  action: 'streakFreeze' },
         ];
 
         const itemsHTML = items.map(item => {
             const owned = inventory[item.action] || 0;
             return `
             <div class="shop-item-card">
-                <span class="shop-item-icon">${item.icon}</span>
+                <span class="shop-item-icon">${_ic(item.iconId,{size:'xl',color:item.color})}</span>
                 <div class="shop-item-name">${item.name}</div>
                 <div class="shop-item-desc">${item.desc}</div>
                 ${owned > 0 ? `<div class="shop-item-owned">Você tem: ${owned}</div>` : ''}
                 <button class="shop-buy-btn" onclick="Router._shopBuy('${item.action}', ${item.price})">
-                    💎 ${item.price}
+                    ${_ic('gem',{size:'xs',color:'gem'})} ${item.price}
                 </button>
             </div>`;
         }).join('');
@@ -1752,22 +1753,22 @@ const Router = {
         <div class="screen">
             <div class="shop-balance">
                 <div class="shop-balance-label">Suas Gemas</div>
-                <div class="shop-balance-gems">💎 ${gems}</div>
+                <div class="shop-balance-gems">${_ic('gem',{size:'md',color:'gem'})} ${gems}</div>
             </div>
 
             <div class="section-header">
-                <span class="section-title">🛒 Itens Disponíveis</span>
+                <span class="section-title">${_ic('shop',{size:'sm'})} Itens Disponíveis</span>
             </div>
             <div class="shop-grid">
                 ${itemsHTML}
             </div>
 
             <div class="section-header mt-4">
-                <span class="section-title">💎 Comprar Gemas</span>
+                <span class="section-title">${_ic('gem',{size:'sm',color:'gem'})} Comprar Gemas</span>
             </div>
             <div class="xp-level-card">
                 <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;text-align:center">
-                    🚧 Loja de gemas em breve! Continue jogando para ganhar gemas gratuitamente.
+                    Loja de gemas em breve! Continue jogando para ganhar gemas gratuitamente.
                 </p>
             </div>
         </div>`;
@@ -1783,7 +1784,7 @@ const Router = {
         }
         State.addGems(-price);
         State.addItem(action);
-        this._toast(`✅ Item comprado! Disponível na próxima missão.`);
+        this._toast('Item comprado! Disponível na próxima missão.');
         this.renderShop(document.getElementById('app-container'));
     },
 
@@ -1799,6 +1800,7 @@ const Router = {
     // ── MISSIONS ──────────────────────────────────────────
     renderMissions(container) {
         const chapters = CONFIG.chapters || [];
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
 
         const chaptersHTML = chapters.map(ch => {
             const prog    = State.getChapterProgress(ch.id);
@@ -1822,30 +1824,30 @@ const Router = {
 
         const comingSoonHTML = ['Matemática 7º Ano', 'Português 7º Ano', 'História 7º Ano'].map(name => `
             <div class="chapter-card locked">
-                <div class="chapter-icon-wrap" style="background:var(--surface-3)">📚</div>
+                <div class="chapter-icon-wrap" style="background:var(--surface-3)">${_ic('scroll',{size:'md',color:'locked'})}</div>
                 <div class="chapter-body">
                     <div class="chapter-subject" style="color:var(--text-muted)">Em Breve</div>
                     <div class="chapter-title">${name}</div>
                     <div style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-top:4px">Aguarde novos conteúdos!</div>
                 </div>
-                <div class="chapter-arrow">🔒</div>
+                <div class="chapter-arrow">${_ic('lock',{size:'sm',color:'locked'})}</div>
             </div>`
         ).join('');
 
         container.innerHTML = `
         <div class="screen">
             <div class="missions-banner">
-                <h2>⚔️ Todas as Missões</h2>
+                <h2>${_ic('sword',{size:'sm'})} Todas as Missões</h2>
                 <p>Escolha sua próxima batalha, herói!</p>
             </div>
 
             <div class="section-header">
-                <span class="section-title">🔓 Disponíveis</span>
+                <span class="section-title">${_ic('map',{size:'sm'})} Disponíveis</span>
             </div>
             ${chaptersHTML}
 
             <div class="section-header mt-4">
-                <span class="section-title">🔒 Em Breve</span>
+                <span class="section-title">${_ic('lock',{size:'sm',color:'locked'})} Em Breve</span>
             </div>
             ${comingSoonHTML}
         </div>`;

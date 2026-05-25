@@ -1105,7 +1105,7 @@ img { max-width: 100%; }
     box-shadow: 0 4px 18px rgba(8,145,178,0.4);
 }
 .shop-balance-label { font-size: 0.82rem; opacity: 0.88; font-weight: 700; }
-.shop-balance-gems  { font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; }
+.shop-balance-gems  { font-size: 2rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 8px; }
 
 .shop-grid {
     display: grid;
@@ -1120,7 +1120,7 @@ img { max-width: 100%; }
     box-shadow: var(--shadow-sm);
     border: 1.5px solid var(--border);
 }
-.shop-item-icon  { font-size: 2.5rem; display: block; margin-bottom: var(--sp-2); }
+.shop-item-icon  { display: flex; align-items: center; justify-content: center; height: 48px; margin-bottom: var(--sp-2); }
 .shop-item-name  { font-size: 0.85rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
 .shop-item-desc  { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: var(--sp-3); line-height: 1.3; }
 .shop-buy-btn {
@@ -1140,6 +1140,7 @@ img { max-width: 100%; }
     transition: all var(--dur-fast);
 }
 .shop-buy-btn:active { transform: translateY(3px); box-shadow: none; }
+.shop-buy-btn .icon  { color: #fff; }
 
 /* ── MISSIONS SCREEN ─────────────────────────────── */
 .missions-banner {
