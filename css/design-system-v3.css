@@ -1,0 +1,399 @@
+/* ===================================================
+   EduQuest Design System v3.0 — Refinement Layer
+   Principle: UX > Effects · Clarity > Excess
+   Loads last — overrides styles.css selectively.
+
+   What this file does:
+   1. Stops all idle infinite animations
+   2. Removes off-brand indigo/purple gradients
+   3. Reduces glow to functional-only
+   4. Fixes dark mode adventure map nodes
+   5. Cleans landing page excess
+   6. Fixes CSS syntax error (malformed @media selector)
+   7. Adds prefers-reduced-motion support
+   =================================================== */
+
+/* ── TOKEN CORRECTIONS ───────────────────────────── */
+:root {
+    --shadow-brand: 0 2px 10px rgba(249,115,22,0.22);
+    --shadow-glow:  none;
+}
+
+/* ══════════════════════════════════════════════════
+   1. ANIMATION DISCIPLINE
+   Keep: contextual (user-triggered) animations
+   Remove: idle infinite ambient loops
+   ══════════════════════════════════════════════════ */
+
+/* Home screen / prep screen: no idle float */
+.hero-avatar       { animation: none; }
+.prep-icon-wrap    { animation: none; }
+.streak-flame      { animation: none; }
+
+/* Stage map: no floating nodes */
+.stage-node.unlocked { animation: none; }
+
+/* Current active node: very subtle ring only */
+.stage-node.current-active {
+    animation: nodeFocusPulse 2.5s ease-in-out infinite;
+    box-shadow: 0 4px 0 var(--brand-dark), 0 0 0 4px rgba(249,115,22,0.12);
+}
+@keyframes nodeFocusPulse {
+    0%, 100% { box-shadow: 0 4px 0 var(--brand-dark), 0 0 0 4px rgba(249,115,22,0.12); }
+    50%       { box-shadow: 0 4px 0 var(--brand-dark), 0 0 0 8px rgba(249,115,22,0.06); }
+}
+
+/* XP progress bar: remove shimmer (it's always running) */
+.xp-fill::after { display: none; }
+
+/* Adventure map active node: gentle opacity only */
+.amap-node.amap-active .amap-node-icon {
+    animation: amapActiveFade 2.5s ease-in-out infinite;
+}
+@keyframes amapActiveFade {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.82; }
+}
+
+/* Boss and final nodes: no loop — state is clear from color */
+.amap-node.amap-boss.amap-active  .amap-node-icon { animation: none; }
+.amap-node.amap-final.amap-active .amap-node-icon { animation: none; }
+
+/* Done paths: solid gradient, no shimmer */
+.amap-path-line.amap-path-done {
+    background: linear-gradient(90deg, #4ade80, #22d3ee);
+    box-shadow: none;
+    animation: none;
+}
+
+/* Landing orbs: slower, smaller movement, less blur */
+.lp-orb {
+    filter: blur(28px);
+    animation: orbDrift 16s ease-in-out infinite;
+}
+.lp-orb-1 { background: rgba(249,115,22,0.14); }
+.lp-orb-2 { background: rgba(139,92,246,0.10); }
+.lp-orb-3 { background: rgba(251,191,36,0.09); }
+@keyframes orbDrift {
+    0%, 100% { transform: translate(0, 0); }
+    50%       { transform: translate(8px, -10px); }
+}
+
+/* Landing: stop all idle micro-animations */
+.lp-online-dot  { animation: none; background: #4ade80; }
+.lp-combo-badge { animation: none; }
+.lp-xp-pop      { animation: none; transform: none; }
+.lp-boss-glow   { animation: none; opacity: 0.6; }
+.lp-boss-hp-fill{ animation: none; }
+.lp-urgency     { animation: none; opacity: 0.88; transform: none; }
+
+/* ══════════════════════════════════════════════════
+   2. GRADIENT SIMPLIFICATION
+   Remove off-brand indigo/purple (#1e1b4b, #312e81)
+   ══════════════════════════════════════════════════ */
+
+/* Landing hero: clean dark, no indigo */
+.landing-hero {
+    background: #0f172a;
+}
+.landing-hero::before {
+    background: radial-gradient(ellipse at 70% 50%, rgba(249,115,22,0.13) 0%, transparent 65%);
+}
+
+/* Landing highlight: color only, no text glow */
+.landing-highlight {
+    color: var(--brand);
+    text-shadow: none;
+}
+
+/* Landing preview card: remove expensive backdrop-filter */
+.landing-preview-card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* Landing boss teaser: dark neutral, not pure black/red */
+.lp-boss-teaser { background: #1c1917; }
+.lp-boss-name   { text-shadow: none; color: #f5f5f4; }
+
+/* Continue card: warm dark → brand, no indigo */
+.continue-card {
+    background: linear-gradient(135deg, #1c1917 0%, var(--brand-dark) 100%);
+    box-shadow: 0 2px 12px rgba(249,115,22,0.2);
+}
+.continue-card:hover {
+    box-shadow: 0 8px 20px rgba(249,115,22,0.22);
+}
+
+/* Profile hero banner: warm dark, no purple/indigo */
+.profile-hero-banner {
+    background: linear-gradient(135deg, #1c1917 0%, #292524 55%, #431407 100%);
+}
+
+/* Premium card: surface, no gradient */
+.premium-card {
+    background: var(--surface);
+}
+
+/* Chapter map header: reduce radial overlay */
+.chapter-map-header::before {
+    background: radial-gradient(circle at 80% 50%, rgba(255,255,255,0.07), transparent 55%);
+}
+
+/* Adventure map viewport background: must follow theme */
+.amap-wrap { background: var(--bg); }
+
+/* amap-hud: remove blur (visual noise), solid background */
+.amap-hud {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface);
+}
+
+/* ══════════════════════════════════════════════════
+   3. GLOW REDUCTION
+   ══════════════════════════════════════════════════ */
+
+/* HUD: thinner border, minimal shadow */
+.top-hud {
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* HUD chips: lighter, less saturated */
+.hud-chip.streak-chip { background: #fef3c7; color: #b45309; }
+.hud-chip.gem-chip    { background: #f0f9ff; color: #0369a1; }
+.hud-chip.xp-chip     { background: #fff7ed; color: #c2410c; }
+.hud-chip.heart-chip  { background: #fff1f2; color: #be123c; }
+
+/* HUD chip pulse: remove glow (it runs while playing) */
+.streak-chip.hud-pulse { box-shadow: none; }
+.gem-chip.hud-pulse    { box-shadow: none; }
+.xp-chip.hud-pulse     { box-shadow: none; }
+.heart-chip.hud-pulse  { box-shadow: none; }
+
+/* Bottom nav: clean */
+.bottom-nav { box-shadow: 0 -1px 4px rgba(0,0,0,0.05); }
+
+/* Stage node completed: keep depth shadow, remove glow */
+.stage-node.completed {
+    box-shadow: 0 4px 0 var(--brand-deeper, #9a3412), var(--shadow-sm);
+}
+
+/* Ranking: remove text-shadow glows, simplify podium */
+.rank-gold     { text-shadow: none; }
+.rank-silver   { text-shadow: none; }
+.rank-platinum { text-shadow: none; }
+
+.podium-item.first .podium-avatar {
+    box-shadow: var(--shadow-sm);
+}
+.podium-item.first  .podium-block { background: #fef3c7; }
+.podium-item.second .podium-block { background: #f1f5f9; }
+.podium-item.third  .podium-block { background: #ffedd5; }
+
+/* Streak calendar: remove idle glow from today dot */
+.streak-day.today .streak-day-dot { box-shadow: none; }
+
+/* Home hero: reduce shadow-brand weight */
+.home-hero { box-shadow: 0 2px 10px rgba(249,115,22,0.18); }
+
+/* Primary button hover: reduce glow */
+.btn-primary:hover {
+    filter: none;
+    box-shadow: 0 6px 0 var(--brand-deeper, #9a3412), 0 4px 14px rgba(249,115,22,0.25);
+}
+
+/* XP float: no drop-shadow decoration */
+.xp-float { filter: none; }
+
+/* Result screen: plain background, no colored gradient overlay */
+.result-screen.victory-mode,
+.result-screen.defeat-mode { background: var(--bg); }
+
+/* Result icon: no drop-shadow glow */
+.result-icon-victory { filter: none; }
+
+/* Combo badge: fix duplicate definition conflict, reduce glow */
+.combo-badge {
+    animation: comboPop 0.3s var(--ease-bounce);
+}
+.combo-badge.hot {
+    box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+    animation: comboPop 0.3s var(--ease-bounce), comboWiggle 0.55s 0.3s ease;
+}
+.combo-badge.fire {
+    box-shadow: 0 2px 10px rgba(124,58,237,0.35);
+    animation: comboPop 0.3s var(--ease-bounce), comboWiggle 0.55s 0.3s ease;
+}
+
+/* ══════════════════════════════════════════════════
+   4. ADVENTURE MAP NODE SIMPLIFICATION
+   Flat backgrounds instead of gradients
+   ══════════════════════════════════════════════════ */
+
+.amap-node-icon {
+    background: #e2e8f0;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+}
+.amap-node.amap-done .amap-node-icon {
+    background: #dcfce7;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.12);
+}
+.amap-node.amap-active .amap-node-icon {
+    background: #fff7ed;
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.18), 0 3px 8px rgba(0,0,0,0.08);
+}
+.amap-node.amap-locked .amap-node-icon {
+    background: #f1f5f9;
+    box-shadow: none;
+}
+.amap-node.amap-boss .amap-node-icon {
+    background: #fee2e2;
+    box-shadow: 0 3px 8px rgba(220,38,38,0.12);
+}
+.amap-node.amap-final .amap-node-icon {
+    background: #fef3c7;
+    box-shadow: 0 3px 8px rgba(245,158,11,0.18);
+}
+.amap-node:not(.amap-locked):hover .amap-node-icon {
+    box-shadow: 0 6px 14px rgba(0,0,0,0.16);
+    transform: scale(1.07) translateY(-2px);
+}
+.amap-node:active .amap-node-icon {
+    transform: scale(0.90);
+    box-shadow: none;
+}
+
+/* ══════════════════════════════════════════════════
+   5. DARK MODE REFINEMENTS
+   Notion / Linear / GitHub Dark style
+   ══════════════════════════════════════════════════ */
+
+[data-theme="dark"] .top-hud {
+    border-bottom: 1px solid var(--border);
+    box-shadow: none;
+    background: var(--surface);
+}
+
+[data-theme="dark"] .bottom-nav {
+    border-top: 1px solid var(--border);
+    box-shadow: none;
+}
+
+/* Dark HUD chips */
+[data-theme="dark"] .hud-chip.streak-chip { background: rgba(249,115,22,0.1);  color: #fb923c; }
+[data-theme="dark"] .hud-chip.gem-chip    { background: rgba(59,130,246,0.1);  color: #60a5fa; }
+[data-theme="dark"] .hud-chip.xp-chip     { background: rgba(249,115,22,0.1);  color: #fb923c; }
+[data-theme="dark"] .hud-chip.heart-chip  { background: rgba(239,68,68,0.1);   color: #f87171; }
+
+/* Dark landing */
+[data-theme="dark"] .landing-hero {
+    background: #080808;
+}
+[data-theme="dark"] .landing-hero::before {
+    background: radial-gradient(ellipse at 70% 50%, rgba(249,115,22,0.09) 0%, transparent 65%);
+}
+[data-theme="dark"] .lp-boss-teaser { background: #0c0a09; }
+
+/* Dark adventure map */
+[data-theme="dark"] .amap-wrap  { background: var(--bg); }
+[data-theme="dark"] .amap-hud   { background: var(--surface); border-bottom-color: var(--border); }
+
+[data-theme="dark"] .amap-node-icon {
+    background: var(--surface-3) !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3) !important;
+}
+[data-theme="dark"] .amap-node.amap-done .amap-node-icon {
+    background: rgba(22,163,74,0.15)  !important;
+    color: #4ade80                    !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+}
+[data-theme="dark"] .amap-node.amap-active .amap-node-icon {
+    background: rgba(249,115,22,0.12) !important;
+    color: #fb923c                    !important;
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.15), 0 3px 8px rgba(0,0,0,0.3) !important;
+}
+[data-theme="dark"] .amap-node.amap-locked .amap-node-icon {
+    background: var(--surface-2)      !important;
+    color: var(--text-muted)          !important;
+    box-shadow: none                  !important;
+}
+[data-theme="dark"] .amap-node.amap-boss .amap-node-icon {
+    background: rgba(220,38,38,0.15)  !important;
+    color: #f87171                    !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3) !important;
+}
+[data-theme="dark"] .amap-node.amap-final .amap-node-icon {
+    background: rgba(245,158,11,0.15) !important;
+    color: #fbbf24                    !important;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* Dark continue card */
+[data-theme="dark"] .continue-card {
+    background: linear-gradient(135deg, #1c1917 0%, #431407 100%);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+
+/* Dark profile banner (already warm, just ensure bg matches) */
+[data-theme="dark"] .profile-hero-banner {
+    background: linear-gradient(135deg, #0c0a09 0%, #1c1917 55%, #431407 100%);
+}
+
+/* Dark home hero */
+[data-theme="dark"] .home-hero {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+}
+
+/* Dark chapter map header */
+[data-theme="dark"] .chapter-map-header {
+    box-shadow: none;
+}
+
+/* Dark podium blocks */
+[data-theme="dark"] .podium-item.first  .podium-block { background: rgba(245,158,11,0.15); }
+[data-theme="dark"] .podium-item.second .podium-block { background: rgba(148,163,184,0.1); }
+[data-theme="dark"] .podium-item.third  .podium-block { background: rgba(249,115,22,0.12); }
+
+/* Dark result screen */
+[data-theme="dark"] .result-screen.victory-mode,
+[data-theme="dark"] .result-screen.defeat-mode { background: var(--bg); }
+
+/* Fix malformed selector from styles.css (line 3865):
+   "[data-theme="auto"] @media ..." is invalid CSS.
+   Replace with correct rules: */
+[data-theme="dark"]  .continue-card { opacity: 1; }
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] .continue-card {
+        background: linear-gradient(135deg, #1c1917 0%, #431407 100%);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    }
+    [data-theme="auto"] .top-hud    { border-bottom: 1px solid var(--border); box-shadow: none; }
+    [data-theme="auto"] .bottom-nav { border-top:    1px solid var(--border); box-shadow: none; }
+    [data-theme="auto"] .amap-wrap  { background: var(--bg); }
+    [data-theme="auto"] .amap-hud   { background: var(--surface); }
+    [data-theme="auto"] .amap-node-icon {
+        background: var(--surface-3) !important;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3) !important;
+    }
+}
+
+/* ══════════════════════════════════════════════════
+   6. ACCESSIBILITY — Reduced Motion
+   ══════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration:        0.01ms !important;
+        animation-iteration-count: 1      !important;
+        transition-duration:       0.1ms  !important;
+        scroll-behavior:           auto   !important;
+    }
+    .confetti,
+    .burst-particle,
+    .xp-float { display: none !important; }
+}
