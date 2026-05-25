@@ -1,0 +1,187 @@
+/* ============================================================
+   EduQuest Icon System v1.0
+   Sistema de ícones SVG premium — consistente, game-like
+   ============================================================ */
+
+/* --- Base --- */
+.icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  overflow: visible;
+  fill: currentColor;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* --- Size tokens --- */
+:root {
+  --icon-xs:  14px;
+  --icon-sm:  18px;
+  --icon-md:  22px;
+  --icon-lg:  28px;
+  --icon-xl:  36px;
+  --icon-2xl: 48px;
+  --icon-3xl: 64px;
+}
+
+.icon-xs  { width: var(--icon-xs);  height: var(--icon-xs);  }
+.icon-sm  { width: var(--icon-sm);  height: var(--icon-sm);  }
+.icon-md  { width: var(--icon-md);  height: var(--icon-md);  }
+.icon-lg  { width: var(--icon-lg);  height: var(--icon-lg);  }
+.icon-xl  { width: var(--icon-xl);  height: var(--icon-xl);  }
+.icon-2xl { width: var(--icon-2xl); height: var(--icon-2xl); }
+.icon-3xl { width: var(--icon-3xl); height: var(--icon-3xl); }
+
+/* --- Semantic color variants --- */
+.icon-xp      { color: var(--brand, #f97316); }
+.icon-gem     { color: #3b82f6; }
+.icon-streak  { color: #f59e0b; }
+.icon-heart   { color: #ef4444; }
+.icon-success { color: #22c55e; }
+.icon-boss    { color: #dc2626; }
+.icon-final   { color: #eab308; }
+.icon-science { color: #06b6d4; }
+.icon-rpg     { color: #7c3aed; }
+.icon-guild   { color: #7c3aed; }
+.icon-ai      { color: #06b6d4; }
+.icon-locked  { color: #94a3b8; }
+.icon-muted   { color: var(--text-muted, #94a3b8); }
+.icon-white   { color: #ffffff; }
+.icon-brand   { color: var(--brand, #f97316); }
+
+/* --- State variants --- */
+.icon-glow {
+  filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 2px currentColor);
+}
+.icon-premium {
+  color: #eab308;
+  filter: drop-shadow(0 0 6px #eab30880) drop-shadow(0 0 12px #eab30840);
+}
+.icon-disabled {
+  opacity: 0.28;
+  pointer-events: none;
+}
+.icon-locked-state {
+  opacity: 0.38;
+  filter: grayscale(1) brightness(0.9);
+}
+.icon-done {
+  color: #22c55e;
+}
+.icon-active {
+  color: var(--brand, #f97316);
+}
+.icon-danger {
+  color: #dc2626;
+}
+.icon-info {
+  color: #3b82f6;
+}
+
+/* --- Animated states --- */
+.icon-pulse {
+  animation: iconPulse 1.8s ease-in-out infinite;
+}
+.icon-float {
+  animation: iconFloat 3s ease-in-out infinite;
+}
+.icon-bounce {
+  animation: iconBounce 0.55s cubic-bezier(.36,.07,.19,.97) both;
+}
+.icon-shake {
+  animation: iconShake 0.42s ease-in-out;
+}
+.icon-spin {
+  animation: iconSpin 2.5s linear infinite;
+}
+.icon-unlock {
+  animation: iconUnlock 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.icon-pop {
+  animation: iconPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* --- Keyframes --- */
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.14); opacity: 0.82; }
+}
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes iconBounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.32); }
+  70%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+@keyframes iconShake {
+  0%, 100% { transform: translateX(0); }
+  18%      { transform: translateX(-5px) rotate(-4deg); }
+  36%      { transform: translateX(5px)  rotate(4deg);  }
+  54%      { transform: translateX(-3px) rotate(-2deg); }
+  72%      { transform: translateX(3px)  rotate(2deg);  }
+}
+@keyframes iconSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes iconUnlock {
+  0%  { transform: scale(0) rotate(-35deg); opacity: 0; }
+  60% { transform: scale(1.22) rotate(5deg); opacity: 1; }
+  100%{ transform: scale(1) rotate(0deg); }
+}
+@keyframes iconPop {
+  0%  { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.15); opacity: 1; }
+  100%{ transform: scale(1); }
+}
+
+/* --- Custom element host --- */
+eq-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* --- HUD overrides --- */
+.hud-chip .icon { vertical-align: text-bottom; }
+.hud-notif-btn  .icon { vertical-align: middle; }
+.hud-avatar-btn .icon { width: 26px; height: 26px; }
+
+/* --- Bottom nav overrides --- */
+.nav-tab .icon {
+  width: 26px;
+  height: 26px;
+  display: block;
+  margin: 0 auto 2px;
+}
+.nav-tab.active .icon {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* --- Sidebar overrides --- */
+.sidebar-link .icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* --- Adventure map node overrides --- */
+.wm-node-icon .icon   { width: 24px; height: 24px; }
+.wm-boss .wm-node-icon .icon  { width: 30px; height: 30px; }
+.wm-final .wm-node-icon .icon { width: 32px; height: 32px; }
+.wm-done  .icon-check { color: white; }
+
+/* --- Modal overrides --- */
+.modal-icon-lg .icon { width: 56px; height: 56px; }
+.modal-icon-xl .icon { width: 72px; height: 72px; }
+
+/* --- Dark mode --- */
+[data-theme="dark"] .icon-locked { color: #64748b; }
+[data-theme="dark"] .icon-muted  { color: #475569; }
