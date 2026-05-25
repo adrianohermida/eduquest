@@ -249,14 +249,13 @@ const State = {
     checkStreak() {
         const today = new Date().toDateString();
         const last  = this.data.user.lastPlayed;
-        if (!last) { this.data.user.streak = 1; this.data.user.lastPlayed = today; return; }
+        if (!last) { this.data.user.streak = 1; this.data.user.lastPlayed = today; this._recordPlayedDate(today); return; }
         if (last === today) return;
         const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
 
         if (diff === 1) {
             this.data.user.streak = (this.data.user.streak || 0) + 1;
         } else if (diff === 2 && this.hasItem('streakFreeze')) {
-            // Streak freeze saves a 1-day gap
             this.useItem('streakFreeze');
             this.data.user.streak = (this.data.user.streak || 0) + 1;
             if (typeof ModalEngine !== 'undefined') {
@@ -267,9 +266,19 @@ const State = {
         }
 
         this.data.user.lastPlayed = today;
+        this._recordPlayedDate(today);
         this._checkStreakMilestone(this.data.user.streak);
         this.save();
         this.checkProgressAchievements();
+    },
+
+    _recordPlayedDate(dateStr) {
+        const dates = this.data.user.playedDates || [];
+        if (!dates.includes(dateStr)) {
+            dates.push(dateStr);
+            if (dates.length > 90) dates.splice(0, dates.length - 90);
+        }
+        this.data.user.playedDates = dates;
     },
 
     _checkStreakMilestone(streak) {
@@ -568,14 +577,30 @@ const State = {
         }
     },
 
-    getStreakCalendar() {
-        const today  = new Date();
-        const streak = Math.min(this.data.user.streak || 0, 7);
-        const labels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-        return Array.from({ length: 7 }, (_, i) => {
+    getStreakCalendar(n = 7) {
+        const today   = new Date();
+        const DAYS    = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+        const played  = new Set(this.data.user.playedDates || []);
+
+        // Fallback for existing users with no playedDates: infer from streak count
+        if (played.size === 0) {
+            const streak = Math.min(this.data.user.streak || 0, n);
+            for (let i = 0; i < streak; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                played.add(d.toDateString());
+            }
+        }
+
+        return Array.from({ length: n }, (_, i) => {
             const d = new Date(today);
-            d.setDate(d.getDate() - (6 - i));
-            return { label: labels[d.getDay()], active: i >= (7 - streak), isToday: i === 6 };
+            d.setDate(d.getDate() - (n - 1 - i));
+            return {
+                label:   DAYS[d.getDay()],
+                dayNum:  d.getDate(),
+                active:  played.has(d.toDateString()),
+                isToday: i === n - 1,
+            };
         });
     },
 

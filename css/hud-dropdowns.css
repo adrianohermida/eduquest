@@ -261,34 +261,52 @@
     justify-content: space-between;
     gap: 3px;
 }
+/* 30-day streak calendar grid */
+.hdd-streak-cal {
+    display: grid !important;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 3px;
+}
 .hdd-cal-day {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
 }
 .hdd-cal-dot {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: var(--surface-3);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.72rem;
-    transition: background var(--dur-fast);
+    font-size: 0.65rem;
+    transition: background var(--dur-fast), box-shadow var(--dur-fast);
 }
 .hdd-cal-day.sc-active .hdd-cal-dot  { background: #fef3c7; }
-.hdd-cal-day.sc-today  .hdd-cal-dot  { background: var(--brand); box-shadow: 0 0 10px rgba(249,115,22,0.4); }
-.hdd-cal-lbl {
-    font-size: 0.52rem;
+.hdd-cal-day.sc-today  .hdd-cal-dot  { background: var(--brand); box-shadow: 0 0 8px rgba(249,115,22,0.5); }
+.hdd-cal-lbl { display: none; }
+.hdd-cal-num {
+    font-size: 0.46rem;
     font-weight: 800;
-    text-transform: uppercase;
     color: var(--text-muted);
-    letter-spacing: 0.02em;
 }
-.hdd-cal-day.sc-active .hdd-cal-lbl { color: var(--brand); }
+.hdd-cal-day.sc-active .hdd-cal-num  { color: var(--brand); }
+.hdd-cal-day.sc-today  .hdd-cal-num  { color: var(--brand); font-weight: 900; }
+
+/* Streak fire animation */
+@keyframes streak-fire {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50%       { transform: scale(1.25) translateY(-1px); }
+}
+@keyframes streak-glow {
+    0%, 100% { box-shadow: 0 0 6px rgba(249,115,22,0.4); }
+    50%       { box-shadow: 0 0 14px rgba(249,115,22,0.9); }
+}
+.hdd-cal-day.sc-active .hdd-cal-dot .icon { animation: streak-fire 1.6s ease-in-out infinite; }
+.hdd-cal-day.sc-today  .hdd-cal-dot       { animation: streak-glow 1s ease-in-out infinite; }
+.hdd-cal-day.sc-today  .hdd-cal-dot .icon { animation: streak-fire 0.8s ease-in-out infinite; }
 
 .hdd-streak-row {
     display: flex;

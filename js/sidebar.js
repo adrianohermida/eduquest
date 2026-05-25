@@ -151,13 +151,14 @@ const Sidebar = {
         const rank     = State.getRank();
         const calendar = State.getStreakCalendar();
 
-        // ── Streak calendar ──
+        // ── Streak calendar (7-day) ──
         const calHTML = calendar.map(d => `
             <div class="rp-cal-day${d.active ? ' active' : ''}${d.isToday ? ' today' : ''}"
                  role="listitem"
                  aria-label="${d.label}${d.active ? ', streak ativo' : ''}">
                 <span class="rp-cal-dot" aria-hidden="true">${d.active ? (typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥') : '○'}</span>
                 <span class="rp-cal-label">${d.label}</span>
+                <span class="rp-cal-num">${d.dayNum}</span>
             </div>`).join('');
 
         // ── Missions ──
@@ -531,13 +532,14 @@ const HUD = {
 
     _ddStreak(u) {
         const streak   = u.streak || 1;
-        const calendar = (typeof State !== 'undefined') ? State.getStreakCalendar() : [];
+        const calendar = (typeof State !== 'undefined') ? State.getStreakCalendar(30) : [];
         const hasFrz   = (u.inventory?.['streak-freeze'] || 0) > 0;
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
 
         const calHTML = calendar.map(d => `
-            <div class="hdd-cal-day${d.active ? ' sc-active' : ''}${d.isToday ? ' sc-today' : ''}">
-                <div class="hdd-cal-dot">${d.active ? (typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥') : d.isToday ? '●' : ''}</div>
-                <span class="hdd-cal-lbl">${d.label}</span>
+            <div class="hdd-cal-day${d.active ? ' sc-active' : ''}${d.isToday ? ' sc-today' : ''}" title="${d.label} ${d.dayNum}${d.active ? ' ✓' : ''}">
+                <div class="hdd-cal-dot">${d.active ? _ic('streak',{size:'xs',color:'streak'}) : d.isToday ? '●' : '·'}</div>
+                <span class="hdd-cal-num">${d.dayNum}</span>
             </div>`).join('');
 
         const MILESTONES = [3, 7, 14, 30, 60, 100];

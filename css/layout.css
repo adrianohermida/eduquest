@@ -404,6 +404,9 @@
 .rp-cal-day.today  .rp-cal-dot { background: var(--brand); box-shadow: 0 0 8px rgba(249,115,22,0.38); }
 .rp-cal-label { font-size: 0.54rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
 .rp-cal-day.active .rp-cal-label { color: var(--brand); }
+.rp-cal-num { font-size: 0.5rem; color: var(--text-muted); font-weight: 700; line-height: 1; }
+.rp-cal-day.active .rp-cal-num { color: var(--brand); }
+.rp-cal-day.today  .rp-cal-num { color: #fff; }
 
 /* Daily quests */
 .rp-mission {
