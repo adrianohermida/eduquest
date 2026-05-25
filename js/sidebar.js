@@ -8,13 +8,13 @@ const Sidebar = {
     _isOpen: false,
 
     NAV_ITEMS: [
-        { icon: '🗺️', label: 'Início',   route: 'home',     hash: '#home'     },
-        { icon: '📚', label: 'Missões',  route: 'missions', hash: '#missions'  },
-        { icon: '⚔️', label: 'Arena',    route: 'arena',    hash: '#arena',    soon: true },
-        { icon: '🏆', label: 'Ranking',  route: 'ranking',  hash: '#ranking'   },
-        { icon: '🛒', label: 'Loja',     route: 'shop',     hash: '#shop'      },
-        { icon: '👥', label: 'Turmas',   route: 'teams',    hash: '#teams'     },
-        { icon: '🦸', label: 'Perfil',   route: 'profile',  hash: '#profile'   },
+        { icon: 'map',      label: 'Início',  route: 'home',     hash: '#home'     },
+        { icon: 'missions', label: 'Missões', route: 'missions', hash: '#missions'  },
+        { icon: 'sword',    label: 'Arena',   route: 'arena',    hash: '#arena',    soon: true },
+        { icon: 'trophy',   label: 'Ranking', route: 'ranking',  hash: '#ranking'   },
+        { icon: 'shop',     label: 'Loja',    route: 'shop',     hash: '#shop'      },
+        { icon: 'guild',    label: 'Turmas',  route: 'teams',    hash: '#teams'     },
+        { icon: 'avatar',   label: 'Perfil',  route: 'profile',  hash: '#profile'   },
     ],
 
     // ── LIFECYCLE ─────────────────────────────────────────
@@ -106,7 +106,7 @@ const Sidebar = {
                role="menuitem"
                ${item.soon ? 'aria-disabled="true" tabindex="-1"' : ''}
             >
-                <span class="sidebar-item-icon" aria-hidden="true">${item.icon}</span>
+                <span class="sidebar-item-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(item.icon,{size:'md'}) : item.icon}</span>
                 <span class="sidebar-item-label">${item.label}</span>
                 ${item.soon ? '<span class="sidebar-soon-chip" aria-hidden="true">breve</span>' : ''}
             </a>`).join('');
@@ -156,7 +156,7 @@ const Sidebar = {
             <div class="rp-cal-day${d.active ? ' active' : ''}${d.isToday ? ' today' : ''}"
                  role="listitem"
                  aria-label="${d.label}${d.active ? ', streak ativo' : ''}">
-                <span class="rp-cal-dot" aria-hidden="true">${d.active ? '🔥' : '○'}</span>
+                <span class="rp-cal-dot" aria-hidden="true">${d.active ? (typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥') : '○'}</span>
                 <span class="rp-cal-label">${d.label}</span>
             </div>`).join('');
 

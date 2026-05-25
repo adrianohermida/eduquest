@@ -25,6 +25,11 @@ const ModalEngine = {
         this._processQueue();
     },
 
+    // ── SVG ICON HELPER ──────────────────────────────────────────
+    _ic(id, opts = {}) {
+        return typeof IconSystem !== 'undefined' ? IconSystem.html(id, opts) : '';
+    },
+
     // ── INTERNAL ─────────────────────────────────────────────────
 
     _processQueue() {
@@ -130,7 +135,7 @@ const ModalEngine = {
         const rankChanged = rank?.name !== prevRank?.name;
         return `
             <div class="modal-levelup-glow"></div>
-            <div class="modal-levelup-badge">⚡</div>
+            <div class="modal-levelup-badge">${this._ic('xp',{size:'xl',color:'xp'})}</div>
             <div class="modal-levelup-num">${level}</div>
             <h2 class="modal-title" id="modal-title-el">NÍVEL ${level}!</h2>
             ${rankChanged ? `
@@ -157,75 +162,75 @@ const ModalEngine = {
         const toNext = next - streak;
         return `
             <div class="modal-daily-header">
-                <div class="modal-daily-fire">🔥</div>
+                <div class="modal-daily-fire">${this._ic('streak',{size:'xl',color:'streak'})}</div>
                 <div class="modal-daily-streak-badge">${streak}</div>
             </div>
             <h2 class="modal-title" id="modal-title-el">Login Diário!</h2>
-            <p class="modal-subtitle">Dia ${streak} de sequência${streak >= 7 ? ' 🏆' : streak >= 3 ? ' ⭐' : ''}</p>
+            <p class="modal-subtitle">Dia ${streak} de sequência${streak >= 7 ? ` ${this._ic('trophy',{size:'xs',color:'final'})}` : streak >= 3 ? ` ${this._ic('star',{size:'xs',color:'xp'})}` : ''}</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip">
-                    <span class="mrc-icon">⚡</span>
+                    <span class="mrc-icon">${this._ic('xp',{size:'sm',color:'xp'})}</span>
                     <span class="mrc-value">+${xp}</span>
                     <span class="mrc-label">XP</span>
                 </div>
                 ${gems > 0 ? `<div class="modal-reward-chip">
-                    <span class="mrc-icon">💎</span>
+                    <span class="mrc-icon">${this._ic('gem',{size:'sm',color:'gem'})}</span>
                     <span class="mrc-value">+${gems}</span>
                     <span class="mrc-label">Gemas</span>
                 </div>` : ''}
             </div>
-            <div class="modal-milestone-hint">🎯 Faltam ${toNext} dia${toNext !== 1 ? 's' : ''} para o próximo milestone</div>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">⚡ Receber!</button>`;
+            <div class="modal-milestone-hint">${this._ic('star',{size:'xs'})} Faltam ${toNext} dia${toNext !== 1 ? 's' : ''} para o próximo milestone</div>
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('xp',{size:'xs',color:'xp'})} Receber!</button>`;
     },
 
     _streakRiskHTML({ streak }) {
         return `
             <div class="modal-streak-risk-wrap">
-                <div class="modal-streak-risk-fire">🔥</div>
-                <div class="modal-streak-risk-warn">⚠️</div>
+                <div class="modal-streak-risk-fire">${this._ic('streak',{size:'xl',color:'streak'})}</div>
+                <div class="modal-streak-risk-warn">${this._ic('warning',{size:'lg',color:'warning'})}</div>
             </div>
             <h2 class="modal-title modal-title-warn" id="modal-title-el">Sequência em Risco!</h2>
             <p class="modal-subtitle">Você tem <strong>${streak} dia${streak !== 1 ? 's' : ''}</strong> de sequência.</p>
             <p class="modal-text">Complete pelo menos 1 missão hoje para não perder!</p>
             <button class="btn-primary modal-cta" onclick="Router.navigate('#missions'); ModalEngine.dismiss()">
-                ⚔️ Fazer Missão Agora
+                ${this._ic('sword',{size:'xs'})} Fazer Missão Agora
             </button>
             <button class="modal-dismiss-link" onclick="ModalEngine.dismiss()">Deixar para depois</button>`;
     },
 
     _questCompleteHTML({ icon, title, xp, gems }) {
         return `
-            <div class="modal-quest-icon">${icon || '⚡'}</div>
+            <div class="modal-quest-icon">${this._ic(icon || 'xp',{size:'xl',color:'xp'})}</div>
             <h2 class="modal-title" id="modal-title-el">Missão Completa!</h2>
             <p class="modal-subtitle">${title}</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip">
-                    <span class="mrc-icon">⚡</span>
+                    <span class="mrc-icon">${this._ic('xp',{size:'sm',color:'xp'})}</span>
                     <span class="mrc-value">+${xp}</span>
                     <span class="mrc-label">XP</span>
                 </div>
                 ${gems > 0 ? `<div class="modal-reward-chip">
-                    <span class="mrc-icon">💎</span>
+                    <span class="mrc-icon">${this._ic('gem',{size:'sm',color:'gem'})}</span>
                     <span class="mrc-value">+${gems}</span>
                     <span class="mrc-label">Gemas</span>
                 </div>` : ''}
             </div>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">✅ Incrível!</button>`;
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('check',{size:'xs',color:'success'})} Incrível!</button>`;
     },
 
     _allQuestsDoneHTML({ bonusXP, bonusGems }) {
         return `
-            <div class="modal-crown">👑</div>
+            <div class="modal-crown">${this._ic('crown',{size:'xl',color:'final'})}</div>
             <h2 class="modal-title" id="modal-title-el">Todas as Missões!</h2>
             <p class="modal-subtitle">Você completou <strong>todas</strong> as missões de hoje!</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip modal-reward-gold">
-                    <span class="mrc-icon">⚡</span>
+                    <span class="mrc-icon">${this._ic('xp',{size:'sm',color:'xp'})}</span>
                     <span class="mrc-value">+${bonusXP}</span>
                     <span class="mrc-label">Bônus XP</span>
                 </div>
                 <div class="modal-reward-chip modal-reward-gold">
-                    <span class="mrc-icon">💎</span>
+                    <span class="mrc-icon">${this._ic('gem',{size:'sm',color:'gem'})}</span>
                     <span class="mrc-value">+${bonusGems}</span>
                     <span class="mrc-label">Bônus Gemas</span>
                 </div>
@@ -235,34 +240,45 @@ const ModalEngine = {
 
     _noGemsHTML({ needed, have }) {
         return `
-            <div class="modal-no-gems-icon">💎</div>
+            <div class="modal-no-gems-icon">${this._ic('gem',{size:'xl',color:'gem'})}</div>
             <h2 class="modal-title" id="modal-title-el">Gemas Insuficientes</h2>
-            <p class="modal-subtitle">Você tem <strong>${have} 💎</strong> mas precisa de <strong>${needed} 💎</strong>.</p>
+            <p class="modal-subtitle">Você tem <strong>${have} ${this._ic('gem',{size:'xs',color:'gem'})}</strong> mas precisa de <strong>${needed} ${this._ic('gem',{size:'xs',color:'gem'})}</strong>.</p>
             <button class="btn-primary modal-cta" onclick="Router.navigate('#shop'); ModalEngine.dismiss()">🛒 Ir à Loja</button>
             <button class="modal-dismiss-link" onclick="ModalEngine.dismiss()">Fechar</button>`;
     },
 
     _achievementHTML({ icon, name, description, rarity = 'common' }) {
-        const labels = { common: '🏅 Conquista', rare: '⭐ Raro', epic: '💜 Épico', legendary: '👑 Lendário' };
+        const rarityColor = { common: '', rare: 'science', epic: 'rpg', legendary: 'final' };
+        const labels = {
+            common:    `${this._ic('achievement',{size:'xs'})} Conquista`,
+            rare:      `${this._ic('star',{size:'xs',color:'science'})} Raro`,
+            epic:      `${this._ic('portal',{size:'xs',color:'rpg'})} Épico`,
+            legendary: `${this._ic('crown',{size:'xs',color:'final'})} Lendário`,
+        };
         return `
-            <div class="modal-ach-badge modal-ach-${rarity}"><span class="modal-ach-icon">${icon}</span></div>
-            <div class="modal-ach-ribbon">${labels[rarity] || '🏅 Conquista'}</div>
+            <div class="modal-ach-badge modal-ach-${rarity}"><span class="modal-ach-icon">${this._ic(icon,{size:'xl',color:rarityColor[rarity]})}</span></div>
+            <div class="modal-ach-ribbon">${labels[rarity] || labels.common}</div>
             <h2 class="modal-title" id="modal-title-el">${name}</h2>
             <p class="modal-subtitle">${description}</p>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">🏅 Incrível!</button>`;
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('achievement',{size:'xs',color:'xp'})} Incrível!</button>`;
     },
 
     _streakMilestoneHTML({ streak, gems }) {
-        const icons  = { 3: '🔥', 7: '🏅', 14: '💪', 30: '👑' };
+        const icons  = {
+            3:  this._ic('streak',{size:'xl',color:'streak'}),
+            7:  this._ic('achievement',{size:'xl',color:'xp'}),
+            14: this._ic('star',{size:'xl',color:'final'}),
+            30: this._ic('crown',{size:'xl',color:'final'}),
+        };
         const titles = { 3: '3 dias seguidos!', 7: 'Semana de Fogo!', 14: 'Duas Semanas!', 30: 'Um Mês Incrível!' };
         return `
-            <div class="modal-milestone-icon">${icons[streak] || '🔥'}</div>
+            <div class="modal-milestone-icon">${icons[streak] || this._ic('streak',{size:'xl',color:'streak'})}</div>
             <div class="modal-milestone-badge">${streak} dias</div>
             <h2 class="modal-title" id="modal-title-el">${titles[streak] || `${streak} dias!`}</h2>
             <p class="modal-subtitle">Você atingiu um marco de sequência incrível!</p>
             <div class="modal-rewards-row">
                 <div class="modal-reward-chip modal-reward-gold">
-                    <span class="mrc-icon">💎</span>
+                    <span class="mrc-icon">${this._ic('gem',{size:'sm',color:'gem'})}</span>
                     <span class="mrc-value">+${gems}</span>
                     <span class="mrc-label">Bônus Gemas</span>
                 </div>
@@ -276,12 +292,12 @@ const ModalEngine = {
             <h2 class="modal-title" id="modal-title-el">Streak Salvo!</h2>
             <p class="modal-subtitle">Seu Freeze de Streak foi usado automaticamente.</p>
             <p class="modal-text">Sua sequência de <strong>${streak} dias</strong> está intacta!</p>
-            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">✅ Ótimo!</button>`;
+            <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('check',{size:'xs',color:'success'})} Ótimo!</button>`;
     },
 
     _motivationalHTML({ title, msg, icon }) {
         return `
-            <div class="modal-motivational-icon">${icon || '⚡'}</div>
+            <div class="modal-motivational-icon">${this._ic(icon || 'xp',{size:'xl',color:'xp'})}</div>
             <h2 class="modal-title" id="modal-title-el">${title || 'Você consegue!'}</h2>
             <p class="modal-subtitle">${msg || 'Continue jogando e alcance novos níveis!'}</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">💪 Bora!</button>`;
@@ -291,15 +307,15 @@ const ModalEngine = {
 
     _missionExitHTML({ context = 'missão' }) {
         const ctxMap = {
-            'missão':    { icon: '⚔️', title: 'Abandonar a Missão?',     sub: 'Seu progresso desta batalha será perdido.' },
-            'memória':   { icon: '🃏', title: 'Sair do Jogo de Memória?', sub: 'Você perderá o progresso atual.'          },
-            'forca':     { icon: '🔤', title: 'Sair do Jogo da Forca?',   sub: 'Você perderá o progresso atual.'          },
-            'aventura':  { icon: '🗺️', title: 'Sair do Mapa Aventura?',  sub: 'Você poderá retornar depois.'             },
-            'caça-palavras': { icon: '🔍', title: 'Sair do Caça-Palavras?', sub: 'Você perderá o progresso atual.'       },
+            'missão':    { icon: 'sword',   svg: true,  title: 'Abandonar a Missão?',     sub: 'Seu progresso desta batalha será perdido.' },
+            'memória':   { icon: '🃏',       svg: false, title: 'Sair do Jogo de Memória?', sub: 'Você perderá o progresso atual.'          },
+            'forca':     { icon: '🔤',       svg: false, title: 'Sair do Jogo da Forca?',   sub: 'Você perderá o progresso atual.'          },
+            'aventura':  { icon: 'compass',  svg: true,  title: 'Sair do Mapa Aventura?',  sub: 'Você poderá retornar depois.'              },
+            'caça-palavras': { icon: '🔍',   svg: false, title: 'Sair do Caça-Palavras?',  sub: 'Você perderá o progresso atual.'           },
         };
         const c = ctxMap[context] || ctxMap['missão'];
         return `
-            <div class="modal-exit-icon">${c.icon}</div>
+            <div class="modal-exit-icon">${c.svg ? this._ic(c.icon,{size:'xl'}) : c.icon}</div>
             <h2 class="modal-title" id="modal-title-el">${c.title}</h2>
             <p class="modal-subtitle">${c.sub}</p>
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss(false)">
@@ -319,9 +335,10 @@ const ModalEngine = {
             <button class="modal-dismiss-link" onclick="ModalEngine.dismiss(false)">${cancelText}</button>`;
     },
 
-    _dangerConfirmHTML({ title = 'Tem certeza?', message = '', confirmText = 'Confirmar', cancelText = 'Cancelar', icon = '⚠️' }) {
+    _dangerConfirmHTML({ title = 'Tem certeza?', message = '', confirmText = 'Confirmar', cancelText = 'Cancelar', icon = 'warning' }) {
+        const iconHTML = typeof icon === 'string' && icon.length < 20 && !icon.includes('\u{1F') ? this._ic(icon,{size:'xl',color:'warning'}) : icon;
         return `
-            <div class="modal-dialog-icon modal-danger-icon">${icon}</div>
+            <div class="modal-dialog-icon modal-danger-icon">${iconHTML}</div>
             <h2 class="modal-title modal-title-warn" id="modal-title-el">${title}</h2>
             ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
             <button class="btn-danger modal-cta" onclick="ModalEngine.dismiss(true)">${confirmText}</button>
@@ -336,17 +353,19 @@ const ModalEngine = {
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">OK</button>`;
     },
 
-    _successHTML({ title = 'Sucesso!', message = '', icon = '✅' }) {
+    _successHTML({ title = 'Sucesso!', message = '', icon = 'check' }) {
+        const iconHTML = typeof icon === 'string' && icon.length < 20 ? this._ic(icon,{size:'xl',color:'success'}) : icon;
         return `
-            <div class="modal-success-icon">${icon}</div>
+            <div class="modal-success-icon">${iconHTML}</div>
             <h2 class="modal-title" id="modal-title-el">${title}</h2>
             ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">Ótimo!</button>`;
     },
 
-    _warningHTML({ title = 'Atenção!', message = '', icon = '⚠️' }) {
+    _warningHTML({ title = 'Atenção!', message = '', icon = 'warning' }) {
+        const iconHTML = typeof icon === 'string' && icon.length < 20 ? this._ic(icon,{size:'xl',color:'warning'}) : icon;
         return `
-            <div class="modal-dialog-icon modal-warning-icon">${icon}</div>
+            <div class="modal-dialog-icon modal-warning-icon">${iconHTML}</div>
             <h2 class="modal-title" id="modal-title-el">${title}</h2>
             ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">Entendido</button>`;

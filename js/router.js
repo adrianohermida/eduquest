@@ -1164,19 +1164,20 @@ const Router = {
         const chapters   = CONFIG.chapters || [];
         const avatarCls  = State.getAvatarClass();
 
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
         const badges = [
-            { icon: '🛡️', name: 'Guardião',    locked: false },
-            { icon: '🔬', name: 'Cientista',    locked: false },
-            { icon: '⚡', name: 'Relâmpago',    locked: user.level < 3 },
-            { icon: '🌟', name: 'Estrela',      locked: user.level < 5 },
-            { icon: '🏆', name: 'Campeão',      locked: user.level < 10 },
-            { icon: '🔥', name: 'Imparável',    locked: user.streak < 7 },
-            { icon: '💎', name: 'Colecionador', locked: user.gems < 100 },
-            { icon: '🧠', name: 'Gênio',        locked: user.level < 15 }
+            { icon: 'shield',      name: 'Guardião',    locked: false },
+            { icon: 'microscope',  name: 'Cientista',   locked: false },
+            { icon: 'xp',          name: 'Relâmpago',   locked: user.level < 3 },
+            { icon: 'star',        name: 'Estrela',     locked: user.level < 5 },
+            { icon: 'trophy',      name: 'Campeão',     locked: user.level < 10 },
+            { icon: 'streak',      name: 'Imparável',   locked: user.streak < 7 },
+            { icon: 'gem',         name: 'Colecionador',locked: user.gems < 100 },
+            { icon: 'scroll',      name: 'Gênio',       locked: user.level < 15 }
         ];
         const badgesHTML = badges.map(b => `
             <div class="achievement-item ${b.locked ? 'locked' : ''}">
-                <span class="achievement-icon">${b.icon}</span>
+                <span class="achievement-icon">${b.locked ? _ic('lock',{size:'sm',color:'locked'}) : _ic(b.icon,{size:'md'})}</span>
                 <span class="achievement-name">${b.name}</span>
             </div>`).join('');
 
@@ -1653,10 +1654,17 @@ const Router = {
 
     // ── ACHIEVEMENTS ──────────────────────────────────────
     renderAchievements(container) {
+        const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
         const unlocked  = State.data.user.unlockedAchievements || [];
         const allAchs   = window.ACHIEVEMENTS || [];
         const rarities  = ['common', 'rare', 'epic', 'legendary'];
-        const rLabels   = { common: '🏅 Comum', rare: '⭐ Raro', epic: '💜 Épico', legendary: '👑 Lendário' };
+        const rLabels   = {
+            common:    `${_ic('achievement',{size:'xs'})} Comum`,
+            rare:      `${_ic('star',{size:'xs',color:'science'})} Raro`,
+            epic:      `${_ic('portal',{size:'xs',color:'rpg'})} Épico`,
+            legendary: `${_ic('crown',{size:'xs',color:'final'})} Lendário`,
+        };
+        const rarityColor = { common: '', rare: 'science', epic: 'rpg', legendary: 'final' };
 
         let sectionsHTML = '';
         for (const rarity of rarities) {
@@ -1668,7 +1676,7 @@ const Router = {
                 return `
                 <div class="ach-item ${done ? '' : 'ach-locked'}" title="${done ? ach.desc : '???'}">
                     <div class="ach-badge ach-${rarity}${done ? '' : ' ach-badge-locked'}">
-                        <span class="ach-icon">${done ? ach.icon : '🔒'}</span>
+                        <span class="ach-icon">${done ? _ic(ach.icon,{size:'lg',color:rarityColor[rarity]}) : _ic('lock',{size:'sm',color:'locked'})}</span>
                     </div>
                     <div class="ach-name">${done ? ach.name : '???'}</div>
                     ${done ? `<div class="ach-desc">${ach.desc}</div>` : ''}

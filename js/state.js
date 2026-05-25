@@ -5,31 +5,31 @@
 
 const ACHIEVEMENTS = [
     // Common
-    { id:'first_step',    icon:'🛡️', name:'Primeiros Passos',    desc:'Complete sua primeira missão',            rarity:'common'    },
-    { id:'streak_3',      icon:'🔥', name:'3 em Sequência',      desc:'Mantenha 3 dias de sequência',            rarity:'common'    },
-    { id:'gems_10',       icon:'💎', name:'Caçador de Gemas',    desc:'Colete 10 gemas',                         rarity:'common'    },
-    { id:'level_3',       icon:'⚡', name:'Guerreiro',            desc:'Alcance o nível 3',                       rarity:'common'    },
-    { id:'questions_10',  icon:'🎯', name:'Aprendiz',            desc:'Responda 10 questões corretamente',        rarity:'common'    },
-    { id:'perfect_first', icon:'⭐', name:'Estrela de Ouro',     desc:'Ganhe 3 estrelas em uma missão',           rarity:'common'    },
+    { id:'first_step',    icon:'shield',      name:'Primeiros Passos',    desc:'Complete sua primeira missão',            rarity:'common'    },
+    { id:'streak_3',      icon:'streak',      name:'3 em Sequência',      desc:'Mantenha 3 dias de sequência',            rarity:'common'    },
+    { id:'gems_10',       icon:'gem',         name:'Caçador de Gemas',    desc:'Colete 10 gemas',                         rarity:'common'    },
+    { id:'level_3',       icon:'xp',          name:'Guerreiro',           desc:'Alcance o nível 3',                       rarity:'common'    },
+    { id:'questions_10',  icon:'star',        name:'Aprendiz',            desc:'Responda 10 questões corretamente',        rarity:'common'    },
+    { id:'perfect_first', icon:'star',        name:'Estrela de Ouro',     desc:'Ganhe 3 estrelas em uma missão',           rarity:'common'    },
     // Rare
-    { id:'stage_3',       icon:'⚔️', name:'Bom de Missões',     desc:'Complete 3 missões diferentes',            rarity:'rare'      },
-    { id:'streak_7',      icon:'📅', name:'Semana de Fogo',      desc:'Mantenha 7 dias de sequência',             rarity:'rare'      },
-    { id:'level_5',       icon:'🌟', name:'Herói',               desc:'Alcance o nível 5',                        rarity:'rare'      },
-    { id:'combo_5',       icon:'💥', name:'Combo Devastador',    desc:'Acerte 5 questões em sequência',           rarity:'rare'      },
-    { id:'gems_50',       icon:'💰', name:'Colecionador',        desc:'Acumule 50 gemas',                         rarity:'rare'      },
-    { id:'questions_50',  icon:'🧠', name:'Estudioso',           desc:'Responda 50 questões corretamente',        rarity:'rare'      },
+    { id:'stage_3',       icon:'sword',       name:'Bom de Missões',      desc:'Complete 3 missões diferentes',            rarity:'rare'      },
+    { id:'streak_7',      icon:'streak',      name:'Semana de Fogo',      desc:'Mantenha 7 dias de sequência',             rarity:'rare'      },
+    { id:'level_5',       icon:'star',        name:'Herói',               desc:'Alcance o nível 5',                        rarity:'rare'      },
+    { id:'combo_5',       icon:'xp',          name:'Combo Devastador',    desc:'Acerte 5 questões em sequência',           rarity:'rare'      },
+    { id:'gems_50',       icon:'gem',         name:'Colecionador',        desc:'Acumule 50 gemas',                         rarity:'rare'      },
+    { id:'questions_50',  icon:'scroll',      name:'Estudioso',           desc:'Responda 50 questões corretamente',        rarity:'rare'      },
     // Epic
-    { id:'streak_14',     icon:'🏅', name:'Quinzena',            desc:'Mantenha 14 dias de sequência',            rarity:'epic'      },
-    { id:'level_10',      icon:'💜', name:'Mestre',              desc:'Alcance o nível 10',                       rarity:'epic'      },
-    { id:'perfect_5',     icon:'⭐', name:'Perfeccionista',      desc:'Ganhe 3 estrelas em 5 missões',            rarity:'epic'      },
-    { id:'questions_100', icon:'📚', name:'Devorador de Livros', desc:'Responda 100 questões corretamente',       rarity:'epic'      },
-    { id:'gems_100',      icon:'💎', name:'Magnata',             desc:'Acumule 100 gemas',                        rarity:'epic'      },
-    { id:'stage_10',      icon:'🏆', name:'Caçador de Fases',    desc:'Complete 10 missões diferentes',           rarity:'epic'      },
+    { id:'streak_14',     icon:'achievement', name:'Quinzena',            desc:'Mantenha 14 dias de sequência',            rarity:'epic'      },
+    { id:'level_10',      icon:'portal',      name:'Mestre',              desc:'Alcance o nível 10',                       rarity:'epic'      },
+    { id:'perfect_5',     icon:'star',        name:'Perfeccionista',      desc:'Ganhe 3 estrelas em 5 missões',            rarity:'epic'      },
+    { id:'questions_100', icon:'scroll',      name:'Devorador de Livros', desc:'Responda 100 questões corretamente',       rarity:'epic'      },
+    { id:'gems_100',      icon:'gem',         name:'Magnata',             desc:'Acumule 100 gemas',                        rarity:'epic'      },
+    { id:'stage_10',      icon:'trophy',      name:'Caçador de Fases',    desc:'Complete 10 missões diferentes',           rarity:'epic'      },
     // Legendary
-    { id:'streak_30',     icon:'🔥', name:'Dedicação Total',     desc:'30 dias de sequência ininterrupta',        rarity:'legendary' },
-    { id:'level_15',      icon:'🌟', name:'Lendário',            desc:'Alcance o nível 15',                       rarity:'legendary' },
-    { id:'perfect_10',    icon:'⭐', name:'Supremo',             desc:'Ganhe 3 estrelas em 10 missões',           rarity:'legendary' },
-    { id:'questions_500', icon:'🧬', name:'Sábio',               desc:'Responda 500 questões corretamente',       rarity:'legendary' },
+    { id:'streak_30',     icon:'streak',      name:'Dedicação Total',     desc:'30 dias de sequência ininterrupta',        rarity:'legendary' },
+    { id:'level_15',      icon:'crown',       name:'Lendário',            desc:'Alcance o nível 15',                       rarity:'legendary' },
+    { id:'perfect_10',    icon:'star',        name:'Supremo',             desc:'Ganhe 3 estrelas em 10 missões',           rarity:'legendary' },
+    { id:'questions_500', icon:'dna',         name:'Sábio',               desc:'Responda 500 questões corretamente',       rarity:'legendary' },
 ];
 window.ACHIEVEMENTS = ACHIEVEMENTS;
 
@@ -455,10 +455,10 @@ const State = {
     getHeroClass() {
         const goal = this.data.user.goal || 'compete';
         const classes = {
-            grades:    { name: 'Estudioso',  icon: '📚', desc: 'Mestre do conhecimento' },
-            exams:     { name: 'Guerreiro',  icon: '⚔️', desc: 'Pronto para a batalha'  },
-            curiosity: { name: 'Explorador', icon: '🔭', desc: 'Descobridor de mundos'  },
-            compete:   { name: 'Campeão',    icon: '🏆', desc: 'Nascido para vencer'    },
+            grades:    { name: 'Estudioso',  icon: 'scroll',  desc: 'Mestre do conhecimento' },
+            exams:     { name: 'Guerreiro',  icon: 'sword',   desc: 'Pronto para a batalha'  },
+            curiosity: { name: 'Explorador', icon: 'compass', desc: 'Descobridor de mundos'  },
+            compete:   { name: 'Campeão',    icon: 'trophy',  desc: 'Nascido para vencer'    },
         };
         return classes[goal] || classes.compete;
     },
@@ -518,13 +518,13 @@ const State = {
             this.data.dailyMissions = { date: today, completed: [] };
         }
         const pool = [
-            { id: 'complete_stage', icon: '⚔️', title: 'Complete uma missão',  desc: 'Termine qualquer fase hoje',    xp: 100, gems: 15 },
-            { id: 'streak_day',     icon: '🔥', title: 'Sequência mantida',    desc: 'Jogue pelo menos 1x hoje',      xp: 50,  gems: 5  },
-            { id: 'perfect_score',  icon: '⭐', title: 'Pontuação perfeita',   desc: 'Acerte tudo em uma fase',       xp: 150, gems: 20 },
-            { id: 'combo_5',        icon: '⚡', title: 'Combo devastador',     desc: 'Acerte 5 seguidas',             xp: 75,  gems: 10 },
-            { id: 'earn_gems',      icon: '💎', title: 'Caça gemas',           desc: 'Ganhe 10+ gemas hoje',          xp: 50,  gems: 0  },
-            { id: 'fast_answer',    icon: '⏱️', title: 'Raio',                desc: 'Responda em menos de 5s',       xp: 75,  gems: 10 },
-            { id: 'hard_mode',      icon: '💀', title: 'Desafio difícil',      desc: 'Complete uma fase difícil',     xp: 200, gems: 25 },
+            { id: 'complete_stage', icon: 'sword',   title: 'Complete uma missão',  desc: 'Termine qualquer fase hoje',    xp: 100, gems: 15 },
+            { id: 'streak_day',     icon: 'streak',  title: 'Sequência mantida',    desc: 'Jogue pelo menos 1x hoje',      xp: 50,  gems: 5  },
+            { id: 'perfect_score',  icon: 'star',    title: 'Pontuação perfeita',   desc: 'Acerte tudo em uma fase',       xp: 150, gems: 20 },
+            { id: 'combo_5',        icon: 'xp',      title: 'Combo devastador',     desc: 'Acerte 5 seguidas',             xp: 75,  gems: 10 },
+            { id: 'earn_gems',      icon: 'gem',     title: 'Caça gemas',           desc: 'Ganhe 10+ gemas hoje',          xp: 50,  gems: 0  },
+            { id: 'fast_answer',    icon: 'xp',      title: 'Raio',                 desc: 'Responda em menos de 5s',       xp: 75,  gems: 10 },
+            { id: 'hard_mode',      icon: 'boss',    title: 'Desafio difícil',      desc: 'Complete uma fase difícil',     xp: 200, gems: 25 },
         ];
         const seed = today.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
         const picks = [];
@@ -731,7 +731,7 @@ const State = {
     // ── RESET (dev only) ─────────────────────────────────────
     hardReset() {
         ModalEngine.interrupt('dangerConfirm', {
-            icon:        '⚠️',
+            icon:        'warning',
             title:       'Apagar Progresso?',
             message:     'Todo o progresso local será apagado permanentemente. Esta ação não pode ser desfeita.',
             confirmText: '🗑️ Apagar tudo',
