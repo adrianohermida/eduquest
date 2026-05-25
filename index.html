@@ -16,7 +16,10 @@
 <body>
     <!-- HUD Superior -->
     <header class="top-hud" id="top-hud">
-        <button id="hud-avatar-btn" class="hud-avatar-btn" onclick="Router.navigate('#profile')" title="Perfil">🦸</button>
+        <div class="hud-left">
+            <button id="hud-avatar-btn" class="hud-avatar-btn" onclick="Router.navigate('#profile')" title="Perfil">🦸</button>
+            <span class="hud-level-chip" id="hud-level">Nv.1</span>
+        </div>
         <div class="hud-stats">
             <div class="hud-chip streak-chip">🔥<span id="hud-streak">1</span></div>
             <div class="hud-chip gem-chip">💎<span id="hud-gems">0</span></div>
@@ -39,8 +42,12 @@
             <div class="nav-tab-icon">⚔️</div>
             <span class="nav-tab-label">Missões</span>
         </a>
+        <a href="#ranking" class="nav-tab" data-route="ranking">
+            <div class="nav-tab-icon">🏆</div>
+            <span class="nav-tab-label">Ranking</span>
+        </a>
         <a href="#profile" class="nav-tab" data-route="profile">
-            <div class="nav-tab-icon">🏅</div>
+            <div class="nav-tab-icon">🦸</div>
             <span class="nav-tab-label">Perfil</span>
         </a>
         <a href="#shop" class="nav-tab" data-route="shop">

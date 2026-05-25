@@ -67,6 +67,7 @@ const Router = {
             case 'shop':       this.renderShop(container);      break;
             case 'missions':   this.renderMissions(container);           break;
             case 'adventure':  AdventureMap.start(parts[1]);            break;
+            case 'ranking':    this.renderRanking(container);           break;
             case 'teams':      this.renderTeams(container, parts[1]);   break;
             default:           this.renderHome(container);
         }
@@ -664,10 +665,11 @@ const Router = {
     _finishOnboarding() {
         this._onboardData.avatar = this._onboardData.avatar || '🦸';
         State.completeOnboarding(
-            this._onboardData.name     || 'Herói',
+            this._onboardData.name      || 'Herói',
             this._onboardData.dailyGoal || 10,
-            this._onboardData.grade    || '7ano',
-            this._onboardData.avatar
+            this._onboardData.grade     || '7ano',
+            this._onboardData.avatar,
+            this._onboardData.goal      || 'compete'
         );
         if (typeof Utils !== 'undefined') Utils.confetti();
         this.navigate('#home');
@@ -1001,10 +1003,13 @@ const Router = {
 
     // ── PROFILE ───────────────────────────────────────────
     renderProfile(container) {
-        const user   = State.data.user;
-        const xpProg = State.getXPProgress();
-        const theme  = user.theme || 'light';
+        const user    = State.data.user;
+        const xpProg  = State.getXPProgress();
+        const rank    = State.getRank();
+        const heroClass = State.getHeroClass();
+        const theme   = user.theme || 'light';
         const premium = State.isPremium();
+        const chapters = CONFIG.chapters || [];
 
         const badges = [
             { icon: '🛡️', name: 'Guardião',    locked: false },
@@ -1022,71 +1027,248 @@ const Router = {
                 <span class="achievement-name">${b.name}</span>
             </div>`).join('');
 
+        const masteryHTML = chapters.map(ch => {
+            const prog = State.getChapterProgress(ch.id);
+            return `
+            <div class="mastery-item">
+                <div class="mastery-icon">${ch.icon}</div>
+                <div class="mastery-body">
+                    <div class="mastery-name">${ch.subject} · ${ch.grade}</div>
+                    <div class="mastery-track">
+                        <div class="mastery-fill" style="width:${prog.percent}%"></div>
+                    </div>
+                </div>
+                <div class="mastery-pct">${prog.percent}%</div>
+            </div>`;
+        }).join('') + `
+            <div class="mastery-item" style="opacity:0.5">
+                <div class="mastery-icon">📐</div>
+                <div class="mastery-body">
+                    <div class="mastery-name">Matemática · Em breve</div>
+                    <div class="mastery-track"><div class="mastery-fill" style="width:0%"></div></div>
+                </div>
+                <div class="mastery-pct" style="color:var(--text-muted)">🔒</div>
+            </div>`;
+
         container.innerHTML = `
-        <div class="screen">
-            <div class="profile-hero">
-                <span class="profile-avatar">🦸</span>
-                <div class="profile-name">
-                    ${user.name}
-                    ${premium ? '<span class="premium-badge" style="margin-left:8px">👑 Premium</span>' : ''}
-                </div>
-                <div class="profile-level">Nível ${user.level} · ${user.email || ''}</div>
-            </div>
+        <div class="profile-screen">
 
-            <div class="xp-level-card mb-3">
-                <div class="xp-level-row">
-                    <span class="level-badge">⚡ Nível ${user.level}</span>
-                    <span class="xp-text-small">${xpProg.current} / ${xpProg.needed} XP</span>
-                </div>
-                <div class="xp-track"><div class="xp-fill" style="width:${xpProg.percent}%"></div></div>
-            </div>
-
-            <div class="stats-grid-2x2 mb-3">
-                <div class="stat-box-card"><span class="stat-box-icon">⚡</span><span class="stat-box-value">${user.xp}</span><span class="stat-box-label">XP Total</span></div>
-                <div class="stat-box-card"><span class="stat-box-icon">💎</span><span class="stat-box-value">${user.gems}</span><span class="stat-box-label">Gemas</span></div>
-                <div class="stat-box-card"><span class="stat-box-icon">🔥</span><span class="stat-box-value">${user.streak}</span><span class="stat-box-label">Sequência</span></div>
-                <div class="stat-box-card"><span class="stat-box-icon">❤️</span><span class="stat-box-value">${user.hearts}</span><span class="stat-box-label">Vidas</span></div>
-            </div>
-
-            ${!premium ? `
-            <div class="premium-card" onclick="Router._showPremiumModal()">
-                <div class="premium-card-icon">👑</div>
-                <div class="premium-card-text">
-                    <div class="premium-card-title">Seja Premium!</div>
-                    <div class="premium-card-desc">Vidas ilimitadas, estatísticas avançadas e muito mais.</div>
-                </div>
-                <div style="font-size:0.8rem;font-weight:900;color:var(--gold)">Ver →</div>
-            </div>` : `
-            <div class="premium-card">
-                <div class="premium-card-icon">👑</div>
-                <div class="premium-card-text">
-                    <div class="premium-card-title">Conta Premium Ativa</div>
-                    <div class="premium-card-desc">Aproveite todos os benefícios exclusivos!</div>
-                </div>
-            </div>`}
-
-            <!-- Theme toggle -->
-            <div class="theme-toggle-row">
-                <span class="theme-toggle-label">🎨 Aparência</span>
-                <div class="theme-toggle-btns">
-                    <button class="theme-btn ${theme==='light'?'active':''}" onclick="State.setTheme('light'); Router.renderProfile(document.getElementById('app-container'))">☀️ Claro</button>
-                    <button class="theme-btn ${theme==='dark'?'active':''}"  onclick="State.setTheme('dark');  Router.renderProfile(document.getElementById('app-container'))">🌙 Escuro</button>
-                    <button class="theme-btn ${theme==='auto'?'active':''}"  onclick="State.setTheme('auto');  Router.renderProfile(document.getElementById('app-container'))">🔄 Auto</button>
+            <!-- Hero Banner -->
+            <div class="profile-hero-banner">
+                <div class="profile-hero-avatar">${user.avatar || '🦸'}</div>
+                <div class="profile-hero-identity">
+                    <div class="profile-hero-name">
+                        ${user.name}
+                        ${premium ? '<span class="premium-badge">👑</span>' : ''}
+                    </div>
+                    <div class="profile-hero-badges">
+                        <span class="hero-class-badge">${heroClass.icon} ${heroClass.name}</span>
+                        <span class="hero-rank-badge ${rank.cssClass}">${rank.icon} ${rank.name}</span>
+                    </div>
+                    <div class="profile-hero-level">Nível ${user.level} · ${user.grade || '7º Ano'}</div>
                 </div>
             </div>
 
-            <!-- Teams shortcut -->
-            <button class="btn-secondary" style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:12px"
-                onclick="Router.navigate('#teams')">
-                <span>👥 Minhas Turmas</span><span style="opacity:0.5">›</span>
-            </button>
+            <!-- XP Bar -->
+            <div class="profile-xp-wrap">
+                <div class="profile-xp-row">
+                    <span style="font-size:0.78rem;font-weight:900;color:var(--brand)">⚡ Nível ${user.level}</span>
+                    <span style="font-size:0.72rem;color:var(--text-muted);font-weight:700">${xpProg.current} / ${xpProg.needed} XP</span>
+                </div>
+                <div class="profile-xp-track">
+                    <div class="profile-xp-fill" style="width:${xpProg.percent}%"></div>
+                </div>
+            </div>
 
-            <div class="section-header"><span class="section-title">🏅 Conquistas</span></div>
-            <div class="achievements-grid mb-3">${badgesHTML}</div>
+            <!-- Body -->
+            <div class="profile-body">
 
-            <button class="btn-secondary mt-3" onclick="State.logoutAsync()">
-                Sair da conta
-            </button>
+                <!-- Stats -->
+                <div class="section-header" style="margin-bottom:var(--sp-3)"><span class="section-title">📊 Estatísticas</span></div>
+                <div class="profile-stats-row">
+                    <div class="profile-stat">
+                        <span class="profile-stat-icon">⚡</span>
+                        <span class="profile-stat-value">${user.xp}</span>
+                        <span class="profile-stat-label">XP</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-icon">💎</span>
+                        <span class="profile-stat-value">${user.gems}</span>
+                        <span class="profile-stat-label">Gemas</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-icon">🔥</span>
+                        <span class="profile-stat-value">${user.streak}</span>
+                        <span class="profile-stat-label">Streak</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-icon">❤️</span>
+                        <span class="profile-stat-value">${user.hearts}</span>
+                        <span class="profile-stat-label">Vidas</span>
+                    </div>
+                </div>
+
+                <!-- Mastery -->
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">🧬 Domínio</span></div>
+                ${masteryHTML}
+
+                <!-- Achievements -->
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">🏅 Conquistas</span></div>
+                <div class="achievements-grid mb-3">${badgesHTML}</div>
+
+                <!-- Theme -->
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">⚙️ Configurações</span></div>
+                <div class="theme-toggle-row" style="margin-bottom:var(--sp-3)">
+                    <span class="theme-toggle-label">🎨 Aparência</span>
+                    <div class="theme-toggle-btns">
+                        <button class="theme-btn ${theme==='light'?'active':''}" onclick="State.setTheme('light'); Router.renderProfile(document.getElementById('app-container'))">☀️</button>
+                        <button class="theme-btn ${theme==='dark'?'active':''}"  onclick="State.setTheme('dark');  Router.renderProfile(document.getElementById('app-container'))">🌙</button>
+                        <button class="theme-btn ${theme==='auto'?'active':''}"  onclick="State.setTheme('auto');  Router.renderProfile(document.getElementById('app-container'))">🔄</button>
+                    </div>
+                </div>
+
+                ${!premium ? `
+                <div class="premium-card" onclick="Router._showPremiumModal()" style="margin-bottom:var(--sp-3)">
+                    <div class="premium-card-icon">👑</div>
+                    <div class="premium-card-text">
+                        <div class="premium-card-title">Seja Premium!</div>
+                        <div class="premium-card-desc">Vidas ilimitadas, estatísticas avançadas e mais.</div>
+                    </div>
+                    <div style="font-size:0.8rem;font-weight:900;color:var(--gold)">Ver →</div>
+                </div>` : ''}
+
+                <button class="profile-nav-btn" onclick="Router.navigate('#ranking')">
+                    <span class="pnb-icon">🏆</span>
+                    <span class="pnb-label">Ranking Global</span>
+                    <span class="pnb-arrow">›</span>
+                </button>
+                <button class="profile-nav-btn" onclick="Router.navigate('#teams')">
+                    <span class="pnb-icon">👥</span>
+                    <span class="pnb-label">Minhas Turmas</span>
+                    <span class="pnb-arrow">›</span>
+                </button>
+                <button class="profile-nav-btn" onclick="Router.navigate('#shop')">
+                    <span class="pnb-icon">🛒</span>
+                    <span class="pnb-label">Loja de Itens</span>
+                    <span class="pnb-arrow">›</span>
+                </button>
+
+                <button class="btn-secondary mt-3" onclick="State.logoutAsync()">Sair da conta</button>
+            </div>
+        </div>`;
+    },
+
+    // ── RANKING ───────────────────────────────────────────
+    async renderRanking(container) {
+        container.innerHTML = `
+        <div class="screen" style="padding-top:var(--sp-4)">
+            <div style="text-align:center;padding:40px 0">
+                <span style="font-size:2.5rem">⏳</span>
+                <p style="color:var(--text-muted);font-weight:700;margin-top:8px">Carregando ranking...</p>
+            </div>
+        </div>`;
+
+        const uid  = State.data.user.uid;
+        const rank = State.getRank();
+
+        let players = [];
+        if (typeof SupaDB !== 'undefined') {
+            const { data } = await SupaDB.getRanking(20);
+            if (data?.length) players = data;
+        }
+
+        // Ensure current user appears even with no remote data
+        if (!players.length) {
+            players = [{
+                id: uid, name: State.data.user.name, level: State.data.user.level,
+                xp: State.data.user.xp, avatar: State.data.user.avatar || '🦸',
+                streak: State.data.user.streak
+            }];
+        }
+
+        const getRankIcon = xp => xp >= 5000 ? '💜' : xp >= 2000 ? '🥇' : xp >= 800 ? '🥈' : '🥉';
+        const myIdx = players.findIndex(p => p.id === uid);
+
+        const top3 = players.slice(0, 3);
+        const rest = players.slice(3, 10);
+
+        // Podium: render in display order [2nd, 1st, 3rd]
+        const podiumMap = [
+            { p: top3[1], pos: 2, medal: '🥈', cls: 'second' },
+            { p: top3[0], pos: 1, medal: '🥇', cls: 'first'  },
+            { p: top3[2], pos: 3, medal: '🥉', cls: 'third'  },
+        ].filter(item => item.p);
+
+        const podiumHTML = podiumMap.map(({ p, medal, cls }) => {
+            const isMe = p.id === uid;
+            return `
+            <div class="podium-item ${cls}">
+                <div class="podium-medal">${medal}</div>
+                <div class="podium-avatar">${p.avatar || '🦸'}</div>
+                <div class="podium-name">${isMe ? 'Você' : (p.name || '—').slice(0, 9)}</div>
+                <div class="podium-xp">⚡ ${p.xp || 0}</div>
+                <div class="podium-block"></div>
+            </div>`;
+        }).join('');
+
+        const listHTML = rest.map((p, i) => {
+            const pos  = i + 4;
+            const isMe = p.id === uid;
+            return `
+            <div class="ranking-row ${isMe ? 'is-me' : ''}">
+                <span class="rank-num">#${pos}</span>
+                <div class="rank-avatar-cell">${p.avatar || '🦸'}</div>
+                <div class="rank-info">
+                    <div class="rank-info-name">${isMe ? 'Você ✦' : (p.name || '—')}</div>
+                    <div class="rank-info-level">Nível ${p.level || 1}</div>
+                </div>
+                <span class="rank-xp-col">⚡ ${p.xp || 0}</span>
+                <span class="rank-medal-col">${getRankIcon(p.xp || 0)}</span>
+            </div>`;
+        }).join('');
+
+        // Show my row if outside top 10
+        let myPosHTML = '';
+        if (myIdx >= 10) {
+            const me = players[myIdx];
+            myPosHTML = `
+            <div class="ranking-my-section">
+                <div class="ranking-my-label">Sua posição</div>
+                <div class="ranking-row is-me">
+                    <span class="rank-num">#${myIdx + 1}</span>
+                    <div class="rank-avatar-cell">${me.avatar || '🦸'}</div>
+                    <div class="rank-info">
+                        <div class="rank-info-name">Você ✦</div>
+                        <div class="rank-info-level">Nível ${me.level || 1}</div>
+                    </div>
+                    <span class="rank-xp-col">⚡ ${me.xp || 0}</span>
+                    <span class="rank-medal-col">${getRankIcon(me.xp || 0)}</span>
+                </div>
+            </div>`;
+        }
+
+        container.innerHTML = `
+        <div class="screen" style="padding-top:0;padding-left:0;padding-right:0">
+
+            <div class="ranking-header">
+                <span class="ranking-league-icon">${rank.icon}</span>
+                <div class="ranking-league-name">Liga ${rank.name}</div>
+                <div class="ranking-league-desc">Top jogadores do EduQuest</div>
+            </div>
+
+            ${top3.length ? `<div class="ranking-podium">${podiumHTML}</div>` : ''}
+
+            ${rest.length ? `<div class="ranking-list">${listHTML}</div>` : ''}
+
+            ${myPosHTML}
+
+            ${!players.length ? `
+            <div class="empty-state" style="padding: 32px">
+                <span class="empty-icon">🏆</span>
+                <p>Nenhum jogador encontrado ainda.</p>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Seja o primeiro a aparecer aqui!</p>
+            </div>` : ''}
+
         </div>`;
     },
 

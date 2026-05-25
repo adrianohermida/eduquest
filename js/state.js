@@ -29,6 +29,8 @@ const State = {
             // v4 additions
             avatar:       '🦸',
             grade:        '7ano',
+            // v5 additions
+            goal:         'compete',
         },
         progress: {},
         dailyMissions: { date: null, completed: [] },
@@ -103,6 +105,7 @@ const State = {
                 theme:        parsed.user.theme         ?? 'light',
                 avatar:       parsed.user.avatar        ?? '🦸',
                 grade:        parsed.user.grade         ?? '7ano',
+                goal:         parsed.user.goal          ?? 'compete',
             };
         }
         this.data.progress      = parsed.progress || {};
@@ -262,6 +265,7 @@ const State = {
     // ── ACTIONS ──────────────────────────────────────────────
     addXP(amount) {
         this.data.user.xp += amount;
+        this.showXPFloat(amount);
         this._checkLevelUp();
         this.save();
     },
@@ -308,6 +312,36 @@ const State = {
         }
         const avatarEl = document.getElementById('hud-avatar-btn');
         if (avatarEl) avatarEl.textContent = u.avatar || '🦸';
+        const levelEl = document.getElementById('hud-level');
+        if (levelEl) levelEl.textContent = `Nv.${u.level}`;
+    },
+
+    // ── RANK & CLASS ─────────────────────────────────────────
+    getRank() {
+        const xp = this.data.user.xp || 0;
+        if (xp >= 5000) return { name: 'Platina', icon: '💜', cssClass: 'rank-platinum', min: 5000, next: Infinity };
+        if (xp >= 2000) return { name: 'Ouro',    icon: '🥇', cssClass: 'rank-gold',     min: 2000, next: 5000 };
+        if (xp >= 800)  return { name: 'Prata',   icon: '🥈', cssClass: 'rank-silver',   min: 800,  next: 2000 };
+        return                  { name: 'Bronze',  icon: '🥉', cssClass: 'rank-bronze',   min: 0,    next: 800  };
+    },
+
+    getHeroClass() {
+        const goal = this.data.user.goal || 'compete';
+        const classes = {
+            grades:    { name: 'Estudioso',  icon: '📚', desc: 'Mestre do conhecimento' },
+            exams:     { name: 'Guerreiro',  icon: '⚔️', desc: 'Pronto para a batalha'  },
+            curiosity: { name: 'Explorador', icon: '🔭', desc: 'Descobridor de mundos'  },
+            compete:   { name: 'Campeão',    icon: '🏆', desc: 'Nascido para vencer'    },
+        };
+        return classes[goal] || classes.compete;
+    },
+
+    showXPFloat(amount) {
+        const el = document.createElement('div');
+        el.className = 'xp-float';
+        el.textContent = `+${amount} XP`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1500);
     },
 
     // ── DAILY MISSIONS ───────────────────────────────────────
@@ -415,11 +449,12 @@ const State = {
     },
 
     // ── ONBOARDING ────────────────────────────────────────────
-    completeOnboarding(name, dailyGoal, grade, avatar) {
+    completeOnboarding(name, dailyGoal, grade, avatar, goal) {
         this.data.user.name      = name      || 'Herói';
         this.data.user.dailyGoal = dailyGoal || 10;
         this.data.user.grade     = grade     || '7ano';
         this.data.user.avatar    = avatar    || '🦸';
+        this.data.user.goal      = goal      || 'compete';
         this.data.user.onboarded = true;
         this.save();
     },

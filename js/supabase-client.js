@@ -175,6 +175,14 @@ const SupaDB = {
     async deleteTeam(teamId) {
         const c = getClient(); if (!c) return { error: { message: 'offline' } };
         return c.from('teams').delete().eq('id', teamId);
+    },
+
+    async getRanking(limit = 20) {
+        const c = getClient(); if (!c) return { data: [], error: null };
+        return c.from('profiles')
+            .select('id, name, level, xp, streak, avatar')
+            .order('xp', { ascending: false })
+            .limit(limit);
     }
 };
 
