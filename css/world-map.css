@@ -627,14 +627,10 @@
     height: 40px;
     transform: translate(-50%, -50%);
     z-index: 8;
-    font-size: 28px;
-    line-height: 40px;
-    text-align: center;
     pointer-events: none;
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
     animation: wmCharBob 1.6s ease-in-out infinite;
-    transition: left 0s, top 0s; /* immediate positioning — smooth via JS lerp */
-    /* --char-sx set inline via style.transform from JS */
+    transition: left 0s, top 0s;
 }
 
 .wm-char.wm-char-walking {
