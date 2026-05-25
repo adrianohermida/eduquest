@@ -1,3 +1,8 @@
+// Se não houver questões ainda, cria um array vazio para não quebrar
+if (typeof QUESTIONS_BANK === 'undefined') {
+  var QUESTIONS_BANK = [];
+}
+window.QUESTIONS_BANK = QUESTIONS_BANK;
 const QUESTIONS = {
   ciencias: [
     // ETAPA 1: Imunidade e Vacinas (40 questões)

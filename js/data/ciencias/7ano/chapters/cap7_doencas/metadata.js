@@ -6,5 +6,10 @@ const CHAPTER_METADATA = {
     totalStages: 5,
     description: 'Combata os vilões microscópicos!'
 };
-// Não use 'if' solto aqui. Apenas atribua a variável global.
+// Garante que a variável seja global
 window.CHAPTER_METADATA = CHAPTER_METADATA;
+
+// Registro seguro
+if (typeof window.DataLoader !== 'undefined') {
+    window.DataLoader.registerChapter('cap7_doencas', CHAPTER_METADATA);
+}
