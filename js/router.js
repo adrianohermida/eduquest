@@ -27,9 +27,9 @@ const Router = {
 
         if (!container) { console.error('❌ #app-container não encontrado!'); return; }
 
-        const publicRoutes = ['login', 'register', 'onboarding'];
+        const publicRoutes = ['landing', 'login', 'register', 'onboarding'];
         if (!publicRoutes.includes(route)) {
-            if (!State.isAuthenticated()) { this.navigate('#login'); return; }
+            if (!State.isAuthenticated()) { this.navigate('#landing'); return; }
             if (!State.isOnboarded())     { this.navigate('#onboarding/1'); return; }
         }
 
@@ -43,6 +43,7 @@ const Router = {
         if (!isAuth && !isGame) this._updateNavActive(route);
 
         switch (route) {
+            case 'landing':    this.renderLanding(container);                             break;
             case 'login':      this.renderLogin(container);                               break;
             case 'register':   this.renderRegister(container);                            break;
             case 'onboarding': this.renderOnboarding(container, parseInt(parts[1]) || 1); break;
@@ -65,6 +66,124 @@ const Router = {
                              (route === '' && tab.dataset.route === 'home');
             tab.classList.toggle('active', isActive);
         });
+    },
+
+    // ── LANDING PAGE ─────────────────────────────────────
+    renderLanding(container) {
+        container.innerHTML = `
+        <div class="landing-screen">
+            <!-- Hero -->
+            <div class="landing-hero">
+                <div class="landing-badge">✨ Novo · Gamificado · Gratuito</div>
+                <div class="landing-logo">⚡ EduQuest</div>
+                <h1 class="landing-headline">Aprenda como um<br><span class="landing-highlight">Herói</span></h1>
+                <p class="landing-sub">Transforme seus estudos em uma aventura épica. Ganhe XP, suba de nível e domine cada matéria.</p>
+                <div class="landing-ctas">
+                    <button class="btn-primary landing-cta-main" onclick="Router.navigate('#register')">
+                        ⚡ Começar Jornada
+                    </button>
+                    <button class="btn-ghost landing-cta-sec" onclick="Router.navigate('#login')">
+                        Já tenho conta →
+                    </button>
+                </div>
+                <div class="landing-preview">
+                    <div class="landing-preview-card">
+                        <div class="lp-hud">
+                            <span class="lp-chip">🔥 7 dias</span>
+                            <span class="lp-chip">⚡ 1250 XP</span>
+                            <span class="lp-chip">💎 48</span>
+                        </div>
+                        <div class="lp-stage-row">
+                            <div class="lp-node done">✓</div>
+                            <div class="lp-connector done"></div>
+                            <div class="lp-node active pulse">3</div>
+                            <div class="lp-connector"></div>
+                            <div class="lp-node locked">🔒</div>
+                        </div>
+                        <div class="lp-mission">
+                            <span class="lp-m-icon">🧬</span>
+                            <div>
+                                <div class="lp-m-title">Vírus vs Bactérias</div>
+                                <div class="lp-m-sub">Missão 3 · Difícil · +150 XP</div>
+                            </div>
+                            <button class="lp-play-btn">JOGAR →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="landing-features">
+                <div class="landing-section-title">Por que EduQuest?</div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎮</div>
+                        <div class="feature-title">Aprendizado gamificado</div>
+                        <div class="feature-desc">Missões, chefões, power-ups e recompensas reais que tornam o estudo viciante.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔥</div>
+                        <div class="feature-title">Sequências diárias</div>
+                        <div class="feature-desc">Mantenha sua sequência de dias e ganhe recompensas exclusivas por consistência.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-title">Ranking & Turmas</div>
+                        <div class="feature-desc">Compita com amigos, crie ou entre em turmas e veja quem sobe mais rápido.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <div class="feature-title">Conteúdo do 7º ao 9º</div>
+                        <div class="feature-desc">Ciências, Matemática, Português, História e muito mais do currículo nacional.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How it works -->
+            <div class="landing-how">
+                <div class="landing-section-title">Como funciona?</div>
+                <div class="how-steps">
+                    <div class="how-step">
+                        <div class="how-step-num">1</div>
+                        <div class="how-step-text">
+                            <div class="how-step-title">Crie seu herói</div>
+                            <div class="how-step-desc">Escolha seu avatar, série e objetivo. Leva 1 minuto.</div>
+                        </div>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-step-num">2</div>
+                        <div class="how-step-text">
+                            <div class="how-step-title">Jogue missões</div>
+                            <div class="how-step-desc">Responda questões em formato de jogo, ganhe estrelas e XP.</div>
+                        </div>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-step-num">3</div>
+                        <div class="how-step-text">
+                            <div class="how-step-title">Evolua e domine</div>
+                            <div class="how-step-desc">Suba de nível, desbloqueie fases e vire o melhor da turma.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social proof -->
+            <div class="landing-social">
+                <div class="social-stat"><span class="social-num">10k+</span><span class="social-label">Estudantes</span></div>
+                <div class="social-divider"></div>
+                <div class="social-stat"><span class="social-num">500+</span><span class="social-label">Questões</span></div>
+                <div class="social-divider"></div>
+                <div class="social-stat"><span class="social-num">4.9 ⭐</span><span class="social-label">Avaliação</span></div>
+            </div>
+
+            <!-- Final CTA -->
+            <div class="landing-final-cta">
+                <button class="btn-primary" style="font-size:1rem;padding:16px 40px" onclick="Router.navigate('#register')">
+                    ⚡ Começar Grátis Agora
+                </button>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">Gratuito · Sem cartão · Para sempre</p>
+            </div>
+        </div>`;
     },
 
     // ── AUTH ─────────────────────────────────────────────
@@ -225,27 +344,40 @@ const Router = {
 
     // ── ONBOARDING ────────────────────────────────────────
     renderOnboarding(container, step) {
+        const AVATARS = ['🦸','🧙','🐉','🦊','🐺','🦁','🐯','🐸','🤖','👾','🦅','🐲'];
         const steps = [
             {
                 emoji: '🎯',
                 title: 'Por que você quer aprender?',
                 sub: 'Isso nos ajuda a personalizar sua experiência',
                 options: [
-                    { icon: '📈', title: 'Melhorar minhas notas',  desc: 'Quero ir bem nas provas',        value: 'grades'   },
-                    { icon: '🏆', title: 'Me preparar para provas', desc: 'Tenho provas importantes',       value: 'exams'    },
-                    { icon: '🧠', title: 'Aprender por curiosidade',desc: 'Gosto de coisas novas',          value: 'curiosity'},
-                    { icon: '⚡', title: 'Superar desafios',         desc: 'Quero ser o melhor da turma',   value: 'compete'  }
+                    { icon: '📈', title: 'Melhorar minhas notas',   desc: 'Quero ir bem nas provas',       value: 'grades'   },
+                    { icon: '🏆', title: 'Me preparar para provas', desc: 'Tenho provas importantes',      value: 'exams'    },
+                    { icon: '🧠', title: 'Aprender por curiosidade',desc: 'Gosto de coisas novas',         value: 'curiosity'},
+                    { icon: '⚡', title: 'Superar desafios',         desc: 'Quero ser o melhor da turma',  value: 'compete'  }
                 ],
                 key: 'goal'
+            },
+            {
+                emoji: '📚',
+                title: 'Qual é o seu ano escolar?',
+                sub: 'Vamos personalizar o conteúdo para você',
+                options: [
+                    { icon: '6️⃣', title: '6º Ano',        desc: 'Ensino Fundamental II', value: '6ano' },
+                    { icon: '7️⃣', title: '7º Ano',        desc: 'Ensino Fundamental II', value: '7ano' },
+                    { icon: '8️⃣', title: '8º Ano',        desc: 'Ensino Fundamental II', value: '8ano' },
+                    { icon: '9️⃣', title: '9º Ano',        desc: 'Ensino Fundamental II', value: '9ano' }
+                ],
+                key: 'grade'
             },
             {
                 emoji: '⏰',
                 title: 'Qual é seu objetivo diário?',
                 sub: 'Pequenos compromissos constroem grandes resultados',
                 options: [
-                    { icon: '🌱', title: '5 minutos',  desc: 'Treino leve — vai devagar',      value: 5  },
-                    { icon: '⚡', title: '10 minutos', desc: 'Ritmo ideal — recomendado',      value: 10 },
-                    { icon: '🔥', title: '15 minutos', desc: 'Modo intenso — vai fundo',        value: 15 }
+                    { icon: '🌱', title: '5 minutos',  desc: 'Treino leve — vai devagar',  value: 5  },
+                    { icon: '⚡', title: '10 minutos', desc: 'Ritmo ideal — recomendado',  value: 10 },
+                    { icon: '🔥', title: '15 minutos', desc: 'Modo intenso — vai fundo',   value: 15 }
                 ],
                 key: 'dailyGoal'
             },
@@ -254,6 +386,12 @@ const Router = {
                 title: 'Como posso te chamar?',
                 sub: 'Seu nome de herói no EduQuest',
                 isName: true, key: 'name'
+            },
+            {
+                emoji: '🎨',
+                title: 'Escolha seu herói!',
+                sub: 'Quem vai representar você nessa aventura?',
+                isAvatar: true, key: 'avatar'
             }
         ];
 
@@ -272,6 +410,16 @@ const Router = {
                     placeholder="Ex: Herói, Alex, Campeão..."
                     style="text-align:center; font-size:1.1rem; font-weight:900;"
                     maxlength="20" value="${this._onboardData.name || ''}">
+            </div>`;
+        } else if (s.isAvatar) {
+            const selected = this._onboardData.avatar || '🦸';
+            contentHTML = `
+            <div class="avatar-picker">
+                ${AVATARS.map(av => `
+                <button class="avatar-option ${av === selected ? 'selected' : ''}"
+                    onclick="Router._onboardSelectAvatar('${av}', this)">
+                    ${av}
+                </button>`).join('')}
             </div>`;
         } else {
             contentHTML = `
@@ -315,7 +463,7 @@ const Router = {
                 const inp = document.getElementById('onboard-name');
                 inp?.focus();
                 inp?.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') Router._finishOnboarding();
+                    if (e.key === 'Enter') Router._onboardNext(step, 'name', true);
                 });
             }, 120);
         }
@@ -329,6 +477,14 @@ const Router = {
         if (typeof SoundManager !== 'undefined') SoundManager.play('click');
     },
 
+    _onboardSelectAvatar(avatar, el) {
+        this._onboardData.avatar = avatar;
+        el.closest('.avatar-picker').querySelectorAll('.avatar-option')
+            .forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        if (typeof SoundManager !== 'undefined') SoundManager.play('click');
+    },
+
     _onboardNext(step, key, isName) {
         if (isName) {
             this._onboardData.name = document.getElementById('onboard-name')?.value?.trim() || '';
@@ -337,9 +493,13 @@ const Router = {
     },
 
     _finishOnboarding() {
-        const name = document.getElementById('onboard-name')?.value?.trim() || 'Herói';
-        this._onboardData.name = name;
-        State.completeOnboarding(this._onboardData.name, this._onboardData.dailyGoal || 10);
+        this._onboardData.avatar = this._onboardData.avatar || '🦸';
+        State.completeOnboarding(
+            this._onboardData.name     || 'Herói',
+            this._onboardData.dailyGoal || 10,
+            this._onboardData.grade    || '7ano',
+            this._onboardData.avatar
+        );
         if (typeof Utils !== 'undefined') Utils.confetti();
         this.navigate('#home');
     },
@@ -350,10 +510,36 @@ const Router = {
         const xpProg   = State.getXPProgress();
         const streak   = State.getUserStreak();
         const chapters = CONFIG.chapters || [];
+        const missions = State.getMissions();
+        const calendar = State.getStreakCalendar();
+
+        // Find the first unlocked-but-incomplete chapter for "Continue" card
+        const activeChapter = chapters.find(ch => {
+            if (!ch.unlocked) return false;
+            const prog = State.getChapterProgress(ch.id);
+            return !prog.completed;
+        }) || chapters[0];
+        const activeProg = activeChapter ? State.getChapterProgress(activeChapter.id) : null;
+
+        const calendarHTML = calendar.map(d => `
+            <div class="streak-day ${d.active ? 'active' : ''} ${d.isToday ? 'today' : ''}">
+                <div class="streak-day-dot">${d.active ? '🔥' : '○'}</div>
+                <div class="streak-day-label">${d.label}</div>
+            </div>`).join('');
+
+        const missionsHTML = missions.map(m => `
+            <div class="daily-mission ${m.completed ? 'done' : ''}">
+                <div class="dm-icon">${m.icon}</div>
+                <div class="dm-body">
+                    <div class="dm-title">${m.title}</div>
+                    <div class="dm-desc">${m.desc}</div>
+                    <div class="dm-rewards"><span>⚡ +${m.xp}</span>${m.gems ? `<span>💎 +${m.gems}</span>` : ''}</div>
+                </div>
+                <div class="dm-check">${m.completed ? '✅' : '⬜'}</div>
+            </div>`).join('');
 
         const chaptersHTML = chapters.map(ch => {
             const prog    = State.getChapterProgress(ch.id);
-            const percent = prog.percent;
             return `
             <div class="chapter-card ${ch.unlocked ? '' : 'locked'}"
                  onclick="${ch.unlocked ? `Router.navigate('#chapter/${ch.id}')` : ''}">
@@ -363,110 +549,76 @@ const Router = {
                     <div class="chapter-title">${ch.title}</div>
                     <div class="chapter-progress-row">
                         <div class="chapter-progress-track">
-                            <div class="chapter-progress-fill" style="width:${percent}%"></div>
+                            <div class="chapter-progress-fill" style="width:${prog.percent}%"></div>
                         </div>
-                        <span class="chapter-percent">${percent}%</span>
+                        <span class="chapter-percent">${prog.percent}%</span>
                     </div>
                 </div>
                 <div class="chapter-arrow">${ch.unlocked ? '›' : '🔒'}</div>
             </div>`;
         }).join('');
 
-        const questsHTML = `
-        <div class="quests-panel">
-            <div class="quest-item">
-                <span class="quest-icon">📚</span>
-                <div class="quest-body">
-                    <div class="quest-title">Complete uma missão hoje</div>
-                    <div class="quest-reward">+50 ⚡ · +10 💎</div>
-                    <div class="quest-track"><div class="quest-fill" style="width:0%"></div></div>
-                </div>
-                <span class="quest-check">⬜</span>
-            </div>
-            <div class="quest-item">
-                <span class="quest-icon">🔥</span>
-                <div class="quest-body">
-                    <div class="quest-title">Mantenha sua sequência</div>
-                    <div class="quest-reward">+${CONFIG.gems.dailyStreak} 💎</div>
-                    <div class="quest-track"><div class="quest-fill" style="width:${streak > 0 ? 100 : 0}%"></div></div>
-                </div>
-                <span class="quest-check">${streak > 0 ? '✅' : '⬜'}</span>
-            </div>
-            <div class="quest-item">
-                <span class="quest-icon">⚡</span>
-                <div class="quest-body">
-                    <div class="quest-title">Acerte 5 questões seguidas</div>
-                    <div class="quest-reward">+25 ⚡</div>
-                    <div class="quest-track"><div class="quest-fill" style="width:0%"></div></div>
-                </div>
-                <span class="quest-check">⬜</span>
-            </div>
-        </div>`;
-
         container.innerHTML = `
         <div class="screen screen-home">
-            <div class="home-hero">
-                <div class="hero-text">
-                    <h1>Olá, ${user.name}! 👋</h1>
-                    <p>Continue sua jornada épica</p>
+
+            <!-- Greeting -->
+            <div class="home-greeting">
+                <div class="home-greeting-text">
+                    <div class="home-greeting-hi">Olá, ${user.name}! 👋</div>
+                    <div class="home-greeting-sub">Nível ${user.level} · ${xpProg.current}/${xpProg.needed} XP</div>
                 </div>
-                <div class="hero-avatar">🦸</div>
+                <div class="home-greeting-avatar" onclick="Router.navigate('#profile')">${user.avatar || '🦸'}</div>
             </div>
 
-            <div class="xp-level-card">
-                <div class="xp-level-row">
-                    <span class="level-badge">⚡ Nível ${user.level}</span>
-                    <span class="xp-text-small">${xpProg.current} / ${xpProg.needed} XP</span>
-                </div>
-                <div class="xp-track">
-                    <div class="xp-fill" style="width:${xpProg.percent}%"></div>
-                </div>
+            <!-- XP bar -->
+            <div class="home-xp-bar">
+                <div class="home-xp-fill" style="width:${xpProg.percent}%"></div>
             </div>
 
-            ${streak > 0 ? `
-            <div class="streak-banner">
-                <div class="streak-flame">🔥</div>
-                <div class="streak-info">
-                    <span class="streak-count">${streak} ${streak === 1 ? 'dia' : 'dias'} seguidos!</span>
-                    <span class="streak-sub">Continue amanhã para manter a sequência</span>
+            <!-- Continue Journey -->
+            ${activeChapter ? `
+            <div class="continue-card" onclick="Router.navigate('#chapter/${activeChapter.id}')">
+                <div class="continue-top">
+                    <div class="continue-badge">▶ CONTINUAR</div>
+                    <div class="continue-subject">${activeChapter.subject} · ${activeChapter.grade}</div>
                 </div>
-                <span class="streak-gems">+${CONFIG.gems.dailyStreak} 💎</span>
+                <div class="continue-body">
+                    <div class="continue-icon">${activeChapter.icon}</div>
+                    <div class="continue-info">
+                        <div class="continue-title">${activeChapter.title}</div>
+                        <div class="continue-progress-row">
+                            <div class="continue-track">
+                                <div class="continue-fill" style="width:${activeProg.percent}%"></div>
+                            </div>
+                            <span class="continue-pct">${activeProg.percent}%</span>
+                        </div>
+                    </div>
+                </div>
             </div>` : ''}
 
-            <div class="section-header">
-                <span class="section-title">🎯 Missões de Hoje</span>
+            <!-- Streak Calendar -->
+            <div class="streak-calendar-wrap">
+                <div class="streak-cal-header">
+                    <span class="streak-cal-title">🔥 ${streak} ${streak === 1 ? 'dia' : 'dias'} seguidos</span>
+                    <span class="streak-cal-sub">Mantenha a sequência!</span>
+                </div>
+                <div class="streak-calendar">${calendarHTML}</div>
             </div>
-            ${questsHTML}
 
+            <!-- Daily Missions -->
             <div class="section-header">
-                <span class="section-title">📚 Suas Matérias</span>
-                <a href="#missions" class="section-link" onclick="Router.navigate('#missions')">Ver todas ›</a>
+                <span class="section-title">⚡ Missões do Dia</span>
+                <span class="section-badge">${missions.filter(m=>m.completed).length}/${missions.length}</span>
+            </div>
+            <div class="daily-missions-list">${missionsHTML}</div>
+
+            <!-- Chapters -->
+            <div class="section-header mt-4">
+                <span class="section-title">📚 Matérias</span>
+                <span class="section-link" onclick="Router.navigate('#missions')" style="cursor:pointer">Ver todas ›</span>
             </div>
             ${chaptersHTML}
 
-            <div class="section-header mt-4">
-                <span class="section-title">🏆 Sua Jornada</span>
-            </div>
-            <div class="xp-level-card">
-                <div style="display:flex; gap:var(--sp-5); justify-content:space-around; flex-wrap:wrap;">
-                    <div style="text-align:center;">
-                        <div style="font-size:1.4rem;font-weight:900;color:var(--brand)">${user.xp}</div>
-                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;text-transform:uppercase">XP Total</div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div style="font-size:1.4rem;font-weight:900;color:#0369a1">${user.gems}</div>
-                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;text-transform:uppercase">Gemas</div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div style="font-size:1.4rem;font-weight:900;color:#c2410c">${streak}</div>
-                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;text-transform:uppercase">Sequência</div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div style="font-size:1.4rem;font-weight:900;color:var(--success)">${user.level}</div>
-                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;text-transform:uppercase">Nível</div>
-                    </div>
-                </div>
-            </div>
         </div>`;
     },
 

@@ -4,11 +4,11 @@
  */
 
 const State = {
-    SCHEMA_VERSION: 6,
+    SCHEMA_VERSION: 7,
     LS_KEY: 'eduquest_v5',
 
     data: {
-        schemaVersion: 6,
+        schemaVersion: 7,
         user: {
             name:         'Herói',
             level:        1,
@@ -26,8 +26,12 @@ const State = {
             isPremium:    false,
             premiumUntil: null,
             theme:        'light',
+            // v4 additions
+            avatar:       '🦸',
+            grade:        '7ano',
         },
-        progress: {}
+        progress: {},
+        dailyMissions: { date: null, completed: [] },
     },
 
     _syncTimer:  null,
@@ -64,9 +68,9 @@ const State = {
                     await this._loadFromCloud(session.user.id);
                     this.save();
                     this.updateHUD();
-                    // If on login/register page, navigate home
+                    // If on auth/landing page, navigate home
                     const r = window.location.hash.replace('#', '').split('/')[0];
-                    if (r === 'login' || r === 'register' || r === '') {
+                    if (r === 'landing' || r === 'login' || r === 'register' || r === '') {
                         Router.navigate(this.data.user.onboarded ? '#home' : '#onboarding/1');
                     }
                 } else if (event === 'SIGNED_OUT') {
@@ -85,16 +89,18 @@ const State = {
         // Never wipe — always merge, adding new fields with defaults
         if (parsed.user) {
             this.data.user = {
-                ...this.data.user,          // defaults for new fields
-                ...parsed.user,             // existing saved values
-                // Force new fields to have safe defaults if missing
+                ...this.data.user,
+                ...parsed.user,
                 uid:          parsed.user.uid          ?? null,
                 isPremium:    parsed.user.isPremium     ?? false,
                 premiumUntil: parsed.user.premiumUntil  ?? null,
                 theme:        parsed.user.theme         ?? 'light',
+                avatar:       parsed.user.avatar        ?? '🦸',
+                grade:        parsed.user.grade         ?? '7ano',
             };
         }
         this.data.progress      = parsed.progress || {};
+        this.data.dailyMissions = parsed.dailyMissions || { date: null, completed: [] };
         this.data.schemaVersion = this.SCHEMA_VERSION;
     },
 
@@ -129,6 +135,8 @@ const State = {
             is_premium:    u.isPremium,
             premium_until: u.premiumUntil,
             onboarded:     u.onboarded,
+            avatar:        u.avatar,
+            grade:         u.grade,
         });
         this._syncBusy = false;
     },
@@ -155,6 +163,8 @@ const State = {
                 isPremium:    profile.is_premium     || u.isPremium,
                 premiumUntil: profile.premium_until  || u.premiumUntil,
                 onboarded:    profile.onboarded      || u.onboarded,
+                avatar:       profile.avatar         || u.avatar,
+                grade:        profile.grade          || u.grade,
             });
         }
 
@@ -290,6 +300,55 @@ const State = {
         for (const [id, val] of Object.entries(map)) {
             const el = document.getElementById(id); if (el) el.textContent = val;
         }
+        const avatarEl = document.getElementById('hud-avatar-btn');
+        if (avatarEl) avatarEl.textContent = u.avatar || '🦸';
+    },
+
+    // ── DAILY MISSIONS ───────────────────────────────────────
+    getMissions() {
+        const today = new Date().toDateString();
+        if (!this.data.dailyMissions || this.data.dailyMissions.date !== today) {
+            this.data.dailyMissions = { date: today, completed: [] };
+        }
+        const pool = [
+            { id: 'complete_stage', icon: '⚔️', title: 'Complete uma missão',  desc: 'Termine qualquer fase hoje',    xp: 100, gems: 15 },
+            { id: 'streak_day',     icon: '🔥', title: 'Sequência mantida',    desc: 'Jogue pelo menos 1x hoje',      xp: 50,  gems: 5  },
+            { id: 'perfect_score',  icon: '⭐', title: 'Pontuação perfeita',   desc: 'Acerte tudo em uma fase',       xp: 150, gems: 20 },
+            { id: 'combo_5',        icon: '⚡', title: 'Combo devastador',     desc: 'Acerte 5 seguidas',             xp: 75,  gems: 10 },
+            { id: 'earn_gems',      icon: '💎', title: 'Caça gemas',           desc: 'Ganhe 10+ gemas hoje',          xp: 50,  gems: 0  },
+            { id: 'fast_answer',    icon: '⏱️', title: 'Raio',                desc: 'Responda em menos de 5s',       xp: 75,  gems: 10 },
+            { id: 'hard_mode',      icon: '💀', title: 'Desafio difícil',      desc: 'Complete uma fase difícil',     xp: 200, gems: 25 },
+        ];
+        const seed = today.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+        const picks = [];
+        const used  = new Set();
+        for (let i = 0; picks.length < 3 && i < pool.length * 2; i++) {
+            const idx = (seed + i * 3) % pool.length;
+            if (!used.has(idx)) { used.add(idx); picks.push({ ...pool[idx] }); }
+        }
+        return picks.map(m => ({ ...m, completed: this.data.dailyMissions.completed.includes(m.id) }));
+    },
+
+    completeMission(missionId) {
+        const today = new Date().toDateString();
+        if (!this.data.dailyMissions || this.data.dailyMissions.date !== today) {
+            this.data.dailyMissions = { date: today, completed: [] };
+        }
+        if (!this.data.dailyMissions.completed.includes(missionId)) {
+            this.data.dailyMissions.completed.push(missionId);
+            this.save();
+        }
+    },
+
+    getStreakCalendar() {
+        const today  = new Date();
+        const streak = Math.min(this.data.user.streak || 0, 7);
+        const labels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+        return Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(today);
+            d.setDate(d.getDate() - (6 - i));
+            return { label: labels[d.getDay()], active: i >= (7 - streak), isToday: i === 6 };
+        });
     },
 
     // ── THEME ────────────────────────────────────────────────
@@ -328,7 +387,7 @@ const State = {
         this.data.user.authenticated = false;
         this.data.user.uid           = null;
         this.save();
-        if (typeof Router !== 'undefined') Router.navigate('#login');
+        if (typeof Router !== 'undefined') Router.navigate('#landing');
     },
 
     // Legacy fallback (dev/offline)
@@ -350,9 +409,11 @@ const State = {
     },
 
     // ── ONBOARDING ────────────────────────────────────────────
-    completeOnboarding(name, dailyGoal) {
-        this.data.user.name      = name || 'Herói';
+    completeOnboarding(name, dailyGoal, grade, avatar) {
+        this.data.user.name      = name      || 'Herói';
         this.data.user.dailyGoal = dailyGoal || 10;
+        this.data.user.grade     = grade     || '7ano';
+        this.data.user.avatar    = avatar    || '🦸';
         this.data.user.onboarded = true;
         this.save();
     },
