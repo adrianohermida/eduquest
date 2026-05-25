@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     State.init();
+    if (typeof IconSystem !== 'undefined') {
+        IconSystem.init();
+        IconSystem.upgradeHUD();
+        IconSystem.upgradeNav();
+    }
     if (typeof SoundManager !== 'undefined') SoundManager.init();
     if (typeof Sidebar !== 'undefined') Sidebar.init();
     if (typeof HUD !== 'undefined') HUD.init();
