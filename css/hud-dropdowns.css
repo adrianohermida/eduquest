@@ -748,3 +748,188 @@
 @media (max-height: 600px) {
     .hdd-notif-list { max-height: 180px; }
 }
+
+/* ── DISCIPLINE SELECTOR CHIP ──────────────────────────────── */
+
+.hud-disc-wrap { display: none; } /* hidden by default; shown via JS when chapter active */
+
+.hud-disc-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: var(--brand-light);
+    color: var(--brand);
+    border: 1.5px solid rgba(249, 115, 22, 0.22);
+    border-radius: var(--r-full);
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
+    height: 32px;
+    font-family: var(--font);
+    outline: none;
+}
+.hud-disc-chip:hover  { background: rgba(249,115,22,0.18); border-color: rgba(249,115,22,0.4); }
+.hud-disc-chip:active { transform: scale(0.96); }
+.hud-disc-chip:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+
+/* Discipline dropdown — anchored left-aligned (not right) */
+#hud-dd-discipline {
+    left: 0;
+    right: auto;
+    transform-origin: top left;
+}
+
+/* ── DISCIPLINE DROPDOWN ITEMS ─────────────────────────────── */
+
+.hdd-disc-list {
+    padding: 4px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hdd-disc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--r-md);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font);
+    transition: background var(--dur-fast);
+    color: var(--text);
+}
+.hdd-disc-item:hover         { background: var(--surface-3); }
+.hdd-disc-item.hdd-disc-active { background: var(--brand-light); }
+.hdd-disc-item.hdd-disc-soon { opacity: 0.5; cursor: default; }
+
+.hdd-disc-icon  { font-size: 1.2rem; flex-shrink: 0; }
+.hdd-disc-info  { flex: 1; min-width: 0; }
+.hdd-disc-name  { font-size: 0.82rem; font-weight: 800; color: var(--text); }
+.hdd-disc-grade { font-size: 0.66rem; font-weight: 700; color: var(--text-muted); }
+.hdd-disc-check { font-size: 0.85rem; color: var(--brand); font-weight: 900; flex-shrink: 0; }
+.hdd-disc-soon-chip {
+    font-size: 0.55rem; font-weight: 900;
+    background: var(--surface-3); color: var(--text-muted);
+    border-radius: var(--r-full); padding: 2px 6px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+
+/* ── MUTE TOGGLE (in notification footer) ──────────────────── */
+
+.hdd-notif-footer {
+    padding: 6px 10px 10px;
+}
+
+.hdd-mute-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface-3);
+    border: none;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    width: 100%;
+    font-family: var(--font);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text);
+    transition: background var(--dur-fast);
+}
+.hdd-mute-toggle:hover { background: var(--surface-2); }
+
+.hdd-mute-badge {
+    margin-left: auto;
+    font-size: 0.58rem;
+    font-weight: 900;
+    background: #dcfce7;
+    color: #16a34a;
+    border-radius: var(--r-full);
+    padding: 2px 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+.hdd-mute-badge.muted {
+    background: var(--surface-2);
+    color: var(--text-muted);
+}
+
+/* ── MISSÃO ATUAL — Right Panel Section ───────────────────── */
+
+.rp-mission-cur-section {
+    border-radius: var(--r-lg);
+    background: linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(249,115,22,0.04) 100%);
+    border: 1.5px solid rgba(249,115,22,0.18);
+    padding: var(--sp-3);
+    margin-bottom: var(--sp-4);
+}
+
+.rp-mission-cur-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-2);
+}
+
+.rp-mission-cur-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-decoration: none;
+    color: inherit;
+    padding: var(--sp-3);
+    background: var(--surface);
+    border-radius: var(--r-md);
+    box-shadow: 0 2px 8px rgba(249,115,22,0.10);
+    border: 1px solid rgba(249,115,22,0.12);
+    transition: box-shadow var(--dur-fast), transform 0.15s;
+}
+.rp-mission-cur-card:hover {
+    box-shadow: 0 4px 14px rgba(249,115,22,0.18);
+    transform: translateY(-1px);
+}
+
+.rp-mission-cur-meta {
+    font-size: 0.58rem;
+    font-weight: 900;
+    color: var(--brand);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1px;
+}
+
+.rp-mission-cur-title {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.rp-mission-cur-sub {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+.rp-mission-cur-action {
+    margin-top: var(--sp-2);
+    font-size: 0.76rem;
+    font-weight: 900;
+    color: var(--brand);
+}
+
+/* ── RESPONSIVE: hide discipline on mobile ─────────────────── */
+@media (max-width: 767px) {
+    .hud-disc-wrap { display: none !important; }
+}

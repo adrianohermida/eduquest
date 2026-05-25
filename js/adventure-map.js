@@ -1,142 +1,103 @@
 /**
- * EDUQUEST WORLD MAP ENGINE v2.0
- * An exploreable educational world — biomes, organic paths, ambient life.
- * Architecture: static world render once → only character+UI update per frame.
+ * EDUQUEST WORLD MAP ENGINE v3.0
+ * Top-to-bottom progression, attack animations, auto-walk, Web Audio synthesis.
+ * Renders within app-container — HUD and sidebar stay visible on desktop/tablet.
  */
 
 const AdventureMap = {
 
-    // ── WORLD DIMENSIONS ─────────────────────────────────────────
     WORLD_W: 440,
     WORLD_H: 2700,
 
-    // ── STAGE POSITIONS [xPercent, worldY] — bottom→top ─────────
-    // Organic zigzag layout: stages meander up the world
+    // Stage 1 at TOP (y≈180), final boss at BOTTOM (y≈2530)
     _stagePositions: [
-        [50,  2520],  //  1 — Forest of Origin (center)
-        [26,  2330],  //  2 — (left)
-        [68,  2150],  //  3 — (right)
-        [22,  1970],  //  4 — (far left)
-        [60,  1800],  //  5 — Village (right)
-        [78,  1620],  //  6 — (far right)
-        [28,  1440],  //  7 — Lab (left)
-        [64,  1260],  //  8 — (right)
-        [32,  1080],  //  9 — Tower (left)
-        [58,   900],  // 10 — (right)
-        [50,   660],  // 11 — BOSS (center dramatic)
-        [50,   380],  // 12 — FINAL (center triumphant)
+        [50,  180],  //  1 — Forest of Origin (center, top)
+        [28,  380],  //  2 — (left)
+        [72,  580],  //  3 — (right)
+        [22,  790],  //  4 — (far left)
+        [65,  990],  //  5 — Village (right)
+        [30, 1170],  //  6 — (left)
+        [68, 1370],  //  7 — Lab (right)
+        [28, 1570],  //  8 — (left)
+        [62, 1770],  //  9 — Tower (right)
+        [36, 1970],  // 10 — (left)
+        [50, 2210],  // 11 — BOSS (center dramatic)
+        [50, 2540],  // 12 — FINAL (center triumphant)
     ],
 
-    // ── BIOMES ───────────────────────────────────────────────────
+    // Biomes top → bottom (forest=start at top, citadel=end at bottom)
     _biomes: [
-        {
-            top: 0, bottom: 550,
-            id: 'citadel',
-            name: 'Cidadela Final',
-            icon: '🏰',
-            bg1: '#fffbeb', bg2: '#fef3c7',
-        },
-        {
-            top: 550, bottom: 1100,
-            id: 'tower',
-            name: 'Torre do Saber',
-            icon: '🔮',
-            bg1: '#f5f3ff', bg2: '#ede9fe',
-        },
-        {
-            top: 1100, bottom: 1680,
-            id: 'lab',
-            name: 'Laboratório Arcano',
-            icon: '🧪',
-            bg1: '#f0f9ff', bg2: '#e0f2fe',
-        },
-        {
-            top: 1680, bottom: 2250,
-            id: 'village',
-            name: 'Aldeia do Saber',
-            icon: '🏡',
-            bg1: '#f7fef4', bg2: '#f0fdf4',
-        },
-        {
-            top: 2250, bottom: 2700,
-            id: 'forest',
-            name: 'Floresta de Início',
-            icon: '🌿',
-            bg1: '#fafdf8', bg2: '#f7fee7',
-        },
+        { top:    0, bottom:  450, id: 'forest',  name: 'Floresta de Início',  icon: '🌿', bg1: '#fafdf8', bg2: '#f7fee7' },
+        { top:  450, bottom: 1020, id: 'village', name: 'Aldeia do Saber',      icon: '🏡', bg1: '#f7fef4', bg2: '#f0fdf4' },
+        { top: 1020, bottom: 1590, id: 'lab',     name: 'Laboratório Arcano',   icon: '🧪', bg1: '#f0f9ff', bg2: '#e0f2fe' },
+        { top: 1590, bottom: 2160, id: 'tower',   name: 'Torre do Saber',       icon: '🔮', bg1: '#f5f3ff', bg2: '#ede9fe' },
+        { top: 2160, bottom: 2700, id: 'citadel', name: 'Cidadela Final',       icon: '🏰', bg1: '#fffbeb', bg2: '#fef3c7' },
     ],
 
-    // ── WORLD DECORATIONS ────────────────────────────────────────
     _decorations: [
-        // Forest zone
-        { x:  7, y: 2640, emoji: '🌲', cls: 'wm-deco-tree'  },
-        { x: 86, y: 2680, emoji: '🌳', cls: 'wm-deco-tree'  },
-        { x: 14, y: 2480, emoji: '🍄', cls: 'wm-deco-small' },
-        { x: 82, y: 2520, emoji: '🌸', cls: 'wm-deco-small wm-float' },
-        { x:  8, y: 2360, emoji: '🦋', cls: 'wm-deco-small wm-float' },
-        { x: 88, y: 2400, emoji: '🌿', cls: 'wm-deco-small' },
-        { x: 40, y: 2580, emoji: '🪨', cls: 'wm-deco-rock'  },
-
-        // Village zone
-        { x:  9, y: 2200, emoji: '🏠',    cls: 'wm-deco-building' },
-        { x: 84, y: 2170, emoji: '🌻',    cls: 'wm-deco-tree'     },
-        { x: 10, y: 1970, emoji: '🧑‍🌾',  cls: 'wm-deco-npc', label: 'Aldeão'  },
-        { x: 85, y: 1840, emoji: '🛖',    cls: 'wm-deco-building' },
-        { x: 38, y: 1720, emoji: '🌾',    cls: 'wm-deco-small'    },
-        { x: 88, y: 1700, emoji: '🐓',    cls: 'wm-deco-small wm-float' },
-
-        // Lab zone
-        { x:  8, y: 1640, emoji: '🧪',    cls: 'wm-deco-building' },
-        { x: 86, y: 1580, emoji: '🔬',    cls: 'wm-deco-building' },
-        { x: 12, y: 1380, emoji: '👩‍🔬',  cls: 'wm-deco-npc', label: 'Cientista' },
-        { x: 84, y: 1200, emoji: '⚗️',    cls: 'wm-deco-building' },
-        { x: 50, y: 1120, emoji: '🔭',    cls: 'wm-deco-small'    },
-        { x: 10, y: 1120, emoji: '💡',    cls: 'wm-deco-small wm-pulse' },
-
-        // Tower zone
-        { x:  8, y: 1060, emoji: '💠',    cls: 'wm-deco-crystal wm-pulse' },
-        { x: 87, y: 980,  emoji: '🔮',    cls: 'wm-deco-crystal wm-pulse' },
-        { x: 10, y: 780,  emoji: '🧙',    cls: 'wm-deco-npc', label: 'Mago Sábio' },
-        { x: 84, y: 720,  emoji: '✨',    cls: 'wm-deco-small wm-float' },
-        { x: 35, y: 580,  emoji: '📚',    cls: 'wm-deco-building' },
-        { x: 88, y: 570,  emoji: '🌟',    cls: 'wm-deco-small wm-float' },
-
-        // Citadel zone
-        { x: 12, y: 510, emoji: '🚩',    cls: 'wm-deco-small'    },
-        { x: 80, y: 490, emoji: '🏰',    cls: 'wm-deco-building' },
-        { x: 10, y: 300, emoji: '👑',    cls: 'wm-deco-npc', label: 'Rei do Saber' },
-        { x: 85, y: 250, emoji: '⭐',    cls: 'wm-deco-crystal wm-float' },
-        { x: 50, y: 140, emoji: '🎓',    cls: 'wm-deco-crystal wm-pulse' },
+        // Forest zone (y 0–450)
+        { x:  7, y: 100, emoji: '🌲', cls: 'wm-deco-tree' },
+        { x: 86, y:  80, emoji: '🌳', cls: 'wm-deco-tree' },
+        { x: 14, y: 290, emoji: '🍄', cls: 'wm-deco-small' },
+        { x: 82, y: 260, emoji: '🌸', cls: 'wm-deco-small wm-float' },
+        { x:  8, y: 380, emoji: '🦋', cls: 'wm-deco-small wm-float' },
+        { x: 88, y: 350, emoji: '🌿', cls: 'wm-deco-small' },
+        { x: 42, y: 160, emoji: '🪨', cls: 'wm-deco-rock' },
+        // Village zone (y 450–1020)
+        { x:  9, y: 520, emoji: '🏠',   cls: 'wm-deco-building' },
+        { x: 84, y: 490, emoji: '🌻',   cls: 'wm-deco-tree' },
+        { x: 10, y: 720, emoji: '🧑‍🌾', cls: 'wm-deco-npc', label: 'Aldeão' },
+        { x: 85, y: 790, emoji: '🛖',   cls: 'wm-deco-building' },
+        { x: 38, y: 920, emoji: '🌾',   cls: 'wm-deco-small' },
+        { x: 88, y: 950, emoji: '🐓',   cls: 'wm-deco-small wm-float' },
+        // Lab zone (y 1020–1590)
+        { x:  8, y: 1090, emoji: '🧪',   cls: 'wm-deco-building' },
+        { x: 86, y: 1070, emoji: '🔬',   cls: 'wm-deco-building' },
+        { x: 12, y: 1290, emoji: '👩‍🔬', cls: 'wm-deco-npc', label: 'Cientista' },
+        { x: 84, y: 1440, emoji: '⚗️',   cls: 'wm-deco-building' },
+        { x: 50, y: 1510, emoji: '🔭',   cls: 'wm-deco-small' },
+        { x: 10, y: 1545, emoji: '💡',   cls: 'wm-deco-small wm-pulse' },
+        // Tower zone (y 1590–2160)
+        { x:  8, y: 1660, emoji: '💠',   cls: 'wm-deco-crystal wm-pulse' },
+        { x: 87, y: 1710, emoji: '🔮',   cls: 'wm-deco-crystal wm-pulse' },
+        { x: 10, y: 1870, emoji: '🧙',   cls: 'wm-deco-npc', label: 'Mago Sábio' },
+        { x: 84, y: 1955, emoji: '✨',   cls: 'wm-deco-small wm-float' },
+        { x: 35, y: 2080, emoji: '📚',   cls: 'wm-deco-building' },
+        { x: 88, y: 2110, emoji: '🌟',   cls: 'wm-deco-small wm-float' },
+        // Citadel zone (y 2160–2700)
+        { x: 12, y: 2230, emoji: '🚩',   cls: 'wm-deco-small' },
+        { x: 80, y: 2200, emoji: '🏰',   cls: 'wm-deco-building' },
+        { x: 10, y: 2370, emoji: '👑',   cls: 'wm-deco-npc', label: 'Rei do Saber' },
+        { x: 85, y: 2460, emoji: '⭐',   cls: 'wm-deco-crystal wm-float' },
+        { x: 50, y: 2630, emoji: '🎓',   cls: 'wm-deco-crystal wm-pulse' },
     ],
 
-    // ── STATE ─────────────────────────────────────────────────────
-    chapterId:    null,
-    stages:       [],
-    nearStageIdx: -1,
-    running:      false,
-    rafId:        null,
-    _walkTimer:   null,
+    // ── STATE ────────────────────────────────────────────────────
+    chapterId:     null,
+    stages:        [],
+    nearStageIdx:  -1,
+    _labelNearIdx: -1,
+    running:       false,
+    rafId:         null,
+    _walkTimer:    null,
     _currentBiome: '',
 
-    world: {
-        charX: 220, charY: 2480,
-        targetX: null, targetY: null,
-        speed: 3.2,
-        facing: 1,  // 1=right, -1=left
+    world: { charX: 220, charY: 140, speed: 3.2, facing: 1 },
+
+    _autoWalk: {
+        active: false, fromX: 0, fromY: 0, toX: 0, toY: 0,
+        progress: 0, duration: 1400, startTime: 0, stepTimer: 0,
     },
 
     keys: { up: false, down: false, left: false, right: false },
 
     _boundKeyDown: null,
     _boundKeyUp:   null,
-    _boundClick:   null,
-    _boundTouch:   null,
+    _audioCtx:     null,
+    _charEl:       null,
+    _zoneEl:       null,
 
-    _charEl:   null,
-    _interEl:  null,
-    _zoneEl:   null,
-
-    // ── ENTRY POINT ───────────────────────────────────────────────
+    // ── ENTRY POINT ──────────────────────────────────────────────
     start(chapterId) {
         if (this.running) {
             this.running = false;
@@ -147,15 +108,17 @@ const AdventureMap = {
             window.removeEventListener('keyup',   this._boundKeyUp);
         }
 
-        this.chapterId    = chapterId;
-        this.nearStageIdx = -1;
-        Object.assign(this.keys, { up:false, down:false, left:false, right:false });
+        this.chapterId     = chapterId;
+        this.nearStageIdx  = -1;
+        this._labelNearIdx = -1;
+        this._autoWalk.active = false;
+        Object.assign(this.keys, { up: false, down: false, left: false, right: false });
 
         const meta = window.CHAPTER_METADATA;
         if (!meta) { Router.navigate(`#chapter/${chapterId}`); return; }
 
         this.stages = (meta.stages || []).map((s, i) => {
-            const pos  = this._stagePositions[i] || [50, this.WORLD_H - (i + 1) * 220];
+            const pos  = this._stagePositions[i] || [50, (i + 1) * 220];
             const data = window[s.varName] || {};
             return {
                 id:        s.id,
@@ -171,141 +134,110 @@ const AdventureMap = {
             };
         });
 
-        // Place character near first active stage
+        // Place character near first active (unlocked but incomplete) stage
         const firstActive = this.stages.find(s => s.unlocked && !s.completed) || this.stages[0];
         if (firstActive) {
             this.world.charX = (firstActive.xPct / 100) * this.WORLD_W;
-            this.world.charY = firstActive.worldY + 80;
+            this.world.charY = firstActive.worldY - 55;
+        } else {
+            this.world.charX = 220;
+            this.world.charY = 120;
         }
-        this.world.targetX = null;
-        this.world.targetY = null;
 
-        document.getElementById('top-hud')?.classList.add('hidden');
+        // Mark app-container so CSS can make it a proper flex scroll host
+        const container = document.getElementById('app-container');
+        if (container) container.classList.add('wm-host');
+
         document.getElementById('bottom-nav')?.classList.add('hidden');
 
         this._renderWorld();
         this._bindEvents();
         this.running = true;
         this._loop();
-        // Smooth scroll to character
         requestAnimationFrame(() => this._scrollToChar(true));
     },
 
-    // ── WORLD RENDER (once) ───────────────────────────────────────
+    // ── WORLD RENDER ─────────────────────────────────────────────
     _renderWorld() {
         const app = document.getElementById('app-container');
         const W   = this.WORLD_W;
         const H   = this.WORLD_H;
         const u   = State.data.user;
-
-        const biomesHTML    = this._buildBiomes();
-        const decoHTML      = this._buildDecorations();
-        const pathsSVG      = this._buildPathsSVG();
-        const nodesHTML     = this._buildNodes();
-        const charAvatar    = u.avatar || '🦸';
         const starsProgress = this.stages.filter(s => s.completed).length;
 
         app.innerHTML = `
 <div class="wm-wrap" id="wm-wrap">
 
-    <!-- MINIMAL WORLD HUD -->
-    <header class="wm-hud" id="wm-hud" role="banner">
-        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mundo">
-            <span aria-hidden="true">←</span>
-        </button>
+    <div class="wm-topstrip" id="wm-topstrip">
+        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mapa">←</button>
         <div class="wm-zone-pill" id="wm-zone-pill">
             <span class="wm-zone-icon" id="wm-zone-icon">🌿</span>
             <span class="wm-zone-name" id="wm-zone-name">Floresta de Início</span>
         </div>
-        <div class="wm-hud-stats" role="status" aria-label="Progresso">
-            <div class="wm-stat-chip">⚡ ${u.level}</div>
+        <div class="wm-hud-stats">
+            <div class="wm-stat-chip">⚡ ${u.level || 1}</div>
             <div class="wm-stat-chip">⭐ ${starsProgress}/${this.stages.length}</div>
         </div>
-    </header>
+    </div>
 
-    <!-- SCROLLABLE WORLD VIEWPORT -->
     <div class="wm-viewport" id="wm-viewport" role="main">
         <div class="wm-world" id="wm-world" style="width:${W}px;height:${H}px">
 
-            <!-- Biome layers -->
-            ${biomesHTML}
+            ${this._buildBiomes()}
+            ${this._buildPathsSVG()}
+            ${this._buildDecorations()}
+            ${this._buildNodes()}
+            ${this._buildLabels()}
 
-            <!-- Organic SVG paths -->
-            ${pathsSVG}
-
-            <!-- World decorations -->
-            ${decoHTML}
-
-            <!-- Stage nodes -->
-            ${nodesHTML}
-
-            <!-- Player character -->
             <div class="wm-char" id="wm-char"
                  style="left:${this.world.charX}px;top:${this.world.charY}px"
-                 aria-label="Seu personagem">${charAvatar}</div>
+                 aria-label="Seu personagem">${u.avatar || '🦸'}</div>
 
         </div>
     </div>
 
-    <!-- INTERACT PANEL (shown near unlocked stage) -->
-    <div class="wm-interact hidden" id="wm-interact" role="dialog" aria-live="polite">
-        <div class="wm-interact-inner">
-            <div class="wm-interact-meta" id="wm-interact-meta">⚔️ MISSÃO</div>
-            <div class="wm-interact-title" id="wm-interact-title">Missão</div>
-            <div class="wm-interact-stars" id="wm-interact-stars"></div>
-            <button class="wm-enter-btn" onclick="AdventureMap.interactWithNear()">
-                Entrar <span class="wm-enter-arrow">→</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- D-PAD (touch/gamepad, hidden on hover-capable devices) -->
     <div class="wm-dpad" role="group" aria-label="Controles de movimento">
         <button class="wm-dpad-btn wm-dpad-up"
             ontouchstart="AdventureMap.dpad('up',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('up',false)"
             onmousedown="AdventureMap.dpad('up',true)"
             onmouseup="AdventureMap.dpad('up',false)"
-            onmouseleave="AdventureMap.dpad('up',false)"
-            aria-label="Mover para cima">↑</button>
+            onmouseleave="AdventureMap.dpad('up',false)">↑</button>
         <button class="wm-dpad-btn wm-dpad-left"
             ontouchstart="AdventureMap.dpad('left',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('left',false)"
             onmousedown="AdventureMap.dpad('left',true)"
             onmouseup="AdventureMap.dpad('left',false)"
-            onmouseleave="AdventureMap.dpad('left',false)"
-            aria-label="Mover para esquerda">←</button>
+            onmouseleave="AdventureMap.dpad('left',false)">←</button>
         <button class="wm-dpad-btn wm-dpad-right"
             ontouchstart="AdventureMap.dpad('right',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('right',false)"
             onmousedown="AdventureMap.dpad('right',true)"
             onmouseup="AdventureMap.dpad('right',false)"
-            onmouseleave="AdventureMap.dpad('right',false)"
-            aria-label="Mover para direita">→</button>
+            onmouseleave="AdventureMap.dpad('right',false)">→</button>
         <button class="wm-dpad-btn wm-dpad-down"
             ontouchstart="AdventureMap.dpad('down',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('down',false)"
             onmousedown="AdventureMap.dpad('down',true)"
             onmouseup="AdventureMap.dpad('down',false)"
-            onmouseleave="AdventureMap.dpad('down',false)"
-            aria-label="Mover para baixo">↓</button>
+            onmouseleave="AdventureMap.dpad('down',false)">↓</button>
     </div>
 
 </div>`;
 
-        this._charEl  = document.getElementById('wm-char');
-        this._interEl = document.getElementById('wm-interact');
-        this._zoneEl  = { icon: document.getElementById('wm-zone-icon'), name: document.getElementById('wm-zone-name') };
+        this._charEl = document.getElementById('wm-char');
+        this._zoneEl = {
+            icon: document.getElementById('wm-zone-icon'),
+            name: document.getElementById('wm-zone-name'),
+        };
     },
 
-    // ── BIOME LAYERS ──────────────────────────────────────────────
+    // ── BIOMES ───────────────────────────────────────────────────
     _buildBiomes() {
         return this._biomes.map((b, i) => {
-            const h = b.bottom - b.top;
-            // Add subtle wave divider between biomes using a clip-path gradient overlay
-            const dividerTop = i > 0 ? `<div class="wm-biome-divide" style="top:${b.top}px"></div>` : '';
-            return `
-            ${dividerTop}
+            const h       = b.bottom - b.top;
+            const divider = i > 0 ? `<div class="wm-biome-divide" style="top:${b.top}px"></div>` : '';
+            return `${divider}
             <div class="wm-biome wm-biome-${b.id}"
                  style="top:${b.top}px;height:${h}px;background:linear-gradient(180deg,${b.bg1} 0%,${b.bg2} 100%)">
                 <div class="wm-biome-name" aria-hidden="true">${b.icon} ${b.name}</div>
@@ -313,96 +245,75 @@ const AdventureMap = {
         }).join('');
     },
 
-    // ── SVG ORGANIC PATHS ─────────────────────────────────────────
+    // ── COBBLESTONE PATHS — double SVG layer ─────────────────────
     _buildPathsSVG() {
         const W = this.WORLD_W;
         const H = this.WORLD_H;
-        let paths = '';
+        let base = '', tiles = '', doneBase = '', doneTiles = '';
 
         for (let i = 0; i < this.stages.length - 1; i++) {
-            const a  = this.stages[i];
-            const b  = this.stages[i + 1];
-            const x1 = (a.xPct / 100) * W;
-            const y1 = a.worldY;
-            const x2 = (b.xPct / 100) * W;
-            const y2 = b.worldY;
-
-            // Deterministic organic curve: alternate which side the bulge goes
+            const a    = this.stages[i];
+            const b    = this.stages[i + 1];
+            const x1   = (a.xPct / 100) * W;
+            const y1   = a.worldY;
+            const x2   = (b.xPct / 100) * W;
+            const y2   = b.worldY;
             const sign = (i % 2 === 0) ? 1 : -1;
             const bulge = 44 * sign;
-            const cp1x  = x1 + bulge;
-            const cp1y  = y1 + (y2 - y1) * 0.38;
-            const cp2x  = x2 - bulge;
-            const cp2y  = y1 + (y2 - y1) * 0.62;
+            const cp1x = x1 + bulge,  cp1y = y1 + (y2 - y1) * 0.38;
+            const cp2x = x2 - bulge,  cp2y = y1 + (y2 - y1) * 0.62;
+            const d = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
 
-            const isDone = a.completed;
-            paths += `<path class="wm-path ${isDone ? 'wm-path-done' : ''}"
-                d="M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}" />`;
+            if (a.completed) {
+                doneBase  += `<path class="wm-path-base wm-path-done-base"  d="${d}" />`;
+                doneTiles += `<path class="wm-path-tiles wm-path-done-tiles" d="${d}" />`;
+            } else {
+                base  += `<path class="wm-path-base"  d="${d}" />`;
+                tiles += `<path class="wm-path-tiles" d="${d}" />`;
+            }
         }
 
-        return `<svg class="wm-paths-svg"
-            width="${W}" height="${H}"
-            viewBox="0 0 ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true">
+        return `<svg class="wm-paths-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
+            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
-                <linearGradient id="pathDone" x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%"   stop-color="#4ade80" />
-                    <stop offset="100%" stop-color="#34d399" />
+                <linearGradient id="pathDone" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#4ade80" />
+                    <stop offset="100%" stop-color="#22c55e" />
                 </linearGradient>
             </defs>
-            ${paths}
+            ${base}${doneBase}${tiles}${doneTiles}
         </svg>`;
     },
 
-    // ── DECORATION ELEMENTS ───────────────────────────────────────
+    // ── DECORATIONS ──────────────────────────────────────────────
     _buildDecorations() {
         return this._decorations.map(d => {
-            const x = (d.x / 100) * this.WORLD_W;
-            const label = d.label
-                ? `<div class="wm-npc-label">${d.label}</div>`
-                : '';
-            return `<div class="${d.cls} wm-deco"
-                         style="left:${x}px;top:${d.y}px"
-                         aria-hidden="true">${d.emoji}${label}</div>`;
+            const x     = (d.x / 100) * this.WORLD_W;
+            const label = d.label ? `<div class="wm-npc-label">${d.label}</div>` : '';
+            return `<div class="${d.cls} wm-deco" style="left:${x}px;top:${d.y}px" aria-hidden="true">${d.emoji}${label}</div>`;
         }).join('');
     },
 
-    // ── STAGE NODES ───────────────────────────────────────────────
+    // ── STAGE NODES ──────────────────────────────────────────────
     _buildNodes() {
         return this.stages.map((s, i) => {
-            const x = (s.xPct / 100) * this.WORLD_W;
-
-            const stateClass = s.completed ? 'wm-done'
-                             : s.unlocked  ? 'wm-active'
-                             :               'wm-locked';
-            const typeClass  = s.isFinal ? 'wm-final'
-                             : s.isBoss  ? 'wm-boss'
-                             :              '';
-
-            const icon = s.completed ? '✓'
-                       : s.isFinal   ? '🎓'
-                       : s.isBoss    ? '💀'
-                       : s.unlocked  ? String(s.index)
-                       :               '🔒';
-
-            const starsHTML = s.completed
+            const x          = (s.xPct / 100) * this.WORLD_W;
+            const stateClass = s.completed ? 'wm-done' : s.unlocked ? 'wm-active' : 'wm-locked';
+            const typeClass  = s.isFinal ? 'wm-final' : s.isBoss ? 'wm-boss' : '';
+            const icon       = s.completed ? '✓' : s.isFinal ? '🎓' : s.isBoss ? '💀' : s.unlocked ? String(s.index) : '🔒';
+            const typeLabel  = s.isFinal ? '✦ FINAL' : s.isBoss ? '💀 CHEFE' : '';
+            const starsHTML  = s.completed
                 ? `<div class="wm-node-stars" aria-label="${s.stars} estrelas">
                      ${[1,2,3].map(n => `<span class="${n <= s.stars ? 'wm-star-lit' : 'wm-star-dim'}">★</span>`).join('')}
                    </div>`
                 : '';
 
-            const typeLabel = s.isFinal ? '✦ FINAL'
-                            : s.isBoss  ? '💀 CHEFE'
-                            :              '';
-
             return `
-            <div class="wm-node ${stateClass} ${typeClass}"
-                 id="wmn-${i}"
+            <div class="wm-node ${stateClass} ${typeClass}" id="wmn-${i}"
                  style="left:${x}px;top:${s.worldY}px"
                  onclick="AdventureMap._clickNode(${i})"
                  role="button"
-                 aria-label="${s.title}${s.completed ? ' (completo)' : s.unlocked ? ' (disponível)' : ' (bloqueado)'}"
+                 aria-label="${s.title} — ${s.completed ? 'concluído' : s.unlocked ? 'disponível' : 'bloqueado'}"
                  tabindex="${s.unlocked ? 0 : -1}">
                 <div class="wm-node-shadow" aria-hidden="true"></div>
                 <div class="wm-node-body" aria-hidden="true">
@@ -410,6 +321,30 @@ const AdventureMap = {
                 </div>
                 ${starsHTML}
                 ${typeLabel ? `<div class="wm-node-type-badge" aria-hidden="true">${typeLabel}</div>` : ''}
+            </div>`;
+        }).join('');
+    },
+
+    // ── CALLOUT LABELS ────────────────────────────────────────────
+    _buildLabels() {
+        return this.stages.map((s, i) => {
+            const nodeX     = (s.xPct / 100) * this.WORLD_W;
+            const isRight   = s.xPct < 50;  // node on left half → label extends right
+            const statusText = s.completed ? '✓ Concluído' : s.unlocked ? '▶ Disponível' : '🔒 Bloqueado';
+            const statusCls  = s.completed ? 'wm-status-done' : s.unlocked ? 'wm-status-active' : 'wm-status-locked';
+            const posStyle   = isRight
+                ? `left:${nodeX + 34}px;top:${s.worldY}px;transform:translateY(-50%)`
+                : `left:${nodeX - 34}px;top:${s.worldY}px;transform:translate(-100%,-50%)`;
+
+            return `
+            <div class="wm-label ${isRight ? 'wm-label-right' : 'wm-label-left'}" id="wml-${i}" style="${posStyle}">
+                <div class="wm-label-card">
+                    <div class="wm-label-title">${s.title}</div>
+                    <div class="wm-label-status ${statusCls}">${statusText}</div>
+                    <button class="wm-label-enter-btn" onclick="AdventureMap._enterStage(${i})">
+                        Entrar <span aria-hidden="true">→</span>
+                    </button>
+                </div>
             </div>`;
         }).join('');
     },
@@ -422,44 +357,12 @@ const AdventureMap = {
     },
 
     _update() {
-        let dx = 0, dy = 0;
-        const sp = this.world.speed;
+        const now = performance.now();
 
-        // Keyboard input
-        if (this.keys.up)    dy -= sp;
-        if (this.keys.down)  dy += sp;
-        if (this.keys.left)  { dx -= sp; this.world.facing = -1; }
-        if (this.keys.right) { dx += sp; this.world.facing =  1; }
-
-        // Click/touch target movement
-        if (this.world.targetX !== null && dx === 0 && dy === 0) {
-            const tdx  = this.world.targetX - this.world.charX;
-            const tdy  = this.world.targetY - this.world.charY;
-            const dist = Math.sqrt(tdx * tdx + tdy * tdy);
-            if (dist < sp * 1.5) {
-                this.world.targetX = null;
-                this.world.targetY = null;
-            } else {
-                dx = (tdx / dist) * sp;
-                dy = (tdy / dist) * sp;
-                if (dx < 0) this.world.facing = -1;
-                if (dx > 0) this.world.facing =  1;
-            }
-        }
-
-        if (dx !== 0 || dy !== 0) {
-            this.world.charX = Math.max(20, Math.min(this.WORLD_W - 20, this.world.charX + dx));
-            this.world.charY = Math.max(40, Math.min(this.WORLD_H - 40, this.world.charY + dy));
-
-            if (this._charEl) {
-                this._charEl.classList.add('wm-char-walking');
-                // Flip facing
-                this._charEl.style.transform = `translate(-50%, -50%) scaleX(${this.world.facing})`;
-                clearTimeout(this._walkTimer);
-                this._walkTimer = setTimeout(() => {
-                    this._charEl?.classList.remove('wm-char-walking');
-                }, 200);
-            }
+        if (this._autoWalk.active) {
+            this._updateAutoWalk(now);
+        } else {
+            this._updateManual();
         }
 
         if (this._charEl) {
@@ -472,23 +375,79 @@ const AdventureMap = {
         this._updateBiomeLabel();
     },
 
+    _updateManual() {
+        let dx = 0, dy = 0;
+        const sp = this.world.speed;
+        if (this.keys.up)    dy -= sp;
+        if (this.keys.down)  dy += sp;
+        if (this.keys.left)  { dx -= sp; this.world.facing = -1; }
+        if (this.keys.right) { dx += sp; this.world.facing =  1; }
+
+        if (dx !== 0 || dy !== 0) {
+            this.world.charX = Math.max(20, Math.min(this.WORLD_W - 20, this.world.charX + dx));
+            this.world.charY = Math.max(40, Math.min(this.WORLD_H - 40, this.world.charY + dy));
+            if (this._charEl) {
+                this._charEl.classList.add('wm-char-walking');
+                this._charEl.style.transform = `translate(-50%,-50%) scaleX(${this.world.facing})`;
+                clearTimeout(this._walkTimer);
+                this._walkTimer = setTimeout(() => this._charEl?.classList.remove('wm-char-walking'), 200);
+            }
+        }
+    },
+
+    _updateAutoWalk(now) {
+        const aw = this._autoWalk;
+        const elapsed = now - aw.startTime;
+        aw.progress = Math.min(1, elapsed / aw.duration);
+
+        // Ease in-out cubic
+        const t = aw.progress < 0.5
+            ? 4 * aw.progress ** 3
+            : 1 - (-2 * aw.progress + 2) ** 3 / 2;
+
+        this.world.charX = aw.fromX + (aw.toX - aw.fromX) * t;
+        this.world.charY = aw.fromY + (aw.toY - aw.fromY) * t;
+
+        const ddx = aw.toX - aw.fromX;
+        if (Math.abs(ddx) > 2) this.world.facing = ddx > 0 ? 1 : -1;
+
+        if (this._charEl) {
+            this._charEl.classList.add('wm-char-walking');
+            this._charEl.style.transform = `translate(-50%,-50%) scaleX(${this.world.facing})`;
+        }
+
+        if (now - aw.stepTimer > 340) {
+            aw.stepTimer = now;
+            this._playStep();
+            this._spawnFootstep();
+        }
+
+        if (aw.progress >= 1) {
+            aw.active = false;
+            if (this._charEl) this._charEl.classList.remove('wm-char-walking');
+            this._playBell();
+            this._spawnArrivalEffect(this.world.charX, this.world.charY);
+        }
+    },
+
+    // ── SCROLL ───────────────────────────────────────────────────
     _scrollToChar(instant) {
         const vp = document.getElementById('wm-viewport');
         if (!vp) return;
-        const viewH = vp.clientHeight || window.innerHeight - 52;
+        const viewH = vp.clientHeight || window.innerHeight - 100;
         let scrollY = this.world.charY - viewH / 2;
         scrollY = Math.max(0, Math.min(this.WORLD_H - viewH, scrollY));
-
         if (instant) {
             vp.scrollTop = scrollY;
         } else {
             const diff = scrollY - vp.scrollTop;
-            if (Math.abs(diff) > 0.5) vp.scrollTop += diff * 0.10;
+            if (Math.abs(diff) > 0.5) vp.scrollTop += diff * 0.09;
         }
     },
 
+    // ── NEAR STAGE CHECK ─────────────────────────────────────────
     _checkNearStage() {
-        const RADIUS = 72;
+        const RADIUS = 80;
         let nearest = -1, minDist = Infinity;
 
         for (let i = 0; i < this.stages.length; i++) {
@@ -500,30 +459,20 @@ const AdventureMap = {
             if (d < RADIUS && d < minDist) { minDist = d; nearest = i; }
         }
 
-        if (nearest === this.nearStageIdx) return;
-        this.nearStageIdx = nearest;
+        if (nearest === this._labelNearIdx) return;
 
-        if (!this._interEl) return;
+        if (this._labelNearIdx >= 0) {
+            document.getElementById(`wml-${this._labelNearIdx}`)?.classList.remove('wm-label-near');
+        }
+        this._labelNearIdx = nearest;
+        this.nearStageIdx  = nearest;
+
         if (nearest >= 0 && this.stages[nearest].unlocked) {
-            const s = this.stages[nearest];
-            this._interEl.classList.remove('hidden');
-
-            const titleEl = document.getElementById('wm-interact-title');
-            const metaEl  = document.getElementById('wm-interact-meta');
-            const starsEl = document.getElementById('wm-interact-stars');
-
-            if (titleEl)  titleEl.textContent  = s.title;
-            if (metaEl)   metaEl.textContent    = s.isFinal ? '✦ MISSÃO FINAL' : s.isBoss ? '💀 CHEFE' : `⚔️ MISSÃO ${s.index}`;
-            if (starsEl) {
-                starsEl.innerHTML = s.completed
-                    ? [1,2,3].map(n => `<span class="${n <= s.stars ? 'wm-star-lit' : 'wm-star-dim'}">★</span>`).join('')
-                    : '';
-            }
-        } else {
-            this._interEl.classList.add('hidden');
+            document.getElementById(`wml-${nearest}`)?.classList.add('wm-label-near');
         }
     },
 
+    // ── BIOME LABEL ──────────────────────────────────────────────
     _updateBiomeLabel() {
         if (!this._zoneEl?.name) return;
         for (const b of this._biomes) {
@@ -532,7 +481,6 @@ const AdventureMap = {
                     this._currentBiome = b.id;
                     this._zoneEl.icon.textContent = b.icon;
                     this._zoneEl.name.textContent = b.name;
-                    // Flash the zone pill on biome change
                     const pill = document.getElementById('wm-zone-pill');
                     if (pill) {
                         pill.classList.add('wm-zone-flash');
@@ -544,85 +492,259 @@ const AdventureMap = {
         }
     },
 
-    // ── INTERACTIONS ──────────────────────────────────────────────
-    interactWithNear() {
-        if (this.nearStageIdx < 0) return;
-        const s = this.stages[this.nearStageIdx];
+    // ── NODE CLICK ───────────────────────────────────────────────
+    _clickNode(idx) {
+        const s  = this.stages[idx];
+        const sx = (s.xPct / 100) * this.WORLD_W;
+
+        if (!s.unlocked) {
+            const el = document.getElementById(`wmn-${idx}`);
+            el?.classList.remove('wm-node-shake');
+            void el?.offsetWidth;
+            el?.classList.add('wm-node-shake');
+            setTimeout(() => el?.classList.remove('wm-node-shake'), 500);
+            this._playLock();
+            return;
+        }
+
+        const dx   = this.world.charX - sx;
+        const dy   = this.world.charY - s.worldY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 88) {
+            this._fireProjectile(idx);
+        } else {
+            this._startAutoWalk(sx, s.worldY - 55, idx);
+        }
+    },
+
+    _startAutoWalk(targetX, targetY, stageIdx) {
+        const aw = this._autoWalk;
+        aw.active    = true;
+        aw.fromX     = this.world.charX;
+        aw.fromY     = this.world.charY;
+        aw.toX       = Math.max(20, Math.min(this.WORLD_W - 20, targetX));
+        aw.toY       = Math.max(40, Math.min(this.WORLD_H - 40, targetY));
+        aw.progress  = 0;
+        aw.startTime = performance.now();
+        aw.stepTimer = performance.now();
+        const dist   = Math.hypot(aw.toX - aw.fromX, aw.toY - aw.fromY);
+        aw.duration  = Math.max(700, Math.min(2400, dist * 4.2));
+    },
+
+    _fireProjectile(idx) {
+        const s     = this.stages[idx];
+        const sx    = (s.xPct / 100) * this.WORLD_W;
+        const sy    = s.worldY;
+        const isBig = s.isBoss || s.isFinal;
+        const world = document.getElementById('wm-world');
+        if (!world) { this._enterStage(idx); return; }
+
+        const proj  = document.createElement('div');
+        proj.className = `wm-projectile ${isBig ? 'wm-proj-cannonball' : 'wm-proj-arrow'}`;
+
+        const ddx   = sx - this.world.charX;
+        const ddy   = sy - this.world.charY;
+        const angle = Math.atan2(ddy, ddx) * (180 / Math.PI);
+
+        proj.style.left = this.world.charX + 'px';
+        proj.style.top  = this.world.charY + 'px';
+        proj.style.setProperty('--proj-dx', ddx + 'px');
+        proj.style.setProperty('--proj-dy', ddy + 'px');
+        proj.style.setProperty('--proj-rot', angle + 'deg');
+        world.appendChild(proj);
+
+        this._playArrow(isBig);
+
+        setTimeout(() => {
+            proj.remove();
+            this._spawnExplosion(sx, sy, isBig);
+            this._playExplosion(isBig);
+        }, 380);
+
+        setTimeout(() => this._enterStage(idx), 750);
+    },
+
+    _enterStage(idx) {
+        const s = this.stages[idx];
         if (!s.unlocked) return;
         this._doExit();
         Router.navigate(`#stage/${this.chapterId}/${s.id}`);
     },
 
-    _clickNode(idx) {
-        const s = this.stages[idx];
-        this.world.targetX = (s.xPct / 100) * this.WORLD_W;
-        this.world.targetY = s.worldY;
+    // ── EFFECTS ───────────────────────────────────────────────────
+    _spawnExplosion(x, y, big) {
+        const world = document.getElementById('wm-world');
+        if (!world) return;
+        const el = document.createElement('div');
+        el.className = `wm-explosion${big ? ' wm-explosion-big' : ''}`;
+        el.style.left = x + 'px';
+        el.style.top  = y + 'px';
+        el.textContent = big ? '💥' : '✨';
+        world.appendChild(el);
+        setTimeout(() => el.remove(), 700);
     },
 
-    // ── INPUT BINDING ─────────────────────────────────────────────
+    _spawnArrivalEffect(x, y) {
+        const world = document.getElementById('wm-world');
+        if (!world) return;
+        for (let i = 0; i < 5; i++) {
+            const el = document.createElement('div');
+            el.className = 'wm-arrival-spark';
+            el.style.left = (x + (Math.random() - 0.5) * 36) + 'px';
+            el.style.top  = (y + (Math.random() - 0.5) * 36) + 'px';
+            el.textContent = '✦';
+            world.appendChild(el);
+            setTimeout(() => el.remove(), 600);
+        }
+    },
+
+    _spawnFootstep() {
+        const world = document.getElementById('wm-world');
+        if (!world) return;
+        const el = document.createElement('div');
+        el.className = 'wm-footstep';
+        el.style.left = (this.world.charX + (Math.random() - 0.5) * 18) + 'px';
+        el.style.top  = (this.world.charY + 14) + 'px';
+        el.textContent = '·';
+        world.appendChild(el);
+        setTimeout(() => el.remove(), 420);
+    },
+
+    // ── WEB AUDIO SYNTHESIS ───────────────────────────────────────
+    _getAudioCtx() {
+        try {
+            if (!this._audioCtx) {
+                this._audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (this._audioCtx.state === 'suspended') this._audioCtx.resume();
+            return this._audioCtx;
+        } catch { return null; }
+    },
+
+    _playStep() {
+        const ctx = this._getAudioCtx();
+        if (!ctx) return;
+        const dur = 0.055;
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const f = ctx.createBiquadFilter();
+        f.type = 'lowpass'; f.frequency.value = 280;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.10, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+        src.connect(f); f.connect(g); g.connect(ctx.destination);
+        src.start();
+    },
+
+    _playBell() {
+        const ctx = this._getAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const g   = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.45);
+        g.gain.setValueAtTime(0.22, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.5);
+    },
+
+    _playArrow(heavy) {
+        const ctx = this._getAudioCtx();
+        if (!ctx) return;
+        const dur = heavy ? 0.20 : 0.10;
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) ** 2;
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const f = ctx.createBiquadFilter();
+        f.type = 'highpass'; f.frequency.value = heavy ? 180 : 550;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(heavy ? 0.38 : 0.24, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+        src.connect(f); f.connect(g); g.connect(ctx.destination);
+        src.start();
+    },
+
+    _playExplosion(heavy) {
+        const ctx = this._getAudioCtx();
+        if (!ctx) return;
+        const dur = heavy ? 0.60 : 0.32;
+        const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) ** 1.4;
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const f = ctx.createBiquadFilter();
+        f.type = 'lowpass';
+        f.frequency.setValueAtTime(heavy ? 820 : 520, ctx.currentTime);
+        f.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + dur);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(heavy ? 0.55 : 0.38, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+        src.connect(f); f.connect(g); g.connect(ctx.destination);
+        src.start();
+    },
+
+    _playLock() {
+        const ctx = this._getAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const g   = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(120, ctx.currentTime + 0.14);
+        g.gain.setValueAtTime(0.14, ctx.currentTime);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.14);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.14);
+    },
+
+    // ── INPUT ─────────────────────────────────────────────────────
     _bindEvents() {
         this._boundKeyDown = e => this._onKeyDown(e);
         this._boundKeyUp   = e => this._onKeyUp(e);
         window.addEventListener('keydown', this._boundKeyDown);
         window.addEventListener('keyup',   this._boundKeyUp);
-
-        const vp = document.getElementById('wm-viewport');
-        if (vp) {
-            this._boundClick = e => this._onViewportClick(e);
-            this._boundTouch = e => this._onViewportTouch(e);
-            vp.addEventListener('click',    this._boundClick);
-            vp.addEventListener('touchend', this._boundTouch, { passive: true });
-        }
     },
 
     _onKeyDown(e) {
         if (!this.running) return;
         const MAP = {
-            ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right',
-            w:'up', s:'down', a:'left', d:'right',
-            W:'up', S:'down', A:'left', D:'right',
+            ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+            w: 'up', s: 'down', a: 'left', d: 'right',
+            W: 'up', S: 'down', A: 'left', D: 'right',
         };
         if (MAP[e.key]) {
             this.keys[MAP[e.key]] = true;
-            this.world.targetX    = null;
+            this._autoWalk.active = false;
             e.preventDefault();
         }
-        if (e.key === 'Enter' || e.key === ' ') { this.interactWithNear(); e.preventDefault(); }
+        if ((e.key === 'Enter' || e.key === ' ') && this.nearStageIdx >= 0) {
+            this._clickNode(this.nearStageIdx);
+            e.preventDefault();
+        }
         if (e.key === 'Escape') this.exit();
     },
 
     _onKeyUp(e) {
         const MAP = {
-            ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right',
-            w:'up', s:'down', a:'left', d:'right',
-            W:'up', S:'down', A:'left', D:'right',
+            ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+            w: 'up', s: 'down', a: 'left', d: 'right',
+            W: 'up', S: 'down', A: 'left', D: 'right',
         };
         if (MAP[e.key]) this.keys[MAP[e.key]] = false;
     },
 
-    _onViewportClick(e) {
-        if (e.target.closest('.wm-node,.wm-hud,.wm-interact,.wm-dpad,.wm-enter-btn,.wm-back-btn,.wm-deco-npc')) return;
-        const worldEl = document.getElementById('wm-world');
-        if (!worldEl) return;
-        const r = worldEl.getBoundingClientRect();
-        this.world.targetX = e.clientX - r.left;
-        this.world.targetY = e.clientY - r.top + document.getElementById('wm-viewport').scrollTop;
-    },
-
-    _onViewportTouch(e) {
-        if (e.target.closest('.wm-node,.wm-hud,.wm-interact,.wm-dpad,.wm-enter-btn,.wm-back-btn,.wm-deco-npc')) return;
-        const t = e.changedTouches[0];
-        if (!t) return;
-        const worldEl = document.getElementById('wm-world');
-        if (!worldEl) return;
-        const r = worldEl.getBoundingClientRect();
-        this.world.targetX = t.clientX - r.left;
-        this.world.targetY = t.clientY - r.top + document.getElementById('wm-viewport').scrollTop;
-    },
-
     dpad(dir, pressed) {
         this.keys[dir] = pressed;
-        if (pressed) this.world.targetX = null;
+        if (pressed) this._autoWalk.active = false;
     },
 
     // ── EXIT ──────────────────────────────────────────────────────
@@ -643,7 +765,11 @@ const AdventureMap = {
             window.removeEventListener('keydown', this._boundKeyDown);
             window.removeEventListener('keyup',   this._boundKeyUp);
         }
-        document.getElementById('top-hud')?.classList.remove('hidden');
+        if (this._audioCtx) {
+            try { this._audioCtx.close(); } catch {}
+            this._audioCtx = null;
+        }
+        document.getElementById('app-container')?.classList.remove('wm-host');
         document.getElementById('bottom-nav')?.classList.remove('hidden');
     },
 };

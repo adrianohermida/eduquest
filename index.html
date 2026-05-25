@@ -50,6 +50,16 @@
             </a>
 
             <span class="hud-level-chip" id="hud-level" aria-label="Nível atual">Nv.1</span>
+            <!-- Discipline selector — shown on tablet+, populated by HUD when chapter is active -->
+            <div class="hud-chip-wrap hud-disc-wrap" id="hud-disc-wrap" style="display:none">
+                <button class="hud-chip hud-disc-chip" id="hud-disc-btn"
+                    onclick="HUD.toggleDropdown('discipline')"
+                    aria-expanded="false"
+                    aria-controls="hud-dd-discipline"
+                    aria-label="Selecionar disciplina"
+                ><span id="hud-disc-text">Ciências • 7º Ano</span> <span aria-hidden="true">▾</span></button>
+                <div class="hud-dropdown" id="hud-dd-discipline" aria-hidden="true"></div>
+            </div>
         </div>
 
         <!-- CENTER: context breadcrumb (tablet/desktop only) -->
@@ -101,9 +111,6 @@
                 >❤️<span id="hud-hearts">5</span></button>
                 <div class="hud-dropdown" id="hud-dd-hearts" aria-hidden="true"></div>
             </div>
-
-            <!-- Mute -->
-            <button id="mute-btn" class="hud-mute-btn" onclick="SoundManager.toggle()" aria-label="Alternar som" title="Som">🔊</button>
 
             <!-- Notifications -->
             <div class="hud-chip-wrap" id="hud-notif-wrap">

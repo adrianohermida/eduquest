@@ -201,8 +201,35 @@ const Sidebar = {
                 <span class="rp-rank-tier-lbl">${t.name.substring(0, 3)}</span>
             </div>`).join('');
 
+        // ── Missão Atual (active stage from CHAPTER_METADATA) ──
+        const activeMeta  = window.CHAPTER_METADATA;
+        const activeStage = activeMeta?.stages?.find(s => {
+            return !State.isStageCompleted(activeMeta.id || 'cap7_doencas', s.index) &&
+                    State.isStageUnlocked(activeMeta.id || 'cap7_doencas', s.index);
+        });
+        const missionHTML = activeMeta && activeStage
+            ? (() => {
+                const stageData = window[activeStage.varName] || {};
+                const chId = activeMeta.id || 'cap7_doencas';
+                return `
+                <section class="rp-section rp-mission-cur-section" aria-labelledby="rp-cur-lbl">
+                    <div class="rp-mission-cur-header">
+                        <h2 class="rp-section-title" id="rp-cur-lbl">🎯 Missão Atual</h2>
+                    </div>
+                    <a href="#stage/${chId}/${activeStage.id}" class="rp-mission-cur-card" aria-label="Entrar na missão ${stageData.title || activeStage.id}">
+                        <div class="rp-mission-cur-meta">FASE ${activeStage.index}</div>
+                        <div class="rp-mission-cur-title">${stageData.title || `Missão ${activeStage.index}`}</div>
+                        <div class="rp-mission-cur-sub">${activeMeta.icon || '📚'} ${activeMeta.title || ''}</div>
+                        <div class="rp-mission-cur-action">Jogar agora <span aria-hidden="true">→</span></div>
+                    </a>
+                </section>`;
+              })()
+            : '';
+
         el.innerHTML = `
         <div class="rp-inner">
+
+            ${missionHTML}
 
             <!-- Streak section -->
             <section class="rp-section" aria-labelledby="rp-streak-lbl">
@@ -387,11 +414,12 @@ const HUD = {
                       document.getElementById(`hud-streak-btn`);
 
         const btnId = {
-            streak: 'hud-streak-btn',
-            gems:   'hud-gems-btn',
-            xp:     'hud-xp-btn',
-            hearts: 'hud-hearts-btn',
+            streak:        'hud-streak-btn',
+            gems:          'hud-gems-btn',
+            xp:            'hud-xp-btn',
+            hearts:        'hud-hearts-btn',
             notifications: 'hud-notif-btn',
+            discipline:    'hud-disc-btn',
         }[type];
 
         const btn = document.getElementById(btnId);
@@ -408,11 +436,12 @@ const HUD = {
     _closeDropdown(type) {
         const ddEl  = document.getElementById(`hud-dd-${type}`);
         const btnId = {
-            streak: 'hud-streak-btn',
-            gems:   'hud-gems-btn',
-            xp:     'hud-xp-btn',
-            hearts: 'hud-hearts-btn',
+            streak:        'hud-streak-btn',
+            gems:          'hud-gems-btn',
+            xp:            'hud-xp-btn',
+            hearts:        'hud-hearts-btn',
             notifications: 'hud-notif-btn',
+            discipline:    'hud-disc-btn',
         }[type];
         const btn = document.getElementById(btnId);
         if (ddEl) {
@@ -424,7 +453,7 @@ const HUD = {
     },
 
     _closeAll() {
-        ['streak','gems','xp','hearts','notifications'].forEach(t => this._closeDropdown(t));
+        ['streak','gems','xp','hearts','notifications','discipline'].forEach(t => this._closeDropdown(t));
         this.closeAvatarDropdown();
         if (this._outsideHandler) {
             document.removeEventListener('click', this._outsideHandler);
@@ -438,7 +467,7 @@ const HUD = {
         }
         this._outsideHandler = e => {
             const inside = e.target.closest(
-                '#hud-avatar-wrap, #hud-streak-wrap, #hud-gems-wrap, #hud-xp-wrap, #hud-hearts-wrap, #hud-notif-wrap'
+                '#hud-avatar-wrap, #hud-streak-wrap, #hud-gems-wrap, #hud-xp-wrap, #hud-hearts-wrap, #hud-notif-wrap, #hud-disc-wrap'
             );
             if (!inside) this._closeAll();
         };
@@ -455,6 +484,7 @@ const HUD = {
             case 'gems':          return this._ddGems(u);
             case 'hearts':        return this._ddHearts(u);
             case 'notifications': return this._ddNotifications(u);
+            case 'discipline':    return this._ddDiscipline();
             default: return '';
         }
     },
@@ -660,6 +690,7 @@ const HUD = {
                 </div>
             </a>`).join('');
 
+        const muted = (typeof SoundManager !== 'undefined') && SoundManager.muted;
         return `
         <div class="hdd-head">
             <span class="hdd-head-icon">🔔</span>
@@ -670,7 +701,49 @@ const HUD = {
         </div>
         <div class="hdd-body" style="padding-bottom:4px">
             <div class="hdd-notif-list">${listHTML}</div>
+        </div>
+        <div class="hdd-footer hdd-notif-footer">
+            <button class="hdd-mute-toggle" onclick="SoundManager.toggle();HUD.toggleDropdown('notifications')" aria-label="Alternar som">
+                <span>${muted ? '🔇' : '🔊'}</span>
+                <span>${muted ? 'Som desativado' : 'Som ativado'}</span>
+                <span class="hdd-mute-badge ${muted ? 'muted' : ''}">${muted ? 'OFF' : 'ON'}</span>
+            </button>
         </div>`;
+    },
+
+    _ddDiscipline() {
+        const subjects = [
+            { icon: '🔬', name: 'Ciências',    grade: '7º Ano', id: 'ciencias-7' },
+            { icon: '📐', name: 'Matemática',  grade: '7º Ano', id: 'mat-7', soon: true },
+            { icon: '📖', name: 'Português',   grade: '7º Ano', id: 'port-7', soon: true },
+            { icon: '🌎', name: 'Geografia',   grade: '7º Ano', id: 'geo-7',  soon: true },
+        ];
+        const cur = window.CHAPTER_METADATA;
+        const itemsHTML = subjects.map(s => {
+            const active = cur && cur.subject === s.id;
+            return `
+            <button class="hdd-disc-item${active ? ' hdd-disc-active' : ''}${s.soon ? ' hdd-disc-soon' : ''}"
+                    onclick="${s.soon ? '' : `HUD._closeAll()`}"
+                    ${s.soon ? 'disabled aria-disabled="true"' : ''}>
+                <span class="hdd-disc-icon">${s.icon}</span>
+                <div class="hdd-disc-info">
+                    <div class="hdd-disc-name">${s.name}</div>
+                    <div class="hdd-disc-grade">${s.grade}</div>
+                </div>
+                ${active ? '<span class="hdd-disc-check">✓</span>' : ''}
+                ${s.soon ? '<span class="hdd-disc-soon-chip">Em breve</span>' : ''}
+            </button>`;
+        }).join('');
+
+        return `
+        <div class="hdd-head">
+            <span class="hdd-head-icon">📚</span>
+            <div class="hdd-head-info">
+                <div class="hdd-head-title">Disciplina</div>
+                <div class="hdd-head-sub">Selecione o conteúdo</div>
+            </div>
+        </div>
+        <div class="hdd-body hdd-disc-list">${itemsHTML}</div>`;
     },
 
     _getNotifications(u) {
@@ -769,7 +842,8 @@ const HUD = {
 
     // ── CONTEXT BAR ───────────────────────────────────────
     setContext(data) {
-        const el = document.getElementById('hud-context');
+        const el   = document.getElementById('hud-context');
+        const disc = document.getElementById('hud-disc-wrap');
         if (!el) return;
         if (!data) { el.innerHTML = ''; return; }
 
@@ -780,11 +854,20 @@ const HUD = {
             <span class="hud-ctx-sep" aria-hidden="true">•</span>
             <span class="hud-ctx-stage">${data.stage}</span>
         </a>`;
+
+        // Show discipline chip with current subject/grade
+        if (disc) {
+            disc.style.display = '';
+            const txt = document.getElementById('hud-disc-text');
+            if (txt) txt.textContent = `${data.subject} • 7º Ano`;
+        }
     },
 
     clearContext() {
-        const el = document.getElementById('hud-context');
+        const el   = document.getElementById('hud-context');
+        const disc = document.getElementById('hud-disc-wrap');
         if (el) el.innerHTML = '';
+        if (disc) disc.style.display = 'none';
     },
 
     // ── INIT ──────────────────────────────────────────────

@@ -47,13 +47,13 @@ const Router = {
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        const isFullscreen = isGame || isAdventure || isAuth;
+        const isFullscreen = isGame || isAuth;  // adventure keeps app layout (HUD/sidebar visible)
 
         // Layout mode: full-screen (auth/game) vs app (normal)
         document.body.dataset.layout = isFullscreen ? 'full' : 'app';
 
         if (hudEl) hudEl.classList.toggle('hidden', isFullscreen);
-        if (navEl) navEl.classList.toggle('hidden', isFullscreen);
+        if (navEl) navEl.classList.toggle('hidden', isFullscreen || isAdventure);
 
         // Close mobile drawer when navigating
         if (typeof Sidebar !== 'undefined' && window.innerWidth < 768) Sidebar.close();
@@ -99,6 +99,9 @@ const Router = {
                 } else if (route === 'stage' && parts[1] && parts[2]) {
                     const meta = window.CHAPTER_METADATA;
                     if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.title, stage: `Fase ${parts[2]}`, href: `#chapter/${parts[1]}` });
+                } else if (route === 'adventure' && parts[1]) {
+                    const meta = window.CHAPTER_METADATA;
+                    if (meta) HUD.setContext({ icon: meta.icon || '🗺️', subject: meta.title, stage: 'Mapa Aventura', href: `#chapter/${parts[1]}` });
                 }
             }, 0);
         }

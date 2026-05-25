@@ -55,23 +55,49 @@
     to   { stroke-dashoffset: 0; }
 }
 
+/* ── HOST CONTAINER — makes app-container a proper flex scroll host ── */
+
+#app-container.wm-host {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
 /* ── OUTER WRAPPER ─────────────────────────────────────────── */
 
 .wm-wrap {
-    position: fixed;
-    inset: 0;
+    position: relative; /* anchor for absolute children (D-pad) */
+    width: 100%;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     background: #f7fee7;
     overflow: hidden;
-    z-index: 10;
     font-family: 'Nunito', system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 }
 
-/* ── MINIMAL HUD ───────────────────────────────────────────── */
+/* ── TOP STRIP (back button + zone pill + stats) ───────────── */
 
+.wm-topstrip {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 12px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    z-index: 20;
+}
+
+/* Keep old .wm-hud selector working in case anything references it */
 .wm-hud {
     flex-shrink: 0;
     display: flex;
@@ -161,6 +187,7 @@
 
 .wm-viewport {
     flex: 1;
+    min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -170,7 +197,7 @@
     justify-content: center;
 }
 
-/* Hide scrollbar — world is navigated by character, not scroll */
+/* Hide scrollbar — world scrolls via character, not manual scroll */
 .wm-viewport::-webkit-scrollbar { display: none; }
 .wm-viewport { scrollbar-width: none; }
 
@@ -227,7 +254,7 @@
 .wm-biome-tower   { --biome-accent: #7c3aed; }
 .wm-biome-citadel { --biome-accent: #d97706; }
 
-/* ── SVG PATHS ─────────────────────────────────────────────── */
+/* ── SVG PATHS — cobblestone double layer ──────────────────── */
 
 .wm-paths-svg {
     position: absolute;
@@ -238,6 +265,40 @@
     overflow: visible;
 }
 
+/* Layer 1: sandy base */
+.wm-path-base {
+    fill: none;
+    stroke: #d4c4a0;
+    stroke-width: 13;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Layer 2: tile dashes */
+.wm-path-tiles {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.18);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 18 8;
+}
+
+/* Done variants */
+.wm-path-done-base {
+    stroke: #86efac;
+    stroke-width: 13;
+    opacity: 0.9;
+}
+
+.wm-path-done-tiles {
+    stroke: #22c55e;
+    stroke-width: 10;
+    stroke-dasharray: 18 8;
+    opacity: 0.75;
+}
+
+/* Legacy class — keep for any old references */
 .wm-path {
     fill: none;
     stroke: rgba(0, 0, 0, 0.14);
@@ -882,3 +943,284 @@
     color: rgba(255,255,255,0.55);
     background: rgba(0,0,0,0.45);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   V3.0 — NEW CLASSES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── NODE SHAKE (locked tap) ───────────────────────────────── */
+
+@keyframes wmNodeShake {
+    0%, 100% { transform: translate(-50%, -50%) rotate(0); }
+    15%       { transform: translate(-50%, -50%) rotate(-8deg); }
+    35%       { transform: translate(-50%, -50%) rotate(7deg); }
+    55%       { transform: translate(-50%, -50%) rotate(-5deg); }
+    75%       { transform: translate(-50%, -50%) rotate(4deg); }
+}
+
+.wm-node-shake {
+    animation: wmNodeShake 0.48s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+}
+
+/* ── CALLOUT LABELS ────────────────────────────────────────── */
+
+.wm-label {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+}
+
+.wm-label-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 7px 10px;
+    min-width: 120px;
+    max-width: 155px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.13), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    position: relative;
+}
+
+/* Arrow tail pointing toward the node */
+.wm-label-right .wm-label-card::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right: 8px solid #fff;
+    border-left: 0;
+    filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.08));
+}
+
+.wm-label-left .wm-label-card::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-left: 8px solid #fff;
+    border-right: 0;
+    filter: drop-shadow(2px 0 2px rgba(0,0,0,0.08));
+}
+
+.wm-label-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #1a1a2e;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wm-label-status {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.wm-status-done   { color: #16a34a; }
+.wm-status-active { color: #f97316; }
+.wm-status-locked { color: #94a3b8; }
+
+.wm-label-enter-btn {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    box-shadow: 0 2px 0 #c2410c;
+    transition: transform 0.1s, box-shadow 0.1s;
+    pointer-events: auto;
+}
+
+.wm-label-enter-btn:hover  { transform: translateY(-1px); box-shadow: 0 3px 0 #c2410c; }
+.wm-label-enter-btn:active { transform: translateY(1px);  box-shadow: 0 1px 0 #c2410c; }
+
+/* Show enter button and enable pointer events when character is near */
+.wm-label-near {
+    pointer-events: auto;
+}
+
+.wm-label-near .wm-label-enter-btn {
+    display: flex;
+}
+
+/* Pulse effect on label when near */
+.wm-label-near .wm-label-card {
+    box-shadow: 0 2px 14px rgba(249, 115, 22, 0.30), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-color: rgba(249, 115, 22, 0.25);
+}
+
+/* ── PROJECTILES ───────────────────────────────────────────── */
+
+@keyframes wmProjFly {
+    from {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+    to {
+        transform: translate(calc(-50% + var(--proj-dx)), calc(-50% + var(--proj-dy)));
+        opacity: 0.9;
+    }
+}
+
+.wm-projectile {
+    position: absolute;
+    z-index: 9;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: wmProjFly 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    rotate: var(--proj-rot, 0deg);
+}
+
+.wm-proj-arrow {
+    font-size: 20px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.30));
+    /* ➹ arrow pointing right — rotated by --proj-rot */
+}
+.wm-proj-arrow::before { content: '➹'; }
+
+.wm-proj-cannonball {
+    font-size: 24px;
+    line-height: 1;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.40));
+}
+.wm-proj-cannonball::before { content: '⚫'; }
+
+/* ── EXPLOSION / ARRIVAL EFFECTS ───────────────────────────── */
+
+@keyframes wmExplode {
+    0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    60%  { transform: translate(-50%, -50%) scale(1.6); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+
+.wm-explosion {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    font-size: 28px;
+    line-height: 1;
+    transform: translate(-50%, -50%);
+    animation: wmExplode 0.65s ease-out forwards;
+}
+
+.wm-explosion-big {
+    font-size: 38px;
+}
+
+@keyframes wmSpark {
+    0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+}
+
+.wm-arrival-spark {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    font-size: 14px;
+    color: #f59e0b;
+    transform: translate(-50%, -50%);
+    animation: wmSpark 0.55s ease-out forwards;
+}
+
+/* ── FOOTSTEP PARTICLES ─────────────────────────────────────── */
+
+@keyframes wmFootstep {
+    0%   { opacity: 0.7; transform: translate(-50%, 0) scale(1); }
+    100% { opacity: 0;   transform: translate(-50%, 8px) scale(0.5); }
+}
+
+.wm-footstep {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+    font-size: 10px;
+    color: rgba(0, 0, 0, 0.28);
+    font-weight: 900;
+    transform: translate(-50%, 0);
+    animation: wmFootstep 0.40s ease-out forwards;
+}
+
+/* ── D-PAD — overlaid in the bottom-right of the wm-wrap ─────── */
+
+.wm-dpad {
+    position: absolute;
+    bottom: 20px;
+    right: 16px;
+    width: 112px;
+    height: 112px;
+    z-index: 25;
+    display: grid;
+    grid-template-columns: 36px 36px 36px;
+    grid-template-rows:    36px 36px 36px;
+    gap: 2px;
+    opacity: 0.85;
+    /* wm-wrap has overflow:hidden + flex column; pointer needs absolute within it */
+    pointer-events: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .wm-dpad { display: none; }
+}
+
+/* ── RESPONSIVE ADDITIONS ──────────────────────────────────── */
+
+/* On desktop the world map gets comfortable side gutters */
+@media (min-width: 1024px) {
+    .wm-world { box-shadow: 0 0 40px rgba(0,0,0,0.07); }
+}
+
+/* Compact mode: adventure map uses remaining space after compact sidebar */
+@media (min-width: 1280px) {
+    body[data-map-pref="compact"] .wm-wrap { /* inherits flex sizing — nothing extra needed */ }
+}
+
+/* ── DARK MODE ADDITIONS ────────────────────────────────────── */
+
+@media (prefers-color-scheme: dark) {
+    .wm-topstrip {
+        background: rgba(20, 20, 35, 0.92);
+        border-color: rgba(255, 255, 255, 0.07);
+    }
+    .wm-label-card {
+        background: #1e1e2e;
+        border-color: rgba(255, 255, 255, 0.10);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.40);
+    }
+    .wm-label-title { color: #f3f4f6; }
+    .wm-label-right .wm-label-card::before { border-right-color: #1e1e2e; }
+    .wm-label-left  .wm-label-card::after  { border-left-color:  #1e1e2e; }
+    .wm-path-base  { stroke: #6b5e3f; }
+    .wm-path-tiles { stroke: rgba(255, 255, 255, 0.12); }
+    .wm-footstep   { color: rgba(255, 255, 255, 0.22); }
+}
+
+[data-theme="dark"] .wm-topstrip {
+    background: rgba(20, 20, 35, 0.92);
+    border-color: rgba(255, 255, 255, 0.07);
+}
+[data-theme="dark"] .wm-label-card {
+    background: #1e1e2e;
+    border-color: rgba(255, 255, 255, 0.10);
+}
+[data-theme="dark"] .wm-label-title { color: #f3f4f6; }
+[data-theme="dark"] .wm-label-right .wm-label-card::before { border-right-color: #1e1e2e; }
+[data-theme="dark"] .wm-label-left  .wm-label-card::after  { border-left-color:  #1e1e2e; }
+[data-theme="dark"] .wm-path-base  { stroke: #6b5e3f; }
+[data-theme="dark"] .wm-path-tiles { stroke: rgba(255, 255, 255, 0.12); }
