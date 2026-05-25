@@ -27,5 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => State.checkDailyLogin(), 800);
     }
 
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
     console.log('✅ EduQuest v2.0 pronto!');
 });

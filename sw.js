@@ -1,0 +1,68 @@
+/**
+ * EduQuest Service Worker v1.0
+ * Cache-first for assets, network-first for API calls
+ */
+
+const CACHE_NAME  = 'eduquest-v1';
+const CACHE_SHELL = [
+    '/',
+    '/index.html',
+    '/css/styles.css',
+    '/css/layout.css',
+    '/css/animations.css',
+    '/css/modal-hud.css',
+    '/js/config.js',
+    '/js/state.js',
+    '/js/utils.js',
+    '/js/sound-manager.js',
+    '/js/ui-components.js',
+    '/js/game-engine.js',
+    '/js/adventure-map.js',
+    '/js/sidebar.js',
+    '/js/modal-engine.js',
+    '/js/router.js',
+    '/js/app.js',
+    '/assets/sounds/correct.wav',
+    '/assets/sounds/wrong.wav',
+    '/assets/sounds/click.wav',
+    '/assets/sounds/complete.mp3',
+];
+
+self.addEventListener('install', e => {
+    e.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(CACHE_SHELL))
+            .then(() => self.skipWaiting())
+    );
+});
+
+self.addEventListener('activate', e => {
+    e.waitUntil(
+        caches.keys().then(keys =>
+            Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+        ).then(() => self.clients.claim())
+    );
+});
+
+self.addEventListener('fetch', e => {
+    const url = new URL(e.request.url);
+
+    // Never intercept Supabase API calls
+    if (url.hostname.includes('supabase')) return;
+
+    // Cache-first for static assets
+    if (e.request.method === 'GET') {
+        e.respondWith(
+            caches.match(e.request).then(cached => {
+                if (cached) return cached;
+                return fetch(e.request).then(response => {
+                    if (response.ok && url.origin === location.origin) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                    }
+                    return response;
+                }).catch(() => caches.match('/index.html'));
+            })
+        );
+    }
+});
