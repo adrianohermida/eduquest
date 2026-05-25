@@ -6,8 +6,9 @@
 const WordSearch = {
     _state: null,
 
-    // Default vocabulary — overridden by chapter words when available
     DEFAULT_WORDS: ['VIRUS', 'FUNGO', 'VACINA', 'IMUNE', 'FEBRE', 'DENGUE', 'BACTERIA', 'DOENCA'],
+
+    _ic(id, o) { return typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : ''; },
 
     start(chapterId, stageIndex, container) {
         const words = this._getWords(chapterId);
@@ -129,8 +130,8 @@ const WordSearch = {
         container.innerHTML = `
         <div class="ws-wrap">
             <div class="ws-header">
-                <button class="ws-back-btn" onclick="Router.navigate('#stage/${chapterId}/stage_0${String(stageIndex).padStart(2,'0')}/${stageIndex}')">← Voltar</button>
-                <div class="ws-title">🔍 Caça-Palavras</div>
+                <button class="ws-back-btn" onclick="Router.navigate('#chapter/${chapterId}')">‹ Mapa</button>
+                <div class="ws-title">${this._ic('compass',{size:'sm'})} Caça-Palavras</div>
                 <div class="ws-timer ${timeLeft <= 30 ? 'ws-timer-urgent' : ''}" id="ws-timer">${mins}:${secs}</div>
             </div>
             <div class="ws-grid" id="ws-grid">${cellsHTML}</div>
@@ -251,15 +252,19 @@ const WordSearch = {
         const wrap = document.querySelector('.ws-wrap');
         if (!wrap) return;
 
+        const starsHTML = [1,2,3].map(s =>
+            `<span style="color:${s<=stars?'var(--gold)':'var(--border)'};font-size:1.5rem">${s<=stars?'★':'☆'}</span>`
+        ).join('');
+
         const overlay = document.createElement('div');
         overlay.className = 'ws-result-overlay';
         overlay.innerHTML = `
             <div class="ws-result-card">
-                <div class="ws-result-icon">🎉</div>
+                <div class="ws-result-icon">${this._ic('achievement',{size:'xl',color:'final'})}</div>
                 <h2 class="ws-result-title">Caça-palavras completo!</h2>
-                <div class="ws-result-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+                <div class="ws-result-stars">${starsHTML}</div>
                 <p class="ws-result-sub">Tempo: ${Math.floor(elapsed/60)}m${String(elapsed%60).padStart(2,'0')}s</p>
-                <button class="btn-primary" onclick="Router.navigate('#chapter/${chapterId}')">✅ Continuar</button>
+                <button class="btn-primary" onclick="Router.navigate('#chapter/${chapterId}')">${this._ic('check',{size:'sm'})} Continuar</button>
             </div>`;
         wrap.appendChild(overlay);
         if (typeof Utils !== 'undefined') Utils.confetti();

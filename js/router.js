@@ -1045,6 +1045,7 @@ const Router = {
 
     // ── STAGE PREP ────────────────────────────────────────
     renderStagePrep(container, chapterId, stageId) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         if (!chapterId || !stageId) { this.renderHome(container); return; }
 
         const stageVarName = stageId.toUpperCase();
@@ -1092,22 +1093,22 @@ const Router = {
 
             ${(isBoss || isFinal) ? `<div style="text-align:center; margin-bottom:var(--sp-2)">
                 <span style="background:var(--gold-light);color:#92400e;font-size:0.8rem;font-weight:900;padding:4px 12px;border-radius:var(--r-full);border:2px solid var(--gold)">
-                    ${isFinal ? '🎓 EXAME FINAL' : '👑 MISSÃO CHEFE'}
+                    ${isFinal ? `${_ic('achievement',{size:'xs'})} EXAME FINAL` : `${_ic('crown',{size:'xs',color:'final'})} MISSÃO CHEFE`}
                 </span>
             </div>` : ''}
 
             <div class="prep-icon-wrap" style="${(isBoss || isFinal) ? 'background:var(--gold-light);box-shadow:0 4px 18px rgba(245,158,11,0.4)' : ''}">
-                ${stageData.icon || '⚡'}
+                ${stageData.icon || _ic('xp',{size:'xl',color:'xp'})}
             </div>
             <div class="prep-title">${stageData.title}</div>
             <div class="prep-sub">${stageData.estimatedTime || 15} min · ${stageData.questions?.length || 10} questões</div>
 
             <div class="prep-rewards">
-                <div class="reward-chip">⚡ ${xpReward} XP</div>
-                <div class="reward-chip">💎 ${gemReward} Gemas</div>
+                <div class="reward-chip">${_ic('xp',{size:'xs',color:'xp'})} ${xpReward} XP</div>
+                <div class="reward-chip">${_ic('gem',{size:'xs',color:'gem'})} ${gemReward} Gemas</div>
                 ${State.isStageCompleted(chapterId, stageIndex)
                     ? `<div class="reward-chip" style="background:var(--success-light);border-color:var(--success);color:var(--success)">
-                        ✓ Já concluída
+                        ${_ic('check',{size:'xs'})} Já concluída
                        </div>`
                     : ''}
             </div>
@@ -1125,16 +1126,15 @@ const Router = {
             <button class="btn-primary"
                 style="${(isBoss || isFinal) ? 'background:var(--gold);box-shadow:0 5px 0 #92400e' : ''}"
                 onclick="GameEngine.start('${chapterId}', '${stageId}', ${stageIndex})">
-                ${isFinal ? '🎓 Iniciar Exame Final!' : isBoss ? '⚔️ Enfrentar o Chefe!' : '⚡ Iniciar Missão!'}
+                ${isFinal ? `${_ic('achievement',{size:'sm'})} Iniciar Exame Final!` : isBoss ? `${_ic('sword',{size:'sm'})} Enfrentar o Chefe!` : `${_ic('xp',{size:'sm'})} Iniciar Missão!`}
             </button>
 
-            ${(hasFlashcards || hasMnemonics) ? `
             <div class="minigame-select">
                 <div class="minigame-select-title">ou pratique com</div>
                 ${hasFlashcards ? `
                 <button class="minigame-btn"
                         onclick="MemoryGame.start('${chapterId}', '${stageId}', ${stageIndex})">
-                    <span class="mg-icon">🃏</span>
+                    <span class="mg-icon">${_ic('backpack',{size:'md'})}</span>
                     <div class="mg-info">
                         <span class="mg-name">Jogo da Memória</span>
                         <span class="mg-desc">Combine termos e definições · ${flashcards.length} pares</span>
@@ -1143,7 +1143,7 @@ const Router = {
                 ${hasMnemonics ? `
                 <button class="minigame-btn"
                         onclick="Forca.start('${chapterId}', '${stageId}', ${stageIndex})">
-                    <span class="mg-icon">🔤</span>
+                    <span class="mg-icon">${_ic('scroll',{size:'md'})}</span>
                     <div class="mg-info">
                         <span class="mg-name">Jogo da Forca</span>
                         <span class="mg-desc">Adivinhe termos do capítulo · ${mnemonics.length} palavras</span>
@@ -1151,13 +1151,13 @@ const Router = {
                 </button>` : ''}
                 <button class="minigame-btn"
                         onclick="Router.navigate('#word-search/${chapterId}/${stageIndex}')">
-                    <span class="mg-icon">🔍</span>
+                    <span class="mg-icon">${_ic('compass',{size:'md'})}</span>
                     <div class="mg-info">
                         <span class="mg-name">Caça-Palavras</span>
                         <span class="mg-desc">Encontre os termos do capítulo no grid</span>
                     </div>
                 </button>
-            </div>` : ''}
+            </div>
         </div>`;
     },
 
