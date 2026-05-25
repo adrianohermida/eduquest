@@ -1,0 +1,20 @@
+const SUBJECTS = {
+  ciencias: {
+    name: 'Ciências',
+    icon: '🔬',
+    color: '#10b981',
+    chapters: ['cap7']
+  },
+  matematica: {
+    name: 'Matemática',
+    icon: '📐',
+    color: '#3b82f6',
+    chapters: []
+  },
+  portugues: {
+    name: 'Português',
+    icon: '📚',
+    color: '#f59e0b',
+    chapters: []
+  }
+};
