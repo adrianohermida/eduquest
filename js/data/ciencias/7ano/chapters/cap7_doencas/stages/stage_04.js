@@ -1,4 +1,5 @@
 const STAGE_04 = {
+const STAGE_04 = {
 
   id: 'stage_04',
 
@@ -444,7 +445,7 @@ const STAGE_04 = {
 
 if (typeof window !== 'undefined') {
   window.STAGE_04 = STAGE_04;
-  if (window.DataLoader) {
-    window.DataLoader.registerStage('cap7_doencas', 4, STAGE_04);
-  }
+}
+if (window.DataLoader) {
+  window.DataLoader.registerStage('cap7_doencas', 4, STAGE_04);
 }

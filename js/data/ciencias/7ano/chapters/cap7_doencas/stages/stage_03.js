@@ -497,9 +497,4 @@ const STAGE_03 = {
   }
 },
 
-if (typeof window !== 'undefined') {
-  window.STAGE_03 = STAGE_03;
-  if (window.DataLoader) {
-    window.DataLoader.registerStage('cap7_doencas', 3, STAGE_03);
-  }
-}
+window.STAGE_03 = STAGE_03;

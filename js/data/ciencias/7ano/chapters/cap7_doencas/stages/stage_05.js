@@ -357,9 +357,4 @@ const STAGE_05 = {
   }
 },
 
-if (typeof window !== 'undefined') {
-  window.STAGE_05 = STAGE_05;
-  if (window.DataLoader) {
-    window.DataLoader.registerStage('cap7_doencas', 5, STAGE_05);
-  }
-}
+window.STAGE_05 = STAGE_05;
