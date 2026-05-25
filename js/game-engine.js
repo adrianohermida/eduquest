@@ -269,10 +269,12 @@ const GameEngine = {
     // ── BATTLE ARENA ────────────────────────────────────────────
 
     _getBattleTheme() {
-        const sd = this.state.stageData || {};
-        if (sd.isFinal) return { bgClass: 'final-mode', enemy: '🎓', name: 'Exame Final' };
-        if (sd.isBoss)  return { bgClass: 'boss-mode',  enemy: '💀', name: 'Chefe Final' };
-        return { bgClass: '', enemy: sd.icon || '🦠', name: sd.title || 'Inimigo' };
+        const sd  = this.state.stageData || {};
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        if (sd.isFinal) return { bgClass: 'final-mode', enemy: _ic('portal',{size:'3xl',color:'final'}), name: 'Exame Final' };
+        if (sd.isBoss)  return { bgClass: 'boss-mode',  enemy: _ic('boss',  {size:'3xl',color:'rpg'}),   name: 'Chefe Final' };
+        const enemyIcon = _ic(sd.iconId || 'virus',{size:'3xl',color:'science'}) || sd.icon || '🦠';
+        return { bgClass: '', enemy: enemyIcon, name: sd.title || 'Inimigo' };
     },
 
     _renderArena() {
@@ -304,16 +306,16 @@ const GameEngine = {
                         <div class="battle-combo-zone" id="battle-combo"></div>
                     </div>
                     <div class="battle-entity battle-player-side">
-                        <div class="battle-sprite player-sprite" id="player-sprite">🦸</div>
+                        ${(() => { const ic = typeof IconSystem !== 'undefined' ? IconSystem : null; const avatarCls = (typeof State !== 'undefined') ? (State.getAvatarClass() || 'guerreiro') : 'guerreiro'; const clsColor = { guerreiro:'rpg', mago:'science', ninja:'final', cientista:'science' }; return `<div class="battle-sprite player-sprite" id="player-sprite">${ic ? ic.html('avatar',{size:'3xl',color:clsColor[avatarCls]||'xp'}) : '🦸'}</div>`; })()}
                         <div class="battle-hp-wrap">
                             <div class="battle-hp-bar">
                                 <div class="battle-hp-fill hp-player" id="player-hp" style="width:100%"></div>
                             </div>
                             <span class="battle-hp-text" id="player-hp-hearts">
-                                ${Array.from({length: maxLives}, (_, i) => (typeof IconSystem !== 'undefined') ? IconSystem.html('heart',{size:'xs',color:'heart'}) : '❤️').join('')}
+                                ${Array.from({length: maxLives}, () => (typeof IconSystem !== 'undefined') ? IconSystem.html('heart',{size:'xs',color:'heart'}) : '❤️').join('')}
                             </span>
                         </div>
-                        <div class="battle-entity-name">🦸 Herói</div>
+                        <div class="battle-entity-name">${(typeof IconSystem !== 'undefined') ? IconSystem.html('avatar',{size:'xs'}) : '🦸'} Herói</div>
                     </div>
                 </div>
                 <div class="question-container" id="question-container"></div>
