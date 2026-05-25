@@ -369,6 +369,6 @@ const STAGE_01 = {
     trackResponseTime: true,
     spacedReviewEnabled: true
   }
-},
+};
 
 window.STAGE_01 = STAGE_01;

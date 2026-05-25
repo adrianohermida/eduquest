@@ -381,7 +381,6 @@ const STAGE_02 = {
 
     spacedReviewEnabled: true
   }
-},
+};
 
 window.STAGE_02 = STAGE_02;
-}

@@ -442,7 +442,7 @@ const STAGE_04 = {
 
     generateFinalReport: true
   }
-},
+};
 
 if (typeof window !== 'undefined') {
   window.STAGE_04 = STAGE_04;

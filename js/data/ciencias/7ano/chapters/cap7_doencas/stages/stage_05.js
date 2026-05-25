@@ -355,6 +355,6 @@ const STAGE_05 = {
 
     generateFinalReport: true
   }
-},
+};
 
 window.STAGE_05 = STAGE_05;

@@ -1,265 +1,369 @@
 /**
- * EDUQUEST GAME ENGINE v1.0
- * Responsável pela lógica de Quiz, Timer, Vidas e Feedback Visual.
+ * EDUQUEST GAME ENGINE v2.0
+ * Motor de quiz com feedback visual, timer, vidas e sistema de pontuação
  */
 
 const GameEngine = {
     state: {
-        currentStage: null,
-        questions: [],
+        chapterId:    null,
+        stageId:      null,
+        stageIndex:   null,
+        stageData:    null,
+        questions:    [],
         currentIndex: 0,
-        score: 0,
-        lives: 3,
-        timer: 0,
-        timerInterval: null,
-        isPlaying: false,
-        combo: 0
+        score:        0,
+        lives:        3,
+        timer:        15,
+        timerInterval:null,
+        isPlaying:    false,
+        combo:        0,
+        pendingFeedback: false
     },
 
-    // Inicializa uma nova partida
-    start(stageData, chapterId, stageIndex) {
-        this.state.currentStage = stageData;
-        // Seleciona questões aleatórias ou usa as definidas no stage
-        // Para este MVP, usamos o banco global QUESTIONS_BANK filtrado ou aleatório se vazio
-        this.state.questions = this.loadQuestions(stageData);
-        this.state.currentIndex = 0;
-        this.state.score = 0;
-        this.state.lives = 3;
-        this.state.combo = 0;
-        this.state.isPlaying = true;
-        
-        // Tempo base: 15s por questão + bônus
-        this.state.timer = 15; 
+    start(chapterId, stageId, stageIndex) {
+        const stageVarName = stageId.toUpperCase();
+        const stageData    = window[stageVarName];
 
-        this.renderArena(chapterId, stageIndex);
-        this.startTimer();
-    },
-
-    loadQuestions(stageData) {
-        // Tenta pegar questões específicas do stage, senão pega do banco global aleatoriamente
-        if (stageData.questions && stageData.questions.length > 0) {
-            return stageData.questions;
+        if (!stageData) {
+            console.error(`GameEngine: ${stageVarName} não encontrado.`);
+            Router.navigate(`#chapter/${chapterId}`);
+            return;
         }
-        // Fallback: Pegar 10 questões aleatórias do banco global (simulação)
-        const allQuestions = window.QUESTIONS_BANK || [];
-        return allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+        this.state.chapterId  = chapterId;
+        this.state.stageId    = stageId;
+        this.state.stageIndex = parseInt(stageIndex) || 1;
+        this.state.stageData  = stageData;
+        this.state.questions  = this._loadQuestions(stageData);
+        this.state.currentIndex = 0;
+        this.state.score      = 0;
+        this.state.lives      = CONFIG.lives.gameHearts || 3;
+        this.state.combo      = 0;
+        this.state.isPlaying  = true;
+        this.state.pendingFeedback = false;
+
+        this._renderArena();
+        this._startTimer();
     },
 
-    startTimer() {
+    _loadQuestions(stageData) {
+        let questions = [];
+
+        if (stageData.questions && stageData.questions.length > 0) {
+            questions = stageData.questions.map(q => this._normalizeQuestion(q));
+        }
+
+        if (questions.length === 0) {
+            const bank = window.QUESTIONS_BANK || [];
+            questions = bank.map(q => this._normalizeQuestion(q));
+        }
+
+        // Shuffle and limit
+        const shuffled = [...questions].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, CONFIG.stages.questionsPerGame || 10);
+    },
+
+    _normalizeQuestion(q) {
+        // Handle both question formats:
+        // Format A (stage files): { prompt, options: [{text, correct}], explanation }
+        // Format B (questions bank): { question, options: [string], correct: index, explanation }
+        if (Array.isArray(q.options) && typeof q.options[0] === 'object') {
+            // Format A
+            return {
+                question:     q.prompt || q.question || 'Questão',
+                options:      q.options.map(o => o.text || String(o)),
+                correctIndex: q.options.findIndex(o => o.correct === true),
+                explanation:  q.explanation || ''
+            };
+        } else {
+            // Format B
+            return {
+                question:     q.question || q.prompt || 'Questão',
+                options:      q.options || [],
+                correctIndex: typeof q.correct === 'number' ? q.correct : (q.correctIndex || 0),
+                explanation:  q.explanation || ''
+            };
+        }
+    },
+
+    _startTimer() {
         clearInterval(this.state.timerInterval);
+        this.state.timer = CONFIG.stages.timePerQuestion || 15;
+        this._updateTimerUI();
+
         this.state.timerInterval = setInterval(() => {
+            if (this.state.pendingFeedback) return;
             this.state.timer--;
-            this.updateHUD();
-            
+            this._updateTimerUI();
             if (this.state.timer <= 0) {
-                this.handleAnswer(-1); // Tempo esgotado conta como erro
+                clearInterval(this.state.timerInterval);
+                this.handleAnswer(-1);
             }
         }, 1000);
     },
 
-    stopTimer() {
+    _stopTimer() {
         clearInterval(this.state.timerInterval);
     },
 
-    updateHUD() {
-        const timerEl = document.getElementById('game-timer');
-        const livesEl = document.getElementById('game-lives');
-        const progressEl = document.getElementById('game-progress');
-        
-        if (timerEl) {
-            timerEl.innerText = `⏱️ ${this.state.timer}s`;
-            timerEl.style.color = this.state.timer < 5 ? '#ef4444' : '#f8fafc';
-        }
-        
-        if (livesEl) {
-            livesEl.innerHTML = '❤️'.repeat(this.state.lives) + '🖤'.repeat(3 - this.state.lives);
-        }
-
-        if (progressEl) {
-            const pct = ((this.state.currentIndex) / this.state.questions.length) * 100;
-            progressEl.style.width = `${pct}%`;
-        }
+    _updateTimerUI() {
+        const el = document.getElementById('game-timer');
+        if (!el) return;
+        el.textContent = `⏱ ${this.state.timer}s`;
+        el.classList.toggle('urgent', this.state.timer <= 5);
     },
 
-    renderArena(chapterId, stageIndex) {
-        const app = document.getElementById('app');
+    _renderArena() {
+        // Oculta HUD e nav para tela cheia do jogo
+        document.getElementById('top-hud')?.classList.add('hidden');
+        document.getElementById('bottom-nav')?.classList.add('hidden');
+
+        const app = document.getElementById('app-container');
         app.innerHTML = `
-            <div class="game-arena">
+            <div class="game-arena" id="game-arena">
                 <div class="game-header">
-                    <button class="btn-exit" onclick="GameEngine.exit()">✕</button>
-                    <div id="game-progress" class="progress-bar"></div>
-                    <div class="game-stats">
-                        <span id="game-lives">❤️❤️❤️</span>
-                        <span id="game-timer">⏱️ 15s</span>
+                    <button class="btn-exit" onclick="GameEngine.exit()" title="Sair">✕</button>
+                    <div class="game-progress-track">
+                        <div class="game-progress-fill" id="game-progress" style="width:0%"></div>
                     </div>
-                </div>
-                
-                <div id="question-container" class="question-container">
-                    <!-- Questão injetada aqui -->
+                    <div class="game-lives" id="game-lives">❤️❤️❤️</div>
+                    <div class="game-timer" id="game-timer">⏱ 15s</div>
                 </div>
 
-                <div id="feedback-overlay" class="feedback-overlay"></div>
-            </div>
-        `;
-        this.loadQuestion();
+                <div class="question-container" id="question-container"></div>
+
+                <div class="feedback-overlay" id="feedback-overlay"></div>
+            </div>`;
+
+        this._loadQuestion();
     },
 
-    loadQuestion() {
+    _loadQuestion() {
         if (this.state.currentIndex >= this.state.questions.length) {
-            this.endGame(true);
+            this._endGame(true);
             return;
         }
 
-        const q = this.state.questions[this.state.currentIndex];
+        this.state.pendingFeedback = false;
+        this.state.isPlaying = true;
+
+        const q         = this.state.questions[this.state.currentIndex];
         const container = document.getElementById('question-container');
-        
-        // Reset timer para nova questão
-        this.state.timer = 15; 
-        this.updateHUD();
+        const letters   = ['A', 'B', 'C', 'D'];
+
+        // Reset and restart timer
+        this.state.timer = CONFIG.stages.timePerQuestion || 15;
+        this._updateTimerUI();
+        this._startTimer();
+
+        // Update progress bar
+        const pct = (this.state.currentIndex / this.state.questions.length) * 100;
+        const progressEl = document.getElementById('game-progress');
+        if (progressEl) progressEl.style.width = `${pct}%`;
+
+        // Update lives
+        this._updateLivesUI();
 
         container.innerHTML = `
-            <div class="question-card animate-in">
-                <h2 class="question-text">${q.question}</h2>
-                <div class="options-grid">
-                    ${q.options.map((opt, idx) => `
-                        <button class="option-btn" onclick="GameEngine.handleAnswer(${idx})">
-                            ${opt}
-                        </button>
-                    `).join('')}
-                </div>
+            <div class="question-counter">Questão ${this.state.currentIndex + 1} / ${this.state.questions.length}</div>
+            <div class="question-card">
+                <div class="question-text">${q.question}</div>
             </div>
-        `;
+            <div class="options-grid" id="options-grid">
+                ${q.options.map((opt, idx) => `
+                    <button class="option-btn" id="opt-${idx}" onclick="GameEngine.handleAnswer(${idx})">
+                        <span class="option-letter">${letters[idx] || idx + 1}</span>
+                        ${opt}
+                    </button>
+                `).join('')}
+            </div>`;
+    },
+
+    _updateLivesUI() {
+        const el = document.getElementById('game-lives');
+        if (!el) return;
+        const max    = CONFIG.lives.gameHearts || 3;
+        const alive  = this.state.lives;
+        el.innerHTML = '❤️'.repeat(Math.max(0, alive)) + '🖤'.repeat(Math.max(0, max - alive));
     },
 
     handleAnswer(selectedIndex) {
-        if (!this.state.isPlaying) return;
-        
-        const currentQ = this.state.questions[this.state.currentIndex];
-        const isCorrect = selectedIndex === currentQ.correctIndex;
-        const buttons = document.querySelectorAll('.option-btn');
+        if (!this.state.isPlaying || this.state.pendingFeedback) return;
 
-        // Desabilita cliques
-        this.state.isPlaying = false;
+        this._stopTimer();
+        this.state.isPlaying      = false;
+        this.state.pendingFeedback = true;
+
+        const q         = this.state.questions[this.state.currentIndex];
+        const isCorrect = selectedIndex === q.correctIndex;
+        const buttons   = document.querySelectorAll('.option-btn');
+
+        // Desabilita todos os botões
         buttons.forEach(btn => btn.disabled = true);
 
         if (isCorrect) {
-            // Lógica de Acerto
             this.state.combo++;
-            const points = 100 + (this.state.combo * 10) + (this.state.timer * 5);
-            this.state.score += points;
-            
-            if (buttons[selectedIndex]) {
-                buttons[selectedIndex].classList.add('correct');
-            }
-            this.triggerFeedback('success');
-            
-            setTimeout(() => {
-                this.state.currentIndex++;
-                this.state.isPlaying = true;
-                this.loadQuestion();
-            }, 1000);
+            const timeBonusMax  = CONFIG.xp.timeBonusMax || 75;
+            const comboBonus    = CONFIG.xp.comboBonus * this.state.combo;
+            const timeBonus     = Math.floor((this.state.timer / 15) * timeBonusMax);
+            const points        = CONFIG.xp.correct + comboBonus + timeBonus;
+            this.state.score   += points;
+
+            const btn = document.getElementById(`opt-${selectedIndex}`);
+            if (btn) btn.classList.add('correct');
+
+            this._showFeedback(true, q.explanation, points);
         } else {
-            // Lógica de Erro
             this.state.combo = 0;
             this.state.lives--;
-            this.updateHUD();
-            
-            if (selectedIndex !== -1 && buttons[selectedIndex]) {
-                buttons[selectedIndex].classList.add('wrong');
-            }
-            // Mostra a correta
-            if (buttons[currentQ.correctIndex]) {
-                buttons[currentQ.correctIndex].classList.add('correct');
-            }
-            
-            this.triggerFeedback('error');
+            this._updateLivesUI();
 
-            if (this.state.lives <= 0) {
-                setTimeout(() => this.endGame(false), 1500);
-            } else {
-                setTimeout(() => {
-                    this.state.currentIndex++;
-                    this.state.isPlaying = true;
-                    this.loadQuestion();
-                }, 1500);
+            if (selectedIndex !== -1) {
+                const wrongBtn = document.getElementById(`opt-${selectedIndex}`);
+                if (wrongBtn) wrongBtn.classList.add('wrong');
             }
+            const correctBtn = document.getElementById(`opt-${q.correctIndex}`);
+            if (correctBtn) correctBtn.classList.add('correct');
+
+            this._showFeedback(false, q.explanation, 0);
+
+            // Shake arena on wrong answer
+            const arena = document.getElementById('game-arena');
+            if (arena) {
+                arena.classList.add('shake');
+                setTimeout(() => arena.classList.remove('shake'), 500);
+            }
+            if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
         }
     },
 
-    triggerFeedback(type) {
+    _showFeedback(isCorrect, explanation, points) {
         const overlay = document.getElementById('feedback-overlay');
-        const app = document.getElementById('app');
-        
-        if (type === 'success') {
-            overlay.className = 'feedback-overlay success-anim';
-            overlay.innerHTML = '<div class="feedback-text">CORRETO! ⚡</div>';
-            if (navigator.vibrate) navigator.vibrate(50);
-        } else {
-            overlay.className = 'feedback-overlay error-anim';
-            overlay.innerHTML = '<div class="feedback-text">ERROU! 💥</div>';
-            app.classList.add('shake');
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        if (!overlay) {
+            this._nextQuestion(isCorrect);
+            return;
         }
 
-        setTimeout(() => {
+        const icon  = isCorrect ? '✅' : '❌';
+        const label = isCorrect ? `Correto! +${points} pts` : 'Incorreto!';
+
+        overlay.className = `feedback-overlay show ${isCorrect ? 'success-fb' : 'error-fb'}`;
+        overlay.innerHTML = `
+            <div class="feedback-icon">${icon}</div>
+            <div class="feedback-body feedback-${isCorrect ? 'success' : 'error'}">
+                <div class="feedback-label">${label}</div>
+                ${explanation ? `<div class="feedback-explanation">${explanation}</div>` : ''}
+            </div>
+            <button class="feedback-continue" onclick="GameEngine._dismissFeedback()">
+                ${this.state.lives <= 0 ? 'Ver resultado' : 'Continuar'}
+            </button>`;
+    },
+
+    _dismissFeedback() {
+        const overlay = document.getElementById('feedback-overlay');
+        if (overlay) {
             overlay.className = 'feedback-overlay';
             overlay.innerHTML = '';
-            app.classList.remove('shake');
-        }, 800);
-    },
-
-    endGame(victory) {
-        this.stopTimer();
-        const app = document.getElementById('app');
-        const stars = victory ? (this.state.lives === 3 ? 3 : this.state.lives === 2 ? 2 : 1) : 0;
-        
-        // Salvar progresso
-        if (victory) {
-            const stageKey = `${this.state.currentStage.id || 'unknown'}_s${window.currentStageIdx || 0}`;
-            // Nota: Em produção, passar o ID correto do stage
-            window.GameState.completeStage('cap7_doencas', window.currentStageIdx || 0, stars);
         }
 
+        const isAlive = this.state.lives > 0;
+        if (!isAlive) {
+            this._endGame(false);
+            return;
+        }
+
+        this.state.currentIndex++;
+        this._loadQuestion();
+    },
+
+    _nextQuestion(isCorrect) {
+        if (!isCorrect && this.state.lives <= 0) {
+            setTimeout(() => this._endGame(false), 1200);
+            return;
+        }
+        setTimeout(() => {
+            this.state.currentIndex++;
+            this._loadQuestion();
+        }, isCorrect ? 800 : 1500);
+    },
+
+    _endGame(victory) {
+        this._stopTimer();
+
+        const stars = victory
+            ? (this.state.lives === 3 ? 3 : this.state.lives === 2 ? 2 : 1)
+            : 0;
+
+        if (victory) {
+            State.completeStage(this.state.chapterId, this.state.stageIndex, stars);
+            const xpGain  = this.state.score + CONFIG.xp.stageComplete;
+            const gemGain = CONFIG.gems.stageComplete + (stars === 3 ? CONFIG.gems.perfect : 0);
+            State.addXP(xpGain);
+            State.addGems(gemGain);
+        }
+
+        const starsDisplay = victory
+            ? ['⭐', '⭐⭐', '⭐⭐⭐'][stars - 1] || ''
+            : '💀';
+
+        const app = document.getElementById('app-container');
         app.innerHTML = `
-            <div class="modal-overlay active">
-                <div class="modal-content result-screen ${victory ? 'victory' : 'defeat'}">
-                    <div class="result-icon">${victory ? '🏆' : '💀'}</div>
-                    <h1>${victory ? 'MISSÃO CUMPRIDA!' : 'GAME OVER'}</h1>
-                    <div class="result-stats">
-                        <div class="stat-box">
-                            <span class="label">Pontos</span>
-                            <span class="value">${this.state.score}</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="label">Estrelas</span>
-                            <span class="value">${'⭐'.repeat(stars)}</span>
-                        </div>
+            <div class="result-screen">
+                <div class="result-icon">${victory ? '🏆' : '💀'}</div>
+                <h1 class="result-title ${victory ? 'victory' : 'defeat'}">
+                    ${victory ? 'MISSÃO CUMPRIDA!' : 'GAME OVER'}
+                </h1>
+                <p class="result-subtitle">
+                    ${victory ? 'Você foi incrível, herói!' : 'Não desista! Cada erro é um aprendizado.'}
+                </p>
+
+                ${victory ? `<div class="result-stars">${starsDisplay}</div>` : ''}
+
+                <div class="result-stats">
+                    <div class="result-stat-box">
+                        <span class="result-stat-value">${this.state.score}</span>
+                        <span class="result-stat-label">Pontos</span>
                     </div>
-                    <p>${victory ? 'Você evoluiu seu conhecimento!' : 'Não desista! Tente novamente.'}</p>
-                    
-                    <div class="action-buttons">
-                        <button class="btn-primary" onclick="Router.navigate()">VOLTAR AO MAPA</button>
-                        ${!victory ? `<button class="btn-secondary" onclick="GameEngine.restart()">TENTAR DE NOVO</button>` : ''}
+                    ${victory ? `
+                    <div class="result-stat-box">
+                        <span class="result-stat-value">+${this.state.score + CONFIG.xp.stageComplete} ⚡</span>
+                        <span class="result-stat-label">XP Ganho</span>
                     </div>
+                    <div class="result-stat-box">
+                        <span class="result-stat-value">+${CONFIG.gems.stageComplete + (stars === 3 ? CONFIG.gems.perfect : 0)} 💎</span>
+                        <span class="result-stat-label">Gemas</span>
+                    </div>` : ''}
                 </div>
-            </div>
-        `;
+
+                <div class="result-actions">
+                    <button class="btn-primary" onclick="Router.navigate('#chapter/${this.state.chapterId}')">
+                        🗺️ Voltar ao Mapa
+                    </button>
+                    ${!victory ? `
+                    <button class="btn-secondary" onclick="GameEngine.start('${this.state.chapterId}','${this.state.stageId}',${this.state.stageIndex})">
+                        🔄 Tentar de Novo
+                    </button>` : ''}
+                </div>
+            </div>`;
+
+        if (victory && typeof Utils !== 'undefined') {
+            Utils.confetti();
+        }
+
+        // Restaura HUD e nav
+        document.getElementById('top-hud')?.classList.remove('hidden');
+        document.getElementById('bottom-nav')?.classList.remove('hidden');
+        State.updateHUD();
     },
 
     exit() {
-        if(confirm("Deseja sair da missão? Seu progresso será perdido.")) {
-            Router.navigate();
+        if (confirm('Deseja sair da missão? Seu progresso será perdido.')) {
+            this._stopTimer();
+            document.getElementById('top-hud')?.classList.remove('hidden');
+            document.getElementById('bottom-nav')?.classList.remove('hidden');
+            Router.navigate(`#chapter/${this.state.chapterId}`);
         }
-    },
-
-    restart() {
-        // Reinicia com os mesmos parâmetros
-        const chapterId = 'cap7_doencas'; // Deveria ser passado dinamicamente
-        const stageIdx = window.currentStageIdx || 0;
-        // Recarrega a view do stage para reiniciar
-        UI.renderStage(chapterId, stageIdx);
     }
 };
 
-// Expor globalmente
 window.GameEngine = GameEngine;

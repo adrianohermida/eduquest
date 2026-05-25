@@ -496,6 +496,6 @@ const STAGE_03 = {
 
     spacedReviewEnabled: true
   }
-},
+};
 
 window.STAGE_03 = STAGE_03;
