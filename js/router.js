@@ -1364,6 +1364,12 @@ const Router = {
                     <span class="pnb-label">Ranking Global</span>
                     <span class="pnb-arrow">›</span>
                 </button>
+                <button class="profile-nav-btn" onclick="Router.navigate('#guild')">
+                    <span class="pnb-icon">${_ic('guild',{size:'sm'})}</span>
+                    <span class="pnb-label">Minha Guild</span>
+                    ${(typeof SocialEngine !== 'undefined' && SocialEngine.getUserGuild()) ? `<span class="pnb-count">${SocialEngine.getUserGuild().name}</span>` : `<span class="pnb-count" style="color:var(--text-muted)">Sem guild</span>`}
+                    <span class="pnb-arrow">›</span>
+                </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#teams')">
                     <span class="pnb-icon">${_ic('friends',{size:'sm'})}</span>
                     <span class="pnb-label">Minhas Turmas</span>
