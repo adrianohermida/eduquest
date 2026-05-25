@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduQuest - Ciências Cap. 7</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>EduQuest - Aprenda Ciências Gamificado</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <!-- Top Bar (Hearts, Streak, XP) -->
@@ -15,7 +15,7 @@
     </div>
     <div class="streak" id="streak-display">🔥 0</div>
   </header>
-
+  
   <!-- Game Area -->
   <main id="game-container" class="game-container">
     <!-- Content is injected here by JS -->
@@ -29,6 +29,20 @@
     <button id="check-btn" class="btn btn-primary" disabled>VERIFICAR</button>
   </footer>
 
-  <script src="app.js"></script>
+  <!-- Load order matters: dependencies first -->
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/data/chapters.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/components/ProgressBar.js"></script>
+  <script src="js/components/QuestionCard.js"></script>
+  <script src="js/components/Flashcard.js"></script>
+  <script src="js/components/Modal.js"></script>
+  <script src="js/components/SummaryCard.js"></script>
+  <script src="js/components/StatsPanel.js"></script>
+  <script src="js/components/Sidebar.js"></script>
+  <script src="js/components/RightPanel.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
