@@ -1515,7 +1515,7 @@ const Router = {
         <div class="screen" style="padding-top:0;padding-left:0;padding-right:0">
 
             <div class="ranking-header">
-                <span class="ranking-league-icon">${rank.icon}</span>
+                <span class="ranking-league-icon">${_ic(rank.iconId,{size:'lg',color:rank.iconColor})}</span>
                 <div class="ranking-league-name">Liga ${rank.name}</div>
                 <div class="ranking-league-desc">Top jogadores do EduQuest</div>
             </div>
