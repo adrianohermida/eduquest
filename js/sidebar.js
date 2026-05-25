@@ -167,16 +167,16 @@ const Sidebar = {
             const prog = m.completed ? 100 : (m.progress ?? 0);
             return `
             <div class="rp-mission${m.completed ? ' done' : ''}" role="listitem">
-                <span class="rp-mission-icon" aria-hidden="true">${m.icon}</span>
+                <span class="rp-mission-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(m.icon,{size:'sm'}) : m.icon}</span>
                 <div class="rp-mission-body">
                     <div class="rp-mission-title">${m.title}</div>
-                    <div class="rp-mission-reward">⚡ +${m.xp}${m.gems ? ` · 💎 +${m.gems}` : ''}</div>
+                    <div class="rp-mission-reward">${typeof IconSystem !== 'undefined' ? IconSystem.html('xp',{size:'xs',color:'xp'}) : '⚡'} +${m.xp}${m.gems ? ` · ${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xs',color:'gem'}) : '💎'} +${m.gems}` : ''}</div>
                     ${!m.completed ? `
                     <div class="rp-mission-progress-wrap" aria-hidden="true">
                         <div class="rp-mission-progress-fill" style="width:${prog}%"></div>
                     </div>` : ''}
                 </div>
-                <span class="rp-mission-check" aria-label="${m.completed ? 'Concluída' : 'Pendente'}">${m.completed ? '✅' : '⬜'}</span>
+                <span class="rp-mission-check" aria-label="${m.completed ? 'Concluída' : 'Pendente'}">${m.completed ? (typeof IconSystem !== 'undefined' ? IconSystem.html('check',{size:'xs',color:'success'}) : '✅') : '⬜'}</span>
             </div>`;
         }).join('');
 
@@ -214,7 +214,7 @@ const Sidebar = {
                 return `
                 <section class="rp-section rp-mission-cur-section" aria-labelledby="rp-cur-lbl">
                     <div class="rp-mission-cur-header">
-                        <h2 class="rp-section-title" id="rp-cur-lbl">🎯 Missão Atual</h2>
+                        <h2 class="rp-section-title" id="rp-cur-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'xs',color:'xp'}) : '🎯'} Missão Atual</h2>
                     </div>
                     <a href="#stage/${chId}/${activeStage.id}" class="rp-mission-cur-card" aria-label="Entrar na missão ${stageData.title || activeStage.id}">
                         <div class="rp-mission-cur-meta">FASE ${activeStage.index}</div>
@@ -234,7 +234,7 @@ const Sidebar = {
             <!-- Streak section -->
             <section class="rp-section" aria-labelledby="rp-streak-lbl">
                 <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-streak-lbl">🔥 Sequência</h2>
+                    <h2 class="rp-section-title" id="rp-streak-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥'} Sequência</h2>
                     <span class="rp-streak-count" aria-label="${user.streak || 1} dias">${user.streak || 1} dia${(user.streak || 1) !== 1 ? 's' : ''}</span>
                 </div>
                 <div class="rp-calendar" role="list" aria-label="Calendário de sequência">${calHTML}</div>
@@ -243,7 +243,7 @@ const Sidebar = {
             <!-- Daily missions section -->
             <section class="rp-section" aria-labelledby="rp-quests-lbl">
                 <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-quests-lbl">⚡ Missões do Dia</h2>
+                    <h2 class="rp-section-title" id="rp-quests-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('xp',{size:'xs',color:'xp'}) : '⚡'} Missões do Dia</h2>
                     <span class="rp-badge" aria-label="${mDone} de ${mTotal} concluídas">${mDone}/${mTotal}</span>
                 </div>
                 <div role="list" aria-label="Lista de missões diárias">${mHTML}</div>
@@ -252,7 +252,7 @@ const Sidebar = {
             <!-- League section -->
             <section class="rp-section" aria-labelledby="rp-rank-lbl">
                 <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-rank-lbl">🏆 Sua Liga</h2>
+                    <h2 class="rp-section-title" id="rp-rank-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('trophy',{size:'xs',color:'final'}) : '🏆'} Sua Liga</h2>
                     <a href="#ranking" class="rp-section-link" aria-label="Ver ranking">Ver →</a>
                 </div>
                 <div class="rp-rank-card">
@@ -271,7 +271,7 @@ const Sidebar = {
             <!-- Boss section -->
             <section class="rp-section" aria-labelledby="rp-boss-lbl">
                 <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-boss-lbl">💀 Boss da Semana</h2>
+                    <h2 class="rp-section-title" id="rp-boss-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('boss',{size:'xs',color:'rpg'}) : '💀'} Boss da Semana</h2>
                     <span class="rp-soon-chip" aria-label="Em breve">breve</span>
                 </div>
                 <div class="rp-boss-card" aria-label="Boss da semana — em breve">
@@ -292,11 +292,11 @@ const Sidebar = {
             <!-- Weekly event (decorative/teaser) -->
             <section class="rp-section" aria-labelledby="rp-event-lbl">
                 <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-event-lbl">🎯 Evento</h2>
+                    <h2 class="rp-section-title" id="rp-event-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('flag',{size:'xs',color:'xp'}) : '🎯'} Evento</h2>
                     <span class="rp-soon-chip">breve</span>
                 </div>
                 <a class="rp-event-card" href="#home" aria-label="Evento semanal — em breve">
-                    <span class="rp-event-icon" aria-hidden="true">🌟</span>
+                    <span class="rp-event-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'md',color:'final'}) : '🌟'}</span>
                     <div>
                         <div class="rp-event-title">Semana da Ciência</div>
                         <div class="rp-event-sub">XP em dobro · Em breve!</div>
@@ -500,7 +500,7 @@ const HUD = {
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">⚡</span>
+            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('xp',{size:'lg',color:'xp'}) : '⚡'}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">XP &amp; Nível</div>
                 <div class="hdd-head-sub">${xp.toLocaleString('pt-BR')} XP total</div>
@@ -514,7 +514,7 @@ const HUD = {
                 </div>
                 <div style="text-align:right">
                     <div class="hdd-next-reward">Próxima recompensa</div>
-                    <div style="font-size:0.8rem;font-weight:900;color:var(--gold,#f59e0b)">+${gemRwd} 💎</div>
+                    <div style="font-size:0.8rem;font-weight:900;color:var(--gold,#f59e0b)">+${gemRwd} ${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xs',color:'gem'}) : '💎'}</div>
                 </div>
             </div>
             <div>
@@ -536,7 +536,7 @@ const HUD = {
 
         const calHTML = calendar.map(d => `
             <div class="hdd-cal-day${d.active ? ' sc-active' : ''}${d.isToday ? ' sc-today' : ''}">
-                <div class="hdd-cal-dot">${d.active ? '🔥' : d.isToday ? '●' : ''}</div>
+                <div class="hdd-cal-dot">${d.active ? (typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥') : d.isToday ? '●' : ''}</div>
                 <span class="hdd-cal-lbl">${d.label}</span>
             </div>`).join('');
 
@@ -546,16 +546,16 @@ const HUD = {
             const next = !done && MILESTONES.find(m => m > streak) === days;
             return `
             <div class="hdd-milestone${done ? ' ms-done' : next ? ' ms-next' : ''}">
-                <span class="hdd-milestone-icon">${done ? '✅' : next ? '🎯' : '○'}</span>
+                <span class="hdd-milestone-icon">${done ? (typeof IconSystem !== 'undefined' ? IconSystem.html('check',{size:'xs',color:'success'}) : '✅') : next ? (typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'xs',color:'xp'}) : '🎯') : '○'}</span>
                 <span class="hdd-milestone-days">${days} dias</span>
                 <span>${done ? 'Concluído!' : next ? 'Próximo!' : ''}</span>
-                <span class="hdd-milestone-reward">💎 +${days < 10 ? 5 : days < 20 ? 10 : 25}</span>
+                <span class="hdd-milestone-reward">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xs',color:'gem'}) : '💎'} +${days < 10 ? 5 : days < 20 ? 10 : 25}</span>
             </div>`;
         }).join('');
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">🔥</span>
+            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'lg',color:'streak'}) : '🔥'}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">${streak} dia${streak !== 1 ? 's' : ''} seguidos!</div>
                 <div class="hdd-head-sub">${hasFrz ? '🧊 1 freeze disponível' : 'Sem proteção ativa'}</div>
@@ -565,17 +565,17 @@ const HUD = {
             <div class="hdd-streak-cal">${calHTML}</div>
             <div class="hdd-streak-row">
                 <div class="hdd-streak-chip">
-                    <span class="hdd-streak-chip-icon">🔥</span>
+                    <span class="hdd-streak-chip-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'sm',color:'streak'}) : '🔥'}</span>
                     <span class="hdd-streak-chip-val">${streak}</span>
                     <span class="hdd-streak-chip-lbl">Atual</span>
                 </div>
                 <div class="hdd-streak-chip">
-                    <span class="hdd-streak-chip-icon">⭐</span>
+                    <span class="hdd-streak-chip-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'sm',color:'final'}) : '⭐'}</span>
                     <span class="hdd-streak-chip-val">${Math.max(streak, u.maxStreak || streak)}</span>
                     <span class="hdd-streak-chip-lbl">Recorde</span>
                 </div>
                 <div class="hdd-streak-chip">
-                    <span class="hdd-streak-chip-icon">💎</span>
+                    <span class="hdd-streak-chip-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'sm',color:'gem'}) : '💎'}</span>
                     <span class="hdd-streak-chip-val">+5</span>
                     <span class="hdd-streak-chip-lbl">Por dia</span>
                 </div>
@@ -595,7 +595,7 @@ const HUD = {
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">💎</span>
+            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'lg',color:'gem'}) : '💎'}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">Gemas</div>
                 <div class="hdd-head-sub">Moeda premium do EduQuest</div>
@@ -603,14 +603,14 @@ const HUD = {
         </div>
         <div class="hdd-body">
             <div class="hdd-gems-hero">
-                <span class="hdd-gems-icon">💎</span>
+                <span class="hdd-gems-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xl',color:'gem'}) : '💎'}</span>
                 <div>
                     <div class="hdd-gems-count">${gems}</div>
                     <div class="hdd-gems-label">gemas disponíveis</div>
                 </div>
             </div>
             <div class="hdd-daily-reward">
-                <span class="hdd-dr-icon">${claimed ? '✅' : '🎁'}</span>
+                <span class="hdd-dr-icon">${claimed ? (typeof IconSystem !== 'undefined' ? IconSystem.html('check',{size:'sm',color:'success'}) : '✅') : '🎁'}</span>
                 <div>
                     <div class="hdd-dr-text">Recompensa diária</div>
                     <div class="hdd-dr-sub">${claimed ? 'Coletada hoje!' : '+5 gemas disponíveis'}</div>
@@ -618,7 +618,7 @@ const HUD = {
                 <span class="hdd-dr-badge ${claimed ? '' : 'pending'}">${claimed ? 'Coletado' : 'Coletar!'}</span>
             </div>
             <div class="hdd-milestone">
-                <span class="hdd-milestone-icon">🏆</span>
+                <span class="hdd-milestone-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('trophy',{size:'sm',color:'final'}) : '🏆'}</span>
                 <span style="flex:1;font-size:0.74rem;font-weight:700">Complete missões para ganhar mais</span>
             </div>
         </div>
@@ -633,13 +633,14 @@ const HUD = {
         const regen     = 3600; // 1h per heart in seconds
         const full      = hearts >= maxHearts;
 
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
         const heartsHTML = Array.from({ length: maxHearts }, (_, i) =>
-            `<span class="hdd-heart${i >= hearts ? ' hh-empty' : ''}" aria-hidden="true">❤️</span>`
+            `<span class="hdd-heart${i >= hearts ? ' hh-empty' : ''}" aria-hidden="true">${i < hearts ? _ic('heart',{size:'md',color:'heart'}) : _ic('heart',{size:'md',color:'locked'})}</span>`
         ).join('');
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">❤️</span>
+            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('heart',{size:'lg',color:'heart'}) : '❤️'}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">${hearts} / ${maxHearts} Vidas</div>
                 <div class="hdd-head-sub">${full ? 'Cheio! Vá batalhar!' : `Recuperação: 1h por vida`}</div>
@@ -653,7 +654,7 @@ const HUD = {
             </div>` : `
             <div class="hdd-hearts-max">Todas as vidas disponíveis ✓</div>`}
             <div class="hdd-milestone">
-                <span class="hdd-milestone-icon">🛡️</span>
+                <span class="hdd-milestone-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('shield',{size:'sm',color:'success'}) : '🛡️'}</span>
                 <span style="flex:1;font-size:0.74rem;font-weight:700">Escudo protege contra perda de vidas</span>
             </div>
         </div>
@@ -667,14 +668,14 @@ const HUD = {
         if (!notifs.length) {
             return `
             <div class="hdd-head">
-                <span class="hdd-head-icon">🔔</span>
+                <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('bell',{size:'lg'}) : '🔔'}</span>
                 <div class="hdd-head-info">
                     <div class="hdd-head-title">Notificações</div>
                     <div class="hdd-head-sub">Tudo em dia!</div>
                 </div>
             </div>
             <div class="hdd-notif-empty">
-                <span class="hdd-notif-empty-icon">🎉</span>
+                <span class="hdd-notif-empty-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('achievement',{size:'lg',color:'xp'}) : '🎉'}</span>
                 Sem notificações pendentes
             </div>`;
         }
@@ -713,10 +714,10 @@ const HUD = {
 
     _ddDiscipline() {
         const subjects = [
-            { icon: '🔬', name: 'Ciências',    grade: '7º Ano', id: 'ciencias-7' },
-            { icon: '📐', name: 'Matemática',  grade: '7º Ano', id: 'mat-7', soon: true },
-            { icon: '📖', name: 'Português',   grade: '7º Ano', id: 'port-7', soon: true },
-            { icon: '🌎', name: 'Geografia',   grade: '7º Ano', id: 'geo-7',  soon: true },
+            { icon: 'microscope', name: 'Ciências',   grade: '7º Ano', id: 'ciencias-7' },
+            { icon: 'star',       name: 'Matemática', grade: '7º Ano', id: 'mat-7', soon: true },
+            { icon: 'scroll',     name: 'Português',  grade: '7º Ano', id: 'port-7', soon: true },
+            { icon: 'compass',    name: 'Geografia',  grade: '7º Ano', id: 'geo-7',  soon: true },
         ];
         const cur = window.CHAPTER_METADATA;
         const itemsHTML = subjects.map(s => {
@@ -753,16 +754,17 @@ const HUD = {
         const missions = (typeof State !== 'undefined') ? State.getMissions() : [];
         const pendingMissions = missions.filter(m => !m.completed);
 
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
         if (streak >= 3) {
-            notifs.push({ icon: '🔥', text: `Sequência de ${streak} dias! Continue assim!`, time: 'Hoje', unread: false, href: '#home' });
+            notifs.push({ icon: _ic('streak',{size:'sm',color:'streak'}), text: `Sequência de ${streak} dias! Continue assim!`, time: 'Hoje', unread: false, href: '#home' });
         }
         if (hearts <= 1) {
-            notifs.push({ icon: '❤️', text: `Atenção: você está com apenas ${hearts} vida(s)!`, time: 'Agora', unread: true, href: '#shop' });
+            notifs.push({ icon: _ic('heart',{size:'sm',color:'heart'}), text: `Atenção: você está com apenas ${hearts} vida(s)!`, time: 'Agora', unread: true, href: '#shop' });
         }
         if (pendingMissions.length) {
-            notifs.push({ icon: '⚡', text: `${pendingMissions.length} missão(ões) diária(s) disponível(is)!`, time: 'Hoje', unread: true, href: '#missions' });
+            notifs.push({ icon: _ic('xp',{size:'sm',color:'xp'}), text: `${pendingMissions.length} missão(ões) diária(s) disponível(is)!`, time: 'Hoje', unread: true, href: '#missions' });
         }
-        notifs.push({ icon: '💀', text: 'Boss da semana chegando em breve!', time: 'Esta semana', unread: false, href: '#home' });
+        notifs.push({ icon: _ic('boss',{size:'sm',color:'rpg'}), text: 'Boss da semana chegando em breve!', time: 'Esta semana', unread: false, href: '#home' });
 
         return notifs;
     },
@@ -793,8 +795,8 @@ const HUD = {
         if (id('had-name'))       id('had-name').textContent       = u.name   || 'Herói';
         if (id('had-lvl-txt'))    id('had-lvl-txt').textContent    = `Nível ${u.level} · ${rank.icon} ${rank.name}`;
         if (id('had-xp-val'))     id('had-xp-val').textContent     = `${(u.xp||0).toLocaleString('pt-BR')} XP`;
-        if (id('had-streak-val')) id('had-streak-val').textContent = `${u.streak || 1} dias 🔥`;
-        if (id('had-gems-val'))   id('had-gems-val').textContent   = `${u.gems || 0} 💎`;
+        if (id('had-streak-val')) id('had-streak-val').textContent = `${u.streak || 1} dias`;
+        if (id('had-gems-val'))   id('had-gems-val').textContent   = `${u.gems || 0}`;
     },
 
     // ── LAYOUT PREFERENCE (compact / advanced) ────────────
