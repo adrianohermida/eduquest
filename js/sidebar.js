@@ -726,7 +726,7 @@ const HUD = {
             <button class="hdd-disc-item${active ? ' hdd-disc-active' : ''}${s.soon ? ' hdd-disc-soon' : ''}"
                     onclick="${s.soon ? '' : `HUD._closeAll()`}"
                     ${s.soon ? 'disabled aria-disabled="true"' : ''}>
-                <span class="hdd-disc-icon">${s.icon}</span>
+                <span class="hdd-disc-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html(s.icon,{size:'md',color:'science'}) : s.icon}</span>
                 <div class="hdd-disc-info">
                     <div class="hdd-disc-name">${s.name}</div>
                     <div class="hdd-disc-grade">${s.grade}</div>
