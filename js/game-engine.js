@@ -219,10 +219,10 @@ const GameEngine = {
                     </div>
                 </div>
                 <div class="learning-footer">
-                    <div class="learning-stage-label">${stageData.icon || '⚡'} ${stageData.title || ''}</div>
+                    <div class="learning-stage-label">${(typeof IconSystem !== 'undefined' ? IconSystem.html('xp',{size:'sm',color:'xp'}) : '⚡')} ${stageData.title || ''}</div>
                     <button class="btn-primary learning-next-btn" id="learning-next-btn"
                             onclick="GameEngine._nextLearningCard()">
-                        ${cards.length <= 1 ? '⚔️ BATALHAR!' : 'Próximo →'}
+                        ${cards.length <= 1 ? `${(typeof IconSystem !== 'undefined' ? IconSystem.html('sword',{size:'sm'}) : '⚔️')} BATALHAR!` : 'Próximo →'}
                     </button>
                 </div>
             </div>`;
@@ -259,7 +259,9 @@ const GameEngine = {
         });
         document.querySelectorAll('.ldot').forEach((d, i) => d.classList.toggle('active', i === idx));
         const btn = document.getElementById('learning-next-btn');
-        if (btn) btn.textContent = idx === total - 1 ? '⚔️ BATALHAR!' : 'Próximo →';
+        if (btn) btn.innerHTML = idx === total - 1
+            ? `${(typeof IconSystem !== 'undefined' ? IconSystem.html('sword',{size:'sm'}) : '⚔️')} BATALHAR!`
+            : 'Próximo →';
     },
 
     _startBattle() { this._renderArena(); },
@@ -308,7 +310,7 @@ const GameEngine = {
                                 <div class="battle-hp-fill hp-player" id="player-hp" style="width:100%"></div>
                             </div>
                             <span class="battle-hp-text" id="player-hp-hearts">
-                                ${'❤️'.repeat(maxLives)}
+                                ${Array.from({length: maxLives}, (_, i) => (typeof IconSystem !== 'undefined') ? IconSystem.html('heart',{size:'xs',color:'heart'}) : '❤️').join('')}
                             </span>
                         </div>
                         <div class="battle-entity-name">🦸 Herói</div>
@@ -343,8 +345,16 @@ const GameEngine = {
         }
         const hearts = document.getElementById('player-hp-hearts');
         if (hearts) {
-            hearts.textContent = '❤️'.repeat(Math.max(0, this.state.lives)) +
-                                 '🖤'.repeat(Math.max(0, maxLives - this.state.lives));
+            const ic = typeof IconSystem !== 'undefined' ? IconSystem : null;
+            const live  = Math.max(0, this.state.lives);
+            const empty = Math.max(0, maxLives - live);
+            if (ic) {
+                hearts.innerHTML =
+                    Array.from({length: live},  () => ic.html('heart',{size:'xs',color:'heart'})).join('') +
+                    Array.from({length: empty}, () => ic.html('heart',{size:'xs',color:'locked'})).join('');
+            } else {
+                hearts.textContent = '❤️'.repeat(live) + '🖤'.repeat(empty);
+            }
         }
     },
 
@@ -613,9 +623,16 @@ const GameEngine = {
         this._updatePlayerHP();
         const el  = document.getElementById('game-lives');
         if (!el) return;
-        const max = CONFIG.lives.gameHearts || 3;
-        el.innerHTML = '❤️'.repeat(Math.max(0, this.state.lives)) +
-                       '🖤'.repeat(Math.max(0, max - this.state.lives));
+        const max  = CONFIG.lives.gameHearts || 3;
+        const live = Math.max(0, this.state.lives);
+        const ic   = typeof IconSystem !== 'undefined' ? IconSystem : null;
+        if (ic) {
+            el.innerHTML =
+                Array.from({length: live},          () => ic.html('heart',{size:'xs',color:'heart'})).join('') +
+                Array.from({length: max - live},     () => ic.html('heart',{size:'xs',color:'locked'})).join('');
+        } else {
+            el.innerHTML = '❤️'.repeat(live) + '🖤'.repeat(max - live);
+        }
     },
 
     // ── ANSWER HANDLING ──────────────────────────────────────────
@@ -793,17 +810,22 @@ const GameEngine = {
             victory,
         });
 
+        const ic = (typeof IconSystem !== 'undefined') ? IconSystem : null;
         const starsHtml = victory
             ? Array(stars).fill(0).map((_, i) =>
-                `<span class="result-star" style="animation-delay:${0.45 + i * 0.22}s">⭐</span>`
+                `<span class="result-star" style="animation-delay:${0.45 + i * 0.22}s">${ic ? ic.html('star',{size:'xl',color:'final',variant:'glow'}) : '⭐'}</span>`
               ).join('')
             : '';
         const xpGain   = this.state.score + (CONFIG.xp.stageComplete || 0);
         const gemGain  = (CONFIG.gems.stageComplete || 0) + (stars === 3 ? (CONFIG.gems.perfect || 0) : 0);
+        const iconVict = ic ? ic.html('trophy',{size:'3xl',color:'final',variant:'glow'}) : '🏆';
+        const iconDef  = ic ? ic.html('boss',  {size:'3xl',color:'boss'}) : '💀';
+        const iconXP   = ic ? ic.html('xp',   {size:'xs',color:'xp'})    : '⚡';
+        const iconGem  = ic ? ic.html('gem',  {size:'xs',color:'gem'})   : '💎';
         const app = document.getElementById('app-container');
         app.innerHTML = `
             <div class="result-screen ${victory ? 'victory-mode' : 'defeat-mode'}">
-                <div class="result-icon ${victory ? 'result-icon-victory' : ''}">${victory ? '🏆' : '💀'}</div>
+                <div class="result-icon ${victory ? 'result-icon-victory' : ''}">${victory ? iconVict : iconDef}</div>
                 <h1 class="result-title ${victory ? 'victory' : 'defeat'}">
                     ${victory ? 'MISSÃO CUMPRIDA!' : 'GAME OVER'}
                 </h1>
@@ -818,11 +840,11 @@ const GameEngine = {
                     </div>
                     ${victory ? `
                     <div class="result-stat-box">
-                        <span class="result-stat-value">+<span id="rs-xp">0</span> ⚡</span>
+                        <span class="result-stat-value">+<span id="rs-xp">0</span> ${iconXP}</span>
                         <span class="result-stat-label">XP Ganho</span>
                     </div>
                     <div class="result-stat-box">
-                        <span class="result-stat-value">+<span id="rs-gems">0</span> 💎</span>
+                        <span class="result-stat-value">+<span id="rs-gems">0</span> ${iconGem}</span>
                         <span class="result-stat-label">Gemas</span>
                     </div>` : ''}
                 </div>

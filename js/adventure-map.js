@@ -27,11 +27,11 @@ const AdventureMap = {
 
     // Biomes top → bottom (forest=start at top, citadel=end at bottom)
     _biomes: [
-        { top:    0, bottom:  450, id: 'forest',  name: 'Floresta de Início',  svgIcon: 'compass',    iconColor: 'success', bg1: '#fafdf8', bg2: '#f7fee7' },
-        { top:  450, bottom: 1020, id: 'village', name: 'Aldeia do Saber',      svgIcon: 'home',       iconColor: '',        bg1: '#f7fef4', bg2: '#f0fdf4' },
-        { top: 1020, bottom: 1590, id: 'lab',     name: 'Laboratório Arcano',   svgIcon: 'microscope', iconColor: 'science', bg1: '#f0f9ff', bg2: '#e0f2fe' },
-        { top: 1590, bottom: 2160, id: 'tower',   name: 'Torre do Saber',       svgIcon: 'portal',     iconColor: 'rpg',     bg1: '#f5f3ff', bg2: '#ede9fe' },
-        { top: 2160, bottom: 2700, id: 'citadel', name: 'Cidadela Final',       svgIcon: 'crown',      iconColor: 'final',   bg1: '#fffbeb', bg2: '#fef3c7' },
+        { top:    0, bottom:  450, id: 'forest',  name: 'Floresta de Início',  svgIcon: 'compass',    iconColor: 'success', bg1: '#d1fae5', bg2: '#a7f3d0' },
+        { top:  450, bottom: 1020, id: 'village', name: 'Aldeia do Saber',      svgIcon: 'home',       iconColor: '',        bg1: '#fef9c3', bg2: '#fde68a' },
+        { top: 1020, bottom: 1590, id: 'lab',     name: 'Laboratório Arcano',   svgIcon: 'microscope', iconColor: 'science', bg1: '#dbeafe', bg2: '#bfdbfe' },
+        { top: 1590, bottom: 2160, id: 'tower',   name: 'Torre do Saber',       svgIcon: 'portal',     iconColor: 'rpg',     bg1: '#ede9fe', bg2: '#ddd6fe' },
+        { top: 2160, bottom: 2700, id: 'citadel', name: 'Cidadela Final',       svgIcon: 'crown',      iconColor: 'final',   bg1: '#fef3c7', bg2: '#fde68a' },
     ],
 
     _decorations: [
@@ -151,6 +151,19 @@ const AdventureMap = {
         document.getElementById('bottom-nav')?.classList.add('hidden');
 
         this._renderWorld();
+
+        // Show discipline selector in header
+        const discWrap = document.getElementById('hud-disc-wrap');
+        const discText = document.getElementById('hud-disc-text');
+        if (discWrap) discWrap.style.removeProperty('display');
+        if (discText && meta) {
+            const subNames = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', geografia: 'Geografia' };
+            const gradeNames = { '7ano': '7º Ano', '8ano': '8º Ano', '9ano': '9º Ano' };
+            const sub = subNames[meta.subject] || 'Ciências';
+            const grade = gradeNames[meta.grade] || '';
+            discText.textContent = grade ? `${sub} • ${grade}` : sub;
+        }
+
         this._bindEvents();
         this.running = true;
         this._loop();
@@ -165,35 +178,52 @@ const AdventureMap = {
         const u   = State.data.user;
         const starsProgress = this.stages.filter(s => s.completed).length;
 
+        const ic = IconSystem;
         app.innerHTML = `
 <div class="wm-wrap" id="wm-wrap">
 
     <div class="wm-topstrip" id="wm-topstrip">
-        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mapa">${IconSystem.html('chevron-left',{size:'md'})}</button>
+        <button class="wm-back-btn" onclick="AdventureMap.exit()" aria-label="Sair do mapa">${ic.html('chevron-left',{size:'md'})}</button>
         <div class="wm-zone-pill" id="wm-zone-pill">
-            <span class="wm-zone-icon" id="wm-zone-icon">${IconSystem.html('compass',{size:'sm',color:'success'})}</span>
+            <span class="wm-zone-icon" id="wm-zone-icon">${ic.html('compass',{size:'sm',color:'success'})}</span>
             <span class="wm-zone-name" id="wm-zone-name">Floresta de Início</span>
         </div>
         <div class="wm-hud-stats">
-            <div class="wm-stat-chip">${IconSystem.html('xp',{size:'xs',color:'xp'})} ${u.level || 1}</div>
-            <div class="wm-stat-chip">${IconSystem.html('star',{size:'xs',color:'final'})} ${starsProgress}/${this.stages.length}</div>
+            <div class="wm-stat-chip">${ic.html('xp',{size:'xs',color:'xp'})} ${u.level || 1}</div>
+            <div class="wm-stat-chip">${ic.html('star',{size:'xs',color:'final'})} ${starsProgress}/${this.stages.length}</div>
         </div>
     </div>
 
-    <div class="wm-viewport" id="wm-viewport" role="main">
-        <div class="wm-world" id="wm-world" style="width:${W}px;height:${H}px">
+    <div class="wm-content" id="wm-content">
 
-            ${this._buildBiomes()}
-            ${this._buildPathsSVG()}
-            ${this._buildDecorations()}
-            ${this._buildNodes()}
-            ${this._buildLabels()}
+        <div class="wm-map-area">
+            <div class="wm-map-pghdr">
+                <span class="wm-map-pghdr-globe">🌍</span>
+                <div>
+                    <div class="wm-map-pghdr-title">Modo Aventura</div>
+                    <div class="wm-map-pghdr-sub">Explore os mundos, aprenda e derrote os vilões da desinformação!</div>
+                </div>
+            </div>
 
-            <div class="wm-char" id="wm-char"
-                 style="left:${this.world.charX}px;top:${this.world.charY}px"
-                 aria-label="Seu personagem">${IconSystem.html('char',{size:'xl'})}</div>
+            <div class="wm-viewport" id="wm-viewport" role="main">
+                <div class="wm-world" id="wm-world" style="width:${W}px;height:${H}px">
 
+                    ${this._buildBiomes()}
+                    ${this._buildPathsSVG()}
+                    ${this._buildDecorations()}
+                    ${this._buildNodes()}
+                    ${this._buildLabels()}
+
+                    <div class="wm-char" id="wm-char"
+                         style="left:${this.world.charX}px;top:${this.world.charY}px"
+                         aria-label="Seu personagem">${ic.html('char',{size:'xl'})}</div>
+
+                </div>
+            </div>
         </div>
+
+        ${this._buildRightPanel()}
+
     </div>
 
     <div class="wm-dpad" role="group" aria-label="Controles de movimento">
@@ -202,25 +232,25 @@ const AdventureMap = {
             ontouchend="AdventureMap.dpad('up',false)"
             onmousedown="AdventureMap.dpad('up',true)"
             onmouseup="AdventureMap.dpad('up',false)"
-            onmouseleave="AdventureMap.dpad('up',false)">${IconSystem.html('chevron-up',{size:'lg'})}</button>
+            onmouseleave="AdventureMap.dpad('up',false)">${ic.html('chevron-up',{size:'lg'})}</button>
         <button class="wm-dpad-btn wm-dpad-left"
             ontouchstart="AdventureMap.dpad('left',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('left',false)"
             onmousedown="AdventureMap.dpad('left',true)"
             onmouseup="AdventureMap.dpad('left',false)"
-            onmouseleave="AdventureMap.dpad('left',false)">${IconSystem.html('chevron-left',{size:'lg'})}</button>
+            onmouseleave="AdventureMap.dpad('left',false)">${ic.html('chevron-left',{size:'lg'})}</button>
         <button class="wm-dpad-btn wm-dpad-right"
             ontouchstart="AdventureMap.dpad('right',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('right',false)"
             onmousedown="AdventureMap.dpad('right',true)"
             onmouseup="AdventureMap.dpad('right',false)"
-            onmouseleave="AdventureMap.dpad('right',false)">${IconSystem.html('chevron-right',{size:'lg'})}</button>
+            onmouseleave="AdventureMap.dpad('right',false)">${ic.html('chevron-right',{size:'lg'})}</button>
         <button class="wm-dpad-btn wm-dpad-down"
             ontouchstart="AdventureMap.dpad('down',true);event.preventDefault()"
             ontouchend="AdventureMap.dpad('down',false)"
             onmousedown="AdventureMap.dpad('down',true)"
             onmouseup="AdventureMap.dpad('down',false)"
-            onmouseleave="AdventureMap.dpad('down',false)">${IconSystem.html('chevron-down',{size:'lg'})}</button>
+            onmouseleave="AdventureMap.dpad('down',false)">${ic.html('chevron-down',{size:'lg'})}</button>
     </div>
 
 </div>`;
@@ -789,6 +819,121 @@ const AdventureMap = {
         }
         document.getElementById('app-container')?.classList.remove('wm-host');
         document.getElementById('bottom-nav')?.classList.remove('hidden');
+        const discWrap = document.getElementById('hud-disc-wrap');
+        if (discWrap) discWrap.style.display = 'none';
+    },
+
+    // ── RIGHT PANEL ───────────────────────────────────────────────
+    _buildRightPanel() {
+        const u  = State.data.user;
+        const ic = IconSystem;
+        const activeStage = this.stages.find(s => s.unlocked && !s.completed);
+        const activeIdx   = activeStage ? this.stages.indexOf(activeStage) : -1;
+        const boss        = this.stages.find(s => s.isBoss);
+        const streakDays  = u.streak || 1;
+
+        const DAYS = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+        const today = new Date().getDay();
+        const weekDays = Array.from({length: 7}, (_, i) => {
+            const offset = 6 - i;
+            const dayIdx = (today - offset + 7) % 7;
+            return { label: DAYS[dayIdx], isDone: offset < streakDays, isToday: offset === 0 };
+        });
+
+        const xp     = u.xp || 0;
+        const league = xp >= 15000 ? 'Liga Platina' : xp >= 5000 ? 'Liga Ouro' : xp >= 1000 ? 'Liga Prata' : 'Liga Bronze';
+        const dm     = State.data.dailyMissions || {};
+        const dmDone = Array.isArray(dm.completed) ? dm.completed : [];
+        const dailyList = [
+            { id: 'complete_mission', icon: 'sword', label: 'Complete uma missão', xp: 100, gem: 15 },
+            { id: 'combo_5',         icon: 'xp',    label: 'Combo devastador',    xp:  75, gem: 10 },
+            { id: 'hard_stage',      icon: 'sword', label: 'Desafio difícil',     xp: 200, gem: 25 },
+        ];
+        const dmCount = dailyList.filter(d => dmDone.includes(d.id)).length;
+
+        return `
+<aside class="wm-right-panel" id="wm-right-panel">
+
+    <div class="wm-rp-card wm-rp-mission-card">
+        <div class="wm-rp-mission-hdr">
+            ${ic.html('xp',{size:'sm'})} Missão Atual
+        </div>
+        <div class="wm-rp-mission-body">
+            <div class="wm-rp-mission-title">${activeStage ? activeStage.title : 'Capítulo concluído!'}</div>
+            <div class="wm-rp-mission-desc">${activeStage ? 'Responda as questões e avance!' : 'Todos os estágios completos.'}</div>
+            ${activeIdx >= 0 ? `<button class="wm-rp-mission-btn" onclick="AdventureMap._enterStage(${activeIdx})">${ic.html('chevron-right',{size:'sm'})} Entrar</button>` : ''}
+        </div>
+    </div>
+
+    <div class="wm-rp-card">
+        <div class="wm-rp-header">
+            ${ic.html('streak',{size:'sm',color:'streak'})} Sequência
+            <span class="wm-rp-badge">${streakDays} dia${streakDays !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="wm-rp-streak-row">
+            ${weekDays.map(d => `
+            <div class="wm-rp-streak-day${d.isToday ? ' today' : ''}${d.isDone ? ' done' : ''}">
+                <div class="wm-rp-streak-icon">${d.isDone
+                    ? ic.html('streak',{size:'xs',color:'streak'})
+                    : ic.html('lock',{size:'xs'})}</div>
+                <div class="wm-rp-streak-label">${d.label}</div>
+            </div>`).join('')}
+        </div>
+    </div>
+
+    <div class="wm-rp-card">
+        <div class="wm-rp-header">
+            ${ic.html('xp',{size:'sm',color:'xp'})} Missões do Dia
+            <span class="wm-rp-badge${dmCount === 3 ? ' done' : ''}">${dmCount}/3</span>
+        </div>
+        <div class="wm-rp-dm-list">
+            ${dailyList.map(d => {
+                const done = dmDone.includes(d.id);
+                return `
+            <div class="wm-rp-dm-row${done ? ' done' : ''}">
+                <div class="wm-rp-dm-icon">${ic.html(d.icon, {size:'sm', color: done ? 'success' : 'xp'})}</div>
+                <div class="wm-rp-dm-info">
+                    <div class="wm-rp-dm-label">${d.label}</div>
+                    <div class="wm-rp-dm-rewards">
+                        ${ic.html('xp',{size:'xs',color:'xp'})} +${d.xp}&nbsp;XP
+                        &ensp;${ic.html('gem',{size:'xs',color:'gem'})} +${d.gem}
+                    </div>
+                </div>
+                <div class="wm-rp-dm-check${done ? ' checked' : ''}">${done ? ic.html('check',{size:'xs',color:'white'}) : ''}</div>
+            </div>`;}).join('')}
+        </div>
+    </div>
+
+    <div class="wm-rp-card">
+        <div class="wm-rp-header">
+            ${ic.html('trophy',{size:'sm',color:'final'})} Sua Liga
+        </div>
+        <a href="#ranking" class="wm-rp-league-row">
+            <div class="wm-rp-league-icon">${ic.html('crown',{size:'xl',color:'premium'})}</div>
+            <div class="wm-rp-league-info">
+                <div class="wm-rp-league-name">${league}</div>
+                <div class="wm-rp-league-xp">${xp.toLocaleString('pt-BR')} XP total</div>
+                <span class="wm-rp-league-link">Ver ranking →</span>
+            </div>
+            <div class="wm-rp-league-chev">${ic.html('chevron-right',{size:'sm'})}</div>
+        </a>
+    </div>
+
+    <div class="wm-rp-card">
+        <div class="wm-rp-header">
+            ${ic.html('boss',{size:'sm',color:'boss'})} Boss da Semana
+            <span class="wm-rp-badge soon">BREVE</span>
+        </div>
+        <div class="wm-rp-boss-row">
+            <div class="wm-rp-boss-icon">${ic.html('boss',{size:'2xl',color:'boss'})}</div>
+            <div class="wm-rp-boss-info">
+                <div class="wm-rp-boss-name">${boss ? boss.title : 'Dragão do Conhecimento'}</div>
+                <div class="wm-rp-boss-desc">Desbloqueio em breve!</div>
+            </div>
+        </div>
+    </div>
+
+</aside>`;
     },
 };
 

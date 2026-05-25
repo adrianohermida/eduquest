@@ -64,6 +64,348 @@
     padding: 0;
 }
 
+/* ── CONTENT ROW — map + right panel ──────────────────────── */
+
+.wm-content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+}
+
+.wm-map-area {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ── MAP PAGE HEADER (desktop/tablet title bar) ────────────── */
+
+.wm-map-pghdr {
+    display: none;
+    flex-shrink: 0;
+    padding: 12px 16px 8px;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+@media (min-width: 768px) {
+    .wm-map-pghdr {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+.wm-map-pghdr-globe { font-size: 22px; flex-shrink: 0; }
+
+.wm-map-pghdr-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--text-primary, #1a1a2e);
+    line-height: 1.2;
+}
+
+.wm-map-pghdr-sub {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted, #94a3b8);
+    line-height: 1.3;
+}
+
+/* ── RIGHT PANEL ───────────────────────────────────────────── */
+
+.wm-right-panel {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .wm-right-panel {
+        display: flex;
+        flex-direction: column;
+        width: 256px;
+        flex-shrink: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: var(--surface, #f8f9fa);
+        border-left: 1px solid rgba(0,0,0,0.07);
+        gap: 10px;
+        padding: 12px;
+        scrollbar-width: none;
+    }
+    .wm-right-panel::-webkit-scrollbar { display: none; }
+}
+
+@media (min-width: 1024px) {
+    .wm-right-panel { width: var(--rp-w, 292px); padding: 14px; gap: 12px; }
+}
+
+/* ── RIGHT PANEL CARDS ─────────────────────────────────────── */
+
+.wm-rp-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.07);
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* Mission card */
+.wm-rp-mission-hdr {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.wm-rp-mission-body { padding: 12px 14px 14px; }
+
+.wm-rp-mission-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text-primary, #1a1a2e);
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.wm-rp-mission-desc {
+    font-size: 11px;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.wm-rp-mission-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #c2410c;
+    transition: transform 0.1s, box-shadow 0.1s;
+    font-family: 'Nunito', system-ui, sans-serif;
+}
+.wm-rp-mission-btn:hover  { transform: translateY(-1px); box-shadow: 0 4px 0 #c2410c; }
+.wm-rp-mission-btn:active { transform: translateY(1px);  box-shadow: 0 1px 0 #c2410c; }
+
+/* Section header row */
+.wm-rp-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 14px 9px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-primary, #1a1a2e);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.wm-rp-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.06);
+    color: var(--text-muted, #94a3b8);
+    white-space: nowrap;
+}
+.wm-rp-badge.done { background: rgba(34,197,94,0.14); color: #16a34a; }
+.wm-rp-badge.soon { background: rgba(249,115,22,0.14); color: #ea580c; }
+
+/* Streak calendar */
+.wm-rp-streak-row {
+    display: flex;
+    gap: 3px;
+    padding: 10px 8px 10px;
+    justify-content: space-between;
+}
+
+.wm-rp-streak-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    padding: 5px 2px;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+.wm-rp-streak-day.today { background: rgba(249,115,22,0.08); }
+
+.wm-rp-streak-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.wm-rp-streak-day.done  .wm-rp-streak-icon { background: rgba(245,158,11,0.15); }
+.wm-rp-streak-day.today .wm-rp-streak-icon { background: rgba(249,115,22,0.18); }
+
+.wm-rp-streak-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: rgba(0,0,0,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.wm-rp-streak-day.today .wm-rp-streak-label { color: #f97316; }
+.wm-rp-streak-day.done  .wm-rp-streak-label { color: #d97706; }
+
+/* Daily missions */
+.wm-rp-dm-list { padding: 6px 0 2px; }
+
+.wm-rp-dm-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 12px;
+    transition: background 0.12s;
+}
+.wm-rp-dm-row:hover { background: rgba(0,0,0,0.02); }
+.wm-rp-dm-row.done  { opacity: 0.52; }
+
+.wm-rp-dm-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(249,115,22,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.wm-rp-dm-row.done .wm-rp-dm-icon { background: rgba(34,197,94,0.10); }
+
+.wm-rp-dm-info { flex: 1; min-width: 0; }
+
+.wm-rp-dm-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a2e);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wm-rp-dm-rewards {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted, #94a3b8);
+    margin-top: 1px;
+    gap: 2px;
+}
+
+.wm-rp-dm-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 2px solid rgba(0,0,0,0.12);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.wm-rp-dm-check.checked { background: #22c55e; border-color: #22c55e; }
+
+/* League */
+.wm-rp-league-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s;
+}
+.wm-rp-league-row:hover { background: rgba(0,0,0,0.02); }
+
+.wm-rp-league-icon { flex-shrink: 0; }
+
+.wm-rp-league-info { flex: 1; min-width: 0; }
+
+.wm-rp-league-name {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.wm-rp-league-xp {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--brand, #f97316);
+    margin-top: 1px;
+}
+
+.wm-rp-league-link {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--brand, #f97316);
+    display: inline-block;
+    margin-top: 2px;
+    text-decoration: underline;
+}
+
+.wm-rp-league-chev { color: var(--text-muted, #94a3b8); flex-shrink: 0; }
+
+/* Boss */
+.wm-rp-boss-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+}
+
+.wm-rp-boss-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(220,38,38,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wm-rp-boss-info { flex: 1; min-width: 0; }
+
+.wm-rp-boss-name {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-primary, #1a1a2e);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wm-rp-boss-desc {
+    font-size: 10px;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
 /* ── OUTER WRAPPER ─────────────────────────────────────────── */
 
 .wm-wrap {
@@ -73,7 +415,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    background: #f7fee7;
+    background: #fdf4e3;
     overflow: hidden;
     font-family: 'Nunito', system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
@@ -801,7 +1143,7 @@
 
 /* Wide screens — center the world, show side gutters */
 @media (min-width: 600px) {
-    .wm-viewport { background: rgba(0,0,0,0.04); }
+    .wm-viewport { background: rgba(199,150,80,0.07); }
     .wm-world {
         margin: 0 auto;
         box-shadow: 0 0 40px rgba(0,0,0,0.08);
@@ -818,10 +1160,14 @@
     }
 }
 
+@media (min-width: 768px) {
+    /* With right panel visible, dpad should not overlap the panel */
+    .wm-dpad { right: calc(256px + 16px + (100vw - 256px) / 2 - 220px - 120px); }
+}
+
 @media (min-width: 1024px) {
-    /* On desktop, D-pad is already hidden by hover:hover rule.
-       Give the world more breathing room. */
     .wm-viewport { padding: 0; }
+    .wm-dpad { right: calc(292px + 16px + (100vw - 292px) / 2 - 220px - 120px); }
 }
 
 /* ── DARK MODE ─────────────────────────────────────────────── */
@@ -1220,3 +1566,32 @@
 [data-theme="dark"] .wm-label-left  .wm-label-card::after  { border-left-color:  #1e1e2e; }
 [data-theme="dark"] .wm-path-base  { stroke: #6b5e3f; }
 [data-theme="dark"] .wm-path-tiles { stroke: rgba(255, 255, 255, 0.12); }
+
+/* ── RIGHT PANEL & MAP HEADER — DARK MODE ──────────────────── */
+
+@media (prefers-color-scheme: dark) {
+    .wm-wrap           { background: #14141f; }
+    .wm-map-pghdr      { background: rgba(14,14,28,0.85); border-color: rgba(255,255,255,0.07); }
+    .wm-map-pghdr-title { color: #f3f4f6; }
+    .wm-map-pghdr-sub   { color: #64748b; }
+    .wm-right-panel    { background: #1a1a2e; border-color: rgba(255,255,255,0.07); }
+    .wm-rp-card        { background: #1e1e30; border-color: rgba(255,255,255,0.08); }
+    .wm-rp-header      { border-color: rgba(255,255,255,0.06); color: #e5e7eb; }
+    .wm-rp-mission-title { color: #f3f4f6; }
+    .wm-rp-dm-label    { color: #e5e7eb; }
+    .wm-rp-league-name { color: #f3f4f6; }
+    .wm-rp-boss-name   { color: #f3f4f6; }
+    .wm-rp-dm-row:hover     { background: rgba(255,255,255,0.04); }
+    .wm-rp-league-row:hover { background: rgba(255,255,255,0.04); }
+}
+
+[data-theme="dark"] .wm-wrap           { background: #14141f; }
+[data-theme="dark"] .wm-map-pghdr      { background: rgba(14,14,28,0.85); border-color: rgba(255,255,255,0.07); }
+[data-theme="dark"] .wm-map-pghdr-title { color: #f3f4f6; }
+[data-theme="dark"] .wm-right-panel    { background: #1a1a2e; border-color: rgba(255,255,255,0.07); }
+[data-theme="dark"] .wm-rp-card        { background: #1e1e30; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .wm-rp-header      { border-color: rgba(255,255,255,0.06); color: #e5e7eb; }
+[data-theme="dark"] .wm-rp-mission-title { color: #f3f4f6; }
+[data-theme="dark"] .wm-rp-dm-label    { color: #e5e7eb; }
+[data-theme="dark"] .wm-rp-league-name { color: #f3f4f6; }
+[data-theme="dark"] .wm-rp-boss-name   { color: #f3f4f6; }
