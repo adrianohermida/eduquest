@@ -1,117 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 540" preserveAspectRatio="xMidYMid slice">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 560" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <linearGradient id="sky-c" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fffbeb"/>
-      <stop offset="50%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#fde68a"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset=".56" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#b45309"/>
     </linearGradient>
-    <linearGradient id="castle-c" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#b45309"/>
-      <stop offset="100%" stop-color="#78350f"/>
-    </linearGradient>
-    <radialGradient id="sun-glow" cx="50%" cy="30%" r="50%">
-      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#fde68a" stop-opacity="0"/>
-    </radialGradient>
   </defs>
-
-  <!-- Sky with sunset glow -->
-  <rect width="440" height="540" fill="url(#sky-c)"/>
-  <ellipse cx="220" cy="100" rx="200" ry="140" fill="url(#sun-glow)"/>
-
-  <!-- Horizon glow -->
-  <ellipse cx="220" cy="0" rx="280" ry="80" fill="#fbbf24" opacity="0.3"/>
-
-  <!-- Epic clouds -->
-  <g opacity="0.5">
-    <ellipse cx="70"  cy="80" rx="60" ry="25" fill="white"/>
-    <ellipse cx="95"  cy="65" rx="40" ry="25" fill="white"/>
-    <ellipse cx="42"  cy="74" rx="35" ry="20" fill="white"/>
+  <rect width="1180" height="560" fill="url(#bg)"/>
+  <path d="M0 405 C145 305 280 410 435 310 C585 214 725 332 890 232 C1018 154 1098 178 1180 118 L1180 560 L0 560Z" fill="#7c2d12" opacity=".18"/>
+  <path d="M-60 500 C85 410 175 455 305 380 C450 298 570 345 705 262 C870 160 1038 220 1240 92" fill="none" stroke="#0ea5e9" stroke-width="50" opacity=".22"/>
+  <g transform="translate(760 115)" opacity=".48">
+    <rect x="0" y="120" width="230" height="165" rx="20" fill="#451a03"/>
+    <rect x="32" y="70" width="42" height="90" fill="#78350f"/>
+    <rect x="156" y="70" width="42" height="90" fill="#78350f"/>
+    <rect x="93" y="35" width="44" height="125" fill="#92400e"/>
+    <path d="M32 70 53 25 74 70Z" fill="#f59e0b"/>
+    <path d="M156 70 177 25 198 70Z" fill="#f59e0b"/>
+    <path d="M93 35 115 -8 137 35Z" fill="#fde68a"/>
+    <rect x="91" y="190" width="48" height="95" rx="18" fill="#fef3c7"/>
   </g>
-  <g opacity="0.4">
-    <ellipse cx="350" cy="70" rx="55" ry="22" fill="white"/>
-    <ellipse cx="375" cy="58" rx="38" ry="22" fill="white"/>
-    <ellipse cx="326" cy="65" rx="32" ry="18" fill="white"/>
+  <g transform="translate(175 260)" opacity=".38">
+    <rect x="0" y="70" width="170" height="110" rx="18" fill="#1f2937"/>
+    <rect x="35" y="25" width="35" height="70" fill="#374151"/>
+    <rect x="102" y="8" width="40" height="88" fill="#4b5563"/>
+    <rect x="67" y="120" width="38" height="60" rx="12" fill="#f59e0b"/>
   </g>
-  <!-- Golden-tinted cloud -->
-  <g opacity="0.3">
-    <ellipse cx="185" cy="55" rx="45" ry="18" fill="#fbbf24"/>
-    <ellipse cx="205" cy="44" rx="30" ry="18" fill="#fcd34d"/>
-    <ellipse cx="165" cy="50" rx="28" ry="14" fill="#fbbf24"/>
-  </g>
-
-  <!-- Golden hills in background -->
-  <ellipse cx="100" cy="300" rx="200" ry="90" fill="#f59e0b" opacity="0.3"/>
-  <ellipse cx="360" cy="290" rx="180" ry="80" fill="#f59e0b" opacity="0.28"/>
-
-  <!-- Castle / Citadel structure (prominent center) -->
-  <g opacity="0.38" transform="translate(140, 130)">
-    <!-- Main keep -->
-    <rect x="40" y="60" width="80" height="110" fill="url(#castle-c)"/>
-    <!-- Left tower -->
-    <rect x="8" y="70" width="38" height="100" fill="#92400e"/>
-    <!-- Right tower -->
-    <rect x="114" y="70" width="38" height="100" fill="#92400e"/>
-    <!-- Center spire -->
-    <polygon points="80,0 60,62 100,62" fill="#78350f"/>
-    <!-- Left spire -->
-    <polygon points="27,30 14,72 40,72" fill="#78350f"/>
-    <!-- Right spire -->
-    <polygon points="133,30 120,72 146,72" fill="#78350f"/>
-    <!-- Battlements main -->
-    <rect x="40" y="52" width="10" height="12" fill="#78350f"/>
-    <rect x="56" y="52" width="10" height="12" fill="#78350f"/>
-    <rect x="72" y="52" width="10" height="12" fill="#78350f"/>
-    <rect x="88" y="52" width="10" height="12" fill="#78350f"/>
-    <rect x="104" y="52" width="10" height="12" fill="#78350f"/>
-    <!-- Left tower battlements -->
-    <rect x="8"  y="62" width="8" height="10" fill="#78350f"/>
-    <rect x="20" y="62" width="8" height="10" fill="#78350f"/>
-    <rect x="32" y="62" width="8" height="10" fill="#78350f"/>
-    <!-- Right tower battlements -->
-    <rect x="114" y="62" width="8" height="10" fill="#78350f"/>
-    <rect x="126" y="62" width="8" height="10" fill="#78350f"/>
-    <rect x="138" y="62" width="8" height="10" fill="#78350f"/>
-    <!-- Gate arch -->
-    <path d="M 66 170 L 66 140 Q 80 125 94 140 L 94 170" fill="#4a2005"/>
-    <!-- Windows -->
-    <ellipse cx="80" cy="100" rx="10" ry="13" fill="#fde68a" opacity="0.6"/>
-    <rect cx="27"  cy="100" x="20" y="95"  width="14" height="18" rx="3" fill="#fde68a" opacity="0.5"/>
-    <rect cx="133" cy="100" x="126" y="95" width="14" height="18" rx="3" fill="#fde68a" opacity="0.5"/>
-    <!-- Flag -->
-    <line x1="80" y1="0" x2="80" y2="-20" stroke="#78350f" stroke-width="2"/>
-    <polygon points="80,-20 100,-14 80,-8" fill="#dc2626"/>
-  </g>
-
-  <!-- Side fortifications -->
-  <g opacity="0.22">
-    <!-- Left wall -->
-    <rect x="10" y="310" width="20" height="60" fill="#92400e"/>
-    <rect x="8"  y="305" width="8" height="10" fill="#78350f"/>
-    <rect x="18" y="305" width="8" height="10" fill="#78350f"/>
-    <!-- Right wall -->
-    <rect x="410" y="305" width="20" height="65" fill="#92400e"/>
-    <rect x="408" y="300" width="8" height="10" fill="#78350f"/>
-    <rect x="418" y="300" width="8" height="10" fill="#78350f"/>
-  </g>
-
-  <!-- Ground terrain -->
-  <ellipse cx="220" cy="490" rx="280" ry="110" fill="#f59e0b" opacity="0.55"/>
-  <rect x="0" y="515" width="440" height="25" fill="#d97706" opacity="0.6"/>
-
-  <!-- Legendary sparkles / stars -->
-  <g fill="#fbbf24">
-    <polygon points="60,190   63,198  71,198  65,203  67,211  60,206  53,211  55,203  49,198  57,198" opacity="0.6"/>
-    <polygon points="380,180  382,186 388,186 383,190 385,196 380,192 375,196 377,190 372,186 378,186" opacity="0.55"/>
-    <polygon points="155,155  157,160 162,160 158,163 160,168 155,165 150,168 152,163 148,160 153,160" opacity="0.5"/>
-    <polygon points="285,160  287,165 292,165 288,168 290,173 285,170 280,173 282,168 278,165 283,165" opacity="0.5"/>
-  </g>
-
-  <!-- Epic golden path glow -->
-  <path d="M 185 540 Q 200 470 215 400 Q 228 330 218 270" stroke="rgba(251,191,36,0.25)" stroke-width="25" fill="none" stroke-linecap="round"/>
-
-  <!-- Crown icon hint -->
-  <g opacity="0.2" transform="translate(200, 90)">
-    <polygon points="20,15 20,5 0,12 10,0 20,8 30,0 40,12 20,5 40,12 40,15" fill="#fbbf24"/>
+  <g fill="#fff7ed" opacity=".42">
+    <circle cx="640" cy="100" r="5"/><circle cx="700" cy="145" r="4"/><circle cx="1080" cy="360" r="6"/><circle cx="425" cy="420" r="4"/>
   </g>
 </svg>

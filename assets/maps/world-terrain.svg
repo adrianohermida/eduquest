@@ -1,17 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 100" preserveAspectRatio="xMidYMid">
-  <!-- Repeating sandy terrain texture tile -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" preserveAspectRatio="xMidYMid">
   <defs>
-    <pattern id="sandy" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-      <!-- Subtle pebble/grain texture -->
-      <circle cx="12" cy="14" r="2.5" fill="rgba(180,140,80,0.08)"/>
-      <circle cx="38" cy="8"  r="1.8" fill="rgba(160,120,70,0.07)"/>
-      <circle cx="62" cy="22" r="3"   fill="rgba(180,140,80,0.06)"/>
-      <circle cx="24" cy="40" r="2"   fill="rgba(200,160,90,0.07)"/>
-      <circle cx="55" cy="50" r="2.5" fill="rgba(170,130,75,0.08)"/>
-      <circle cx="10" cy="65" r="1.5" fill="rgba(160,120,70,0.06)"/>
-      <circle cx="70" cy="68" r="2"   fill="rgba(180,140,80,0.07)"/>
-      <circle cx="42" cy="72" r="1.8" fill="rgba(200,155,85,0.07)"/>
+    <pattern id="terrain" width="80" height="80" patternUnits="userSpaceOnUse">
+      <rect width="80" height="80" fill="#f7dfaa"/>
+      <path d="M-8 62 C15 45 26 75 48 58 C63 47 78 51 92 40" fill="none" stroke="#e0bd78" stroke-width="6" opacity=".28"/>
+      <path d="M-10 18 C12 8 31 29 52 16 C66 7 78 12 90 4" fill="none" stroke="#fff4c7" stroke-width="5" opacity=".38"/>
+      <circle cx="12" cy="14" r="2.2" fill="#a16207" opacity=".14"/>
+      <circle cx="38" cy="8" r="1.5" fill="#854d0e" opacity=".12"/>
+      <circle cx="62" cy="22" r="2.5" fill="#a16207" opacity=".10"/>
+      <circle cx="24" cy="40" r="1.8" fill="#b45309" opacity=".11"/>
+      <circle cx="55" cy="50" r="2.4" fill="#92400e" opacity=".13"/>
+      <circle cx="10" cy="65" r="1.4" fill="#78350f" opacity=".10"/>
+      <circle cx="70" cy="68" r="2" fill="#a16207" opacity=".12"/>
+      <circle cx="42" cy="72" r="1.8" fill="#ca8a04" opacity=".11"/>
     </pattern>
   </defs>
-  <rect width="440" height="100" fill="url(#sandy)"/>
+  <rect width="160" height="160" fill="url(#terrain)"/>
 </svg>
