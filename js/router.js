@@ -86,6 +86,22 @@ const Router = {
         if (!isFullscreen && typeof Sidebar !== 'undefined') {
             setTimeout(() => Sidebar.refreshRightPanel(), 0);
         }
+
+        // Update HUD context bar and notification badge
+        if (typeof HUD !== 'undefined') {
+            setTimeout(() => {
+                HUD.refreshNotifBadge();
+                if (isFullscreen || route === 'home' || route === '') {
+                    HUD.clearContext();
+                } else if (route === 'chapter' && parts[1]) {
+                    const meta = window.CHAPTER_METADATA;
+                    if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.title, stage: 'Mapa', href: `#chapter/${parts[1]}` });
+                } else if (route === 'stage' && parts[1] && parts[2]) {
+                    const meta = window.CHAPTER_METADATA;
+                    if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.title, stage: `Fase ${parts[2]}`, href: `#chapter/${parts[1]}` });
+                }
+            }, 0);
+        }
     },
 
     _updateNavActive(route) {

@@ -178,16 +178,14 @@ img { max-width: 100%; }
 .hud-left { display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0; }
 
 .hud-brand {
-    font-size: 1.1rem;
-    font-weight: 900;
-    color: var(--brand);
     display: flex;
     align-items: center;
-    gap: var(--sp-1);
-    letter-spacing: -0.5px;
+    gap: 7px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
 }
-.hud-brand-text { display: none; }
-@media (min-width: 400px) { .hud-brand-text { display: inline; } }
+/* hud-brand-text visibility controlled in hud-dropdowns.css */
 
 .hud-stats {
     display: flex;
@@ -195,18 +193,17 @@ img { max-width: 100%; }
     gap: var(--sp-2);
 }
 
+/* Base chip — hud-dropdowns.css adds interactive states on top */
 .hud-chip {
     display: flex;
     align-items: center;
     gap: 3px;
     font-size: 0.78rem;
     font-weight: 800;
-    padding: 4px 9px;
+    padding: 5px 9px;
     border-radius: var(--r-full);
     background: var(--surface-2);
     color: var(--text);
-    min-width: 44px;
-    justify-content: center;
 }
 .hud-chip.streak-chip { background: #fff7ed; color: #c2410c; }
 .hud-chip.gem-chip    { background: #e0f2fe; color: #0369a1; }

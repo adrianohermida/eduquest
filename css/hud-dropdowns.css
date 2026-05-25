@@ -1,0 +1,750 @@
+/* ═══════════════════════════════════════════════════════════════
+   EDUQUEST — HUD Dropdowns & Premium Header System
+   Stat chips → interactive dropdowns. Context bar. Logo. Notifications.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── KEYFRAMES ─────────────────────────────────────────────── */
+
+@keyframes ddOpen {
+    from { opacity: 0; transform: scale(0.92) translateY(-8px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);     }
+}
+
+@keyframes notifPop {
+    0%   { transform: scale(1);    }
+    40%  { transform: scale(1.30); }
+    100% { transform: scale(1);    }
+}
+
+/* ── BRAND LOGO IN HUD ─────────────────────────────────────── */
+
+.hud-brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    color: inherit;
+    padding: 4px 6px 4px 2px;
+    border-radius: var(--r-md);
+    transition: background var(--dur-fast);
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+.hud-brand:hover { background: var(--surface-3); }
+.hud-brand:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+
+.hud-brand-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--r-sm);
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
+}
+
+.hud-brand-text {
+    font-size: 0.92rem;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+}
+
+/* Hide brand text on very small screens */
+@media (max-width: 399px) { .hud-brand-text { display: none; } }
+
+/* ── CONTEXT BAR (center section) ──────────────────────────── */
+
+.hud-context {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0 8px;
+    overflow: hidden;
+}
+
+.hud-ctx-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--surface-3);
+    border-radius: var(--r-full);
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: var(--text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 320px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+.hud-ctx-pill:hover { background: var(--brand-light); border-color: var(--brand); color: var(--brand); }
+
+.hud-ctx-subject { color: var(--text-2); font-weight: 700; }
+.hud-ctx-sep     { color: var(--text-muted); opacity: 0.7; }
+.hud-ctx-stage   { color: var(--brand); font-weight: 900; }
+.hud-ctx-icon    { font-size: 0.9rem; flex-shrink: 0; }
+
+/* ── CHIP WRAPS (dropdown anchors) ─────────────────────────── */
+
+.hud-chip-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Make chips into proper interactive buttons */
+.hud-chip {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.78rem;
+    font-weight: 900;
+    padding: 5px 9px;
+    border-radius: var(--r-full);
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    font-family: var(--font);
+    min-height: 32px;
+    white-space: nowrap;
+    transition: background var(--dur-fast), border-color var(--dur-fast), transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.hud-chip:hover  { background: var(--surface-3); border-color: var(--border); }
+.hud-chip:active { transform: scale(0.91); }
+.hud-chip:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+
+/* Chip type colors */
+.hud-chip.streak-chip { background: #fff7ed; color: #c2410c; }
+.hud-chip.streak-chip:hover  { background: #fef3c7; border-color: #fbbf24; }
+
+.hud-chip.gem-chip    { background: #e0f2fe; color: #0369a1; }
+.hud-chip.gem-chip:hover     { background: #bae6fd; border-color: #7dd3fc; }
+
+.hud-chip.xp-chip     { background: var(--brand-light); color: var(--brand-dark); }
+.hud-chip.xp-chip:hover      { background: #fed7aa; border-color: var(--brand); }
+
+.hud-chip.heart-chip  { background: #fee2e2; color: #dc2626; }
+.hud-chip.heart-chip:hover   { background: #fecaca; border-color: #f87171; }
+
+/* ── DROPDOWN PANEL ────────────────────────────────────────── */
+
+.hud-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 248px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-xl);
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.14), 0 4px 16px rgba(0, 0, 0, 0.07);
+    z-index: 501;
+    opacity: 0;
+    transform: scale(0.92) translateY(-8px);
+    transform-origin: top right;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.hud-dropdown.open {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+    animation: ddOpen 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* First chip-wrap: use left alignment to avoid off-screen */
+.hud-chip-wrap:first-child .hud-dropdown,
+.hud-chip-wrap.dd-align-left .hud-dropdown {
+    right: auto;
+    left: 0;
+    transform-origin: top left;
+}
+
+/* ── DROPDOWN HEADER ───────────────────────────────────────── */
+
+.hdd-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.hdd-head-icon { font-size: 1.35rem; flex-shrink: 0; line-height: 1; }
+
+.hdd-head-info { flex: 1; min-width: 0; }
+.hdd-head-title {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1.2;
+}
+.hdd-head-sub {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+/* ── DROPDOWN BODY ─────────────────────────────────────────── */
+
+.hdd-body {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ── XP / LEVEL DROPDOWN ───────────────────────────────────── */
+
+.hdd-level-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    justify-content: space-between;
+}
+
+.hdd-lvl-big {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--brand);
+    line-height: 1;
+}
+.hdd-lvl-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+.hdd-next-reward {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--text-2);
+    text-align: right;
+}
+.hdd-next-reward span { color: var(--gold, #f59e0b); }
+
+.hdd-bar-wrap {
+    height: 9px;
+    background: var(--surface-3);
+    border-radius: var(--r-full);
+    overflow: hidden;
+}
+.hdd-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f97316, #fbbf24);
+    border-radius: var(--r-full);
+    transition: width 0.6s var(--ease-smooth);
+    min-width: 4px;
+}
+.hdd-bar-text {
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 2px;
+}
+
+/* ── STREAK DROPDOWN ───────────────────────────────────────── */
+
+.hdd-streak-cal {
+    display: flex;
+    justify-content: space-between;
+    gap: 3px;
+}
+.hdd-cal-day {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.hdd-cal-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    transition: background var(--dur-fast);
+}
+.hdd-cal-day.sc-active .hdd-cal-dot  { background: #fef3c7; }
+.hdd-cal-day.sc-today  .hdd-cal-dot  { background: var(--brand); box-shadow: 0 0 10px rgba(249,115,22,0.4); }
+.hdd-cal-lbl {
+    font-size: 0.52rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+.hdd-cal-day.sc-active .hdd-cal-lbl { color: var(--brand); }
+
+.hdd-streak-row {
+    display: flex;
+    gap: 6px;
+}
+.hdd-streak-chip {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    background: var(--surface-3);
+    border-radius: var(--r-md);
+}
+.hdd-streak-chip-icon { font-size: 1.1rem; }
+.hdd-streak-chip-val  { font-size: 0.85rem; font-weight: 900; color: var(--text); }
+.hdd-streak-chip-lbl  { font-size: 0.56rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+/* Milestone row */
+.hdd-milestones { display: flex; flex-direction: column; gap: 5px; }
+.hdd-milestone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--surface-3);
+    border-radius: var(--r-md);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-2);
+}
+.hdd-milestone-icon { font-size: 1rem; flex-shrink: 0; }
+.hdd-milestone-days { font-weight: 900; color: var(--text); min-width: 24px; }
+.hdd-milestone-reward { margin-left: auto; font-size: 0.68rem; font-weight: 800; color: var(--brand); }
+.hdd-milestone.ms-done {
+    opacity: 0.45;
+    text-decoration: line-through;
+}
+.hdd-milestone.ms-next {
+    background: var(--brand-light);
+    border: 1.5px solid rgba(249,115,22,0.25);
+    color: var(--text);
+}
+
+/* ── GEMS DROPDOWN ─────────────────────────────────────────── */
+
+.hdd-gems-hero {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+}
+.hdd-gems-icon { font-size: 2.2rem; line-height: 1; }
+.hdd-gems-count {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+}
+.hdd-gems-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+
+.hdd-daily-reward {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--r-md);
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+}
+.hdd-dr-icon { font-size: 1.2rem; flex-shrink: 0; }
+.hdd-dr-text {
+    flex: 1;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--text);
+}
+.hdd-dr-sub {
+    font-size: 0.64rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+.hdd-dr-badge {
+    font-size: 0.66rem;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: var(--r-full);
+    background: var(--success-light);
+    color: var(--success);
+    white-space: nowrap;
+}
+.hdd-dr-badge.pending { background: var(--gold-light); color: #92400e; }
+
+/* ── HEARTS DROPDOWN ───────────────────────────────────────── */
+
+.hdd-hearts-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 4px 0;
+}
+.hdd-heart {
+    font-size: 1.65rem;
+    line-height: 1;
+    transition: transform 0.15s;
+}
+.hdd-heart:hover { transform: scale(1.15); }
+.hdd-heart.hh-empty { filter: grayscale(1); opacity: 0.22; }
+
+.hdd-recovery {
+    text-align: center;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    padding: 2px 0;
+    line-height: 1.5;
+}
+.hdd-recovery strong { color: var(--danger, #dc2626); }
+
+.hdd-hearts-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.hdd-hearts-max {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* ── NOTIFICATION BUTTON ───────────────────────────────────── */
+
+.hud-notif-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border: none;
+    background: var(--surface-3);
+    border-radius: 50%;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    transition: background var(--dur-fast), transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.hud-notif-btn:hover  { background: var(--brand-light); color: var(--brand); }
+.hud-notif-btn:active { transform: scale(0.9); }
+.hud-notif-btn:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+
+.hud-notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 16px;
+    height: 16px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 900;
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    border: 1.5px solid var(--surface);
+    font-family: var(--font);
+    animation: notifPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── NOTIFICATIONS DROPDOWN ITEMS ──────────────────────────── */
+
+.hdd-notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+}
+.hdd-notif-list::-webkit-scrollbar { width: 4px; }
+.hdd-notif-list::-webkit-scrollbar-track { background: transparent; }
+.hdd-notif-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.hdd-notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: background var(--dur-fast);
+    text-decoration: none;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+.hdd-notif-item:hover { background: var(--surface-3); }
+
+.hdd-notif-item.hni-unread {
+    background: rgba(249, 115, 22, 0.05);
+}
+.hdd-notif-item.hni-unread::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--brand);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+    align-self: flex-start;
+}
+
+.hdd-notif-icon  { font-size: 1.15rem; flex-shrink: 0; line-height: 1.2; }
+.hdd-notif-body  { flex: 1; min-width: 0; }
+.hdd-notif-text  { font-size: 0.76rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+.hdd-notif-time  { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); margin-top: 2px; }
+
+.hdd-notif-empty {
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.hdd-notif-empty-icon { font-size: 1.8rem; opacity: 0.4; }
+
+/* ── DROPDOWN ACTION BUTTON ────────────────────────────────── */
+
+.hdd-footer {
+    padding: 8px 16px 14px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+}
+
+.hdd-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 16px;
+    background: var(--brand-light);
+    color: var(--brand);
+    border-radius: var(--r-md);
+    font-size: 0.8rem;
+    font-weight: 900;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font);
+    width: 100%;
+    transition: background var(--dur-fast), color var(--dur-fast), transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+}
+.hdd-action:hover  { background: var(--brand); color: #fff; }
+.hdd-action:active { transform: scale(0.97); }
+
+/* ── LAYOUT PREF TOGGLE ────────────────────────────────────── */
+
+.had-pref-badge {
+    margin-left: auto;
+    font-size: 0.58rem;
+    font-weight: 900;
+    background: var(--brand-light);
+    color: var(--brand);
+    border-radius: var(--r-full);
+    padding: 2px 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ── RIGHT PANEL ENHANCEMENTS ──────────────────────────────── */
+
+/* Mission progress bar */
+.rp-mission-progress-wrap {
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: var(--r-full);
+    margin-top: 4px;
+    overflow: hidden;
+}
+.rp-mission-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), #fbbf24);
+    border-radius: var(--r-full);
+    transition: width 0.4s var(--ease-smooth);
+}
+
+/* Mission complete checkmark */
+.rp-mission.done .rp-mission-icon { filter: grayscale(0.5); }
+
+/* League progression bar */
+.rp-league-bar-wrap {
+    height: 5px;
+    background: var(--surface-2);
+    border-radius: var(--r-full);
+    margin-top: 6px;
+    overflow: hidden;
+}
+.rp-league-bar-fill {
+    height: 100%;
+    border-radius: var(--r-full);
+    background: linear-gradient(90deg, #7c3aed, #a78bfa);
+    transition: width 0.5s var(--ease-smooth);
+}
+
+.rp-rank-tiers {
+    display: flex;
+    gap: 3px;
+    margin-top: 6px;
+}
+.rp-rank-tier {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.rp-rank-tier-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    transition: background var(--dur-fast);
+}
+.rp-rank-tier.rt-done .rp-rank-tier-dot  { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+.rp-rank-tier.rt-cur  .rp-rank-tier-dot  { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 8px rgba(249,115,22,0.4); }
+.rp-rank-tier-lbl { font-size: 0.46rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+.rp-rank-tier.rt-cur .rp-rank-tier-lbl  { color: var(--brand); }
+
+/* Boss panel improvements */
+.rp-boss-card {
+    position: relative;
+    overflow: hidden;
+}
+.rp-boss-hp-wrap {
+    height: 5px;
+    background: var(--surface-2);
+    border-radius: var(--r-full);
+    margin-top: 6px;
+    overflow: hidden;
+}
+.rp-boss-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #fbbf24);
+    border-radius: var(--r-full);
+    width: 78%;
+    transition: width 0.5s var(--ease-smooth);
+}
+.rp-boss-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+.rp-boss-hp-label { font-size: 0.62rem; font-weight: 800; color: var(--text-muted); }
+.rp-boss-timer    { font-size: 0.62rem; font-weight: 800; color: #ef4444; }
+
+/* Section header "see more" link */
+.rp-section-link {
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: var(--brand);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.rp-section-link:hover { text-decoration: underline; }
+
+/* Events section */
+.rp-event-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: linear-gradient(135deg, var(--purple-light), rgba(124,58,237,0.06));
+    border: 1.5px solid rgba(124,58,237,0.18);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: border-color var(--dur-fast);
+    text-decoration: none;
+    color: inherit;
+}
+.rp-event-card:hover { border-color: #7c3aed; }
+.rp-event-icon  { font-size: 1.5rem; flex-shrink: 0; }
+.rp-event-title { font-size: 0.78rem; font-weight: 900; color: var(--text); }
+.rp-event-sub   { font-size: 0.64rem; font-weight: 700; color: var(--text-muted); margin-top: 1px; }
+.rp-event-timer { font-size: 0.62rem; font-weight: 900; color: #7c3aed; margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+
+/* ── DARK MODE ─────────────────────────────────────────────── */
+
+[data-theme="dark"] .hud-dropdown,
+[data-theme="dark"] .hud-avatar-dropdown {
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .hdd-cal-day.sc-today .hdd-cal-dot {
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
+}
+
+[data-theme="dark"] .hdd-notif-item.hni-unread {
+    background: rgba(249, 115, 22, 0.08);
+}
+
+[data-theme="dark"] .hud-chip.streak-chip { background: rgba(254,243,199,0.12); color: #fbbf24; }
+[data-theme="dark"] .hud-chip.gem-chip    { background: rgba(14,165,233,0.12);  color: #38bdf8; }
+[data-theme="dark"] .hud-chip.xp-chip     { background: rgba(249,115,22,0.14);  color: #fb923c; }
+[data-theme="dark"] .hud-chip.heart-chip  { background: rgba(239,68,68,0.12);   color: #f87171; }
+
+[data-theme="dark"] .hud-chip.streak-chip:hover { background: rgba(254,243,199,0.2); }
+[data-theme="dark"] .hud-chip.gem-chip:hover    { background: rgba(14,165,233,0.2);  }
+[data-theme="dark"] .hud-chip.xp-chip:hover     { background: rgba(249,115,22,0.22); }
+[data-theme="dark"] .hud-chip.heart-chip:hover  { background: rgba(239,68,68,0.2);   }
+
+[data-theme="dark"] .hud-notif-badge { border-color: var(--surface); }
+
+[data-theme="dark"] .rp-event-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.14), rgba(124,58,237,0.06));
+    border-color: rgba(124,58,237,0.25);
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+
+/* On small mobile: hide XP chip (lower priority) */
+@media (max-width: 440px) {
+    .hud-xp-wrap { display: none; }
+}
+
+/* On very small: also hide gems */
+@media (max-width: 360px) {
+    .hud-gems-wrap { display: none; }
+    .hud-notif-wrap { display: none; }
+    .hud-chip { padding: 4px 7px; }
+}
+
+/* On tablet+, context bar shows */
+@media (max-width: 767px) {
+    .hud-context { display: none; }
+}
+
+/* Dropdown max-height on small screens */
+@media (max-height: 600px) {
+    .hdd-notif-list { max-height: 180px; }
+}

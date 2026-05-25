@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/modal-hud.css">
     <link rel="stylesheet" href="css/design-system-v3.css">
     <link rel="stylesheet" href="css/world-map.css">
+    <link rel="stylesheet" href="css/hud-dropdowns.css">
 </head>
 <body data-layout="app">
 
@@ -29,8 +30,10 @@
     <!-- Sidebar (populated by Sidebar.init()) -->
     <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal"></aside>
 
-    <!-- HUD Superior -->
+    <!-- HUD Superior — Premium v2.0 -->
     <header class="top-hud" id="top-hud" role="banner">
+
+        <!-- LEFT: hamburger · logo · level -->
         <div class="hud-left">
             <button
                 class="hud-menu-btn"
@@ -40,6 +43,80 @@
                 aria-controls="sidebar"
                 aria-expanded="false"
             >☰</button>
+
+            <a class="hud-brand" href="#home" aria-label="EduQuest — Início">
+                <img src="assets/icons/icon-192.png" alt="" class="hud-brand-logo" aria-hidden="true">
+                <span class="hud-brand-text">EduQuest</span>
+            </a>
+
+            <span class="hud-level-chip" id="hud-level" aria-label="Nível atual">Nv.1</span>
+        </div>
+
+        <!-- CENTER: context breadcrumb (tablet/desktop only) -->
+        <div class="hud-context" id="hud-context" aria-live="polite"></div>
+
+        <!-- RIGHT: interactive stat chips + notifications + avatar -->
+        <div class="hud-stats" role="status" aria-label="Estatísticas do jogador">
+
+            <!-- Streak -->
+            <div class="hud-chip-wrap hud-streak-wrap" id="hud-streak-wrap">
+                <button class="hud-chip streak-chip" id="hud-streak-btn"
+                    onclick="HUD.toggleDropdown('streak')"
+                    aria-label="Sequência de dias"
+                    aria-expanded="false"
+                    aria-controls="hud-dd-streak"
+                >🔥<span id="hud-streak">1</span></button>
+                <div class="hud-dropdown" id="hud-dd-streak" aria-hidden="true"></div>
+            </div>
+
+            <!-- Gems -->
+            <div class="hud-chip-wrap hud-gems-wrap" id="hud-gems-wrap">
+                <button class="hud-chip gem-chip" id="hud-gems-btn"
+                    onclick="HUD.toggleDropdown('gems')"
+                    aria-label="Gemas"
+                    aria-expanded="false"
+                    aria-controls="hud-dd-gems"
+                >💎<span id="hud-gems">0</span></button>
+                <div class="hud-dropdown" id="hud-dd-gems" aria-hidden="true"></div>
+            </div>
+
+            <!-- XP -->
+            <div class="hud-chip-wrap hud-xp-wrap" id="hud-xp-wrap">
+                <button class="hud-chip xp-chip" id="hud-xp-btn"
+                    onclick="HUD.toggleDropdown('xp')"
+                    aria-label="XP total"
+                    aria-expanded="false"
+                    aria-controls="hud-dd-xp"
+                >⚡<span id="hud-xp">0</span></button>
+                <div class="hud-dropdown" id="hud-dd-xp" aria-hidden="true"></div>
+            </div>
+
+            <!-- Hearts -->
+            <div class="hud-chip-wrap hud-hearts-wrap" id="hud-hearts-wrap">
+                <button class="hud-chip heart-chip" id="hud-hearts-btn"
+                    onclick="HUD.toggleDropdown('hearts')"
+                    aria-label="Vidas"
+                    aria-expanded="false"
+                    aria-controls="hud-dd-hearts"
+                >❤️<span id="hud-hearts">5</span></button>
+                <div class="hud-dropdown" id="hud-dd-hearts" aria-hidden="true"></div>
+            </div>
+
+            <!-- Mute -->
+            <button id="mute-btn" class="hud-mute-btn" onclick="SoundManager.toggle()" aria-label="Alternar som" title="Som">🔊</button>
+
+            <!-- Notifications -->
+            <div class="hud-chip-wrap" id="hud-notif-wrap">
+                <button class="hud-notif-btn" id="hud-notif-btn"
+                    onclick="HUD.toggleDropdown('notifications')"
+                    aria-label="Notificações"
+                    aria-expanded="false"
+                    aria-controls="hud-dd-notifications"
+                >🔔<span class="hud-notif-badge" id="hud-notif-badge" style="display:none">0</span></button>
+                <div class="hud-dropdown" id="hud-dd-notifications" aria-hidden="true"></div>
+            </div>
+
+            <!-- Avatar + dropdown -->
             <div class="hud-avatar-wrap" id="hud-avatar-wrap">
                 <button
                     id="hud-avatar-btn"
@@ -64,27 +141,21 @@
                         <div class="had-stat"><span>💎</span><span id="had-gems-val">0</span></div>
                     </div>
                     <div class="had-divider"></div>
-                    <a class="had-link" href="#profile"  onclick="HUD.closeAvatarDropdown()" role="menuitem">🦸 Meu Perfil</a>
-                    <a class="had-link" href="#shop"     onclick="HUD.closeAvatarDropdown()" role="menuitem">🛒 Loja</a>
-                    <a class="had-link" href="#ranking"  onclick="HUD.closeAvatarDropdown()" role="menuitem">🏆 Ranking</a>
+                    <a class="had-link" href="#profile"      onclick="HUD.closeAvatarDropdown()" role="menuitem">🦸 Meu Perfil</a>
+                    <a class="had-link" href="#achievements" onclick="HUD.closeAvatarDropdown()" role="menuitem">🏅 Conquistas</a>
+                    <a class="had-link" href="#shop"         onclick="HUD.closeAvatarDropdown()" role="menuitem">🛒 Loja</a>
+                    <a class="had-link" href="#ranking"      onclick="HUD.closeAvatarDropdown()" role="menuitem">🏆 Ranking</a>
+                    <div class="had-divider"></div>
+                    <button class="had-link" onclick="HUD.toggleLayoutPref()" role="menuitem">
+                        <span id="hud-pref-icon">🖥️</span>
+                        <span id="hud-pref-label">Modo Compacto</span>
+                        <span class="had-pref-badge" id="hud-pref-badge">ATIVO</span>
+                    </button>
                     <div class="had-divider"></div>
                     <button class="had-link had-logout" onclick="State.logoutAsync()" role="menuitem">🚪 Sair</button>
                 </div>
             </div>
-            <span class="hud-level-chip" id="hud-level" aria-label="Nível atual">Nv.1</span>
-        </div>
-        <div class="hud-stats" role="status" aria-label="Estatísticas do jogador">
-            <div class="hud-chip streak-chip" aria-label="Sequência de dias">🔥<span id="hud-streak">1</span></div>
-            <div class="hud-chip gem-chip"    aria-label="Gemas">💎<span id="hud-gems">0</span></div>
-            <div class="hud-chip xp-chip"     aria-label="XP total">⚡<span id="hud-xp">0</span></div>
-            <div class="hud-chip heart-chip"  aria-label="Vidas">❤️<span id="hud-hearts">5</span></div>
-            <button
-                id="mute-btn"
-                class="hud-mute-btn"
-                onclick="SoundManager.toggle()"
-                aria-label="Alternar som"
-                title="Som"
-            >🔊</button>
+
         </div>
     </header>
 

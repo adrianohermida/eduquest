@@ -574,6 +574,70 @@ body[data-layout="full"] .sidebar-overlay { display: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════
+   COMPACT MAP MODE — sidebar collapsed for more content
+   Toggled via HUD.toggleLayoutPref() → body[data-map-pref="compact"]
+   ═══════════════════════════════════════════════════════ */
+
+@media (min-width: 1280px) {
+    body[data-map-pref="compact"] {
+        padding-left: var(--sidebar-w-compact);
+        padding-right: 0;
+    }
+    body[data-map-pref="compact"] .top-hud {
+        left: var(--sidebar-w-compact);
+        right: 0;
+    }
+    body[data-map-pref="compact"] .sidebar {
+        width: var(--sidebar-w-compact);
+    }
+    /* In compact mode sidebar behaves like tablet compact */
+    body[data-map-pref="compact"] .sidebar-brand {
+        justify-content: center;
+        padding: 0;
+    }
+    body[data-map-pref="compact"] .sidebar-brand-text { display: none; }
+    body[data-map-pref="compact"] .sidebar-nav  { align-items: center; }
+    body[data-map-pref="compact"] .sidebar-item {
+        justify-content: center;
+        padding: var(--sp-3) 0;
+        width: 48px;
+    }
+    body[data-map-pref="compact"] .sidebar-item-label { display: none; }
+    body[data-map-pref="compact"] .sidebar-item.active::before { display: none; }
+    body[data-map-pref="compact"] .sidebar-item.active { box-shadow: inset 0 0 0 2px var(--brand); }
+    body[data-map-pref="compact"] .sidebar-soon-chip { display: none; }
+    body[data-map-pref="compact"] .sidebar-footer { display: none; }
+    body[data-map-pref="compact"] .right-panel { display: none; }
+}
+
+/* F11 / browser fullscreen — hide chrome */
+:fullscreen body,
+:-webkit-full-screen body,
+:-moz-full-screen body {
+    --hud-h: 0px;
+}
+:fullscreen .top-hud,
+:-webkit-full-screen .top-hud,
+:-moz-full-screen .top-hud {
+    display: none !important;
+}
+:fullscreen .sidebar,
+:-webkit-full-screen .sidebar,
+:-moz-full-screen .sidebar {
+    display: none !important;
+}
+:fullscreen .right-panel,
+:-webkit-full-screen .right-panel,
+:-moz-full-screen .right-panel {
+    display: none !important;
+}
+:fullscreen body,
+:-webkit-full-screen body,
+:-moz-full-screen body {
+    padding: 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
    ACCESSIBILITY — Universal focus ring
    ═══════════════════════════════════════════════════════ */
 *:focus { outline: none; }
