@@ -711,7 +711,9 @@ const GameEngine = {
         const overlay = document.getElementById('feedback-overlay');
         if (!overlay) { this._nextQuestion(isCorrect); return; }
 
-        const icon  = isCorrect ? '✅' : '❌';
+        const icon  = (typeof IconSystem !== 'undefined')
+            ? (isCorrect ? IconSystem.html('check',{size:'xl',color:'success'}) : IconSystem.html('warning',{size:'xl',color:'danger'}))
+            : (isCorrect ? '✅' : '❌');
         const label = isCorrect ? `Correto! +${points} pts` : 'Incorreto!';
         const typingNote = typedValue && !isCorrect
             ? `<div class="feedback-typed">Você digitou: "${typedValue}"</div>`
@@ -748,7 +750,7 @@ const GameEngine = {
     _showXPFloat(points, anchorEl) {
         const float = document.createElement('div');
         float.className   = 'xp-float';
-        float.textContent = `+${points} ⚡`;
+        float.innerHTML = `+${points} ${(typeof IconSystem !== 'undefined') ? IconSystem.html('xp',{size:'xs',color:'xp'}) : '⚡'}`;
         if (anchorEl) {
             const r = anchorEl.getBoundingClientRect();
             float.style.left = `${r.left + r.width / 2 - 30}px`;
