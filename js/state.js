@@ -61,6 +61,11 @@ const State = {
         // Supabase auth listener (fires asynchronously on load)
         if (typeof SupaAuth !== 'undefined') {
             SupaAuth.onAuthChange(async (event, session) => {
+                if (event === 'PASSWORD_RECOVERY') {
+                    // Show reset-password form instead of logging in
+                    if (typeof Router !== 'undefined') Router.navigate('#reset-password');
+                    return;
+                }
                 if (session?.user) {
                     this.data.user.uid           = session.user.id;
                     this.data.user.email         = session.user.email;
@@ -68,9 +73,10 @@ const State = {
                     await this._loadFromCloud(session.user.id);
                     this.save();
                     this.updateHUD();
-                    // If on auth/landing page, navigate home
+                    // Navigate away from auth/landing pages
                     const r = window.location.hash.replace('#', '').split('/')[0];
-                    if (r === 'landing' || r === 'login' || r === 'register' || r === '') {
+                    const authPages = ['landing','login','register','','reset-password'];
+                    if (authPages.includes(r) || r.includes('access_token')) {
                         Router.navigate(this.data.user.onboarded ? '#home' : '#onboarding/1');
                     }
                 } else if (event === 'SIGNED_OUT') {

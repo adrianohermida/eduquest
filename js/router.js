@@ -27,7 +27,18 @@ const Router = {
 
         if (!container) { console.error('❌ #app-container não encontrado!'); return; }
 
-        const publicRoutes = ['landing', 'login', 'register', 'onboarding'];
+        // Supabase auth callback (magic link / password recovery / OAuth)
+        const rawHash = window.location.hash;
+        if (rawHash.includes('access_token=') || rawHash.includes('error_code=')) {
+            container.innerHTML = `
+            <div class="auth-screen">
+                <div class="auth-logo">⚡ EduQuest</div>
+                <p style="color:var(--text-muted);font-size:0.9rem;font-weight:700;margin-top:8px">Verificando...</p>
+            </div>`;
+            return; // onAuthStateChange handles navigation
+        }
+
+        const publicRoutes = ['landing', 'login', 'register', 'onboarding', 'reset-password'];
         if (!publicRoutes.includes(route)) {
             if (!State.isAuthenticated()) { this.navigate('#landing'); return; }
             if (!State.isOnboarded())     { this.navigate('#onboarding/1'); return; }
@@ -43,9 +54,10 @@ const Router = {
         if (!isAuth && !isGame) this._updateNavActive(route);
 
         switch (route) {
-            case 'landing':    this.renderLanding(container);                             break;
-            case 'login':      this.renderLogin(container);                               break;
-            case 'register':   this.renderRegister(container);                            break;
+            case 'landing':         this.renderLanding(container);                        break;
+            case 'login':           this.renderLogin(container);                          break;
+            case 'register':        this.renderRegister(container);                       break;
+            case 'reset-password':  this.renderResetPassword(container);                  break;
             case 'onboarding': this.renderOnboarding(container, parseInt(parts[1]) || 1); break;
             case 'home':
             case '':           this.renderHome(container);      break;
@@ -193,42 +205,97 @@ const Router = {
             <div class="auth-logo">⚡ EduQuest</div>
             <div class="auth-tagline">Aprenda. Evolua. Domine.</div>
             <div class="auth-card">
-                <div class="auth-title">Bem-vindo de volta!</div>
-                <div class="auth-field">
-                    <label class="auth-label">Email</label>
-                    <input class="auth-input" type="email" id="login-email"
-                        placeholder="seu@email.com" autocomplete="email">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="Router._switchAuthTab('password',this)">Senha</button>
+                    <button class="auth-tab" onclick="Router._switchAuthTab('magic',this)">Link Mágico</button>
+                    <button class="auth-tab" onclick="Router._switchAuthTab('otp',this)">Código</button>
                 </div>
-                <div class="auth-field">
-                    <label class="auth-label">Senha</label>
-                    <input class="auth-input" type="password" id="login-password"
-                        placeholder="••••••" autocomplete="current-password">
+
+                <!-- Tab: Email + Senha -->
+                <div id="tab-password" class="auth-tab-pane active">
+                    <div class="auth-field">
+                        <input class="auth-input" type="email" id="login-email"
+                            placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="auth-field">
+                        <input class="auth-input" type="password" id="login-password"
+                            placeholder="sua senha" autocomplete="current-password">
+                    </div>
+                    <div class="auth-error" id="login-error"></div>
+                    <button class="btn-primary mt-3" id="login-submit-btn" onclick="Router._doLogin()">⚡ Entrar</button>
+                    <div style="text-align:center;margin-top:10px">
+                        <span onclick="Router._showForgotPassword()" class="auth-link">Esqueci minha senha</span>
+                    </div>
                 </div>
-                <div class="auth-error" id="login-error">Email ou senha incorretos.</div>
-                <button class="btn-primary mt-4" id="login-submit-btn" onclick="Router._doLogin()">⚡ Entrar</button>
-                <div style="text-align:center;margin-top:10px">
-                    <span onclick="Router._showForgotPassword()" style="cursor:pointer;font-size:0.8rem;color:var(--text-muted);font-weight:700">
-                        Esqueci minha senha
-                    </span>
+
+                <!-- Tab: Link Mágico -->
+                <div id="tab-magic" class="auth-tab-pane">
+                    <p class="auth-hint">Receba um link de acesso direto no email, sem precisar de senha.</p>
+                    <div class="auth-field">
+                        <input class="auth-input" type="email" id="magic-email"
+                            placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="auth-error" id="magic-error"></div>
+                    <div class="auth-success" id="magic-success">✅ Verifique seu email para o link de acesso!</div>
+                    <button class="btn-primary mt-3" id="magic-btn" onclick="Router._sendMagicLink()">📧 Enviar Link Mágico</button>
                 </div>
+
+                <!-- Tab: Código OTP -->
+                <div id="tab-otp" class="auth-tab-pane">
+                    <div id="otp-phase-1">
+                        <p class="auth-hint">Enviaremos um código de 6 dígitos para seu email.</p>
+                        <div class="auth-field">
+                            <input class="auth-input" type="email" id="otp-email"
+                                placeholder="seu@email.com" autocomplete="email">
+                        </div>
+                        <div class="auth-error" id="otp-error"></div>
+                        <button class="btn-primary mt-3" id="otp-send-btn" onclick="Router._sendOTP()">🔑 Enviar Código</button>
+                    </div>
+                    <div id="otp-phase-2" style="display:none">
+                        <div class="otp-sent-label" id="otp-sent-label">Código enviado!</div>
+                        <div class="auth-field" style="margin-top:12px">
+                            <input class="auth-input otp-input" type="text" id="otp-code"
+                                placeholder="000000" maxlength="6" inputmode="numeric"
+                                autocomplete="one-time-code">
+                        </div>
+                        <div class="auth-error" id="otp-verify-error"></div>
+                        <button class="btn-primary mt-3" id="otp-verify-btn" onclick="Router._verifyOTP()">✓ Verificar</button>
+                        <div style="text-align:center;margin-top:8px">
+                            <span onclick="Router._otpBack()" class="auth-link">← Trocar email</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="auth-footer mt-3">
                     Não tem conta?
-                    <span onclick="Router.navigate('#register')" style="cursor:pointer">
-                        <strong style="color:var(--brand)">Criar conta</strong>
-                    </span>
+                    <span onclick="Router.navigate('#register')" class="auth-link-brand">Criar conta</span>
                 </div>
             </div>
         </div>`;
         setTimeout(() => document.getElementById('login-email')?.focus(), 120);
-
-        // Allow enter key
         setTimeout(() => {
             ['login-email','login-password'].forEach(id => {
                 document.getElementById(id)?.addEventListener('keydown', e => {
                     if (e.key === 'Enter') Router._doLogin();
                 });
             });
+            document.getElementById('magic-email')?.addEventListener('keydown', e => {
+                if (e.key === 'Enter') Router._sendMagicLink();
+            });
+            document.getElementById('otp-email')?.addEventListener('keydown', e => {
+                if (e.key === 'Enter') Router._sendOTP();
+            });
+            document.getElementById('otp-code')?.addEventListener('keydown', e => {
+                if (e.key === 'Enter') Router._verifyOTP();
+            });
         }, 150);
+    },
+
+    _switchAuthTab(tabId, btn) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + tabId)?.classList.add('active');
     },
 
     async _doLogin() {
@@ -241,9 +308,7 @@ const Router = {
 
         if (result.success) {
             if (typeof SoundManager !== 'undefined') SoundManager.play('click');
-            // onAuthChange in state.js handles navigation after loading cloud profile
             if (!State.data.user.uid) {
-                // offline/legacy fallback
                 State.isOnboarded() ? this.navigate('#home') : this.navigate('#onboarding/1');
             }
         } else {
@@ -255,14 +320,118 @@ const Router = {
         }
     },
 
+    async _sendMagicLink() {
+        const email = (document.getElementById('magic-email')?.value || '').trim();
+        const errEl = document.getElementById('magic-error');
+        const okEl  = document.getElementById('magic-success');
+        const btn   = document.getElementById('magic-btn');
+        if (!email) { if(errEl){errEl.textContent='Digite seu email.';errEl.classList.add('show');} return; }
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
+        if (errEl) errEl.classList.remove('show');
+        const { error } = await SupaAuth.sendMagicLink(email);
+        if (error) {
+            if (errEl) { errEl.textContent = error.message; errEl.classList.add('show'); }
+            if (btn) { btn.disabled = false; btn.textContent = '📧 Enviar Link Mágico'; }
+        } else {
+            if (okEl) okEl.classList.add('show');
+            if (btn) { btn.textContent = '📧 Reenviar Link'; btn.disabled = false; }
+        }
+    },
+
+    async _sendOTP() {
+        const email = (document.getElementById('otp-email')?.value || '').trim();
+        const errEl = document.getElementById('otp-error');
+        const btn   = document.getElementById('otp-send-btn');
+        if (!email) { if(errEl){errEl.textContent='Digite seu email.';errEl.classList.add('show');} return; }
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Enviando...'; }
+        if (errEl) errEl.classList.remove('show');
+        const { error } = await SupaAuth.sendOTP(email);
+        if (error) {
+            if (errEl) { errEl.textContent = error.message; errEl.classList.add('show'); }
+            if (btn) { btn.disabled = false; btn.textContent = '🔑 Enviar Código'; }
+        } else {
+            const lbl = document.getElementById('otp-sent-label');
+            if (lbl) lbl.textContent = `Código enviado para ${email}`;
+            document.getElementById('otp-phase-1').style.display = 'none';
+            document.getElementById('otp-phase-2').style.display = '';
+            setTimeout(() => document.getElementById('otp-code')?.focus(), 100);
+        }
+    },
+
+    async _verifyOTP() {
+        const email = (document.getElementById('otp-email')?.value || '').trim();
+        const token = (document.getElementById('otp-code')?.value  || '').trim();
+        const errEl = document.getElementById('otp-verify-error');
+        const btn   = document.getElementById('otp-verify-btn');
+        if (token.length < 6) { if(errEl){errEl.textContent='Digite o código de 6 dígitos.';errEl.classList.add('show');} return; }
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Verificando...'; }
+        if (errEl) errEl.classList.remove('show');
+        const { error } = await SupaAuth.verifyOTP(email, token);
+        if (error) {
+            if (errEl) { errEl.textContent = error.message || 'Código inválido ou expirado.'; errEl.classList.add('show'); }
+            if (btn) { btn.disabled = false; btn.textContent = '✓ Verificar'; }
+        }
+        // success: onAuthStateChange handles navigation
+    },
+
+    _otpBack() {
+        document.getElementById('otp-phase-1').style.display = '';
+        document.getElementById('otp-phase-2').style.display = 'none';
+        if (document.getElementById('otp-code')) document.getElementById('otp-code').value = '';
+        const errEl = document.getElementById('otp-verify-error');
+        if (errEl) errEl.classList.remove('show');
+    },
+
     _showForgotPassword() {
         const email = (document.getElementById('login-email')?.value || '').trim();
-        if (!email) { alert('Digite seu email primeiro.'); return; }
+        if (!email) { alert('Digite seu email no campo acima primeiro.'); return; }
         if (typeof SupaAuth === 'undefined') { alert('Serviço indisponível no momento.'); return; }
         SupaAuth.resetPassword(email).then(({ error }) => {
             if (error) alert('Erro: ' + error.message);
             else alert('✅ Email de recuperação enviado! Verifique sua caixa de entrada.');
         });
+    },
+
+    // ── RESET PASSWORD ────────────────────────────────────
+    renderResetPassword(container) {
+        container.innerHTML = `
+        <div class="auth-screen">
+            <div class="auth-logo">⚡ EduQuest</div>
+            <div class="auth-tagline">Defina sua nova senha</div>
+            <div class="auth-card">
+                <div class="auth-title" style="margin-bottom:16px">🔐 Nova Senha</div>
+                <div class="auth-field">
+                    <input class="auth-input" type="password" id="rp-new"
+                        placeholder="mínimo 6 caracteres" autocomplete="new-password">
+                </div>
+                <div class="auth-field">
+                    <input class="auth-input" type="password" id="rp-confirm"
+                        placeholder="confirme a senha" autocomplete="new-password">
+                </div>
+                <div class="auth-error" id="rp-error"></div>
+                <button class="btn-primary mt-3" id="rp-btn" onclick="Router._doResetPassword()">✅ Salvar Nova Senha</button>
+            </div>
+        </div>`;
+        setTimeout(() => document.getElementById('rp-new')?.focus(), 120);
+    },
+
+    async _doResetPassword() {
+        const pass  = document.getElementById('rp-new')?.value     || '';
+        const conf  = document.getElementById('rp-confirm')?.value || '';
+        const errEl = document.getElementById('rp-error');
+        const btn   = document.getElementById('rp-btn');
+        if (pass.length < 6) { errEl.textContent='Senha muito curta (mín. 6 caracteres).'; errEl.classList.add('show'); return; }
+        if (pass !== conf)    { errEl.textContent='As senhas não coincidem.';               errEl.classList.add('show'); return; }
+        if (errEl) errEl.classList.remove('show');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Salvando...'; }
+        const { error } = await SupaAuth.updatePassword(pass);
+        if (error) {
+            errEl.textContent = error.message; errEl.classList.add('show');
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Salvar Nova Senha'; }
+        } else {
+            alert('✅ Senha atualizada! Você já está logado.');
+            this.navigate(State.isOnboarded() ? '#home' : '#onboarding/1');
+        }
     },
 
     renderRegister(container) {

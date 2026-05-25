@@ -1238,6 +1238,84 @@ img { max-width: 100%; }
 }
 .auth-footer a { color: var(--brand); font-weight: 800; cursor: pointer; }
 
+/* Auth helper classes */
+.auth-success {
+    color: var(--success);
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: var(--sp-2);
+    display: none;
+    animation: screenIn var(--dur-fast) var(--ease-smooth);
+}
+.auth-success.show { display: block; }
+.auth-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: var(--sp-3);
+    line-height: 1.5;
+}
+.auth-link {
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.auth-link:hover { color: var(--brand); }
+.auth-link-brand {
+    cursor: pointer;
+    font-weight: 800;
+    color: var(--brand);
+}
+
+/* Auth method tabs */
+.auth-tabs {
+    display: flex;
+    gap: 3px;
+    background: var(--surface-3);
+    border-radius: var(--r-lg);
+    padding: 3px;
+    margin-bottom: var(--sp-4);
+}
+.auth-tab {
+    flex: 1;
+    padding: 7px 6px;
+    border: none;
+    border-radius: var(--r-md);
+    background: transparent;
+    font-family: var(--font);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
+    white-space: nowrap;
+}
+.auth-tab.active {
+    background: var(--surface);
+    color: var(--brand);
+    box-shadow: var(--shadow-sm);
+}
+.auth-tab-pane { display: none; }
+.auth-tab-pane.active { display: block; animation: screenIn var(--dur-fast) var(--ease-smooth); }
+
+/* OTP input */
+.otp-input {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 6px;
+}
+.otp-sent-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--success);
+    text-align: center;
+    padding: 6px;
+    background: var(--success-light);
+    border-radius: var(--r-lg);
+}
+
 /* ── ONBOARDING SCREEN ───────────────────────────── */
 .onboard-screen {
     position: fixed; inset: 0;
