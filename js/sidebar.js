@@ -182,12 +182,13 @@ const Sidebar = {
         }).join('');
 
         // ── League tiers ──
+        const _icT = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const TIERS = [
-            { name: 'Bronze',  icon: '🥉', min: 0    },
-            { name: 'Prata',   icon: '🥈', min: 1000 },
-            { name: 'Ouro',    icon: '🥇', min: 5000 },
-            { name: 'Platina', icon: '💜', min: 15000 },
-            { name: 'Diamante',icon: '💎', min: 40000 },
+            { name: 'Bronze',  iconId: 'achievement', iconColor: 'locked',  min: 0    },
+            { name: 'Prata',   iconId: 'shield',       iconColor: 'science', min: 1000 },
+            { name: 'Ouro',    iconId: 'star',         iconColor: 'xp',      min: 5000 },
+            { name: 'Platina', iconId: 'crown',        iconColor: 'final',   min: 15000},
+            { name: 'Diamante',iconId: 'gem',          iconColor: 'gem',     min: 40000},
         ];
         const xp = user.xp || 0;
         const curTierIdx = TIERS.reduce((best, t, i) => xp >= t.min ? i : best, 0);
