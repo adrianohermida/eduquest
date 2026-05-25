@@ -168,9 +168,96 @@
 .gfi-time   { font-size: 0.66rem; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
 .gfi-icon   { flex-shrink: 0; display: flex; align-items: center; opacity: 0.7; }
 
+/* ── FRIENDS SCREEN ─────────────────────────────────────────── */
+.friends-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-4) var(--sp-2);
+}
+.friends-header-icon { font-size: 2rem; flex-shrink: 0; }
+.friends-header-title { font-size: 1.1rem; font-weight: 900; color: var(--text); display: flex; align-items: center; }
+.friends-header-sub   { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+
+.friends-section { padding: 0 var(--sp-4) var(--sp-4); }
+.friends-section-title {
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--sp-2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.friends-list { display: flex; flex-direction: column; gap: 6px; }
+
+.friends-row, .challenge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 10px var(--sp-3);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+}
+.challenge-pending { border-color: #f97316; background: rgba(249,115,22,0.05); }
+.challenge-won     { border-color: #10b981; background: rgba(16,185,129,0.05); }
+.challenge-lost    { border-color: var(--border); }
+
+.fr-avatar { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+.fr-info   { flex: 1; min-width: 0; }
+.fr-name   { font-size: 0.85rem; font-weight: 900; color: var(--text); }
+.fr-meta   { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+
+.fr-add-btn, .fr-challenge-btn, .fr-accept-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: var(--r-md);
+    font-family: var(--font);
+    font-size: 0.75rem;
+    font-weight: 900;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+    transition: transform 0.12s, opacity 0.12s;
+}
+.fr-add-btn       { background: var(--brand); color: #fff; box-shadow: 0 2px 0 var(--brand-dark); }
+.fr-challenge-btn { background: rgba(99,102,241,0.12); color: #6366f1; border: 1.5px solid rgba(99,102,241,0.3); }
+.fr-accept-btn    { background: #10b981; color: #fff; box-shadow: 0 2px 0 #065f46; }
+.fr-add-btn:active, .fr-challenge-btn:active, .fr-accept-btn:active { transform: translateY(2px); box-shadow: none; }
+
+.fr-remove-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    border-radius: var(--r-sm);
+}
+.fr-remove-btn:hover { color: #ef4444; background: rgba(239,68,68,0.08); }
+
+.challenge-result-badge {
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+.challenge-result-badge.won  { background: rgba(16,185,129,0.15); color: #10b981; }
+.challenge-result-badge.lost { background: rgba(239,68,68,0.10); color: #ef4444; }
+
 /* ── DARK MODE ──────────────────────────────────────────────── */
 [data-theme="dark"] .live-presence-bar   { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.15); }
 [data-theme="dark"] .social-feed-item    { background: var(--surface-2); }
 [data-theme="dark"] .guild-card          { background: var(--surface-2); }
 [data-theme="dark"] .guild-lb-row        { background: var(--surface-2); }
 [data-theme="dark"] .guild-feed-item     { background: var(--surface-2); }
+[data-theme="dark"] .friends-row         { background: var(--surface-2); }
+[data-theme="dark"] .challenge-row       { background: var(--surface-2); }

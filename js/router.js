@@ -78,6 +78,7 @@ const Router = {
             case 'ranking':       this.renderRanking(container);           break;
             case 'teams':         this.renderTeams(container, parts[1]);   break;
             case 'guild':         this.renderGuild(container);              break;
+            case 'friends':       this.renderFriends(container);            break;
             case 'achievements':  this.renderAchievements(container);       break;
             case 'word-search':   this.renderWordSearch(container, parts[1], parts[2]); break;
             default:              this.renderHome(container);
@@ -1370,6 +1371,12 @@ const Router = {
                     ${(typeof SocialEngine !== 'undefined' && SocialEngine.getUserGuild()) ? `<span class="pnb-count">${SocialEngine.getUserGuild().name}</span>` : `<span class="pnb-count" style="color:var(--text-muted)">Sem guild</span>`}
                     <span class="pnb-arrow">›</span>
                 </button>
+                <button class="profile-nav-btn" onclick="Router.navigate('#friends')">
+                    <span class="pnb-icon">${_ic('friends',{size:'sm'})}</span>
+                    <span class="pnb-label">Amigos</span>
+                    ${(() => { const fc = typeof SocialEngine !== 'undefined' ? SocialEngine.getFriendPlayers().length : 0; const pc = typeof SocialEngine !== 'undefined' ? SocialEngine.getChallenges().filter(c=>c.status==='pending').length : 0; return pc > 0 ? `<span class="pnb-count" style="color:#ef4444">${pc} desafio${pc>1?'s':''}</span>` : fc > 0 ? `<span class="pnb-count">${fc} amigo${fc>1?'s':''}</span>` : `<span class="pnb-count" style="color:var(--text-muted)">0 amigos</span>`; })()}
+                    <span class="pnb-arrow">›</span>
+                </button>
                 <button class="profile-nav-btn" onclick="Router.navigate('#teams')">
                     <span class="pnb-icon">${_ic('friends',{size:'sm'})}</span>
                     <span class="pnb-label">Minhas Turmas</span>
@@ -1405,13 +1412,17 @@ const Router = {
             if (data?.length) players = data;
         }
 
-        // Ensure current user appears even with no remote data
+        // Use mixed ranking (ghost players + user) when no remote data
         if (!players.length) {
-            players = [{
-                id: uid, name: State.data.user.name, level: State.data.user.level,
-                xp: State.data.user.xp, avatar: State.data.user.avatar || '🦸',
-                streak: State.data.user.streak
-            }];
+            if (typeof SocialEngine !== 'undefined') {
+                players = SocialEngine.getMixedRanking(State.data.user);
+            } else {
+                players = [{
+                    id: uid, name: State.data.user.name, level: State.data.user.level,
+                    xp: State.data.user.xp, avatar: State.data.user.avatar || '🦸',
+                    streak: State.data.user.streak
+                }];
+            }
         }
 
         const getRankIcon = xp => xp >= 5000 ? '💜' : xp >= 2000 ? '🥇' : xp >= 800 ? '🥈' : '🥉';
@@ -1838,6 +1849,148 @@ const Router = {
                 this.navigate('#guild');
             },
         });
+    },
+
+    // ── FRIENDS ──────────────────────────────────────────
+    renderFriends(container) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const SE  = typeof SocialEngine !== 'undefined' ? SocialEngine : null;
+        if (!SE) { container.innerHTML = `<div class="screen"><p style="padding:32px;color:var(--text-muted);text-align:center">Sistema social indisponível.</p></div>`; return; }
+
+        const myFriendIds  = SE.getFriends();
+        const friendPlayers = SE.getFriendPlayers();
+        const challenges    = SE.getChallenges();
+        const pending       = challenges.filter(c => c.status === 'pending');
+        const resolved      = challenges.filter(c => c.status !== 'pending').slice(-5).reverse();
+
+        // Suggested friends: ghost players NOT already friends (up to 8)
+        const allGhosts = SE.GHOST_PLAYERS.map((p, i) => ({ ...p, id: `ghost_${i}` }));
+        const suggested = allGhosts.filter(g => !myFriendIds.includes(g.id)).slice(0, 8);
+
+        const challengeBadge = pending.length
+            ? `<span style="background:#ef4444;color:#fff;font-size:0.65rem;font-weight:900;padding:2px 7px;border-radius:99px;margin-left:6px">${pending.length}</span>`
+            : '';
+
+        const friendsHTML = friendPlayers.length ? friendPlayers.map(p => `
+            <div class="friends-row">
+                <span class="fr-avatar">${p.avatar}</span>
+                <div class="fr-info">
+                    <div class="fr-name">${p.name}</div>
+                    <div class="fr-meta">Nv.${p.level} · ⚡${p.xp} · 🔥${p.streak}d</div>
+                </div>
+                <button class="fr-challenge-btn" onclick="Router._sendChallenge('${p.id}')">
+                    ${_ic('sword',{size:'xs',color:'rpg'})} Desafiar
+                </button>
+                <button class="fr-remove-btn" onclick="Router._removeFriend('${p.id}')" title="Remover amigo">×</button>
+            </div>`).join('') : `
+            <div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.82rem;font-weight:700">
+                Nenhum amigo adicionado ainda. Sugestões abaixo!
+            </div>`;
+
+        const pendingHTML = pending.map(ch => `
+            <div class="challenge-row challenge-pending">
+                <span class="fr-avatar">${ch.ghostAvatar}</span>
+                <div class="fr-info">
+                    <div class="fr-name">${ch.ghostName} te desafiou!</div>
+                    <div class="fr-meta">Tópico: ${ch.topic}</div>
+                </div>
+                <button class="fr-accept-btn" onclick="Router._acceptChallenge('${ch.id}')">
+                    ${_ic('check',{size:'xs'})} Aceitar
+                </button>
+            </div>`).join('');
+
+        const resolvedHTML = resolved.map(ch => `
+            <div class="challenge-row ${ch.status === 'won' ? 'challenge-won' : 'challenge-lost'}">
+                <span class="fr-avatar">${ch.ghostAvatar}</span>
+                <div class="fr-info">
+                    <div class="fr-name">${ch.ghostName}</div>
+                    <div class="fr-meta">${ch.topic} · ${ch.status === 'won' ? `Você venceu! +${ch.xpGain} XP` : `Você perdeu. +${ch.xpGain} XP`}</div>
+                </div>
+                <span class="challenge-result-badge ${ch.status}">${ch.status === 'won' ? 'VITÓRIA' : 'DERROTA'}</span>
+            </div>`).join('');
+
+        const suggestedHTML = suggested.map(p => `
+            <div class="friends-row">
+                <span class="fr-avatar">${p.avatar}</span>
+                <div class="fr-info">
+                    <div class="fr-name">${p.name}</div>
+                    <div class="fr-meta">Nv.${p.level} · ⚡${p.xp} · 🔥${p.streak}d · ${p.guild}</div>
+                </div>
+                <button class="fr-add-btn" onclick="Router._addFriend('${p.id}')">
+                    ${_ic('friends',{size:'xs'})} Adicionar
+                </button>
+            </div>`).join('');
+
+        container.innerHTML = `
+        <div class="screen" style="padding-top:var(--sp-4)">
+            <button class="btn-back" onclick="Router.navigate('#profile')">‹ Perfil</button>
+
+            <div class="friends-header">
+                <span class="friends-header-icon">${_ic('friends',{size:'md',color:'science'})}</span>
+                <div>
+                    <div class="friends-header-title">Amigos${challengeBadge}</div>
+                    <div class="friends-header-sub">${friendPlayers.length} amigo${friendPlayers.length !== 1 ? 's' : ''} · ${pending.length} desafio${pending.length !== 1 ? 's' : ''} pendente${pending.length !== 1 ? 's' : ''}</div>
+                </div>
+            </div>
+
+            ${pending.length ? `
+            <div class="friends-section">
+                <div class="friends-section-title">${_ic('sword',{size:'xs',color:'rpg'})} Desafios Pendentes</div>
+                <div class="friends-list">${pendingHTML}</div>
+            </div>` : ''}
+
+            <div class="friends-section">
+                <div class="friends-section-title">${_ic('friends',{size:'xs',color:'science'})} Meus Amigos</div>
+                <div class="friends-list">${friendsHTML}</div>
+            </div>
+
+            ${resolved.length ? `
+            <div class="friends-section">
+                <div class="friends-section-title">${_ic('scroll',{size:'xs',color:'xp'})} Histórico de Desafios</div>
+                <div class="friends-list">${resolvedHTML}</div>
+            </div>` : ''}
+
+            <div class="friends-section">
+                <div class="friends-section-title">${_ic('compass',{size:'xs',color:'final'})} Sugestões de Amigos</div>
+                <div class="friends-list">${suggestedHTML}</div>
+            </div>
+        </div>`;
+    },
+
+    _addFriend(ghostId) {
+        if (typeof SocialEngine === 'undefined') return;
+        SocialEngine.addFriend(ghostId);
+        const idx    = parseInt(ghostId.replace('ghost_', ''), 10);
+        const ghost  = SocialEngine.GHOST_PLAYERS[idx];
+        if (typeof HUD !== 'undefined') HUD._toast(`${ghost?.name || 'Jogador'} adicionado aos amigos!`);
+        this.renderFriends(document.getElementById('app-container'));
+    },
+
+    _removeFriend(ghostId) {
+        if (typeof SocialEngine === 'undefined') return;
+        SocialEngine.removeFriend(ghostId);
+        this.renderFriends(document.getElementById('app-container'));
+    },
+
+    _sendChallenge(ghostId) {
+        if (typeof SocialEngine === 'undefined') return;
+        const ch = SocialEngine.sendChallenge(ghostId);
+        if (ch && typeof HUD !== 'undefined') HUD._toast(`Desafio enviado para ${ch.ghostName}!`);
+        this.renderFriends(document.getElementById('app-container'));
+    },
+
+    _acceptChallenge(challengeId) {
+        if (typeof SocialEngine === 'undefined') return;
+        const ch = SocialEngine.resolveChallenge(challengeId);
+        if (!ch) return;
+        if (ch.xpGain && typeof State !== 'undefined') {
+            State.addXP(ch.xpGain);
+        }
+        const msg = ch.status === 'won'
+            ? `Você venceu ${ch.ghostName}! +${ch.xpGain} XP`
+            : `${ch.ghostName} venceu desta vez. +${ch.xpGain} XP`;
+        if (typeof HUD !== 'undefined') HUD._toast(msg);
+        this.renderFriends(document.getElementById('app-container'));
     },
 
     // ── ACHIEVEMENTS ──────────────────────────────────────

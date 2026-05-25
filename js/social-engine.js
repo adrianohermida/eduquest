@@ -195,11 +195,99 @@ const SocialEngine = {
         return members;
     },
 
+    // ── FRIENDS ─────────────────────────────────────────────────
+    getFriends() {
+        try { return JSON.parse(localStorage.getItem('eq_friends') || '[]'); } catch { return []; }
+    },
+
+    addFriend(ghostId) {
+        const friends = this.getFriends();
+        if (!friends.includes(ghostId)) {
+            friends.push(ghostId);
+            localStorage.setItem('eq_friends', JSON.stringify(friends));
+        }
+    },
+
+    removeFriend(ghostId) {
+        const friends = this.getFriends().filter(id => id !== ghostId);
+        localStorage.setItem('eq_friends', JSON.stringify(friends));
+    },
+
+    isFriend(ghostId) {
+        return this.getFriends().includes(ghostId);
+    },
+
+    getFriendPlayers() {
+        const ids = this.getFriends();
+        return ids.map(id => {
+            const idx = parseInt(id.replace('ghost_', ''), 10);
+            return { ...this.GHOST_PLAYERS[idx], id };
+        }).filter(p => p.name);
+    },
+
+    getChallenges() {
+        try { return JSON.parse(localStorage.getItem('eq_challenges') || '[]'); } catch { return []; }
+    },
+
+    sendChallenge(ghostId) {
+        const challenges = this.getChallenges();
+        const idx = parseInt(ghostId.replace('ghost_', ''), 10);
+        const ghost = this.GHOST_PLAYERS[idx];
+        if (!ghost) return null;
+
+        const id = `ch_${Date.now()}_${ghostId}`;
+        const challenge = {
+            id, ghostId,
+            ghostName: ghost.name, ghostAvatar: ghost.avatar, ghostLevel: ghost.level,
+            status: 'pending',
+            sentAt: new Date().toISOString(),
+            topic: this.STAGE_NAMES[Math.floor(Date.now() / 1000) % this.STAGE_NAMES.length],
+        };
+        challenges.push(challenge);
+        localStorage.setItem('eq_challenges', JSON.stringify(challenges));
+        return challenge;
+    },
+
+    resolveChallenge(challengeId) {
+        const challenges = this.getChallenges();
+        const ch = challenges.find(c => c.id === challengeId);
+        if (!ch || ch.status !== 'pending') return null;
+
+        const userLevel = (typeof State !== 'undefined') ? (State.data?.user?.level || 1) : 1;
+        const seed      = parseInt(challengeId.split('_')[1], 10) || Date.now();
+        const roll      = ((seed * 37) % 100);
+        const winChance = 40 + Math.min(userLevel * 3, 30);
+        ch.status  = roll < winChance ? 'won' : 'lost';
+        ch.xpGain  = ch.status === 'won' ? 30 + Math.floor(Math.random() * 20) : 5;
+        ch.resolvedAt = new Date().toISOString();
+
+        localStorage.setItem('eq_challenges', JSON.stringify(challenges));
+        return ch;
+    },
+
+    clearResolvedChallenges() {
+        const challenges = this.getChallenges().filter(c => c.status === 'pending');
+        localStorage.setItem('eq_challenges', JSON.stringify(challenges));
+    },
+
     // ── SOCIAL NOTIFICATIONS ─────────────────────────────────────
     getSocialNotifications() {
         const feed  = this.getActivityFeed(3);
         const guild = this.getUserGuild();
         const notifs = [];
+
+        // Pending challenges from friends
+        const pending = this.getChallenges().filter(c => c.status === 'pending');
+        if (pending.length) {
+            notifs.push({
+                icon:   'sword',
+                color:  'rpg',
+                text:   `${pending[0].ghostName} te desafiou em ${pending[0].topic}!`,
+                time:   'agora',
+                unread: true,
+                href:   '#friends',
+            });
+        }
 
         if (guild) {
             const gFeed = this.getGuildFeed(guild.id, 2);
