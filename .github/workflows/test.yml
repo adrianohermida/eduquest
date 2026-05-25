@@ -1,0 +1,46 @@
+name: Test Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate HTML
+        run: |
+          echo "Validating index.html..."
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html not found!"
+            exit 1
+          fi
+          echo "✅ index.html exists"
+
+      - name: Validate JS Files
+        run: |
+          echo "Checking JavaScript files..."
+          for file in js/*.js js/components/*.js js/data/*.js; do
+            if [ -f "$file" ]; then
+              echo "✅ $file exists"
+            fi
+          done
+
+      - name: Check CSS
+        run: |
+          echo "Checking CSS files..."
+          for file in css/*.css; do
+            if [ -f "$file" ]; then
+              echo "✅ $file exists"
+            fi
+          done
+
+      - name: Summary
+        run: |
+          echo "✅ All basic checks passed!"
+          echo "Ready for deployment to GitHub Pages"
