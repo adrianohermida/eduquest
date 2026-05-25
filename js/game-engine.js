@@ -25,7 +25,8 @@ const GameEngine = {
         eliminatedIdx:    new Set(),
         hintShown:        false,
         typingMode:       false,
-        typingTimeout:    null
+        typingTimeout:    null,
+        _floats:          []
     },
 
     // ── ENTRY POINT ─────────────────────────────────────────────
@@ -69,31 +70,37 @@ const GameEngine = {
     // ── QUESTION BUILDING ───────────────────────────────────────
 
     _buildQuestionSet(stageData) {
-        // 1. Main MC questions (shuffled)
         let mc = [];
         if (stageData.questions?.length > 0) {
             mc = stageData.questions.map(q => this._normalizeQuestion(q));
         } else {
             mc = (window.QUESTIONS_BANK || []).map(q => this._normalizeQuestion(q));
         }
-        mc = [...mc].sort(() => Math.random() - 0.5).slice(0, CONFIG.stages.questionsPerGame || 10);
+        mc = this._fisherYates(mc).slice(0, CONFIG.stages.questionsPerGame || 10);
 
-        // 2. Prepend 2-3 True/False questions from flashcards (if available)
         const tf = this._generateTFQuestions(stageData);
 
-        // 3. Mix: TF first, then MC (also shuffle options within MC questions)
-        return [...tf, ...mc].map(q => ({
-            ...q,
-            options: q.type === 'tf' ? q.options : this._shuffleOptions(q)
-        }));
+        return [...tf, ...mc].map(q =>
+            q.type === 'tf' ? q : { ...q, ...this._shuffleOptions(q) }
+        );
+    },
+
+    _fisherYates(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
     },
 
     _shuffleOptions(q) {
-        // Shuffle options but track the new correct index
         const indexed = q.options.map((text, i) => ({ text, isCorrect: i === q.correctIndex }));
-        indexed.sort(() => Math.random() - 0.5);
+        for (let i = indexed.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+        }
         return {
-            ...q,
             options:      indexed.map(o => o.text),
             correctIndex: indexed.findIndex(o => o.isCorrect)
         };
@@ -103,7 +110,7 @@ const GameEngine = {
         const flashcards = stageData.summary?.flashcards || [];
         if (flashcards.length < 2) return [];
 
-        const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
+        const shuffled = this._fisherYates(flashcards);
         const count    = Math.min(2, Math.floor(flashcards.length / 2));
         const result   = [];
 
@@ -229,7 +236,7 @@ const GameEngine = {
         if (btn) btn.textContent = idx === total - 1 ? '⚔️ BATALHAR!' : 'Próximo →';
     },
 
-    _startBattle() { this._renderArena(); this._startTimer(); },
+    _startBattle() { this._renderArena(); },
 
     // ── BATTLE ARENA ────────────────────────────────────────────
 
@@ -340,7 +347,8 @@ const GameEngine = {
         el.style.left  = `${r.left + r.width / 2 - 42}px`;
         el.style.top   = `${r.top + 8}px`;
         document.body.appendChild(el);
-        setTimeout(() => el.remove(), 950);
+        this.state._floats.push(el);
+        setTimeout(() => { el.remove(); this.state._floats = this.state._floats.filter(f => f !== el); }, 950);
     },
 
     // ── QUESTION RENDERING ───────────────────────────────────────
@@ -689,7 +697,8 @@ const GameEngine = {
             float.style.top  = `${r.top - 10}px`;
         } else { float.style.left = '50%'; float.style.top = '40%'; }
         document.body.appendChild(float);
-        setTimeout(() => float.remove(), 1300);
+        this.state._floats.push(float);
+        setTimeout(() => { float.remove(); this.state._floats = this.state._floats.filter(f => f !== float); }, 1300);
     },
 
     _updateCombo() {
@@ -777,6 +786,9 @@ const GameEngine = {
     exit() {
         if (confirm('Deseja sair da missão? Seu progresso será perdido.')) {
             this._stopTimer();
+            this.state._floats.forEach(el => el.remove());
+            this.state._floats = [];
+            this._removeCombo();
             document.getElementById('top-hud')?.classList.remove('hidden');
             document.getElementById('bottom-nav')?.classList.remove('hidden');
             Router.navigate(`#chapter/${this.state.chapterId}`);

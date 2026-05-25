@@ -130,13 +130,18 @@ const MemoryGame = {
             }
         } else {
             if (typeof SoundManager !== 'undefined') SoundManager.play('wrong');
+            ['mc-' + a, 'mc-' + b].forEach(id => document.getElementById(id)?.classList.add('mismatch'));
+            this.state.flipped = [];
             setTimeout(() => {
                 ['mc-' + a, 'mc-' + b].forEach(id => {
-                    document.getElementById(id)?.classList.remove('flipped');
+                    const el = document.getElementById(id);
+                    el?.classList.remove('flipped', 'mismatch');
                 });
                 this.state.cards[a].revealed = false;
                 this.state.cards[b].revealed = false;
-            }, 450);
+                this.state.canFlip = true;
+            }, 700);
+            return;
         }
 
         this.state.flipped = [];
