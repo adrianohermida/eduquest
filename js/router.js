@@ -103,33 +103,52 @@ const Router = {
     renderLanding(container) {
         container.innerHTML = `
         <div class="landing-screen">
-            <!-- Hero -->
+
+            <!-- ── HERO ── -->
             <div class="landing-hero">
-                <div class="landing-badge">✨ Novo · Gamificado · Gratuito</div>
+                <div class="lp-orb lp-orb-1"></div>
+                <div class="lp-orb lp-orb-2"></div>
+                <div class="lp-orb lp-orb-3"></div>
+
+                <div class="landing-badge">✨ v2.0 · Gamificado · Gratuito</div>
                 <div class="landing-logo">⚡ EduQuest</div>
                 <h1 class="landing-headline">Aprenda como um<br><span class="landing-highlight">Herói</span></h1>
-                <p class="landing-sub">Transforme seus estudos em uma aventura épica. Ganhe XP, suba de nível e domine cada matéria.</p>
-                <div class="landing-ctas">
-                    <button class="btn-primary landing-cta-main" onclick="Router.navigate('#register')">
-                        ⚡ Começar Jornada
-                    </button>
-                    <button class="btn-ghost landing-cta-sec" onclick="Router.navigate('#login')">
-                        Já tenho conta →
-                    </button>
+
+                <!-- Social avatars + live counter -->
+                <div class="lp-social-row">
+                    <div class="lp-avatars">
+                        <span class="lp-av">🦸</span>
+                        <span class="lp-av">🧙</span>
+                        <span class="lp-av">🦹</span>
+                        <span class="lp-av">⚔️</span>
+                        <span class="lp-av lp-av-more">+12k</span>
+                    </div>
+                    <div class="lp-online">
+                        <span class="lp-online-dot"></span>
+                        <span id="lp-online-count">847</span> heróis online
+                    </div>
                 </div>
+
+                <p class="landing-sub">Missões, batalhas e conquistas reais.<br>O app de estudos mais viciante do Brasil.</p>
+
+                <!-- Preview card -->
                 <div class="landing-preview">
                     <div class="landing-preview-card">
                         <div class="lp-hud">
                             <span class="lp-chip">🔥 7 dias</span>
-                            <span class="lp-chip">⚡ 1250 XP</span>
+                            <span class="lp-chip">⚡ 1.250 XP</span>
                             <span class="lp-chip">💎 48</span>
                         </div>
                         <div class="lp-stage-row">
                             <div class="lp-node done">✓</div>
                             <div class="lp-connector done"></div>
+                            <div class="lp-node done">✓</div>
+                            <div class="lp-connector done"></div>
                             <div class="lp-node active pulse">3</div>
                             <div class="lp-connector"></div>
                             <div class="lp-node locked">🔒</div>
+                            <div class="lp-connector"></div>
+                            <div class="lp-node lp-boss-node">💀</div>
                         </div>
                         <div class="lp-mission">
                             <span class="lp-m-icon">🧬</span>
@@ -137,40 +156,85 @@ const Router = {
                                 <div class="lp-m-title">Vírus vs Bactérias</div>
                                 <div class="lp-m-sub">Missão 3 · Difícil · +150 XP</div>
                             </div>
-                            <button class="lp-play-btn">JOGAR →</button>
+                            <button class="lp-play-btn" onclick="Router.navigate('#register')">JOGAR →</button>
+                        </div>
+                        <div class="lp-combo-row">
+                            <span class="lp-combo-badge">🔥 5x Combo!</span>
+                            <span class="lp-xp-pop">+75 XP</span>
                         </div>
                     </div>
                 </div>
+
+                <div class="landing-ctas">
+                    <button class="btn-primary landing-cta-main" onclick="Router.navigate('#register')">
+                        ⚡ Começar Jornada — Grátis
+                    </button>
+                    <button class="btn-ghost landing-cta-sec" onclick="Router.navigate('#login')">
+                        Já tenho conta →
+                    </button>
+                </div>
             </div>
 
-            <!-- Features -->
+            <!-- ── LIVE ACTIVITY TICKER ── -->
+            <div class="lp-ticker-wrap" aria-hidden="true">
+                <div class="lp-ticker">
+                    <span class="lp-tick">🔥 Ana manteve 30 dias de sequência</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">⚡ Pedro subiu para Liga Ouro</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">🏆 Maria venceu o Boss Mutante</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">💎 Lucas ganhou 150 gemas hoje</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">⭐ Carla completou 3 estrelas</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">🛡️ Diego desbloqueou a Cidadela Final</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">🔥 Fernanda tem 45 dias seguidos</span>
+                    <span class="lp-tick-dot">·</span>
+                    <span class="lp-tick">⚡ Rafael subiu para Nível 10</span>
+                </div>
+            </div>
+
+            <!-- ── FEATURES ── -->
             <div class="landing-features">
                 <div class="landing-section-title">Por que EduQuest?</div>
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">🎮</div>
-                        <div class="feature-title">Aprendizado gamificado</div>
-                        <div class="feature-desc">Missões, chefões, power-ups e recompensas reais que tornam o estudo viciante.</div>
+                        <div class="feature-icon">🗺️</div>
+                        <div class="feature-title">Mapa Aventura RPG</div>
+                        <div class="feature-desc">Navegue por um mundo, explore regiões e enfrente bosses épicos.</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-title">Sistema de Combos</div>
+                        <div class="feature-desc">XP extra por velocidade e sequências. Fica difícil de parar.</div>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🔥</div>
-                        <div class="feature-title">Sequências diárias</div>
-                        <div class="feature-desc">Mantenha sua sequência de dias e ganhe recompensas exclusivas por consistência.</div>
+                        <div class="feature-title">Streaks Diários</div>
+                        <div class="feature-desc">Construa hábitos de estudo e ganhe recompensas por consistência.</div>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🏆</div>
-                        <div class="feature-title">Ranking & Turmas</div>
-                        <div class="feature-desc">Compita com amigos, crie ou entre em turmas e veja quem sobe mais rápido.</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">📚</div>
-                        <div class="feature-title">Conteúdo do 7º ao 9º</div>
-                        <div class="feature-desc">Ciências, Matemática, Português, História e muito mais do currículo nacional.</div>
+                        <div class="feature-title">Ranking & Ligas</div>
+                        <div class="feature-desc">Bronze → Prata → Ouro → Platina. Suba de liga e domine.</div>
                     </div>
                 </div>
             </div>
 
-            <!-- How it works -->
+            <!-- ── BOSS TEASER ── -->
+            <div class="lp-boss-teaser">
+                <div class="lp-boss-glow"></div>
+                <div class="lp-boss-label">👑 PRÓXIMO DESAFIO</div>
+                <div class="lp-boss-name">💀 Vírus Mutante</div>
+                <div class="lp-boss-hp-wrap">
+                    <div class="lp-boss-hp-fill"></div>
+                </div>
+                <p class="lp-boss-sub">Complete as missões para desafiar o chefão</p>
+            </div>
+
+            <!-- ── HOW IT WORKS ── -->
             <div class="landing-how">
                 <div class="landing-section-title">Como funciona?</div>
                 <div class="how-steps">
@@ -178,43 +242,65 @@ const Router = {
                         <div class="how-step-num">1</div>
                         <div class="how-step-text">
                             <div class="how-step-title">Crie seu herói</div>
-                            <div class="how-step-desc">Escolha seu avatar, série e objetivo. Leva 1 minuto.</div>
+                            <div class="how-step-desc">Escolha avatar, classe e objetivo. Leva 1 minuto.</div>
                         </div>
                     </div>
                     <div class="how-step">
                         <div class="how-step-num">2</div>
                         <div class="how-step-text">
-                            <div class="how-step-title">Jogue missões</div>
-                            <div class="how-step-desc">Responda questões em formato de jogo, ganhe estrelas e XP.</div>
+                            <div class="how-step-title">Explore o mapa</div>
+                            <div class="how-step-desc">Navegue por regiões, complete missões, enfrente bosses.</div>
                         </div>
                     </div>
                     <div class="how-step">
                         <div class="how-step-num">3</div>
                         <div class="how-step-text">
-                            <div class="how-step-title">Evolua e domine</div>
-                            <div class="how-step-desc">Suba de nível, desbloqueie fases e vire o melhor da turma.</div>
+                            <div class="how-step-title">Domine e suba de liga</div>
+                            <div class="how-step-desc">Acumule XP, conquistas e tome o topo do ranking.</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Social proof -->
+            <!-- ── SOCIAL PROOF ── -->
             <div class="landing-social">
-                <div class="social-stat"><span class="social-num">10k+</span><span class="social-label">Estudantes</span></div>
+                <div class="social-stat"><span class="social-num">12k+</span><span class="social-label">Estudantes</span></div>
                 <div class="social-divider"></div>
                 <div class="social-stat"><span class="social-num">500+</span><span class="social-label">Questões</span></div>
                 <div class="social-divider"></div>
                 <div class="social-stat"><span class="social-num">4.9 ⭐</span><span class="social-label">Avaliação</span></div>
             </div>
 
-            <!-- Final CTA -->
+            <!-- ── FINAL CTA ── -->
             <div class="landing-final-cta">
-                <button class="btn-primary" style="font-size:1rem;padding:16px 40px" onclick="Router.navigate('#register')">
+                <div class="lp-urgency">🔥 <span id="lp-joined">23</span> heróis se juntaram hoje</div>
+                <button class="btn-primary" style="font-size:1rem;padding:16px 40px;max-width:300px" onclick="Router.navigate('#register')">
                     ⚡ Começar Grátis Agora
                 </button>
-                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">Gratuito · Sem cartão · Para sempre</p>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:10px">Gratuito · Sem cartão · Para sempre</p>
             </div>
+
         </div>`;
+
+        // Animate the live counters — creates illusion of active community
+        const liveEl = document.getElementById('lp-online-count');
+        if (liveEl) {
+            let base = 830 + Math.floor(Math.random() * 40);
+            liveEl.textContent = base;
+            setInterval(() => {
+                base += Math.floor(Math.random() * 5) - 2;
+                base = Math.max(820, base);
+                liveEl.textContent = base;
+            }, 3200);
+        }
+        const joinedEl = document.getElementById('lp-joined');
+        if (joinedEl) {
+            let j = 18 + Math.floor(Math.random() * 12);
+            joinedEl.textContent = j;
+            setInterval(() => {
+                if (Math.random() > 0.65) { j++; joinedEl.textContent = j; }
+            }, 4500);
+        }
     },
 
     // ── AUTH ─────────────────────────────────────────────

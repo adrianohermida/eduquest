@@ -726,18 +726,27 @@ const GameEngine = {
         } else { float.style.left = '50%'; float.style.top = '40%'; }
         document.body.appendChild(float);
         this.state._floats.push(float);
+        if (this.state.combo >= 3 && typeof Utils !== 'undefined') {
+            Utils.burst(float, this.state.combo >= 5 ? 14 : 10, '#f97316');
+        }
         setTimeout(() => { float.remove(); this.state._floats = this.state._floats.filter(f => f !== float); }, 1300);
     },
 
     _updateCombo() {
         this._removeCombo();
         if (this.state.combo < 2) return;
+        const combo = this.state.combo;
         const zone = document.getElementById('battle-combo');
-        if (zone) zone.textContent = `🔥 ${this.state.combo}x Combo!`;
+        if (zone) zone.textContent = combo >= 10 ? `💜 ${combo}x INSANO!` : combo >= 5 ? `🔥 ${combo}x COMBO!` : `🔥 ${combo}x Combo!`;
         const badge = document.createElement('div');
-        badge.className = 'combo-badge'; badge.id = 'combo-badge';
-        badge.textContent = `🔥 ${this.state.combo}x Combo!`;
+        const intensity = combo >= 10 ? 'fire' : combo >= 5 ? 'hot' : '';
+        badge.className = intensity ? `combo-badge ${intensity}` : 'combo-badge';
+        badge.id = 'combo-badge';
+        badge.textContent = combo >= 10 ? `💜 ${combo}x INSANO!` : combo >= 5 ? `🔥 ${combo}x COMBO!` : `🔥 ${combo}x Combo!`;
         document.body.appendChild(badge);
+        if (typeof Utils !== 'undefined') {
+            Utils.burst(badge, combo >= 10 ? 18 : combo >= 5 ? 14 : 10, combo >= 10 ? '#7c3aed' : '#f97316');
+        }
     },
 
     _removeCombo() {
@@ -771,30 +780,36 @@ const GameEngine = {
             victory,
         });
 
-        const starsDisplay = victory ? (['⭐', '⭐⭐', '⭐⭐⭐'][stars - 1] || '') : '💀';
+        const starsHtml = victory
+            ? Array(stars).fill(0).map((_, i) =>
+                `<span class="result-star" style="animation-delay:${0.45 + i * 0.22}s">⭐</span>`
+              ).join('')
+            : '';
+        const xpGain   = this.state.score + (CONFIG.xp.stageComplete || 0);
+        const gemGain  = (CONFIG.gems.stageComplete || 0) + (stars === 3 ? (CONFIG.gems.perfect || 0) : 0);
         const app = document.getElementById('app-container');
         app.innerHTML = `
-            <div class="result-screen">
-                <div class="result-icon">${victory ? '🏆' : '💀'}</div>
+            <div class="result-screen ${victory ? 'victory-mode' : 'defeat-mode'}">
+                <div class="result-icon ${victory ? 'result-icon-victory' : ''}">${victory ? '🏆' : '💀'}</div>
                 <h1 class="result-title ${victory ? 'victory' : 'defeat'}">
                     ${victory ? 'MISSÃO CUMPRIDA!' : 'GAME OVER'}
                 </h1>
                 <p class="result-subtitle">
                     ${victory ? 'Você foi incrível, herói!' : 'Não desista! Cada erro é um aprendizado.'}
                 </p>
-                ${victory ? `<div class="result-stars">${starsDisplay}</div>` : ''}
+                ${victory ? `<div class="result-stars">${starsHtml}</div>` : ''}
                 <div class="result-stats">
                     <div class="result-stat-box">
-                        <span class="result-stat-value">${this.state.score}</span>
+                        <span class="result-stat-value" id="rs-score">0</span>
                         <span class="result-stat-label">Pontos</span>
                     </div>
                     ${victory ? `
                     <div class="result-stat-box">
-                        <span class="result-stat-value">+${this.state.score + (CONFIG.xp.stageComplete || 0)} ⚡</span>
+                        <span class="result-stat-value">+<span id="rs-xp">0</span> ⚡</span>
                         <span class="result-stat-label">XP Ganho</span>
                     </div>
                     <div class="result-stat-box">
-                        <span class="result-stat-value">+${(CONFIG.gems.stageComplete || 0) + (stars === 3 ? (CONFIG.gems.perfect || 0) : 0)} 💎</span>
+                        <span class="result-stat-value">+<span id="rs-gems">0</span> 💎</span>
                         <span class="result-stat-label">Gemas</span>
                     </div>` : ''}
                 </div>
@@ -813,9 +828,19 @@ const GameEngine = {
                 </div>
             </div>`;
 
+        if (typeof Utils !== 'undefined') {
+            setTimeout(() => {
+                Utils.countUp(document.getElementById('rs-score'), 0, this.state.score, 900);
+                if (victory) {
+                    Utils.countUp(document.getElementById('rs-xp'),   0, xpGain,  1000);
+                    Utils.countUp(document.getElementById('rs-gems'), 0, gemGain,  800);
+                }
+            }, 300);
+        }
+
         if (victory) {
             if (typeof SoundManager !== 'undefined') SoundManager.play('complete');
-            if (typeof Utils !== 'undefined') Utils.confetti();
+            setTimeout(() => { if (typeof Utils !== 'undefined') Utils.confetti(); }, 600);
         }
         this._removeCombo();
         document.getElementById('top-hud')?.classList.remove('hidden');
