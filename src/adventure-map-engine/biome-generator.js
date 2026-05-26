@@ -21,7 +21,7 @@ const AdventureBiomeGenerator = {
             id: 'microbes',
             title: 'Floresta dos Microrganismos',
             range: [0.125, 0.25],
-            icon: 'mushroom',
+            icon: 'warning',
             color: '#8b5cf6',
             bg: ['#f3e8ff', '#c084fc'],
             asset: 'biome-forest.svg',
