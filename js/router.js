@@ -87,6 +87,8 @@ const Router = {
             case 'battle-pass':   this.renderBattlePass(container);                     break;
             case 'ai-studio':     this.renderAIStudio(container);                       break;
             case 'pvp':           this.renderPvP(container);                            break;
+            case 'memory':        if (typeof MemoryEngine !== 'undefined') MemoryEngine.renderMemoryScreen(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Memory Engine não carregado.</p></div>'; break;
+            case 'speed-drill':   if (typeof SpeedDrill !== 'undefined') SpeedDrill.start(); else container.innerHTML = '<div class="screen"><p style="padding:32px">Speed Drill não carregado.</p></div>'; break;
             default:              this.renderHome(container);
         }
 

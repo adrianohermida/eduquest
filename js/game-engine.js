@@ -724,6 +724,13 @@ const GameEngine = {
                 EventsEngine.trackCorrectAnswer();
                 EventsEngine.trackCombo(this.state.combo);
             }
+            if (typeof MemoryEngine !== 'undefined') {
+                MemoryEngine.processAnswer(
+                    this.state.chapterId, this.state.stageId, this.state.currentIndex, true,
+                    (CONFIG.stages.timePerQuestion || 15) - this.state.timer,
+                    q.question, q.options?.[q.correctIndex] || '', q.topic || q.tags?.[0] || 'Geral'
+                );
+            }
             this._showBattleEffect(true);
             this._updateCombo();
             this._showFeedback(true, q.explanation, points, typedValue);
@@ -749,6 +756,13 @@ const GameEngine = {
                     this.state.stageId,
                     this.state.currentIndex,
                     q.topic || q.tags?.[0] || 'Geral'
+                );
+            }
+            if (typeof MemoryEngine !== 'undefined') {
+                MemoryEngine.processAnswer(
+                    this.state.chapterId, this.state.stageId, this.state.currentIndex, false,
+                    (CONFIG.stages.timePerQuestion || 15) - this.state.timer,
+                    q.question, q.options?.[q.correctIndex] || '', q.topic || q.tags?.[0] || 'Geral'
                 );
             }
             this._showBattleEffect(false);

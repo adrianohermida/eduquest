@@ -34,11 +34,11 @@ const ACHIEVEMENTS = [
 window.ACHIEVEMENTS = ACHIEVEMENTS;
 
 const State = {
-    SCHEMA_VERSION: 9,
+    SCHEMA_VERSION: 10,
     LS_KEY: 'eduquest_v5',
 
     data: {
-        schemaVersion: 9,
+        schemaVersion: 10,
         user: {
             name:         'Herói',
             level:        1,
@@ -89,6 +89,7 @@ const State = {
         wrongAnswers:  {},
         eventMissions: {},
         aiStudySets:   [],
+        leitnerBoxes:  {},
     },
 
     _syncTimer:  null,
@@ -186,6 +187,7 @@ const State = {
         this.data.wrongAnswers  = parsed.wrongAnswers   || {};
         this.data.eventMissions = parsed.eventMissions  || {};
         this.data.aiStudySets   = parsed.aiStudySets    || [];
+        this.data.leitnerBoxes  = parsed.leitnerBoxes   || {};
         this.data.schemaVersion = this.SCHEMA_VERSION;
     },
 

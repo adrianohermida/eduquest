@@ -18,6 +18,8 @@ const Sidebar = {
         { icon: 'crown',    label: 'Battle Pass',route: 'battle-pass',hash: '#battle-pass'},
         { icon: 'ai-tutor', label: 'AI Studio', route: 'ai-studio',  hash: '#ai-studio'  },
         { icon: 'sword',    label: 'PvP',       route: 'pvp',        hash: '#pvp'        },
+        { icon: 'scroll',   label: 'Memória',   route: 'memory',     hash: '#memory'     },
+        { icon: 'xp',       label: 'Speed Drill',route: 'speed-drill',hash: '#speed-drill'},
         { icon: 'avatar',   label: 'Perfil',    route: 'profile',    hash: '#profile'    },
     ],
 
