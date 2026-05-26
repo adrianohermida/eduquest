@@ -846,7 +846,6 @@ const Router = {
         const streak    = State.getUserStreak();
         const chapters  = CONFIG.chapters || [];
         const missions  = State.getMissions();
-        const calendar  = State.getStreakCalendar();
         const companion = State.getCompanionMessage();
         const avatarCls   = State.getAvatarClass();
         const _ic         = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
@@ -866,24 +865,18 @@ const Router = {
         }) || chapters[0];
         const activeProg = activeChapter ? State.getChapterProgress(activeChapter.id) : null;
 
-        const calendarHTML = calendar.map(d => `
-            <div class="streak-day ${d.active ? 'active' : ''} ${d.isToday ? 'today' : ''}">
-                <div class="streak-day-dot">${d.active ? _ic('streak',{size:'sm'}) : ''}</div>
-                <div class="streak-day-label">${d.label}</div>
-            </div>`).join('');
-
         const missionsHTML = missions.map(m => `
             <div class="daily-mission ${m.completed ? 'done' : ''}">
                 <div class="dm-icon">${_ic(m.icon, {size:'md'})}</div>
                 <div class="dm-body">
                     <div class="dm-title">${m.title}</div>
                     <div class="dm-desc">${m.desc}</div>
-                    <div class="dm-rewards">
-                        <span>${_ic('xp',{size:'xs',color:'xp'})} +${m.xp}</span>
-                        ${m.gems ? `<span>${_ic('gem',{size:'xs',color:'gem'})} +${m.gems}</span>` : ''}
-                    </div>
                 </div>
-                <div class="dm-check">${m.completed ? _ic('check',{size:'sm',color:'success'}) : ''}</div>
+                <div class="dm-rewards-col">
+                    <span class="dm-reward-chip dm-reward-xp">+${m.xp} XP</span>
+                    ${m.gems ? `<span class="dm-reward-chip dm-reward-gem">${_ic('gem',{size:'xs',color:'gem'})} +${m.gems}</span>` : ''}
+                </div>
+                <div class="dm-check">${m.completed ? _ic('check',{size:'sm',color:'success'}) : '<span class="dm-check-empty"></span>'}</div>
             </div>`).join('');
 
         const chaptersHTML = chapters.map(ch => {
@@ -933,14 +926,11 @@ const Router = {
             <!-- Continue Journey -->
             ${activeChapter ? `
             <div class="continue-card" onclick="Router.navigate('#chapter/${activeChapter.id}')">
-                <div class="continue-top">
-                    <div class="continue-badge">▶ CONTINUAR</div>
-                    <div class="continue-subject">${activeChapter.subject} · ${activeChapter.grade}</div>
-                </div>
-                <div class="continue-body">
-                    <div class="continue-icon">${activeChapter.icon}</div>
-                    <div class="continue-info">
+                <div class="continue-content">
+                    <div class="continue-left">
+                        <div class="continue-badge">▶ CONTINUAR</div>
                         <div class="continue-title">${activeChapter.title}</div>
+                        <div class="continue-subject">${activeChapter.subject} · Fase ${(activeProg.completed || 0) + 1}</div>
                         <div class="continue-progress-row">
                             <div class="continue-track">
                                 <div class="continue-fill" style="width:${activeProg.percent}%"></div>
@@ -948,16 +938,33 @@ const Router = {
                             <span class="continue-pct">${activeProg.percent}%</span>
                         </div>
                     </div>
+                    <div class="continue-art" aria-hidden="true">
+                        <div class="continue-art-icon">${activeChapter.icon}</div>
+                        <div class="continue-art-map">🗺️</div>
+                    </div>
                 </div>
             </div>` : ''}
 
-            <!-- Streak Calendar -->
-            <div class="streak-calendar-wrap">
-                <div class="streak-cal-header">
-                    <span class="streak-cal-title">${_ic('streak',{size:'sm',color:'xp'})} ${streak} ${streak === 1 ? 'dia' : 'dias'} seguidos</span>
-                    <span class="streak-cal-sub">Mantenha a sequência!</span>
-                </div>
-                <div class="streak-calendar">${calendarHTML}</div>
+            <!-- Quick Actions Row -->
+            <div class="quick-actions-row">
+                ${(() => {
+                    const activeEvents = typeof EventsEngine !== 'undefined' ? (EventsEngine.getCurrentEvent() ? 1 : 0) : 0;
+                    const onlineFriends = typeof SocialEngine !== 'undefined' ? SocialEngine.getLiveCount() : 0;
+                    const mDone = missions.filter(m => m.completed).length;
+                    const hasReward = mDone >= missions.length && missions.length > 0;
+                    return [
+                        { icon: '📅', label: 'Eventos',    value: activeEvents > 0 ? `${activeEvents} ativo${activeEvents>1?'s':''}` : 'Ver todos', badge: activeEvents > 0 ? activeEvents : 0, route: '#events'    },
+                        { icon: '🏆', label: 'Desafios',   value: '1 novo',    badge: 1,               route: '#missions'   },
+                        { icon: '🎁', label: 'Recompensas',value: hasReward ? 'Pronto!' : `${mDone}/${missions.length}`, badge: hasReward ? 1 : 0, route: '#shop' },
+                        { icon: '👥', label: 'Amigos',     value: onlineFriends > 0 ? `${onlineFriends} online` : 'Ver todos', badge: 0, route: '#friends' },
+                    ].map(a => `
+                    <a class="qa-chip" href="${a.route}">
+                        ${a.badge ? `<span class="qa-badge">${a.badge}</span>` : ''}
+                        <span class="qa-chip-icon">${a.icon}</span>
+                        <span class="qa-chip-label">${a.label}</span>
+                        <span class="qa-chip-value">${a.value}</span>
+                    </a>`).join('');
+                })()}
             </div>
 
             <!-- Daily Missions -->

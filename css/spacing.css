@@ -313,6 +313,11 @@
 .gap-3  { gap: var(--space-3); }
 .gap-4  { gap: var(--space-4); }
 
+/* ── QUICK ACTIONS — responsive ─────────────────────────── */
+@media (max-width: 360px) {
+    .quick-actions-row { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ── DARK MODE ────────────────────────────────────────────── */
 /* Spacing is dimension-based, no dark mode changes needed */
 

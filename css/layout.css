@@ -245,6 +245,19 @@
     transition: opacity 0.18s;
 }
 
+.sidebar-badge-chip {
+    font-size: 0.55rem;
+    font-weight: 900;
+    background: var(--brand);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: var(--r-full);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 /* Footer user card */
 .sidebar-footer {
     padding: var(--sp-3) var(--sp-2);

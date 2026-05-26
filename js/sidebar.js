@@ -8,22 +8,23 @@ const Sidebar = {
     _isOpen: false,
 
     NAV_ITEMS: [
-        { icon: 'map',      label: 'Início',    route: 'home',       hash: '#home'       },
-        { icon: 'missions', label: 'Missões',   route: 'missions',   hash: '#missions'   },
-        { icon: 'trophy',   label: 'Ranking',   route: 'ranking',    hash: '#ranking'    },
-        { icon: 'shop',     label: 'Loja',      route: 'shop',       hash: '#shop'       },
-        { icon: 'guild',    label: 'Guild',     route: 'guild',      hash: '#guild'      },
-        { icon: 'friends',  label: 'Amigos',    route: 'friends',    hash: '#friends'    },
-        { icon: 'xp',       label: 'Eventos',   route: 'events',     hash: '#events'     },
-        { icon: 'crown',    label: 'Battle Pass',route: 'battle-pass',hash: '#battle-pass'},
-        { icon: 'ai-tutor', label: 'AI Studio', route: 'ai-studio',  hash: '#ai-studio'  },
-        { icon: 'sword',    label: 'PvP',       route: 'pvp',        hash: '#pvp'        },
-        { icon: 'scroll',   label: 'Memória',     route: 'memory',      hash: '#memory'      },
-        { icon: 'star',     label: 'Flashcards',  route: 'flashcards',  hash: '#flashcards'  },
-        { icon: 'xp',       label: 'Speed Drill', route: 'speed-drill', hash: '#speed-drill' },
-        { icon: 'compass',  label: 'Modo Foco',  action: 'DeepFocus.toggle()', route: 'deep-focus' },
-        { icon: 'backpack', label: 'Builder',   route: 'builder',    hash: '#builder'    },
-        { icon: 'avatar',   label: 'Perfil',    route: 'profile',    hash: '#profile'    },
+        { icon: 'map',         label: 'Aventura',    route: 'home',        hash: '#home'        },
+        { icon: 'missions',    label: 'Missões',     route: 'missions',    hash: '#missions'    },
+        { icon: 'star',        label: 'Flashcards',  route: 'flashcards',  hash: '#flashcards'  },
+        { icon: 'scroll',      label: 'Memória',     route: 'memory',      hash: '#memory'      },
+        { icon: 'xp',          label: 'Speed Drill', route: 'speed-drill', hash: '#speed-drill' },
+        { icon: 'trophy',      label: 'Ranking',     route: 'ranking',     hash: '#ranking'     },
+        { icon: 'guild',       label: 'Guilda',      route: 'guild',       hash: '#guild'       },
+        { icon: 'friends',     label: 'Amigos',      route: 'friends',     hash: '#friends'     },
+        { icon: 'achievement', label: 'Conquistas',  route: 'achievements',hash: '#achievements'},
+        { icon: 'shop',        label: 'Loja',        route: 'shop',        hash: '#shop',  badge: 'Novo' },
+        { icon: 'flag',        label: 'Eventos',     route: 'events',      hash: '#events'      },
+        { icon: 'crown',       label: 'Battle Pass', route: 'battle-pass', hash: '#battle-pass' },
+        { icon: 'ai-tutor',    label: 'AI Studio',   route: 'ai-studio',   hash: '#ai-studio'   },
+        { icon: 'sword',       label: 'PvP',         route: 'pvp',         hash: '#pvp'         },
+        { icon: 'compass',     label: 'Modo Foco',   action: 'DeepFocus.toggle()', route: 'deep-focus' },
+        { icon: 'backpack',    label: 'Builder',     route: 'builder',     hash: '#builder'     },
+        { icon: 'avatar',      label: 'Perfil',      route: 'profile',     hash: '#profile'     },
     ],
 
     // ── LIFECYCLE ─────────────────────────────────────────
@@ -107,14 +108,15 @@ const Sidebar = {
         if (!el) return;
 
         const itemsHTML = this.NAV_ITEMS.map(item => {
-            const iconHTML = `<span class="sidebar-item-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(item.icon,{size:'md'}) : item.icon}</span>`;
-            const lblHTML  = `<span class="sidebar-item-label">${item.label}</span>`;
-            const soonHTML = item.soon ? '<span class="sidebar-soon-chip" aria-hidden="true">breve</span>' : '';
-            const cls      = `sidebar-item${item.soon ? ' soon' : ''}`;
+            const iconHTML  = `<span class="sidebar-item-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(item.icon,{size:'md'}) : item.icon}</span>`;
+            const lblHTML   = `<span class="sidebar-item-label">${item.label}</span>`;
+            const soonHTML  = item.soon  ? '<span class="sidebar-soon-chip" aria-hidden="true">breve</span>' : '';
+            const badgeHTML = item.badge ? `<span class="sidebar-badge-chip" aria-hidden="true">${item.badge}</span>` : '';
+            const cls       = `sidebar-item${item.soon ? ' soon' : ''}`;
             if (item.action) {
-                return `<button class="${cls}" onclick="${item.action};Sidebar.close()" data-route="${item.route||''}" data-tooltip="${item.label}" aria-label="${item.label}" role="menuitem">${iconHTML}${lblHTML}${soonHTML}</button>`;
+                return `<button class="${cls}" onclick="${item.action};Sidebar.close()" data-route="${item.route||''}" data-tooltip="${item.label}" aria-label="${item.label}" role="menuitem">${iconHTML}${lblHTML}${soonHTML}${badgeHTML}</button>`;
             }
-            return `<a class="${cls}" href="${item.hash}" data-route="${item.route}" data-tooltip="${item.label}" aria-label="${item.label}${item.soon ? ' — em breve' : ''}" role="menuitem" ${item.soon ? 'aria-disabled="true" tabindex="-1"' : ''}>${iconHTML}${lblHTML}${soonHTML}</a>`;
+            return `<a class="${cls}" href="${item.hash}" data-route="${item.route}" data-tooltip="${item.label}" aria-label="${item.label}${item.soon ? ' — em breve' : ''}" role="menuitem" ${item.soon ? 'aria-disabled="true" tabindex="-1"' : ''}>${iconHTML}${lblHTML}${soonHTML}${badgeHTML}</a>`;
         }).join('');
 
         const u = (typeof State !== 'undefined') ? State.data.user : { name: 'Herói', level: 1, avatar: '🦸' };
@@ -215,20 +217,33 @@ const Sidebar = {
             return !State.isStageCompleted(activeMeta.id || 'cap7_doencas', s.index) &&
                     State.isStageUnlocked(activeMeta.id || 'cap7_doencas', s.index);
         });
+        const _icR = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const missionHTML = activeMeta && activeStage
             ? (() => {
                 const stageData = window[activeStage.varName] || {};
-                const chId = activeMeta.id || 'cap7_doencas';
+                const chId      = activeMeta.id || 'cap7_doencas';
+                const stageXP   = stageData.xpReward  || 100;
+                const stageGems = stageData.gemReward  || 15;
+                const stageDesc = stageData.description || `Responda ${stageData.questions?.length || 5} questões para avançar na história.`;
                 return `
                 <section class="rp-section rp-mission-cur-section" aria-labelledby="rp-cur-lbl">
                     <div class="rp-mission-cur-header">
-                        <h2 class="rp-section-title" id="rp-cur-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'xs',color:'xp'}) : '🎯'} Missão Atual</h2>
+                        <h2 class="rp-section-title" id="rp-cur-lbl">${_icR('flag',{size:'xs',color:'xp'})} Missão Atual</h2>
+                        <span class="rp-principal-chip">Principal</span>
                     </div>
-                    <a href="#stage/${chId}/${activeStage.id}" class="rp-mission-cur-card" aria-label="Entrar na missão ${stageData.title || activeStage.id}">
-                        <div class="rp-mission-cur-meta">FASE ${activeStage.index}</div>
-                        <div class="rp-mission-cur-title">${stageData.title || `Missão ${activeStage.index}`}</div>
-                        <div class="rp-mission-cur-sub">${activeMeta.icon || '📚'} ${activeMeta.title || ''}</div>
-                        <div class="rp-mission-cur-action">Jogar agora <span aria-hidden="true">→</span></div>
+                    <div class="rp-mission-cur-card">
+                        <div class="rp-mission-cur-body">
+                            <div class="rp-mission-cur-meta">FASE ${activeStage.index}</div>
+                            <div class="rp-mission-cur-title">${stageData.title || `Missão ${activeStage.index}`}</div>
+                            <div class="rp-mission-cur-desc">${stageDesc}</div>
+                            <div class="rp-mission-cur-rewards">
+                                <span class="rp-reward-chip rp-reward-xp">${_icR('xp',{size:'xs',color:'xp'})} +${stageXP} XP</span>
+                                <span class="rp-reward-chip rp-reward-gem">${_icR('gem',{size:'xs',color:'gem'})} +${stageGems}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#stage/${chId}/${activeStage.id}" class="rp-jogar-btn" aria-label="Jogar missão ${stageData.title || activeStage.id}">
+                        Jogar agora <span aria-hidden="true">→</span>
                     </a>
                 </section>`;
               })()

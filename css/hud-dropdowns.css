@@ -940,12 +940,80 @@
     margin-top: 1px;
 }
 
-.rp-mission-cur-action {
-    margin-top: var(--sp-2);
-    font-size: 0.76rem;
+/* Badge "Principal" */
+.rp-principal-chip {
+    font-size: 0.58rem;
     font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: #fff7ed;
     color: var(--brand);
+    border: 1px solid rgba(249,115,22,0.25);
+    padding: 2px 8px;
+    border-radius: 99px;
 }
+
+/* Card body (no longer an <a> — just the info block) */
+.rp-mission-cur-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Description text */
+.rp-mission-cur-desc {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin-top: 4px;
+}
+
+/* Reward chips row */
+.rp-mission-cur-rewards {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+.rp-reward-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 99px;
+}
+.rp-reward-xp  { background: #fff7ed; color: #ea580c; }
+.rp-reward-gem { background: #eff6ff; color: #2563eb; }
+
+/* Big "Jogar agora" button */
+.rp-jogar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: var(--sp-3);
+    padding: 13px 20px;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 900;
+    border-radius: var(--r-lg);
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(249,115,22,0.35);
+    transition: transform 150ms, box-shadow 150ms;
+    letter-spacing: 0.01em;
+}
+.rp-jogar-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(249,115,22,0.45);
+}
+.rp-jogar-btn:active { transform: scale(0.97); }
+
+/* Remove old action text style */
+.rp-mission-cur-action { display: none; }
 
 /* ── RESPONSIVE: hide discipline on mobile ─────────────────── */
 @media (max-width: 767px) {
