@@ -53,7 +53,8 @@ const Router = {
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        const isFullscreen = isGame || isAuth || route === 'speed-drill' || route === 'reading';
+        const isAdmin      = route === 'admin';
+        const isFullscreen = isGame || isAuth || route === 'speed-drill' || route === 'reading' || isAdmin;
 
         // Layout mode: full-screen (auth/game) vs app (normal)
         document.body.dataset.layout = isFullscreen ? 'full' : 'app';
@@ -98,6 +99,13 @@ const Router = {
             case 'flashcards':    this._renderFlashcardsRoute(container); break;
             case 'reading':       if (typeof ReadingFocus !== 'undefined') ReadingFocus.start(parts[1], parts[2]); else container.innerHTML = '<div class="screen"><p style="padding:32px">Reading Focus não carregado.</p></div>'; break;
             case 'builder':       if (typeof Builder !== 'undefined') Builder.start(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Builder não carregado.</p></div>'; break;
+            case 'admin':
+                if (typeof EduAdmin !== 'undefined' && State.isAdmin()) {
+                    EduAdmin.render(container, parts[1] || 'overview');
+                } else {
+                    this.renderHome(container);
+                }
+                break;
             default:              this.renderHome(container);
         }
 

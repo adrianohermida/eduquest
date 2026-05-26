@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof SoundManager !== 'undefined') SoundManager.init();
     if (typeof Sidebar !== 'undefined') Sidebar.init();
     if (typeof HUD !== 'undefined') HUD.init();
+    if (typeof EduAdmin !== 'undefined') EduAdmin.init();
     if (typeof EduFeedback !== 'undefined') EduFeedback.init();
     Router.init();
     Router.handleRoute();

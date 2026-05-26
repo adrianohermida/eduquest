@@ -919,6 +919,11 @@ const HUD = {
         if (id('had-xp-val'))     id('had-xp-val').textContent     = `${(u.xp||0).toLocaleString('pt-BR')} XP`;
         if (id('had-streak-val')) id('had-streak-val').textContent = `${u.streak || 1} dias`;
         if (id('had-gems-val'))   id('had-gems-val').textContent   = `${u.gems || 0}`;
+        const adminLink = id('had-admin-link');
+        const adminDiv  = id('had-admin-div');
+        const isAdmin   = State.isAdmin();
+        if (adminLink) adminLink.style.display = isAdmin ? '' : 'none';
+        if (adminDiv)  adminDiv.style.display  = isAdmin ? '' : 'none';
     },
 
     // ── LAYOUT PREFERENCE (compact / advanced) ────────────

@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="css/depth.css">
     <link rel="stylesheet" href="css/cards.css">
     <link rel="stylesheet" href="css/spacing.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body data-layout="app">
 
@@ -174,6 +175,8 @@
                     <a class="had-link" href="#ai-studio"    onclick="HUD.closeAvatarDropdown()" role="menuitem">🤖 AI Studio</a>
                     <a class="had-link" href="#pvp"          onclick="HUD.closeAvatarDropdown()" role="menuitem">⚔️ Batalhas PvP</a>
                     <div class="had-divider"></div>
+                    <a class="had-link had-admin" href="#admin" onclick="HUD.closeAvatarDropdown()" role="menuitem" id="had-admin-link" style="display:none">🛡️ Admin Dashboard</a>
+                    <div class="had-divider" id="had-admin-div" style="display:none"></div>
                     <button class="had-link" onclick="HUD.toggleLayoutPref()" role="menuitem">
                         <span id="hud-pref-icon">🖥️</span>
                         <span id="hud-pref-label">Modo Compacto</span>
@@ -271,6 +274,7 @@
     <script src="src/motion/tactile-engine.js"></script>
     <script src="src/motion/ui-animations.js"></script>
     <script src="src/motion/feedback.js"></script>
+    <script src="src/admin/admin.js"></script>
     <script src="js/app.js"></script>
     <script src="js/utils/no-native-dialogs.js"></script>
 </body>
