@@ -1,0 +1,320 @@
+/* ════════════════════════════════════════════════════════════
+   EDUQUEST SPACING SYSTEM v1.0
+   Phase 5 — Canonical Spacing Scale + Visual Breathing
+   Load order: after cards.css — final spatial authority.
+
+   SCALE (4px base, ×2 every 2 steps):
+   --space-1:  4px   micro    — icon gap, badge inset
+   --space-2:  8px   xs       — inline gap, chip padding
+   --space-3: 12px   sm       — tight rows, form labels
+   --space-4: 16px   md (base)— card padding, list gap
+   --space-5: 20px   lg       — section inner padding
+   --space-6: 24px   xl       — panel padding, card bottom
+   --space-7: 32px   2xl      — section separator
+   --space-8: 48px   3xl      — hero area, screen top
+   ════════════════════════════════════════════════════════════ */
+
+/* ── CANONICAL TOKEN SCALE ────────────────────────────────── */
+:root {
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 48px;
+
+    /* Plug the gap: --sp-7 was missing */
+    --sp-7: var(--space-7);
+
+    /* ── Semantic component tokens ───────────────────────── */
+
+    /* Gaps — use inside flex/grid containers */
+    --gap-xs: var(--space-1);   /*  4px */
+    --gap-sm: var(--space-3);   /* 12px */
+    --gap-md: var(--space-4);   /* 16px */
+    --gap-lg: var(--space-6);   /* 24px */
+    --gap-xl: var(--space-7);   /* 32px */
+
+    /* Padding — use on cards / panels */
+    --pad-card-y:   var(--space-4);   /* 16px vertical */
+    --pad-card-x:   var(--space-5);   /* 20px horizontal */
+    --pad-panel:    var(--space-6);   /* 24px panels */
+    --pad-screen-x: var(--space-5);   /* 20px screen horizontal */
+
+    /* Vertical rhythm */
+    --rhythm-sm:  var(--space-4);   /* 16px — tight between items */
+    --rhythm-md:  var(--space-6);   /* 24px — between groups */
+    --rhythm-lg:  var(--space-7);   /* 32px — between major sections */
+}
+
+/* ── SCREEN WRAPPER — more breathing ─────────────────────── */
+/* Body already clears the fixed nav via padding-bottom: --nav-h.
+   Screen bottom padding is purely visual — breathing after last section. */
+
+.screen {
+    padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+/* Tablet+ gets wider padding */
+@media (min-width: 600px) {
+    .screen { padding-left: var(--space-7); padding-right: var(--space-7); }
+}
+
+/* ── SECTION HEADER — key breathing fix ──────────────────── */
+/* The dominant source of visual crowding.
+   Sections need to feel like "chapters" — generous top gap. */
+
+.section-header {
+    margin-top: var(--space-7);      /* 32px — was 20px */
+    margin-bottom: var(--space-4);   /* 16px — was 12px */
+}
+
+/* First section on a screen sits closer to the top */
+.screen > .section-header:first-child,
+.screen-home > .section-header:first-child,
+.screen-ach > .section-header:first-child {
+    margin-top: var(--space-5);
+}
+
+/* ── CARD LISTS — consistent gaps ─────────────────────────── */
+
+/* Chapter cards */
+.chapter-card {
+    margin-bottom: var(--space-4);   /* 16px — was 12px */
+}
+
+/* Daily missions list */
+.daily-missions-list {
+    gap: var(--space-4);             /* 16px — was 12px */
+    margin-bottom: var(--space-6);   /* 24px bottom — was 16px */
+}
+
+/* Mission cards (chapter map path) */
+.mission-card {
+    margin-bottom: var(--space-3);   /* keep 12px — dense path is intentional */
+}
+
+/* Event mission cards */
+.event-mission-card {
+    margin-bottom: var(--space-4);   /* 16px — was 10px */
+}
+
+/* ── CARD INNER PADDING — more vertical air ───────────────── */
+
+/* Chapter card — taller feel */
+.chapter-card {
+    padding: var(--space-4) var(--space-5);   /* 16px 20px */
+}
+
+/* Daily mission — more vertical breathing */
+.daily-mission {
+    padding: var(--space-4) var(--space-5);   /* 16px 20px — was 12px 16px */
+    gap: var(--space-4);                      /* 16px gap between icon/body/check */
+}
+
+/* Shop item card */
+.shop-item-card {
+    padding: var(--space-5) var(--space-4);   /* 20px 16px — was 16px 16px */
+}
+
+/* ── SHOP GRID — better breathe ──────────────────────────── */
+
+.shop-grid {
+    gap: var(--space-4);             /* 16px — was 12px */
+}
+
+.shop-balance {
+    padding: var(--space-6);         /* 24px — was 20px */
+    margin-bottom: var(--space-6);   /* 24px — was 16px */
+}
+
+/* ── HOME SCREEN — visual rhythm ─────────────────────────── */
+
+/* Greeting row — breathing below */
+.home-greeting {
+    padding-bottom: var(--space-4);  /* 16px — was 8px */
+    margin-bottom: var(--space-2);
+}
+
+/* XP bar row — small compact separator */
+.home-xp-bar {
+    margin-bottom: var(--space-5);   /* 20px breathing after XP */
+}
+
+/* Companion bar — more space */
+.companion-bar {
+    margin-bottom: var(--space-5);   /* 20px */
+}
+
+/* Continue journey card */
+.continue-card {
+    margin-bottom: var(--space-7);   /* 32px — prominent hero CTA needs room */
+}
+
+/* Streak calendar */
+.streak-calendar-wrap {
+    margin-bottom: var(--space-6);   /* 24px */
+}
+
+/* Daily missions section */
+.daily-missions-list {
+    margin-bottom: var(--space-7);   /* 32px — strong section close */
+}
+
+/* ── MISSIONS SCREEN ──────────────────────────────────────── */
+
+.missions-banner {
+    margin-bottom: var(--space-6);   /* 24px — was 0 (no margin) */
+    padding: var(--space-6) var(--space-5);  /* 24px 20px — was 20px */
+}
+
+/* ── CHAPTER MAP SCREEN ───────────────────────────────────── */
+
+.chapter-map-header {
+    padding: var(--space-6) var(--space-5);  /* 24px 20px — was 20px */
+    margin-bottom: var(--space-4);
+}
+
+/* Mission connector — give the path more space */
+.mission-connector {
+    height: var(--space-4);          /* 16px — was 8px */
+    min-height: var(--space-4);
+}
+
+/* ── RANKING SCREEN ───────────────────────────────────────── */
+
+.ranking-header {
+    padding: var(--space-7) var(--space-4) var(--space-5);  /* 32px 16px 20px */
+}
+
+.ranking-list {
+    padding: 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);             /* 12px between rows */
+}
+
+/* Podium area */
+.ranking-podium {
+    padding: var(--space-4) var(--space-4) var(--space-6);  /* more bottom space */
+    gap: var(--space-4);
+}
+
+/* My position separator */
+.ranking-my-section {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+}
+
+/* ── ACHIEVEMENTS SCREEN ──────────────────────────────────── */
+
+.ach-header {
+    padding: var(--space-5) 0 var(--space-6);  /* 20px top, 24px bottom */
+    margin-bottom: var(--space-4);
+}
+
+/* Rarity section — breathing between groups */
+.ach-rarity-section {
+    margin-bottom: var(--space-7);   /* 32px between rarity groups */
+}
+.ach-rarity-section:last-child {
+    margin-bottom: var(--space-4);
+}
+
+.ach-rarity-header {
+    margin-bottom: var(--space-4);   /* 16px — was no margin */
+    padding: var(--space-2) 0;
+}
+
+/* Achievement grid — tighter grid but more breathing around items */
+.ach-grid {
+    gap: var(--space-4);             /* 16px — was 10px */
+}
+
+.ach-item {
+    padding: var(--space-4) var(--space-3) var(--space-4);  /* 16px vert — was 12px */
+}
+
+/* ── PROFILE SCREEN ───────────────────────────────────────── */
+
+/* Nav buttons — cleaner stack */
+.profile-nav-btn {
+    margin-bottom: var(--space-2);   /* 8px between nav buttons */
+}
+
+/* Avatar class grid */
+.avatar-class-grid {
+    gap: var(--space-4);             /* 16px — was 12px */
+    margin-bottom: var(--space-6);   /* 24px — was 16px */
+}
+
+/* ── RIGHT PANEL ──────────────────────────────────────────── */
+
+.rp-inner {
+    gap: var(--space-5);             /* 20px between panel sections */
+}
+
+.rp-section {
+    padding: var(--space-4) var(--space-4);  /* 16px — was 2px */
+    margin-bottom: 0;
+}
+
+.rp-section-header {
+    margin-bottom: var(--space-3);   /* 12px */
+    padding-bottom: var(--space-2);
+}
+
+/* ── EVENT SCREEN ─────────────────────────────────────────── */
+
+.event-hero {
+    padding: var(--space-7) var(--space-5);  /* 32px 20px */
+    margin-bottom: var(--space-5);
+}
+
+.event-missions-title {
+    margin-bottom: var(--space-4);   /* 16px */
+    margin-top: var(--space-2);
+}
+
+/* ── MODAL / OVERLAY SPACING ──────────────────────────────── */
+
+.modal-card {
+    padding: var(--space-6);         /* 24px — generous */
+}
+
+/* ── UTILITY — spacing helpers ────────────────────────────── */
+
+/* Vertical spacers */
+.sp-1  { height: var(--space-1);  display: block; }
+.sp-2  { height: var(--space-2);  display: block; }
+.sp-3  { height: var(--space-3);  display: block; }
+.sp-4  { height: var(--space-4);  display: block; }
+.sp-6  { height: var(--space-6);  display: block; }
+.sp-8  { height: var(--space-8);  display: block; }
+
+/* Margin shorthands */
+.mt-auto   { margin-top: auto; }
+.mt-0      { margin-top: 0 !important; }
+.mt-2      { margin-top: var(--space-2) !important; }
+.mt-3      { margin-top: var(--space-6) !important; }   /* used on profile section headers */
+.mt-4      { margin-top: var(--space-7) !important; }   /* used on AI studio / event section headers */
+.mt-5      { margin-top: var(--space-5) !important; }
+.mt-6      { margin-top: var(--space-6) !important; }
+.mb-0      { margin-bottom: 0 !important; }
+.mb-2      { margin-bottom: var(--space-2) !important; }
+.mb-4      { margin-bottom: var(--space-4) !important; }
+.mb-6      { margin-bottom: var(--space-6) !important; }
+
+/* Gap utilities */
+.gap-2  { gap: var(--space-2); }
+.gap-3  { gap: var(--space-3); }
+.gap-4  { gap: var(--space-4); }
+
+/* ── DARK MODE ────────────────────────────────────────────── */
+/* Spacing is dimension-based, no dark mode changes needed */
+
+/* ── REDUCED MOTION ──────────────────────────────────────── */
+/* Spacing has no animations — no reduced-motion block needed */
