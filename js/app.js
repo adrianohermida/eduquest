@@ -21,11 +21,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof SoundManager !== 'undefined') SoundManager.init();
     if (typeof Sidebar !== 'undefined') Sidebar.init();
     if (typeof HUD !== 'undefined') HUD.init();
+    if (typeof EduFeedback !== 'undefined') EduFeedback.init();
     Router.init();
     Router.handleRoute();
+    if (typeof EduTransitions !== 'undefined') {
+        const route = (location.hash.replace('#', '').split('/')[0] || 'home');
+        EduTransitions.markRoute(route);
+        requestAnimationFrame(() => EduTransitions.pageEnter(document.getElementById('app-container')));
+    }
 
     window.addEventListener('hashchange', () => {
         Router.handleRoute();
+        if (typeof EduTransitions !== 'undefined') {
+            const route = (location.hash.replace('#', '').split('/')[0] || 'home');
+            EduTransitions.markRoute(route);
+            requestAnimationFrame(() => EduTransitions.pageEnter(document.getElementById('app-container')));
+        }
     });
 
     // Daily login reward + streak risk — delayed so route renders first
