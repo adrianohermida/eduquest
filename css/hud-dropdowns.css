@@ -855,8 +855,7 @@
 }
 
 /* ── DISCIPLINE SELECTOR CHIP ──────────────────────────────── */
-
-.hud-disc-wrap { display: none; } /* hidden by default; shown via JS when chapter active */
+/* Visibility controlled by parent #hud-ctx-nav — no need for display:none here */
 
 .hud-disc-chip {
     display: flex;
@@ -1102,9 +1101,9 @@
 /* Remove old action text style */
 .rp-mission-cur-action { display: none; }
 
-/* ── RESPONSIVE: hide discipline on mobile ─────────────────── */
+/* ── RESPONSIVE: context nav hidden on mobile (hud-context is hidden) ── */
 @media (max-width: 767px) {
-    .hud-disc-wrap { display: none !important; }
+    .hud-ctx-nav { display: none !important; }
 }
 
 /* ════════════════════════════════════════════════════════════
