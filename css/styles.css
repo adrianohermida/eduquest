@@ -3516,6 +3516,13 @@ img { max-width: 100%; }
     gap: 4px;
     flex-shrink: 0;
 }
+.dm-rewards-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
 .dm-reward-chip {
     display: inline-flex;
     align-items: center;
@@ -3529,6 +3536,18 @@ img { max-width: 100%; }
 .dm-reward-xp  { background: #fff7ed; color: #ea580c; }
 .dm-reward-gem { background: #eff6ff; color: #2563eb; }
 
+.dm-check-done {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    flex-shrink: 0;
+}
 .dm-check-empty {
     display: inline-block;
     width: 22px; height: 22px;
@@ -3600,7 +3619,7 @@ img { max-width: 100%; }
     padding: 2px 8px;
     border-radius: var(--r-full);
 }
-.dm-check { margin-left: auto; font-size: 1.2rem; flex-shrink: 0; }
+.dm-check { display: flex; align-items: center; flex-shrink: 0; }
 
 /* Section badge */
 .section-badge {

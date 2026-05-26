@@ -872,11 +872,11 @@ const Router = {
                     <div class="dm-title">${m.title}</div>
                     <div class="dm-desc">${m.desc}</div>
                 </div>
-                <div class="dm-rewards-col">
+                <div class="dm-rewards-row">
                     <span class="dm-reward-chip dm-reward-xp">+${m.xp} XP</span>
                     ${m.gems ? `<span class="dm-reward-chip dm-reward-gem">${_ic('gem',{size:'xs',color:'gem'})} +${m.gems}</span>` : ''}
+                    <div class="dm-check">${m.completed ? '<span class="dm-check-done">✓</span>' : '<span class="dm-check-empty"></span>'}</div>
                 </div>
-                <div class="dm-check">${m.completed ? _ic('check',{size:'sm',color:'success'}) : '<span class="dm-check-empty"></span>'}</div>
             </div>`).join('');
 
         const chaptersHTML = chapters.map(ch => {
