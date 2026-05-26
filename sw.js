@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v16';
+const CACHE_NAME  = 'eduquest-v17';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -126,6 +126,22 @@ const CACHE_SHELL = [
     '/js/data/geografia/7ano/chapters/geo_brasil/stages/geo_s06.js',
     '/js/data/geografia/7ano/chapters/geo_brasil/stages/geo_sboss.js',
     '/js/data/geografia/7ano/chapters/geo_brasil/stages/geo_sfinal.js',
+    /* Geografia 7º Ano — Cap. 6: População Brasileira */
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/metadata.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_s01.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_s02.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_s03.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_s04.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_sboss.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_sfinal.js',
+    /* Geografia 7º Ano — Cap. 7: Urbanização e Dinâmicas Migratórias */
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/metadata.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_s01.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_s02.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_s03.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_s04.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_sboss.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_sfinal.js',
     /* Ciências 8º Ano — Corpo Humano */
     '/js/data/ciencias/8ano/chapters/cap8_corpo/metadata.js',
     '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s01.js',

@@ -1,0 +1,173 @@
+# 🎧 PASSO 3: GATILHOS EMOCIONAIS E SENSORIAIS
+*(Geografia 7º Ano | Capítulos 6 e 7 | 450 questões | Neurociência + Acessibilidade)*
+
+---
+
+## 🎨 3.1 Biblioteca de Ícones e Gatilhos Visuais Consistentes
+
+Cada conceito central recebe um **ícone SVG semântico** padronizado (24x24px), associado a uma paleta de cores de alto contraste e a um gatilho emocional específico. A consistência visual ativa o **reconhecimento padrão do córtex occipital**, acelerando a recuperação da memória.
+
+| Tópico | Ícone | Cor Primária | Gatilho Emocional Alvo | Conceito Vinculado (PDF) |
+|--------|-------|--------------|------------------------|--------------------------|
+| 1. Pop. Absoluta/Relativa | `👥` / `📏` | `#2563EB` (Azul) | Curiosidade + Clareza | "Contar gente vs. medir aperto" |
+| 2. Crescimento Vegetativo | `📈` / `👶➡️👴` | `#059669` (Verde) | Esperança + Progresso | Natalidade, mortalidade, fecundidade |
+| 3. Estrutura Etária | `🔺` / `🧓` | `#7C3AED` (Roxo) | Empatia geracional | Pirâmides, PEA, longevidade |
+| 4. Migrações (Geral) | `🧳` / `🗺️` | `#D97706` (Laranja) | Identidade + Movimento | Êxodo, retornos, fluxos internos |
+| 5. Urbanização | `🏙️` / `🚌` | `#DC2626` (Vermelho) | Urgência + Realidade | Macrocefalia, segregação, RMs |
+| 6. Êxodo Rural | `🌾` / `🚜` | `#92400E` (Marrom) | Resiliência + Contexto | Mecanização, concentração fundiária |
+| 7. Pendular/Sazonal | `⏱️` / `🌤️` | `#0891B2` (Ciano) | Rotina + Ciclicidade | Ida/volta diário, colheitas, retirantes |
+| 8. Xenofobia/Direitos | `🤝` / `🌍` | `#4F46E5` (Índigo) | Justiça + Pertencimento | ACNUR, Art. 13, diversidade |
+| 9. Projeções Futuras | `🔮` / `📊` | `#0F172A` (Escuro) | Visão + Responsabilidade | IBGE 2042/2060, bônus demográfico |
+
+### 🔧 Especificação Técnica dos Ícones
+```xml
+<!-- Exemplo: ícone-pendular.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-label="Migração Pendular">
+  <path d="M3 12h18M3 12l4-4M3 12l4 4" stroke="#0891B2" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="21" cy="12" r="3" stroke="#0891B2" stroke-width="2" fill="none"/>
+  <title>Migração Pendular</title>
+</svg>
+```
+- **Formato**: SVG inline ou sprite otimizado
+- **Acessibilidade**: `role="img"`, `aria-label`, `title`
+- **Modo Escuro**: Variáveis CSS (`var(--icon-primary)`) adaptam automaticamente
+- **`prefers-reduced-motion`**: Desativa animações de pulso/brilho
+
+---
+
+## 🔊 3.2 Micro-Áudios (2-3s) e Engenharia de Som Educativo
+
+Áudios curtos ativam o **córtex auditivo primário** e o **sistema límbico**, criando marcas mnêmicas mais resistentes ao esquecimento. Todos os áudios seguem o padrão `LUFS -16` (broadcast), garantindo clareza sem causar fadiga sensorial.
+
+| Tipo de Áudio | Duração | Exemplo de Conteúdo (PT-BR) | Gatilho Neurocognitivo | Arquivo |
+|---------------|---------|-----------------------------|------------------------|---------|
+| **Confirmação Positiva** | 1.8s | *Som suave de "sino" + sussurro: "Absoluto!"* | Dopamina (recompensa imediata) | `sfx_confirm_1s8.mp3` |
+| **Associação Contextual** | 2.5s | *Motor de ônibus + buzina leve + vento* | Memória episódica (rotina diária) | `sfx_bus_routine_2s5.mp3` |
+| **Alerta Pedagógico** | 2.0s | *Tom descendente suave + voz: "Vamos revisar?"* | Foco seletivo (sem ansiedade) | `sfx_hint_prompt_2s.mp3` |
+| **Reforço Histórico** | 2.8s | *Som de trem antigo + passos na terra* | Conexão afetiva (êxodo rural) | `sfx_train_migrant_2s8.mp3` |
+| **Fechamento de Etapa** | 3.0s | *Acorde ascendente + aplauso sutil* | Serotonina (senso de conquista) | `sfx_stage_complete_3s.mp3` |
+
+### ⚙️ Configuração de Áudio no Frontend
+```javascript
+// audioEngine.js
+const AudioEngine = {
+  playSFX(id, volume = 0.3) {
+    if (localStorage.getItem('audio_disabled') === 'true') return;
+    const audio = new Audio(`/assets/sounds/${id}.mp3`);
+    audio.volume = volume;
+    audio.play().catch(() => console.warn('Autoplay bloqueado ou áudio indisponível'));
+  }
+};
+```
+- **Controle do Usuário**: Toggle global `🔇/🔊` no cabeçalho
+- **Fallback**: Se MP3 falhar, usa `Web Speech API` com voz `pt-BR-AntonioNeural`
+- **Otimização**: Pré-carrega áudios críticos via `<link rel="preload">`
+
+---
+
+## 📱 3.3 Pop-ups Visuais com Animação Acessível
+
+As "Dicas" são exibidas como **micro-tooltips não intrusivos**, projetados para não quebrar o fluxo de estudo (Kumon) nem sobrecarregar alunos neurodivergentes.
+
+### 🎨 Componente React (TipTooltip)
+```jsx
+const TipTooltip = ({ tip, icon, audioId }) => {
+  const [visible, setVisible] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  
+  const handleEnter = () => {
+    setVisible(true);
+    AudioEngine.playSFX(audioId);
+  };
+
+  return (
+    <div className="tip-wrapper" role="tooltip" aria-live="polite">
+      <button 
+        className="tip-trigger" 
+        onMouseEnter={handleEnter}
+        onMouseLeave={() => setVisible(false)}
+        aria-describedby={`tip-${icon}`}
+      >
+        <span className="tip-icon">{icon}</span>
+      </button>
+      {visible && (
+        <div 
+          className={`tip-popup ${prefersReducedMotion ? 'static' : 'fade-in'}`}
+          id={`tip-${icon}`}
+        >
+          <p className="tip-text">{tip}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+### ♿ Diretrizes de Acessibilidade (WCAG 2.1 AA)
+- ✅ `aria-live="polite"` para leitores de tela anunciarem sem interromper
+- ✅ Navegação por `Tab` e `Enter`
+- ✅ Contraste mínimo `4.5:1` (fundo `#F8FAFC`, texto `#1E293B`)
+- ✅ Respeita `@media (prefers-reduced-motion: reduce)`
+- ✅ Foco visível (`outline: 2px solid #3B82F6; outline-offset: 2px;`)
+
+---
+
+## 🗺️ 3.4 Mapeamento de Gatilhos por Tópico e Nível de Dificuldade
+
+| Tópico | Nível | Ícone | Áudio | Texto da Dica (Exemplo) | Emoção-Alvo |
+|--------|-------|-------|-------|--------------------------|-------------|
+| 1. Pop. Abs/Rel | N1 | `👥` | `sfx_confirm` | "'Absoluta' = número BRUTO. Não divide por área!" | Clareza |
+| 1. Pop. Abs/Rel | N2 | `📏👥` | `sfx_hint` | "Densidade = Aperto. Mais gente no mesmo quadrado." | Curiosidade |
+| 4. Migrações | N1 | `🧳` | `sfx_train` | "Migrar é mudar de casa, não só viajar." | Identidade |
+| 4. Migrações | N3 | `🌍🤝` | `sfx_confirm` | "Êxodo rural = campo vazio, cidade cheia. História real!" | Empatia |
+| 7. Pendular | N1 | `⏱️` | `sfx_bus` | "Pêndulo = vai e volta todo dia. Sem mudar de casa." | Rotina |
+| 7. Pendular | N2 | `🚌` | `sfx_hint` | "Trânsito pesado às 6h e 18h? É o pendular batendo ponto." | Realidade |
+| 8. Xenofobia | N1 | `🤝` | `sfx_confirm` | "Xeno = estrangeiro. Fobia = medo. Juntos = rejeição." | Justiça |
+| 8. Xenofobia | N3 | `🌍` | `sfx_hint` | "Preconceito regional também é xenofobia. Respeito é lei." | Pertencimento |
+| 9. Projeções | N1 | `🔮` | `sfx_confirm` | "Projeção não adivinha. Ela calcula com dados reais!" | Visão |
+| 9. Projeções | N3 | `📊` | `sfx_hint` | "2042 = pico. Depois, a pirâmide vira. País precisa se adaptar." | Responsabilidade |
+
+---
+
+## 🛠️ 3.5 Integração com Web Speech API e Fallbacks Inteligentes
+
+Para garantir **acesso universal**, o sistema usa a `Web Speech API` como fallback para alunos com deficiência auditiva ou em dispositivos sem áudio.
+
+```javascript
+// speechFallback.js
+const speakTip = (text) => {
+  if (!window.speechSynthesis) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'pt-BR';
+  utterance.rate = 0.9; // Ritmo calmo para fixação
+  utterance.pitch = 1.0;
+  speechSynthesis.speak(utterance);
+};
+
+// Uso condicional
+if (audioAvailable) playSFX(id);
+else speakTip(tipText);
+```
+
+### 📊 Métricas de Engajamento Sensorial
+| Métrica | Alvo | Ferramenta de Rastreamento |
+|---------|------|----------------------------|
+| Taxa de clique em 💡 | >65% | `event: tip_hover`, `tip_click` |
+| Tempo de leitura do pop-up | 2.5s - 4s | `IntersectionObserver` |
+| Ativação de áudio vs. TTS | 78% vs 22% | `audio_played`, `tts_fallback` |
+| Sessão sem sobrecarga sensorial | <5% de `prefers-reduced-motion` ativo | `navigator.mediaQueries` |
+
+---
+
+## ✅ Checklist de Validação do Passo 3
+
+- [ ] Biblioteca de 50+ ícones SVG exportada com `aria-label` e `title`
+- [ ] 12 micro-áudios gravados, normalizados (-16 LUFS) e mapeados por tópico
+- [ ] Componente `TipTooltip` implementado com `aria-live`, foco visível e `prefers-reduced-motion`
+- [ ] Web Speech API configurada como fallback com voz `pt-BR`
+- [ ] Tabela de mapeamento emocional integrada ao CMS (campo `tip_emotional_trigger`)
+- [ ] Testes de usabilidade com 5 alunos neurodivergentes (TDAH, TEA, baixa visão)
+- [ ] Logs de interação (`tip_viewed`, `audio_played`, `tts_used`) enviados ao analytics
+- [ ] Documentação de design system entregue à equipe de UX/UI
+
+---

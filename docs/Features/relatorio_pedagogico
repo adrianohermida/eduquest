@@ -1,0 +1,741 @@
+# 📊 PASSO 5: RELATÓRIO PEDAGÓGICO E DASHBOARDS PARA PROFESSORES
+*(Geografia 7º Ano | Capítulos 6 e 7 | 450 questões | Analytics + Intervenção Personalizada)*
+
+---
+
+## 🎯 5.1 Dashboard Principal da Turma: Métricas Agregadas em Tempo Real
+
+O dashboard do professor é o centro de comando pedagógico: uma interface visual que transforma dados brutos de aprendizado em **insights acionáveis**, permitindo intervenções precisas e personalizadas.
+
+### 📈 Componentes do Dashboard Principal
+
+```jsx
+// TeacherDashboard.jsx
+const TeacherDashboard = ({ classId, topicFilter }) => {
+  const metrics = useClassMetrics(classId, topicFilter);
+  
+  return (
+    <div className="teacher-dashboard">
+      {/* Cabeçalho com Filtros */}
+      <DashboardHeader 
+        classId={classId}
+        topicFilter={topicFilter}
+        onFilterChange={updateFilter}
+      />
+      
+      {/* Cards de Métricas-Chave */}
+      <MetricCardsGrid>
+        <MetricCard 
+          title="Média Geral da Turma" 
+          value={metrics.overallAverage} 
+          trend={metrics.weeklyTrend}
+          icon="📊"
+          color={getTrendColor(metrics.weeklyTrend)}
+        />
+        <MetricCard 
+          title="Questões Consolidadas (SRS)" 
+          value={metrics.consolidatedCount} 
+          total={450}
+          icon="✅"
+          color="#10B981"
+        />
+        <MetricCard 
+          title="Alunos em Risco" 
+          value={metrics.atRiskCount} 
+          threshold="acerto <60%"
+          icon="⚠️"
+          color="#EF4444"
+          onClick={viewAtRiskStudents}
+        />
+        <MetricCard 
+          title="Revisões Pendentes" 
+          value={metrics.pendingReviews} 
+          icon="🔄"
+          color="#F59E0B"
+        />
+      </MetricCardsGrid>
+      
+      {/* Gráfico de Progresso por Tópico */}
+      <TopicProgressChart 
+        data={metrics.topicAverages}
+        topics={TOPICS_CAP6_7}
+        onTopicClick={drillDownToTopic}
+      />
+      
+      {/* Heatmap de Erros por Conceito */}
+      <ConceptHeatmap 
+        errors={metrics.conceptErrors}
+        concepts={CONCEPT_CLUSTERS}
+        onConceptClick={viewConceptInterventions}
+      />
+      
+      {/* Lista de Alertas Prioritários */}
+      <PriorityAlerts 
+        alerts={metrics.criticalAlerts}
+        onAcknowledge={dismissAlert}
+      />
+    </div>
+  );
+};
+```
+
+### 📊 Tabela de Métricas-Chave (Backend Calculation)
+
+| Métrica | Fórmula | Frequência de Atualização | Uso Pedagógico |
+|---------|---------|---------------------------|----------------|
+| `Média Geral` | `SUM(acertos) / SUM(total_questoes) × 100` | Tempo real (WebSocket) | Visão macro do desempenho |
+| `Taxa de Consolidação SRS` | `(questões_stage_5 / total_questoes) × 100` | A cada 15 min (Celery) | Medir fixação de longo prazo |
+| `Índice de Risco` | `Alunos com acerto <60% em 3+ tópicos consecutivos` | Diário (batch) | Identificar necessidade de intervenção |
+| `Tempo Médio de Resposta` | `AVG(response_time_ms) por nível de dificuldade` | Tempo real | Detectar dúvidas ou domínio |
+| `Heatmap de Erros` | `COUNT(erros) GROUP BY concept_cluster` | Tempo real | Direcionar revisão focalizada |
+| `Streak Médio da Turma` | `AVG(student_streak)` | Tempo real | Medir engajamento e consistência |
+
+### 🔄 Atualização em Tempo Real com WebSockets
+```python
+# websockets/teacher_updates.py
+import asyncio
+from channels.generic.websocket import AsyncWebsocketConsumer
+
+class TeacherDashboardConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.class_id = self.scope['url_route']['kwargs']['class_id']
+        self.room_group_name = f'class_{self.class_id}'
+        
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+        
+        # Enviar snapshot inicial
+        await self.send_initial_metrics()
+    
+    async def receive(self, text_data):
+        # Receber filtros ou ações do professor
+        data = json.loads(text_data)
+        if data.get('action') == 'refresh_metrics':
+            await self.send_updated_metrics()
+    
+    async def send_updated_metrics(self):
+        """Enviar métricas atualizadas para todos os professores da turma"""
+        metrics = await calculate_class_metrics(self.class_id)
+        
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'metrics_update',
+                'payload': {
+                    'overall_average': metrics['overall_average'],
+                    'at_risk_count': metrics['at_risk_count'],
+                    'concept_errors': metrics['concept_errors'],
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+            }
+        )
+    
+    async def metrics_update(self, event):
+        """Handler para enviar atualização para o frontend"""
+        await self.send(text_data=json.dumps({
+            'type': 'METRICS_UPDATE',
+            'data': event['payload']
+        }))
+```
+
+---
+
+## 🔥 5.2 Mapa de Calor de Erros por Conceito e por Aluno
+
+O heatmap é a ferramenta mais poderosa para diagnóstico pedagógico: visualiza padrões de erro que revelam **conceitos mal compreendidos**, permitindo intervenções cirúrgicas.
+
+### 🎨 Componente React: ConceptHeatmap
+```jsx
+const ConceptHeatmap = ({ errors, concepts, onConceptClick }) => {
+  // Normalizar erros para escala de cor (0-100%)
+  const maxErrors = Math.max(...errors.map(e => e.count));
+  
+  return (
+    <div className="concept-heatmap">
+      <h3>🔥 Heatmap de Erros por Conceito</h3>
+      <div className="heatmap-grid">
+        {concepts.map(concept => {
+          const conceptErrors = errors.find(e => e.concept_id === concept.id) || { count: 0, students: [] };
+          const intensity = (conceptErrors.count / maxErrors) * 100;
+          const color = getHeatmapColor(intensity); // Vermelho (alto) → Verde (baixo)
+          
+          return (
+            <button
+              key={concept.id}
+              className="heatmap-cell"
+              style={{ backgroundColor: color }}
+              onClick={() => onConceptClick(concept.id)}
+              aria-label={`${concept.label}: ${conceptErrors.count} erros`}
+            >
+              <span className="cell-label">{concept.label}</span>
+              <span className="cell-count">{conceptErrors.count}</span>
+              {conceptErrors.count > maxErrors * 0.7 && (
+                <span className="cell-alert">⚠️ Crítico</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      
+      {/* Legenda */}
+      <div className="heatmap-legend">
+        <span>Baixo erro</span>
+        <div className="legend-bar">
+          <div className="legend-gradient" />
+        </div>
+        <span>Alto erro</span>
+      </div>
+    </div>
+  );
+};
+
+// Função de cor para heatmap (vermelho = alto erro)
+const getHeatmapColor = (intensity) => {
+  // intensity: 0-100
+  const r = Math.min(255, Math.floor(102 + (intensity * 1.53)));
+  const g = Math.max(0, Math.floor(153 - (intensity * 1.53)));
+  const b = 0;
+  return `rgb(${r}, ${g}, ${b})`;
+};
+```
+
+### 📊 Estrutura de Dados do Heatmap (Backend)
+```python
+# services/heatmap_service.py
+from django.db.models import Count, Avg
+from .models import StudentQuestionProgress, Question
+
+def generate_concept_heatmap(class_id, topic_id=None):
+    """Gerar dados para heatmap de erros por conceito"""
+    
+    # Filtrar questões do tópico (opcional)
+    questions = Question.objects.filter(chapter__in=[6, 7])
+    if topic_id:
+        questions = questions.filter(topic_id=topic_id)
+    
+    # Agrupar erros por concept_cluster
+    heatmap_data = (
+        StudentQuestionProgress.objects
+        .filter(student__class_id=class_id)
+        .filter(question__in=questions)
+        .filter(last_was_correct=False)
+        .values('question__concept_cluster')
+        .annotate(
+            error_count=Count('id'),
+            affected_students=Count('student_id', distinct=True),
+            avg_attempts=Avg('total_attempts')
+        )
+        .order_by('-error_count')
+    )
+    
+    # Enriquecer com metadados do conceito
+    enriched_data = []
+    for item in heatmap_data:
+        concept = CONCEPT_METADATA.get(item['question__concept_cluster'])
+        enriched_data.append({
+            'concept_id': item['question__concept_cluster'],
+            'label': concept['label'] if concept else item['question__concept_cluster'],
+            'description': concept['description'] if concept else '',
+            'error_count': item['error_count'],
+            'affected_students': item['affected_students'],
+            'avg_attempts': round(item['avg_attempts'] or 0, 2),
+            'bncc_skills': concept['bncc_skills'] if concept else [],
+            'suggested_intervention': concept['intervention'] if concept else None
+        })
+    
+    return enriched_data
+```
+
+### 🎯 Exemplo de Heatmap Preenchido (Tópico 4: Migrações)
+```
+🔥 Heatmap de Conceitos - Tópico 4: Migrações
+
+Conceito                  | Erros | Alunos Afetados | Intervenção Sugerida
+--------------------------|-------|-----------------|---------------------
+Definição de pendular     | 45    | 18/32 (56%)     | Flashcard + vídeo 30s
+Fatores do êxodo rural    | 62    | 24/32 (75%)     | Infográfico multifatorial + debate
+Xenofobia interna         | 58    | 21/32 (66%)     | Casos reais + discussão guiada
+Cidades dormitório        | 38    | 14/32 (44%)     | Mapa interativo + quiz rápido
+Retirantes                | 71    | 27/32 (84%)     | Texto crítico + atividade em grupo
+
+🎯 Ação Automática do Sistema:
+   • Se erro > 70% em "Retirantes": 
+     → Liberar micro-aula "Retirantes: Além da Seca"
+     → Sugerir revisão síncrona em grupo
+     → Ajustar dificuldade das próximas questões para esse conceito
+```
+
+---
+
+## 👤 5.3 Relatório Individual do Aluno com Plano de Intervenção Personalizado
+
+Cada aluno recebe um relatório dinâmico que combina **dados quantitativos** com **recomendações qualitativas**, gerando um plano de ação personalizado.
+
+### 📄 Componente React: StudentReport
+```jsx
+const StudentReport = ({ studentId, classId }) => {
+  const report = useStudentReport(studentId, classId);
+  
+  return (
+    <div className="student-report">
+      {/* Cabeçalho do Aluno */}
+      <StudentHeader 
+        name={report.student.name}
+        avatar={report.student.avatar}
+        overallScore={report.overallScore}
+        streak={report.currentStreak}
+      />
+      
+      {/* Progresso por Nível */}
+      <LevelProgressSection 
+        n1Score={report.n1Score}
+        n2Score={report.n2Score}
+        n3Score={report.n3Score}
+        unlockedLevels={report.unlockedLevels}
+      />
+      
+      {/* Pontos Fortes e Áreas de Desenvolvimento */}
+      <StrengthsWeaknesses>
+        <StrengthsList items={report.strengths} icon="✅" />
+        <WeaknessesList 
+          items={report.weaknesses} 
+          icon="🔧"
+          onSuggestIntervention={openInterventionModal}
+        />
+      </StrengthsWeaknesses>
+      
+      {/* Próximas Revisões Espaçadas */}
+      <UpcomingReviews 
+        reviews={report.upcomingSRSReviews}
+        onMarkAsDone={markReviewComplete}
+      />
+      
+      {/* Plano de Intervenção Personalizado */}
+      <InterventionPlan 
+        plan={report.interventionPlan}
+        onAccept={acceptIntervention}
+        onModify={editIntervention}
+      />
+      
+      {/* Botões de Ação */}
+      <ReportActions>
+        <Button variant="primary" onClick={generatePDF}>📄 Exportar PDF</Button>
+        <Button variant="secondary" onClick={shareWithParents}>📧 Compartilhar com Família</Button>
+        <Button variant="outline" onClick={scheduleMeeting}>🗓️ Agendar Atendimento</Button>
+      </ReportActions>
+    </div>
+  );
+};
+```
+
+### 🧠 Estrutura do Plano de Intervenção (JSON)
+```json
+{
+  "student_id": "uuid-aluno-maria",
+  "report_generated_at": "2026-05-27T14:30:00Z",
+  "overall_performance": {
+    "score": 72.4,
+    "trend": "stable",
+    "percentile_in_class": 65
+  },
+  "strengths": [
+    {
+      "concept": "populacao_absoluta",
+      "evidence": "92% de acerto em N1, consolidação SRS stage 5",
+      "pedagogical_note": "Domínio conceitual sólido; pode avançar para aplicação contextual"
+    },
+    {
+      "concept": "interpretacao_graficos_simples",
+      "evidence": "Respostas rápidas (<30s) com alta precisão",
+      "pedagogical_note": "Habilidade de leitura visual desenvolvida"
+    }
+  ],
+  "weaknesses": [
+    {
+      "concept": "fatores_exodo_rural",
+      "evidence": "62% de erro, média de 3.2 tentativas por questão",
+      "misconception": "Associa êxodo rural apenas à seca, ignorando fatores econômicos",
+      "intervention": {
+        "type": "micro_lesson",
+        "resource_id": "ML_EXODO_MULTIFATORIAL_01",
+        "duration_minutes": 5,
+        "activity": "Infográfico interativo + quiz de 3 perguntas",
+        "success_criteria": "≥80% no quiz pós-micro-aula"
+      }
+    },
+    {
+      "concept": "xenofobia_interna",
+      "evidence": "58% de erro, tempo de resposta acima da média",
+      "misconception": "Restringe xenofobia a estrangeiros, não reconhece preconceito regional",
+      "intervention": {
+        "type": "guided_discussion",
+        "resource_id": "DISCUSSAO_XENOFOBIA_BRASIL_01",
+        "duration_minutes": 15,
+        "activity": "Leitura de caso real + debate em duplas",
+        "success_criteria": "Produção de parágrafo argumentativo com exemplo"
+      }
+    }
+  ],
+  "upcoming_srs_reviews": [
+    {
+      "question_id": "GEO7_CAP6_T2_Q014",
+      "concept": "crescimento_vegetativo",
+      "next_review_at": "2026-05-28T10:00:00Z",
+      "current_stage": 3,
+      "priority": "medium"
+    },
+    {
+      "question_id": "GEO7_CAP6_T4_Q027",
+      "concept": "migracao_pendular",
+      "next_review_at": "2026-05-27T16:00:00Z",
+      "current_stage": 1,
+      "priority": "high"
+    }
+  ],
+  "personalized_tips": [
+    "Maria, você domina os conceitos básicos! Para avançar no Nível 3, experimente ler a justificativa das questões que errou em voz alta. Isso ajuda a fixar o raciocínio. 🎧",
+    "Que tal revisar 'fatores do êxodo rural' com o infográfico interativo? Leva só 5 minutos e pode clarear suas dúvidas! 🗺️"
+  ],
+  "parent_communication": {
+    "summary_pt": "Maria está progredindo bem em conceitos básicos de demografia. Recomenda-se reforçar a compreensão dos fatores econômicos do êxodo rural através de conversa sobre a história da família.",
+    "suggested_activity": "Perguntar aos avós/pais sobre mudanças no local onde moravam quando jovens. Registrar em 3 frases."
+  }
+}
+```
+
+### 🔄 Geração Automática do Plano de Intervenção
+```python
+# services/intervention_planner.py
+class InterventionPlanner:
+    """Gera planos de intervenção personalizados baseados em dados de desempenho"""
+    
+    def generate_plan(self, student_id, class_id):
+        # Coletar dados do aluno
+        performance = self._get_student_performance(student_id, class_id)
+        weaknesses = self._identify_weak_concepts(performance)
+        
+        # Gerar recomendações
+        interventions = []
+        for weakness in weaknesses:
+            concept = weakness['concept']
+            misconception = self._detect_misconception(weakness)
+            
+            # Selecionar recurso pedagógico adequado
+            resource = self._select_intervention_resource(
+                concept=concept,
+                misconception=misconception,
+                student_profile=performance['learning_style']
+            )
+            
+            interventions.append({
+                'concept': concept,
+                'misconception': misconception,
+                'intervention': {
+                    'type': resource['type'],  # micro_lesson, discussion, flashcard_set
+                    'resource_id': resource['id'],
+                    'duration_minutes': resource['estimated_duration'],
+                    'activity': resource['activity_description'],
+                    'success_criteria': resource['success_metric']
+                }
+            })
+        
+        # Montar plano completo
+        return {
+            'student_id': student_id,
+            'strengths': self._extract_strengths(performance),
+            'weaknesses': interventions,
+            'upcoming_srs_reviews': self._get_pending_srs(student_id),
+            'personalized_tips': self._generate_tips(performance, interventions),
+            'parent_communication': self._generate_parent_summary(performance, interventions)
+        }
+    
+    def _detect_misconception(self, weakness_data):
+        """Inferir concepção equivocada a partir de padrões de erro"""
+        concept = weakness_data['concept']
+        wrong_answers = weakness_data['common_wrong_answers']
+        
+        # Mapeamento de padrões de erro para misconceptions
+        misconception_map = {
+            'fatores_exodo_rural': {
+                'seca_apenas': ['A', 'D'],  # Opções que mencionam apenas seca
+                'ignora_mecanizacao': ['B', 'C']
+            },
+            'xenofobia_interna': {
+                'restrito_estrangeiros': ['A', 'D'],
+                'ignora_preconceito_regional': ['B', 'C']
+            }
+        }
+        
+        # Heurística simples: se maioria dos erros segue padrão X, inferir misconception X
+        if concept in misconception_map:
+            for misconception, error_patterns in misconception_map[concept].items():
+                if any(ans in wrong_answers for ans in error_patterns):
+                    return misconception
+        
+        return None  # Sem padrão claro identificado
+```
+
+---
+
+## 📤 5.4 Exportação e Integração com Sistemas Externos
+
+### 📄 Formatos de Exportação Suportados
+| Formato | Caso de Uso | Campos Incluídos |
+|---------|-------------|-----------------|
+| **PDF** | Reuniões com pais, arquivo físico | Relatório completo + gráfico de progresso + plano de intervenção |
+| **CSV** | Análise em planilhas, integração com BI | Dados brutos: acertos, erros, tempo, SRS stage, conceito |
+| **JSON** | APIs, integração com LMS | Estrutura completa do relatório, metadados pedagógicos |
+| **Google Classroom** | Atribuição de tarefas de revisão | Link direto para sessão de revisão personalizada |
+| **Moodle** | Sincronização de notas e progresso | Nota consolidada, tópicos concluídos, badges obtidos |
+
+### 🔌 Integração com Google Classroom (Exemplo)
+```python
+# integrations/google_classroom.py
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+
+class ClassroomIntegration:
+    def __init__(self, credentials: Credentials):
+        self.service = build('classroom', 'v1', credentials=credentials)
+    
+    def create_review_assignment(self, class_id: str, student_email: str, topic_id: int):
+        """Criar tarefa de revisão personalizada no Google Classroom"""
+        
+        # Gerar link direto para sessão de revisão do aluno
+        review_link = f"https://eduquest.app/review?student={student_email}&topic={topic_id}"
+        
+        course_work = {
+            'title': f'🔄 Revisão Personalizada: Tópico {topic_id}',
+            'description': f'Olá! Preparamos uma sessão de revisão focada nos conceitos que você precisa reforçar. Clique no link para começar: {review_link}',
+            'state': 'PUBLISHED',
+            'assignment': {
+                'studentWorkFolder': {
+                    'title': f'Revisão {student_email}'
+                }
+            },
+            'dueDate': {
+                'year': 2026,
+                'month': 6,
+                'day': 3
+            },
+            'maxPoints': 10
+        }
+        
+        return self.service.courses().courseWork().create(
+            courseId=class_id,
+            body=course_work
+        ).execute()
+```
+
+### 📊 Exportação para PDF com ReportLab
+```python
+# reports/pdf_generator.py
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Image
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+
+def generate_student_report_pdf(student_report: dict, output_path: str):
+    doc = SimpleDocTemplate(output_path, pagesize='A4')
+    styles = getSampleStyleSheet()
+    story = []
+    
+    # Cabeçalho
+    story.append(Paragraph(f"Relatório Pedagógico - {student_report['student_name']}", styles['Title']))
+    story.append(Paragraph(f"Turma: 7º Ano A | Data: {datetime.now().strftime('%d/%m/%Y')}", styles['Normal']))
+    story.append(Spacer(1, 20))
+    
+    # Métricas Principais
+    story.append(Paragraph("📊 Desempenho Geral", styles['Heading2']))
+    metrics_table = Table([
+        ['Média Geral', f"{student_report['overall_performance']['score']}%"],
+        ['Percentil na Turma', f"{student_report['overall_performance']['percentile_in_class']}º"],
+        ['Streak Atual', f"🔥 {student_report['current_streak']} acertos"],
+        ['Questões Consolidadas', f"{student_report['consolidated_count']}/450"]
+    ])
+    metrics_table.setStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey)
+    ])
+    story.append(metrics_table)
+    story.append(Spacer(1, 20))
+    
+    # Plano de Intervenção
+    story.append(Paragraph("🎯 Plano de Intervenção Personalizado", styles['Heading2']))
+    for intervention in student_report['weaknesses']:
+        story.append(Paragraph(f"• <b>{intervention['concept']}</b>: {intervention['intervention']['activity']}", styles['Normal']))
+        story.append(Paragraph(f"  Critério de sucesso: {intervention['intervention']['success_criteria']}", styles['Italic']))
+    
+    # Footer com QR Code para acesso rápido
+    story.append(Spacer(1, 40))
+    qr_data = f"https://eduquest.app/report/{student_report['student_id']}"
+    # (código para gerar QR code com reportlab-qr)
+    
+    doc.build(story)
+```
+
+---
+
+## 🚨 5.5 Alertas Automáticos para Queda de Desempenho ou Conceitos Críticos
+
+### ⚙️ Sistema de Alertas em Tempo Real
+```python
+# services/alert_service.py
+class AlertService:
+    """Monitora métricas e dispara alertas pedagógicos automáticos"""
+    
+    CRITICAL_THRESHOLDS = {
+        'overall_score_drop': -15,  # Queda de 15 pontos em 1 semana
+        'concept_error_rate': 0.7,   # >70% de erro em um conceito
+        'srs_reset_spike': 5,        # >5 questões resetadas em 24h
+        'inactivity_days': 3         # 3 dias sem atividade
+    }
+    
+    def check_and_trigger_alerts(self, student_id: str):
+        """Verificar métricas e disparar alertas se necessário"""
+        alerts = []
+        
+        # 1. Queda brusca de desempenho
+        recent_scores = self._get_recent_scores(student_id, days=7)
+        if self._detect_score_drop(recent_scores, threshold=self.CRITICAL_THRESHOLDS['overall_score_drop']):
+            alerts.append(self._create_alert(
+                type='score_drop',
+                severity='high',
+                message=f"Queda de {recent_scores['drop']} pontos na média em 7 dias",
+                suggested_action="Agendar atendimento individual para diagnóstico"
+            ))
+        
+        # 2. Conceito com taxa de erro crítica
+        concept_errors = self._get_concept_error_rates(student_id)
+        for concept, error_rate in concept_errors.items():
+            if error_rate > self.CRITICAL_THRESHOLDS['concept_error_rate']:
+                alerts.append(self._create_alert(
+                    type='concept_critical',
+                    severity='medium',
+                    message=f"Conceito '{concept}' com {error_rate*100:.0f}% de erro",
+                    suggested_action=f"Liberar micro-aula '{concept}_intervention'",
+                    auto_action={'release_resource': f"ML_{concept.upper()}_01"}
+                ))
+        
+        # 3. Pico de resets no SRS
+        recent_resets = self._count_srs_resets(student_id, hours=24)
+        if recent_resets > self.CRITICAL_THRESHOLDS['srs_reset_spike']:
+            alerts.append(self._create_alert(
+                type='srs_reset_spike',
+                severity='medium',
+                message=f"{recent_resets} questões resetadas nas últimas 24h",
+                suggested_action="Revisar abordagem pedagógica para os conceitos afetados"
+            ))
+        
+        # 4. Inatividade prolongada
+        last_activity = self._get_last_activity(student_id)
+        if last_activity and (datetime.now() - last_activity).days > self.CRITICAL_THRESHOLDS['inactivity_days']:
+            alerts.append(self._create_alert(
+                type='inactivity',
+                severity='low',
+                message=f"Sem atividade há {(datetime.now() - last_activity).days} dias",
+                suggested_action="Enviar mensagem de incentivo via app ou e-mail"
+            ))
+        
+        # Enviar alertas para o professor
+        if alerts:
+            self._notify_teacher(student_id, alerts)
+            # Opcional: notificar coordenador se severity='high'
+            if any(a['severity'] == 'high' for a in alerts):
+                self._notify_coordinator(student_id, alerts)
+        
+        return alerts
+```
+
+### 📱 Interface de Alertas no Dashboard do Professor
+```jsx
+// components/AlertPanel.jsx
+const AlertPanel = ({ alerts, onAcknowledge, onTakeAction }) => {
+  const getAlertIcon = (severity) => {
+    switch(severity) {
+      case 'high': return '🚨';
+      case 'medium': return '⚠️';
+      case 'low': return 'ℹ️';
+      default: return '🔔';
+    }
+  };
+  
+  return (
+    <div className="alert-panel">
+      <h3>🔔 Alertas Pedagógicos</h3>
+      {alerts.length === 0 ? (
+        <p className="no-alerts">✅ Tudo em ordem! Nenhum alerta ativo.</p>
+      ) : (
+        <ul className="alert-list">
+          {alerts.map(alert => (
+            <li key={alert.id} className={`alert-item alert-${alert.severity}`}>
+              <div className="alert-header">
+                <span className="alert-icon">{getAlertIcon(alert.severity)}</span>
+                <span className="alert-type">{alert.type}</span>
+                <span className="alert-time">{formatTimeAgo(alert.created_at)}</span>
+              </div>
+              <p className="alert-message">{alert.message}</p>
+              <div className="alert-actions">
+                <button 
+                  className="btn-action"
+                  onClick={() => onTakeAction(alert.suggested_action)}
+                >
+                  {alert.auto_action ? '⚡ Ação Automática' : '🔧 Intervir'}
+                </button>
+                <button 
+                  className="btn-dismiss"
+                  onClick={() => onAcknowledge(alert.id)}
+                >
+                  ✓ Reconhecer
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+```
+
+---
+
+## ✅ Checklist de Validação do Passo 5
+
+- [ ] Dashboard principal da turma com métricas em tempo real (WebSocket)
+- [ ] Heatmap de erros por conceito com drill-down para lista de alunos
+- [ ] Relatório individual do aluno com plano de intervenção personalizado
+- [ ] Geração automática de PDF com layout profissional e QR code de acesso
+- [ ] Exportação CSV/JSON para análise externa e integração com BI
+- [ ] Integração com Google Classroom: criação de tarefas de revisão personalizadas
+- [ ] Integração com Moodle: sincronização de notas e progresso via LTI
+- [ ] Sistema de alertas automáticos com thresholds configuráveis
+- [ ] Notificações push/e-mail para professores e coordenadores
+- [ ] Acessibilidade: dashboard navegável por teclado, contraste adequado, screen reader
+- [ ] LGPD: anonimização de dados para relatórios agregados, consentimento para exportação
+- [ ] Testes de carga: dashboard carrega <2s com 500 alunos, 450 questões, 10 conceitos
+
+---
+
+## 🎯 Próximos Passos: Consolidação do Projeto Eduquest
+
+Com os 5 passos técnicos implementados, a plataforma Eduquest está pronta para:
+
+1. **Lançar Prova de Conceito (PoC)** com 1 turma piloto (30 alunos, 7º ano)
+2. **Coletar Feedback Pedagógico** após 4 semanas de uso
+3. **Ajustar Parâmetros**: thresholds de desbloqueio, intervalos SRS, gatilhos emocionais
+4. **Escalar para 10 turmas** com monitoramento contínuo de métricas de engajamento e aprendizado
+5. **Preparar Documentação** para expansão para outros anos e disciplinas
+
+### 📊 Métricas de Sucesso da PoC
+| Métrica | Meta PoC | Como Medir |
+|---------|----------|------------|
+| Taxa de Conclusão de Tópicos | ≥75% dos alunos completam N1-N3 | Analytics de progresso |
+| Retenção de Conceitos (SRS) | ≥60% das questões em stage ≥3 após 15 dias | Banco de dados SRS |
+| Engajamento com Gatilhos | ≥65% de interação com 💡 dicas | Logs de eventos |
+| Satisfação do Professor | ≥4/5 em pesquisa qualitativa | Formulário pós-PoC |
+| Melhoria em Avaliação Externa | +10% vs. turma controle | Comparação de notas bimestrais |
+
+---

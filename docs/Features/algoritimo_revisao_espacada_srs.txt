@@ -1,0 +1,215 @@
+# 🔁 PASSO 2: ALGORITMO DE REVISÃO ESPAÇADA (SRS)
+*(Geografia 7º Ano | Capítulos 6 e 7 | 450 questões | Método Kumon + Neurociência)*
+
+---
+
+## 🧠 2.1 Lógica de Progressão e Estados do SRS
+
+O algoritmo segue o princípio da **Curva do Esquecimento de Ebbinghaus** combinado com a **Repetição Espaçada Adaptativa**. Cada questão transita por 6 estados, com intervalos pré-definidos que só avançam mediante acerto confirmado.
+
+### 📊 Tabela de Estados e Intervalos
+| Estado (Stage) | Condição de Entrada | Intervalo de Revisão | Ação no Sistema |
+|----------------|---------------------|----------------------|-----------------|
+| `0` (Novo) | Primeira exposição | Imediato | Entra na fila diária |
+| `1` (1h) | 1º acerto | 3.600s (1 hora) | Agendado no scheduler |
+| `2` (24h) | Acerto no Stage 1 | 86.400s (24h) | Mantém no pipeline |
+| `3` (3d) | Acerto no Stage 2 | 259.200s (3 dias) | Prioridade média |
+| `4` (7d) | Acerto no Stage 3 | 604.800s (7 dias) | Baixa prioridade |
+| `5` (15d/Consolidado) | Acerto no Stage 4 | 1.296.000s (15 dias) | Sai da fila ativa, entra em revisão mensal |
+
+### 🔄 Regras de Transição
+```python
+# Pseudocódigo do núcleo do SRS
+def process_answer(student_id, question_id, is_correct):
+    record = get_progress(student_id, question_id)
+    
+    if is_correct:
+        record.sr_stage = min(record.sr_stage + 1, 5)
+        if record.sr_stage == 5:
+            record.sr_consolidated = True
+            record.sr_next_review = now() + timedelta(days=30)  # Manutenção
+        else:
+            record.sr_next_review = now() + SRS_INTERVALS[record.sr_stage]
+    else:
+        # Erro: reset pedagógico + micro-aula
+        record.sr_stage = 1
+        record.sr_consolidated = False
+        record.sr_next_review = now() + timedelta(hours=1)
+        record.retry_count += 1
+        trigger_micro_lesson(record.concept_cluster, record.question_id)
+    
+    save(record)
+```
+
+---
+
+## ⚙️ 2.2 Arquitetura Técnica e Fila de Tarefas
+
+### 🗄️ Campos Adicionais no Banco de Dados
+```sql
+ALTER TABLE student_question_progress ADD COLUMN sr_stage INTEGER DEFAULT 0;
+ALTER TABLE student_question_progress ADD COLUMN sr_next_review_at TIMESTAMPTZ;
+ALTER TABLE student_question_progress ADD COLUMN sr_consolidated BOOLEAN DEFAULT false;
+ALTER TABLE student_question_progress ADD COLUMN ease_factor DECIMAL(3,2) DEFAULT 2.5; -- Opcional (FSRS)
+ALTER TABLE student_question_progress ADD COLUMN retry_count INTEGER DEFAULT 0;
+
+-- Índice para busca rápida de questões vencidas
+CREATE INDEX idx_due_reviews ON student_question_progress(sr_next_review_at) 
+WHERE sr_consolidated = false;
+```
+
+### 📦 Scheduler com Celery + Redis
+```python
+# celery_tasks/srs_scheduler.py
+from celery import Celery
+from django.utils import timezone
+from .models import StudentQuestionProgress
+
+app = Celery('eduquest', broker='redis://localhost:6379/0')
+
+@app.task
+def populate_daily_review_queue():
+    """Executa a cada 15 min via Celery Beat"""
+    now = timezone.now()
+    due_records = StudentQuestionProgress.objects.filter(
+        sr_next_review_at__lte=now,
+        sr_consolidated=False
+    ).order_by('sr_next_review_at', 'sr_stage')[:50]  # Limite diário por sessão
+    
+    for record in due_records:
+        add_to_user_queue(record.student_id, record.question_id, priority=record.sr_stage)
+```
+
+### ⏱️ Configuração do Celery Beat
+```python
+# settings.py
+CELERY_BEAT_SCHEDULE = {
+    'srs-scheduler-every-15-min': {
+        'task': 'celery_tasks.srs_scheduler.populate_daily_review_queue',
+        'schedule': crontab(minute='*/15'),
+    }
+}
+```
+
+### 🌐 API de Consumo (Exemplo REST)
+```http
+GET /api/v1/reviews/due?student_id=uuid
+→ Retorna: [{question_id, stem, options, tip_audio, sr_stage, priority}]
+
+POST /api/v1/questions/{id}/answer
+Body: {student_id, answer, response_time_ms}
+→ Retorna: {is_correct, next_review_in, micro_lesson_required?, new_sr_stage}
+```
+
+---
+
+## 📊 2.3 Dashboard do Aluno: Progresso de Consolidação
+
+### 🎨 Componente Visual (React/Next.js)
+```jsx
+const SRSDashboard = ({ progress }) => {
+  const stats = {
+    consolidated: progress.filter(p => p.sr_consolidated).length,
+    in_progress: progress.filter(p => p.sr_stage >= 1 && p.sr_stage <= 4).length,
+    needs_review: progress.filter(p => p.sr_next_review_at <= now).length,
+    reset: progress.filter(p => p.retry_count > 2).length
+  };
+
+  return (
+    <div className="srs-dashboard">
+      <ProgressRing value={stats.consolidated / 450 * 100} label="Consolidado" />
+      <StatBar label="Em revisão (1h-7d)" count={stats.in_progress} color="#4A90E2" />
+      <StatBar label="Precisa reforçar" count={stats.needs_review} color="#E25F4A" />
+      <StatBar label="Resetadas por erro" count={stats.reset} color="#F5A623" />
+      
+      <DailyStreak streak={user.streak_days} />
+      <Button variant="primary" onClick={startReviewSession}>
+        🚀 Iniciar Sessão de Revisão ({stats.needs_review} pendentes)
+      </Button>
+    </div>
+  );
+};
+```
+
+### 📈 Métricas Pedagógicas Geradas
+| Métrica | Cálculo | Uso Pedagógico |
+|---------|---------|----------------|
+| `Taxa de Retenção` | `(Acertos Stage ≥3) / Total Tentativas` | Identifica conceitos consolidados |
+| `Índice de Reset` | `Reset Count / Total Questões` | Sinaliza necessidade de micro-aulas ou revisão do conteúdo base |
+| `Velocidade de Consolidação` | `Dias até Stage 5` | Ajusta dificuldade ou tempo de exposição |
+| `Curva de Esquecimento` | `Erros por intervalo` | Calibra intervalos por perfil de aluno |
+
+---
+
+## 🎓 2.4 Sistema de Micro-Aulas de Recuperação (30s)
+
+### 🧩 Gatilho e Fluxo
+```
+Aluno erra → Sistema detecta `concept_cluster` → 
+Busca micro-aula vinculada → Exibe modal interativo (30s) → 
+Checkpoint de 1 pergunta → Se acertar: libera retry / Se errar: reforça conceito e agenda em 1h
+```
+
+### 📦 Estrutura da Micro-Aula (JSON)
+```json
+{
+  "micro_lesson_id": "ML_DEMOG_ABS_REL_01",
+  "concept_cluster": "demografia_basica",
+  "target_misconception": "confundir_populacao_absoluta_com_relativa",
+  "format": "interactive_card",
+  "content": {
+    "hook": "🤔 'Absoluta' ou 'Relativa'? Qual conta a história certa?",
+    "visual": "infographic_density_vs_total.svg",
+    "audio_snippet": "ml_abs_rel_30s.mp3",
+    "key_text": "Absoluta = número BRUTO. Relativa = número ÷ ÁREA. Um conta gente, o outro conta aperto.",
+    "checkpoint_question": {
+      "stem": "Se o Brasil tem 215M de pessoas e 8,5M km², qual dado é a população absoluta?",
+      "options": ["215M", "25 hab/km²", "8,5M km²", "215 hab/km²"],
+      "correct": "215M"
+    }
+  },
+  "unlock_on_retry": true
+}
+```
+
+### ⚙️ Implementação Técnica
+```python
+def trigger_micro_lesson(concept_cluster, question_id):
+    lesson = MicroLesson.objects.filter(
+        concept_cluster=concept_cluster,
+        target_misconception__in=Question.objects.get(id=question_id).common_misconceptions
+    ).first()
+    
+    if lesson:
+        StudentMicroLessonStatus.objects.create(
+            student_id=current_user,
+            lesson=lesson,
+            status="pending",
+            expires_at=now() + timedelta(hours=1)
+        )
+        return {"micro_lesson_required": True, "lesson_id": lesson.id}
+    return {"micro_lesson_required": False}
+```
+
+### 🧠 Alinhamento Neurocognitivo
+- **Dual Coding**: Texto + ícone + áudio curto ativam córtex visual e auditivo simultaneamente
+- **Retrieval Practice**: Checkpoint obriga o cérebro a buscar a informação, não apenas reconhecê-la
+- **Interleaving**: Micro-aulas misturam conceitos próximos (ex: densidade vs absoluta) para evitar confusão
+- **Dopamina/Serotonina**: Progresso visível + feedback imediato + streaks mantêm motivação intrínseca
+
+---
+
+## ✅ Checklist de Validação do Passo 2
+
+- [ ] Algoritmo SRS implementado com estados `0→5` e intervalos exatos (1h, 24h, 3d, 7d, 15d)
+- [ ] Tabela `student_question_progress` com índices otimizados para `sr_next_review_at`
+- [ ] Celery Beat configurado para executar scheduler a cada 15 min
+- [ ] API `/reviews/due` retorna fila priorizada por urgência e estágio
+- [ ] Dashboard do aluno renderiza métricas de consolidação, retenção e resets
+- [ ] Micro-aulas vinculadas a `concept_cluster` e `common_misconceptions` do Passo 1
+- [ ] Checkpoint de 30s bloqueia retry até conclusão com ≥80%
+- [ ] Fallback offline: questões pendentes armazenadas em IndexedDB, sincronizadas ao reconectar
+- [ ] Testes de carga: 10.000 usuários simultâneos, latência <200ms no scheduler
+- [ ] Logs auditáveis: cada transição de stage registrada para análise pedagógica
+
+---

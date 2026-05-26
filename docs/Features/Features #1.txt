@@ -1,0 +1,348 @@
+# 🚀 Plano de Implementação Técnica - Plataforma Eduquest
+*(Geografia 7º Ano | Capítulos 6 e 7 | 450 questões produzidas)*
+
+---
+
+## 🔧 1. INTEGRAÇÃO TÉCNICA: Estrutura de Dados e Tags no CMS
+
+### Schema de Questão (JSON Example)
+```json
+{
+  "question_id": "GEO7_CAP6_T1_Q001",
+  "topic_hierarchy": {
+    "chapter": 6,
+    "topic": 1,
+    "subtopic": "População Absoluta e Relativa"
+  },
+  "difficulty_level": "N1", // N1, N2, N3, ELIM
+  "question_type": "MC", // MC, VF, DISS, ELIM
+  "content": {
+    "stem": "O termo que indica o número total de habitantes de um território é:",
+    "options": ["a) Densidade demográfica", "b) População relativa", "c) População absoluta", "d) Crescimento vegetativo"],
+    "correct_answer": "C",
+    "justification": "População absoluta é a contagem total de pessoas.",
+    "tip": "'Absoluta' = número 'absoluto', sem dividir por área.",
+    "multisensory": {
+      "icon": "👥",
+      "audio_snippet": "pop_absoluta_2s.mp3",
+      "visual_trigger": "pop_up_icon_absolute.png"
+    }
+  },
+  "bncc_skills": ["EF07GE01", "EF07GE02"],
+  "cognitive_tags": ["memorização", "código_duplo", "recuperação_ativa"],
+  "emotional_triggers": ["curiosidade", "pertencimento"],
+  "spaced_repetition_config": {
+    "initial_interval": "1h",
+    "progression": ["1h", "24h", "3d", "7d", "15d"],
+    "reset_on_error": true
+  },
+  "battle_mode_unlock": {
+    "required_score_N1": 85,
+    "required_score_N2": 80,
+    "next_level": "N2"
+  },
+  "analytics_tracking": {
+    "concept_cluster": "demografia_basica",
+    "common_misconception": "confundir_absoluta_com_relativa"
+  }
+}
+```
+
+### Tags BNCC Mapeadas para Cap. 6/7
+| Habilidade BNCC | Descrição | Tópicos Relacionados |
+|----------------|-----------|---------------------|
+| **EF07GE01** | Analisar a distribuição territorial da população brasileira | T1, T3, T5 |
+| **EF07GE02** | Analisar a influência dos fluxos econômicos e populacionais na formação socioeconômica e territorial do Brasil | T4, T6, T7 |
+| **EF07GE03** | Analisar aspectos indicativos do processo de urbanização no Brasil | T5, T6 |
+| **EF07GE04** | Analisar a distribuição territorial da população brasileira, considerando a diversidade étnico-cultural | T4, T8 |
+| **EF07GE05** | Analisar fatos e situações representativas das alterações nas dinâmicas naturais e sociais | T2, T3, T9 |
+
+### Implementação no CMS (Passo a Passo)
+1. **Criar template de questão** com campos obrigatórios: stem, options, justification, tip, bncc_skills
+2. **Sistema de importação em lote**: CSV/JSON com validação de schema antes do upload
+3. **Editor visual de tags**: Interface drag-and-drop para associar habilidades BNCC
+4. **Preview multimodal**: Visualizar questão com ícone + áudio + texto antes de publicar
+5. **Versionamento**: Histórico de alterações por questão para auditoria pedagógica
+
+---
+
+## 🔄 2. ALGORITMO DE REVISÃO ESPAÇADA: Configuração Técnica
+
+### Lógica do Sistema de Repetição
+```
+Estado Inicial: Questão respondida corretamente pela 1ª vez
+↓
+Intervalo 1: 1 hora → Reaparece em flashcard rápido
+↓
+Se acerto: Intervalo 2: 24 horas
+↓
+Se acerto: Intervalo 3: 3 dias
+↓
+Se acerto: Intervalo 4: 7 dias
+↓
+Se acerto: Intervalo 5: 15 dias → Questão "consolidada"
+↓
+Se erro em qualquer etapa: Reset para Intervalo 1 + micro-aula de 30s
+```
+
+### Configuração no Backend (Pseudocódigo)
+```python
+class SpacedRepetition:
+    INTERVALS = [3600, 86400, 259200, 604800, 1296000]  # em segundos
+    
+    def schedule_next_review(self, user_id, question_id, is_correct):
+        current_stage = get_user_stage(user_id, question_id)
+        
+        if is_correct:
+            if current_stage < len(self.INTERVALS) - 1:
+                next_stage = current_stage + 1
+                next_review = now() + self.INTERVALS[next_stage]
+                update_user_stage(user_id, question_id, next_stage, next_review)
+            else:
+                mark_as_consolidated(user_id, question_id)
+        else:
+            # Erro: reset + intervenção pedagógica
+            reset_to_stage_1(user_id, question_id)
+            trigger_micro_lesson(user_id, question_id)
+            schedule_review(user_id, question_id, now() + self.INTERVALS[0])
+```
+
+### Integração com Flashcards
+- **Flashcards Nível 1**: Aparecem no "Modo Treino Diário" com prioridade baseada no intervalo
+- **Fila inteligente**: Questões com erro recente têm prioridade na fila do dia
+- **Modo "Revisão Relâmpago"**: 5 flashcards aleatórios de estágios 3-5 para manutenção de longo prazo
+
+### Dashboard do Aluno: Progresso de Consolidação
+```
+📊 Minha Revisão Espaçada
+├─ ✅ Consolidadas (15d+): 127 questões
+├─ 🔄 Em consolidação (3-7d): 43 questões  
+├─ ⚠️ Reforço necessário (1-24h): 18 questões
+└─ ❌ Resetadas por erro: 5 questões → [Revisar agora]
+```
+
+---
+
+## ❤️ 3. GATILHOS EMOCIONAIS/SENSORIAIS: Implementação de "Dicas" Multimodais
+
+### Sistema de Micro-Áudios (2-3 segundos)
+| Tipo de Dica | Áudio Exemplo | Gatilho Emocional | Ícone Associado |
+|-------------|--------------|------------------|-----------------|
+| **Memória Visual** | *Som de "clique" suave + sussurro "Absoluta!"* | Curiosidade + Confirmação | 👁️ |
+| **Associação Sonora** | *Som de ônibus + buzina leve* para migração pendular | Rotina + Identificação | 🚌 |
+| **Reforço Positivo** | *Som de "brilho" ou "sininho"* ao acertar | Serotonina + Conquista | ✨ |
+| **Alerta Pedagógico** | *Som suave de "atenção"* ao errar | Foco + Correção sem frustração | 💡 |
+
+### Especificações Técnicas dos Áudios
+```json
+{
+  "audio_specs": {
+    "duration": "2-3 seconds",
+    "format": "MP3, 44.1kHz, 128kbps",
+    "volume_normalization": true,
+    "accessibility": {
+      "visual_alternative": true,
+      "transcript_available": true,
+      "volume_control": "user_adjustable"
+    }
+  }
+}
+```
+
+### Pop-ups Visuais com Ícones Consistentes
+- **Biblioteca de Ícones**: Criar conjunto de 50 ícones vetoriais (SVG) para todos os tópicos
+- **Animação sutil**: Fade-in de 200ms, permanência de 3s, fade-out de 200ms
+- **Posicionamento**: Canto inferior direito, não obstruindo o conteúdo principal
+- **Acessibilidade**: Ícones com alt-text e opção de desativar para usuários com sensibilidade visual
+
+### Exemplo de Implementação Frontend (React)
+```jsx
+const TipTrigger = ({ tip, audioFile, icon }) => {
+  const [showTip, setShowTip] = useState(false);
+  
+  const playAudio = () => {
+    const audio = new Audio(`/audio/tips/${audioFile}`);
+    audio.volume = 0.3; // Volume suave
+    audio.play();
+  };
+  
+  return (
+    <button 
+      className="tip-trigger"
+      onMouseEnter={() => { setShowTip(true); playAudio(); }}
+      onMouseLeave={() => setShowTip(false)}
+      aria-label={`Dica: ${tip}`}
+    >
+      <Icon name={icon} size="sm" />
+      {showTip && (
+        <div className="tip-popup animate-fade">
+          <p className="tip-text">{tip}</p>
+          <span className="tip-icon">{icon}</span>
+        </div>
+      )}
+    </button>
+  );
+};
+```
+
+---
+
+## ⚔️ 4. MODO BATALHA: Calibragem de Progressão e Dificuldade
+
+### Fluxo de Progressão entre Níveis
+```
+┌─────────────────────────────────────┐
+│  NÍVEL 1 - Fixação Kumon            │
+│  • 15 questões por tópico           │
+│  • Foco: Vocabulário, definições    │
+│  • Tipos: MC simples, V/F           │
+│  • Tempo: Sem limite                │
+│  • Feedback: Imediato + justificação│
+│                                     │
+│  🔓 DESBLOQUEIO: ≥85% de acerto    │
+└────────────┬────────────────────────┘
+             ▼
+┌─────────────────────────────────────┐
+│  NÍVEL 2 - Aplicação Escolar        │
+│  • 20 questões por tópico           │
+│  • Foco: Interpretação, contexto    │
+│  • Tipos: MC com texto, gráficos    │
+│  • Tempo: 90 segundos por questão   │
+│  • Feedback: Após bloco de 5        │
+│                                     │
+│  🔓 DESBLOQUEIO: ≥80% de acerto    │
+└────────────┬────────────────────────┘
+             ▼
+┌─────────────────────────────────────┐
+│  NÍVEL 3 + ELIMINATÓRIAS - Vestibular│
+│  • 15 questões por tópico           │
+│  • Foco: Análise crítica, síntese   │
+│  • Tipos: Dissertativas, múltiplas  │
+│  • Tempo: 120 segundos por questão  │
+│  • Feedback: Ao final + ranking     │
+│                                     │
+│  🏆 CONCLUSÃO: Certificado + Badge │
+└─────────────────────────────────────┘
+```
+
+### Sistema de Pontuação e Gamificação
+```json
+{
+  "scoring_system": {
+    "N1_correct": 10,
+    "N2_correct": 15,
+    "N3_correct": 25,
+    "eliminatoria_correct": 40,
+    "streak_bonus": {
+      "3_consecutive": 1.1,
+      "5_consecutive": 1.25,
+      "10_consecutive": 1.5
+    },
+    "time_bonus": "0.1 ponto por 10s economizados (max 5 pontos)"
+  },
+  "badges": [
+    {"name": "Explorador Demográfico", "requirement": "Completar Tópico 1 N1-N3"},
+    {"name": "Mestre das Pirâmides", "requirement": "90%+ em Tópico 3"},
+    {"name": "Guia Migratório", "requirement": "Zero erros em Tópico 4 Eliminatórias"},
+    {"name": "Visionário 2050", "requirement": "Completar todos os tópicos"}
+  ]
+}
+```
+
+### Calibragem Dinâmica de Dificuldade
+- **Sistema adaptativo**: Se aluno acertar >95% no N1, pular para N2 na próxima sessão
+- **Recuperação inteligente**: Se errar <70% no N2, sugerir revisão de conceitos específicos antes de retry
+- **Modo "Desafio Extra"**: Para alunos com >90% em todos os níveis, liberar questões bônus de vestibulares reais (ENEM, FUVEST, UNICAMP)
+
+---
+
+## 📊 5. RELATÓRIO PEDAGÓGICO: Dashboards para Professores
+
+### Dashboard Principal: Visão Geral da Turma
+```
+📈 Turma 7º Ano A - Geografia Cap. 6/7
+├─ 🎯 Média Geral: 78.4/100
+├─ 📚 Tópico com maior dificuldade: T4 - Migrações (62.1%)
+├─ ⚡ Tópico com melhor desempenho: T1 - População Absoluta (91.3%)
+├─ 👥 Alunos precisando de intervenção: 7/32
+└─ 🔄 Revisões pendentes (espaçadas): 143 questões
+```
+
+### Mapa de Calor de Erros por Conceito
+```
+🔥 Heatmap de Conceitos - Tópico 4: Migrações
+
+Conceito                  | Erros Comuns | % Turma | Intervenção Sugerida
+--------------------------|--------------|---------|---------------------
+Definição de pendular     | Confunde com sazonal | 45% | Flashcard + vídeo 30s
+Fatores do êxodo rural    | Foca só na seca | 62% | Infográfico multifatorial
+Xenofobia interna         | Restringe a estrangeiros | 58% | Debate guiado + casos reais
+Cidades dormitório        | Inverte definição | 38% | Mapa interativo + quiz rápido
+Retirantes                | Visão apenas naturalista | 71% | Texto crítico + discussão
+
+🎯 Ação Recomendada: 
+   • Sessão síncrona de 15min sobre "Fatores do Êxodo Rural"
+   • Atividade em grupo: "Mapeando minha história migratória familiar"
+```
+
+### Relatório Individual do Aluno
+```
+👤 Maria Silva - Progresso em Geografia Cap. 6/7
+
+📊 Desempenho por Nível:
+   N1: ████████████████ 92% ✅ Consolidado
+   N2: ████████████░░░░ 76% 🔄 Em progresso  
+   N3: ██████░░░░░░░░░░ 38% ⚠️ Precisa reforçar
+
+🎯 Pontos Fortes:
+   • Memorização de definições (N1)
+   • Interpretação de gráficos simples
+
+🔧 Áreas de Desenvolvimento:
+   • Análise crítica de textos longos (N3)
+   • Conexão entre fatores econômicos e migratórios
+
+📅 Próximas Revisões Espaçadas:
+   • T2-Q14 (Crescimento Vegetativo) - Amanhã, 14h
+   • T4-Q07 (Xenofobia) - Quinta, 10h
+
+💡 Sugestão Personalizada:
+   "Maria, você domina os conceitos básicos! 
+    Para avançar no Nível 3, experimente ler a 
+    justificativa das questões que errou em voz alta. 
+    Isso ajuda a fixar o raciocínio. 🎧"
+```
+
+### Exportação e Integração
+- **Formatos**: PDF para impressão, CSV para planilhas, API para integração com sistemas escolares (Google Classroom, Moodle)
+- **Frequência**: Relatórios automáticos semanais + alertas em tempo real para quedas bruscas de desempenho
+- **Privacidade**: Dados anonimizados para análises agregadas; acesso individual protegido por LGPD
+
+---
+
+## 🗓️ Cronograma de Implementação Sugerido
+
+| Fase | Atividades | Duração | Responsável |
+|------|-----------|---------|-------------|
+| **Fase 1: Estrutura** | Schema CMS, tags BNCC, importação em lote | 2 semanas | Dev Backend + Pedagogo |
+| **Fase 2: Algoritmos** | Revisão espaçada, progressão Modo Batalha | 3 semanas | Dev Fullstack + Data Scientist |
+| **Fase 3: Multimídia** | Áudios, ícones, pop-ups, acessibilidade | 2 semanas | UX/UI + Produtor de Conteúdo |
+| **Fase 4: Dashboards** | Relatórios professor/aluno, heatmap, exportação | 2 semanas | Dev Frontend + Analista Pedagógico |
+| **Fase 5: Testes** | QA pedagógico, teste com grupo piloto, ajustes | 2 semanas | QA + Professores Parceiros |
+| **TOTAL** | | **11 semanas** | |
+
+---
+
+## ✅ Checklist de Validação Final
+
+- [ ] Todas as 450 questões importadas com tags completas
+- [ ] Algoritmo de repetição espaçada testado com 3 cenários (acerto, erro, misto)
+- [ ] Micro-áudios gravados, normalizados e com alternativas visuais
+- [ ] Progressão Modo Batalha calibrada com grupo piloto (n=30)
+- [ ] Dashboards geram insights acionáveis para professores
+- [ ] Acessibilidade verificada (WCAG 2.1 AA): contraste, navegação por teclado, screen reader
+- [ ] LGPD: consentimento para dados de aprendizado, anonimização para analytics
+- [ ] Documentação técnica + manual pedagógico para equipe de suporte
+
+---
+

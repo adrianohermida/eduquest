@@ -1,0 +1,347 @@
+# ⚔️ PASSO 4: MODO BATALHA E CALIBRAGEM VESTIBULAR
+*(Geografia 7º Ano | Capítulos 6 e 7 | 450 questões | Progressão Kumon → Vestibular)*
+
+---
+
+## 🎮 4.1 Fluxo de Progressão entre Níveis de Dificuldade
+
+O "Modo Batalha" é o coração pedagógico da plataforma: um sistema de progressão gamificado que transforma o estudo em uma jornada de conquista, alinhado ao método Kumon (autonomia + repetição) e calibrado para preparação vestibular.
+
+### 📊 Diagrama de Fluxo do Modo Batalha
+```
+┌─────────────────────────────────────┐
+│  🌱 NÍVEL 1 - FIXAÇÃO KUMON         │
+│  • Objetivo: Automatizar conceitos   │
+│  • Questões: 15 por tópico          │
+│  • Tipos: MC simples, V/F           │
+│  • Tempo: Sem limite                │
+│  • Feedback: Imediato + justificação│
+│  • Gatilhos: Ícones + áudios 2-3s   │
+│                                     │
+│  🔓 DESBLOQUEIO: ≥85% de acerto    │
+│  ❌ ERRO: Micro-aula 30s + retry   │
+└────────────┬────────────────────────┘
+             ▼
+┌─────────────────────────────────────┐
+│  🌿 NÍVEL 2 - APLICAÇÃO ESCOLAR     │
+│  • Objetivo: Interpretar contexto    │
+│  • Questões: 20 por tópico          │
+│  • Tipos: MC com texto, gráficos    │
+│  • Tempo: 90s por questão           │
+│  • Feedback: Após bloco de 5        │
+│  • Gatilhos: Pop-ups + dicas visuais│
+│                                     │
+│  🔓 DESBLOQUEIO: ≥80% de acerto    │
+│  ❌ ERRO: Revisão guiada + hint    │
+└────────────┬────────────────────────┘
+             ▼
+┌─────────────────────────────────────┐
+│  🌳 NÍVEL 3 + ELIMINATÓRIAS         │
+│  • Objetivo: Análise crítica vestibular│
+│  • Questões: 15 por tópico          │
+│  • Tipos: Dissertativas, múltiplas  │
+│  • Tempo: 120s por questão          │
+│  • Feedback: Ao final + ranking     │
+│  • Bônus: Questões ENEM/FUVEST      │
+│                                     │
+│  🏆 CONCLUSÃO: Certificado + Badge │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 🎯 4.2 Sistema de Pontuação Dinâmica e Streaks
+
+### 📈 Tabela de Pontuação por Nível
+| Ação | N1 (Fixação) | N2 (Aplicação) | N3 (Vestibular) | Eliminatória |
+|------|-------------|---------------|-----------------|--------------|
+| ✅ Acerto simples | +10 pts | +15 pts | +25 pts | +40 pts |
+| ✅ Acerto com streak | +11 pts (1.1x) | +17 pts (1.1x) | +28 pts (1.1x) | +44 pts (1.1x) |
+| ✅ Streak 5+ | +13 pts (1.25x) | +19 pts (1.25x) | +31 pts (1.25x) | +50 pts (1.25x) |
+| ✅ Streak 10+ | +15 pts (1.5x) | +23 pts (1.5x) | +38 pts (1.5x) | +60 pts (1.5x) |
+| ⏱️ Bônus tempo (<50% limite) | +2 pts | +3 pts | +5 pts | +8 pts |
+| 💡 Dica usada | -3 pts | -4 pts | -6 pts | -10 pts |
+| ❌ Erro | 0 pts + micro-aula | 0 pts + revisão | 0 pts + justificativa | 0 pts + análise |
+
+### 🔥 Sistema de Streaks (Motivação por Dopamina)
+```javascript
+// streakManager.js
+class StreakManager {
+  constructor(studentId) {
+    this.studentId = studentId;
+    this.currentStreak = 0;
+    this.bestStreak = 0;
+    this.lastAnswerTimestamp = null;
+  }
+
+  recordAnswer(isCorrect, responseTimeMs) {
+    const now = Date.now();
+    
+    // Reset streak se > 24h sem atividade
+    if (this.lastAnswerTimestamp && (now - this.lastAnswerTimestamp) > 86400000) {
+      this.currentStreak = 0;
+    }
+    
+    if (isCorrect) {
+      this.currentStreak++;
+      this.bestStreak = Math.max(this.bestStreak, this.currentStreak);
+      
+      // Gatilhos emocionais por marco
+      if ([3, 5, 10, 20].includes(this.currentStreak)) {
+        triggerCelebration(this.currentStreak);
+        awardBadge(`streak_${this.currentStreak}`);
+      }
+    } else {
+      this.currentStreak = 0;
+      triggerEncouragement(); // "Quase! Vamos tentar de novo?"
+    }
+    
+    this.lastAnswerTimestamp = now;
+    return this.calculatePoints(isCorrect, responseTimeMs);
+  }
+
+  calculatePoints(isCorrect, responseTimeMs) {
+    let basePoints = this.getBasePointsForLevel();
+    let multiplier = 1.0;
+    
+    // Aplicar multiplicador de streak
+    if (this.currentStreak >= 10) multiplier = 1.5;
+    else if (this.currentStreak >= 5) multiplier = 1.25;
+    else if (this.currentStreak >= 3) multiplier = 1.1;
+    
+    // Bônus de tempo (responder rápido com acerto)
+    if (isCorrect && responseTimeMs < this.getTimeLimit() * 0.5) {
+      basePoints += Math.floor(basePoints * 0.2);
+    }
+    
+    return isCorrect ? Math.floor(basePoints * multiplier) : 0;
+  }
+}
+```
+
+### 🏆 Sistema de Badges e Conquistas
+| Badge | Ícone | Requisito | Gatilho Emocional |
+|-------|-------|-----------|------------------|
+| 🌟 Explorador Demográfico | `👥` | Completar Tópico 1 N1-N3 | Curiosidade + Conquista |
+| 🔢 Mestre dos Cálculos | `📊` | 90%+ em questões de densidade | Confiança + Clareza |
+| 🧭 Guia Migratório | `🧳` | Zero erros em Tópico 4 Eliminatórias | Pertencimento + Justiça |
+| 🏙️ Urbanista Junior | `🏙️` | Analisar 5 gráficos de urbanização | Visão + Responsabilidade |
+| 🤝 Embaixador da Diversidade | `🌍` | Completar Tópico 8 com 85%+ | Empatia + Respeito |
+| 🔮 Visionário 2050 | `📈` | Completar todos os tópicos N3 | Visão de futuro + Orgulho |
+| 🔥 Streak Master | `⚡` | 20 acertos consecutivos | Dopamina + Autoeficácia |
+| 🎯 Precisão Vestibular | `🎯` | 95%+ em Eliminatórias | Confiança para o ENEM |
+
+---
+
+## ⏱️ 4.3 Calibragem de Tempo por Nível (Kumon → Vestibular)
+
+### 📊 Tabela de Limites de Tempo por Tipo de Questão
+| Tipo de Questão | N1 (Sem limite) | N2 (Escolar) | N3 (Vestibular) | Eliminatória |
+|----------------|-----------------|--------------|-----------------|--------------|
+| Múltipla Escolha (MC) | ∞ | 90s | 120s | 150s |
+| Verdadeiro/Falso (V/F) | ∞ | 60s | 90s | 120s |
+| Interpretação de Gráfico | ∞ | 120s | 180s | 240s |
+| Dissertativa Curta | ∞ | 180s | 300s | 420s |
+| Eliminatória (múltiplas afirmações) | - | - | 240s | 300s |
+
+### 🧠 Justificativa Pedagógica dos Tempos
+- **N1 (Kumon)**: Sem limite para focar na **fixação conceitual** sem pressão. O aluno constrói confiança.
+- **N2 (Escolar)**: Tempo moderado para simular **provas bimestrais**, desenvolvendo gestão de tempo.
+- **N3 (Vestibular)**: Tempo realista para **ENEM/FUVEST**, treinando leitura dinâmica e decisão sob pressão.
+- **Eliminatórias**: Tempo estendido para **análise crítica complexa**, exigindo síntese e eliminação lógica.
+
+### ⚙️ Implementação do Timer com Feedback Visual
+```jsx
+// QuestionTimer.jsx
+const QuestionTimer = ({ timeLimit, onTimeUp, level }) => {
+  const [remaining, setRemaining] = useState(timeLimit);
+  const [warning, setWarning] = useState(false);
+  
+  useEffect(() => {
+    if (level === 'N1') return; // Sem timer no N1
+    
+    const timer = setInterval(() => {
+      setRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          onTimeUp();
+          return 0;
+        }
+        // Gatilho visual/auditivo nos últimos 20% do tempo
+        if (prev === Math.floor(timeLimit * 0.2) && !warning) {
+          setWarning(true);
+          AudioEngine.playSFX('sfx_time_warning');
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [timeLimit, level]);
+  
+  if (level === 'N1') return null;
+  
+  const percentage = (remaining / timeLimit) * 100;
+  const color = percentage > 50 ? '#10B981' : percentage > 20 ? '#F59E0B' : '#EF4444';
+  
+  return (
+    <div className="timer-container" role="timer" aria-live="polite">
+      <div className="timer-bar" style={{ width: `${percentage}%`, backgroundColor: color }} />
+      <span className="timer-text">{Math.ceil(remaining)}s</span>
+      {warning && <span className="timer-warning">⚠️ Tempo acabando!</span>}
+    </div>
+  );
+};
+```
+
+---
+
+## 🎲 4.4 Banco de Questões Bônus (ENEM/FUVEST Adaptadas)
+
+### 🔍 Critérios de Seleção das Questões Bônus
+1. **Alinhamento BNCC**: Todas as questões mapeadas para habilidades EF07GE01-EF07GE05
+2. **Adaptação Cognitiva**: Linguagem simplificada para 7º ano, mantendo o raciocínio vestibular
+3. **Contextualização Regional**: Incluir exemplos do Nordeste (foco do PDF) para engajamento
+4. **Interdisciplinaridade**: Conectar Geografia com História, Sociologia e Atualidades
+
+### 📦 Exemplo de Questão Bônus Adaptada (ENEM 2019 - Geografia)
+```json
+{
+  "question_id": "BONUS_ENEM_T4_Q001",
+  "original_source": "ENEM 2019 - Questão 72",
+  "adapted_for_grade": 7,
+  "content": {
+    "stem": "Observe o mapa dos fluxos migratórios internos no Brasil. A seta mais grossa saindo do Nordeste em direção ao Sudeste representa historicamente:",
+    "image": "map_fluxos_migratorios_simplified.svg",
+    "options": [
+      "a) Turistas em busca de praias",
+      "b) Trabalhadores em busca de emprego nas indústrias",
+      "c) Estudantes em busca de universidades",
+      "d) Aposentados em busca de clima ameno"
+    ],
+    "correct_answer": "B",
+    "justification": "Entre 1960-1980, a industrialização do Sudeste atraiu milhões de nordestinos em busca de trabalho. Esse fluxo moldou a demografia brasileira.",
+    "tip": {
+      "text": "Pense: 'Onde tem fábrica, tem emprego. Onde tem emprego, tem gente.'",
+      "icon": "🏭",
+      "audio": "tip_industrializacao_2s.mp3"
+    }
+  },
+  "classification": {
+    "difficulty_level": "N3_BONUS",
+    "cognitive_skills": ["análise", "interpretação de mapa", "contexto histórico"],
+    "emotional_triggers": ["identidade regional", "empatia histórica"]
+  },
+  "unlock_condition": {
+    "requires": "Tópico 4 N3 concluído com ≥80%",
+    "badge_reward": "Guia Migratório"
+  }
+}
+```
+
+### 🗂️ Estrutura do Banco Bônus por Tópico
+| Tópico | Questões Bônus | Fonte Original | Habilidade BNCC Foco |
+|--------|---------------|----------------|---------------------|
+| 1. Pop. Abs/Rel | 5 | ENEM 2018, FUVEST 2020 | EF07GE01 (Distribuição populacional) |
+| 2. Cresc. Vegetativo | 5 | UNICAMP 2019, ENEM 2021 | EF07GE02 (Dinâmica populacional) |
+| 3. Estrutura Etária | 5 | FUVEST 2021, ENEM 2020 | EF07GE03 (Pirâmides etárias) |
+| 4. Migrações | 8 | ENEM 2019, UNESP 2022 | EF07GE02, EF07GE04 (Fluxos migratórios) |
+| 5. Urbanização | 7 | FUVEST 2022, ENEM 2021 | EF07GE03 (Processo de urbanização) |
+| 6. Êxodo Rural | 5 | ENEM 2020, UNICAMP 2021 | EF07GE02 (Transformações no campo) |
+| 7. Pendular/Sazonal | 5 | ENEM 2022, FUVEST 2023 | EF07GE02 (Mobilidade interna) |
+| 8. Xenofobia/Direitos | 5 | ENEM 2021, UNESP 2023 | EF07GE04 (Diversidade e direitos) |
+| 9. Projeções Futuras | 5 | FUVEST 2023, ENEM 2022 | EF07GE05 (Projeções e desafios) |
+| **TOTAL** | **50 questões bônus** | **Vestibulares reais** | **100% cobertura BNCC** |
+
+---
+
+## 📊 4.5 Dashboard de Desempenho em Tempo Real com Heatmaps
+
+### 🎨 Componente React: BattleDashboard
+```jsx
+const BattleDashboard = ({ studentProgress, topicId }) => {
+  const stats = calculateTopicStats(studentProgress, topicId);
+  
+  return (
+    <div className="battle-dashboard">
+      {/* Barra de Progresso por Nível */}
+      <LevelProgress 
+        n1Score={stats.n1} 
+        n2Score={stats.n2} 
+        n3Score={stats.n3}
+        unlockThresholds={{ n1: 85, n2: 80 }}
+      />
+      
+      {/* Heatmap de Erros por Conceito */}
+      <ConceptHeatmap 
+        errors={stats.errorsByConcept}
+        concepts={[
+          { id: 'pop_absoluta', label: 'Pop. Absoluta', color: '#3B82F6' },
+          { id: 'densidade', label: 'Densidade Demográfica', color: '#10B981' },
+          { id: 'fecundidade', label: 'Taxa de Fecundidade', color: '#8B5CF6' },
+          { id: 'migracao', label: 'Migrações', color: '#F59E0B' },
+          { id: 'urbanizacao', label: 'Urbanização', color: '#EF4444' }
+        ]}
+      />
+      
+      {/* Streak e Badges */}
+      <StreakDisplay 
+        current={stats.currentStreak} 
+        best={stats.bestStreak}
+        badges={stats.earnedBadges}
+      />
+      
+      {/* Recomendações Personalizadas */}
+      <PersonalizedTips 
+        weakConcepts={stats.weakConcepts}
+        suggestedReview={stats.suggestedReviewQuestions}
+      />
+    </div>
+  );
+};
+```
+
+### 🔥 Heatmap de Erros: Visualização Pedagógica
+```
+🔥 Heatmap de Conceitos - Tópico 4: Migrações
+
+Conceito                  | Erros Comuns | % Turma | Intervenção Sugerida
+--------------------------|--------------|---------|---------------------
+Definição de pendular     | Confunde com sazonal | 45% | Flashcard + vídeo 30s
+Fatores do êxodo rural    | Foca só na seca | 62% | Infográfico multifatorial
+Xenofobia interna         | Restringe a estrangeiros | 58% | Debate guiado + casos reais
+Cidades dormitório        | Inverte definição | 38% | Mapa interativo + quiz rápido
+Retirantes                | Visão apenas naturalista | 71% | Texto crítico + discussão
+
+🎯 Ação Automática do Sistema:
+   • Se erro > 50% em "Fatores do êxodo rural": 
+     → Liberar micro-aula "Êxodo Rural: Além da Seca"
+     → Sugerir revisão em grupo síncrono
+     → Ajustar dificuldade das próximas questões
+```
+
+### 📈 Métricas de Desempenho em Tempo Real
+| Métrica | Cálculo | Uso Pedagógico | Gatilho Emocional |
+|---------|---------|----------------|------------------|
+| `Taxa de Acerto por Nível` | `(Acertos / Total) × 100` | Identificar progresso e bloqueios | Confiança ao subir de nível |
+| `Tempo Médio de Resposta` | `Soma(tempo_resposta) / Total` | Detectar dúvidas ou domínio | Orgulho ao responder rápido |
+| `Índice de Streak` | `Maior sequência de acertos` | Medir consistência e foco | Dopamina ao bater recordes |
+| `Conceitos Consolidados` | `% de questões Stage ≥3 no SRS` | Mostrar fixação de longo prazo | Serotonina ao ver progresso |
+| `Heatmap de Erros` | `Agrupamento por concept_cluster` | Direcionar intervenções focalizadas | Alívio ao receber ajuda certa |
+
+---
+
+## ✅ Checklist de Validação do Passo 4
+
+- [ ] Fluxo de progressão N1→N2→N3 implementado com thresholds configuráveis (85%/80%)
+- [ ] Sistema de pontuação com streaks, bônus de tempo e penalidade por dicas
+- [ ] Badges e conquistas com ícones SVG e gatilhos de celebração (áudio + animação)
+- [ ] Timer adaptativo por nível e tipo de questão, com warning visual/auditivo
+- [ ] Banco de 50 questões bônus adaptadas de vestibulares reais (ENEM/FUVEST/UNICAMP)
+- [ ] Dashboard em tempo real com heatmap de erros, streaks e recomendações personalizadas
+- [ ] Integração com SRS: erros no Modo Batalha resetam stage e disparam micro-aulas
+- [ ] Acessibilidade: timer com alerta sonoro opcional, heatmap com padrões para daltonismo
+- [ ] Logs de desempenho enviados ao analytics para ajuste pedagógico contínuo
+- [ ] Testes A/B calibrando thresholds de desbloqueio com grupo piloto (n=50)
+
+---

@@ -1,0 +1,369 @@
+# 🔧 PASSO 1: INTEGRAÇÃO TÉCNICA - CMS com Tags e Estrutura de Dados
+
+Vou detalhar a implementação do **primeiro passo** do plano técnico: a estruturação das 450 questões no CMS da plataforma Eduquest com tags de dificuldade, tópico e habilidades BNCC.
+
+---
+
+## 📦 1.1 Schema de Dados da Questão (JSON Completo)
+
+```json
+{
+  "meta": {
+    "question_id": "GEO7_CAP6_T1_Q001",
+    "version": "1.0",
+    "created_at": "2026-05-27T00:00:00Z",
+    "updated_at": "2026-05-27T00:00:00Z",
+    "status": "published"
+  },
+  "content": {
+    "stem": "O termo que indica o número total de habitantes de um território é:",
+    "type": "multiple_choice",
+    "options": [
+      {"id": "A", "text": "Densidade demográfica"},
+      {"id": "B", "text": "População relativa"},
+      {"id": "C", "text": "População absoluta"},
+      {"id": "D", "text": "Crescimento vegetativo"}
+    ],
+    "correct_answer": "C",
+    "justification": "População absoluta é a contagem total de pessoas, sem divisão por área. É o número 'bruto' de habitantes.",
+    "tip": {
+      "text": "'Absoluta' = número 'absoluto', sem dividir por área.",
+      "icon": "👥",
+      "audio": {
+        "file": "tip_pop_absoluta_2s.mp3",
+        "duration": 2.3,
+        "transcript": "Absoluta: número total, sem divisão."
+      }
+    }
+  },
+  "classification": {
+    "chapter": 6,
+    "topic_id": 1,
+    "topic_name": "População Absoluta, Relativa e Distribuição Espacial",
+    "difficulty_level": "N1",
+    "question_type": "MC",
+    "cognitive_skills": ["memorização", "identificação", "código_duplo"],
+    "emotional_triggers": ["curiosidade", "confirmação"]
+  },
+  "bncc": {
+    "skills": ["EF07GE01", "EF07GE02"],
+    "objects_of_knowledge": ["Dinâmica populacional brasileira", "Distribuição territorial da população"],
+    "competencies": ["Analisar a distribuição territorial da população brasileira"]
+  },
+  "spaced_repetition": {
+    "enabled": true,
+    "initial_interval_seconds": 3600,
+    "progression": [3600, 86400, 259200, 604800, 1296000],
+    "reset_on_error": true,
+    "consolidation_threshold": 5
+  },
+  "battle_mode": {
+    "unlock_requirements": {
+      "previous_level": null,
+      "min_score_to_unlock_next": 85
+    },
+    "time_limit_seconds": null,
+    "points_on_correct": 10,
+    "streak_bonus_multiplier": 1.1
+  },
+  "analytics": {
+    "concept_cluster": "demografia_basica",
+    "common_misconceptions": [
+      "confundir_populacao_absoluta_com_relativa",
+      "associar_densidade_apenas_a_paises_pequenos"
+    ],
+    "tracking_events": ["viewed", "answered", "hint_used", "justification_read"]
+  },
+  "accessibility": {
+    "screen_reader_text": "Questão de múltipla escolha: O termo que indica o número total de habitantes de um território é. Opções: A) Densidade demográfica, B) População relativa, C) População absoluta, D) Crescimento vegetativo.",
+    "high_contrast_mode": true,
+    "font_size_adjustable": true
+  }
+}
+```
+
+---
+
+## 🏷️ 1.2 Sistema de Tags e Classificação
+
+### Tabela de Tags Obrigatórias
+
+| Categoria | Campo | Valores Permitidos | Exemplo |
+|-----------|-------|-------------------|---------|
+| **Estrutura** | `chapter` | 6, 7 | `6` |
+| | `topic_id` | 1-9 | `1` |
+| | `difficulty_level` | N1, N2, N3, ELIM | `N1` |
+| | `question_type` | MC, VF, DISS, ELIM | `MC` |
+| **BNCC** | `skills` | Array de códigos EF07GEXX | `["EF07GE01"]` |
+| | `objects_of_knowledge` | Array de temas | `["Dinâmica populacional"]` |
+| **Pedagógico** | `cognitive_skills` | memorização, aplicação, análise, síntese, avaliação | `["memorização", "código_duplo"]` |
+| | `emotional_triggers` | curiosidade, pertencimento, conquista, empatia | `["curiosidade"]` |
+| **Técnico** | `spaced_repetition.enabled` | boolean | `true` |
+| | `battle_mode.min_score_to_unlock_next` | 0-100 | `85` |
+
+### Script de Validação de Tags (Python)
+```python
+# validators/question_schema.py
+from jsonschema import validate, ValidationError
+
+QUESTION_SCHEMA = {
+    "type": "object",
+    "required": ["meta", "content", "classification", "bncc"],
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": ["question_id", "status"],
+            "properties": {
+                "question_id": {"type": "string", "pattern": "^GEO7_CAP[67]_T[1-9]_Q\d{3}$"},
+                "status": {"enum": ["draft", "published", "archived"]}
+            }
+        },
+        "classification": {
+            "type": "object",
+            "required": ["difficulty_level", "topic_id"],
+            "properties": {
+                "difficulty_level": {"enum": ["N1", "N2", "N3", "ELIM"]},
+                "topic_id": {"type": "integer", "minimum": 1, "maximum": 9}
+            }
+        },
+        "bncc": {
+            "type": "object",
+            "properties": {
+                "skills": {
+                    "type": "array",
+                    "items": {"type": "string", "pattern": "^EF07GE\d{2}$"}
+                }
+            }
+        }
+    }
+}
+
+def validate_question(question_json: dict) -> bool:
+    try:
+        validate(instance=question_json, schema=QUESTION_SCHEMA)
+        return True
+    except ValidationError as e:
+        print(f"Erro de validação em {question_json.get('meta', {}).get('question_id')}: {e.message}")
+        return False
+```
+
+---
+
+## 🗄️ 1.3 Estrutura do Banco de Dados (SQL Schema)
+
+```sql
+-- Tabela principal de questões
+CREATE TABLE questions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    question_id VARCHAR(50) UNIQUE NOT NULL,
+    chapter INTEGER CHECK (chapter IN (6, 7)),
+    topic_id INTEGER CHECK (topic_id BETWEEN 1 AND 9),
+    difficulty_level VARCHAR(4) CHECK (difficulty_level IN ('N1', 'N2', 'N3', 'ELIM')),
+    question_type VARCHAR(10) CHECK (question_type IN ('MC', 'VF', 'DISS', 'ELIM')),
+    
+    -- Conteúdo
+    stem TEXT NOT NULL,
+    options JSONB,
+    correct_answer VARCHAR(10),
+    justification TEXT,
+    tip_text TEXT,
+    tip_icon VARCHAR(10),
+    tip_audio_file VARCHAR(100),
+    
+    -- Classificação pedagógica
+    bncc_skills TEXT[],
+    cognitive_skills TEXT[],
+    emotional_triggers TEXT[],
+    concept_cluster VARCHAR(50),
+    
+    -- Configurações de sistema
+    spaced_repetition_enabled BOOLEAN DEFAULT true,
+    sr_intervals INTEGER[] DEFAULT '{3600,86400,259200,604800,1296000}',
+    battle_unlock_score INTEGER DEFAULT 85,
+    points_value INTEGER DEFAULT 10,
+    
+    -- Metadados
+    status VARCHAR(20) DEFAULT 'draft',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Índices para performance
+    INDEX idx_chapter_topic (chapter, topic_id),
+    INDEX idx_difficulty (difficulty_level),
+    INDEX idx_bncc (bncc_skills),
+    INDEX idx_concept (concept_cluster)
+);
+
+-- Tabela de acompanhamento do aluno por questão
+CREATE TABLE student_question_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID NOT NULL,
+    question_id UUID REFERENCES questions(id),
+    
+    -- Progresso de repetição espaçada
+    sr_current_stage INTEGER DEFAULT 0,
+    sr_next_review_at TIMESTAMPTZ,
+    sr_consolidated BOOLEAN DEFAULT false,
+    
+    -- Histórico de respostas
+    total_attempts INTEGER DEFAULT 0,
+    correct_attempts INTEGER DEFAULT 0,
+    last_answered_at TIMESTAMPTZ,
+    last_was_correct BOOLEAN,
+    
+    -- Metadados de desempenho
+    avg_response_time_seconds DECIMAL(5,2),
+    hints_used_count INTEGER DEFAULT 0,
+    
+    UNIQUE(student_id, question_id),
+    INDEX idx_student_reviews (student_id, sr_next_review_at),
+    INDEX idx_due_for_review (sr_next_review_at) WHERE sr_consolidated = false
+);
+```
+
+---
+
+## 📤 1.4 Script de Importação em Lote (CSV → CMS)
+
+### Formato do CSV de Entrada
+```csv
+question_id,chapter,topic_id,difficulty,question_type,stem,options_json,correct_answer,justification,tip_text,tip_icon,bncc_skills,cognitive_skills
+GEO7_CAP6_T1_Q001,6,1,N1,MC,"O termo que indica o número total de habitantes de um território é:","[{""id"":""A"",""text"":""Densidade demográfica""},{""id"":""B"",""text"":""População relativa""},{""id"":""C"",""text"":""População absoluta""},{""id"":""D"",""text"":""Crescimento vegetativo""}]",C,"População absoluta é a contagem total de pessoas, sem divisão por área.","'Absoluta' = número 'absoluto', sem dividir por área.",👥,"[""EF07GE01"",""EF07GE02"]","[""memorização"",""código_duplo""]"
+```
+
+### Script Python de Importação
+```python
+# scripts/import_questions.py
+import csv
+import json
+import psycopg2
+from datetime import datetime
+from validators.question_schema import validate_question
+
+def import_questions_from_csv(csv_path: str, db_config: dict):
+    conn = psycopg2.connect(**db_config)
+    cursor = conn.cursor()
+    
+    with open(csv_path, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        
+        for row in reader:
+            # Construir JSON da questão
+            question = {
+                "meta": {
+                    "question_id": row['question_id'],
+                    "status": "published",
+                    "created_at": datetime.utcnow().isoformat()
+                },
+                "content": {
+                    "stem": row['stem'],
+                    "type": "multiple_choice" if row['question_type'] == 'MC' else row['question_type'],
+                    "options": json.loads(row['options_json']),
+                    "correct_answer": row['correct_answer'],
+                    "justification": row['justification'],
+                    "tip": {
+                        "text": row['tip_text'],
+                        "icon": row['tip_icon']
+                    }
+                },
+                "classification": {
+                    "chapter": int(row['chapter']),
+                    "topic_id": int(row['topic_id']),
+                    "difficulty_level": row['difficulty'],
+                    "question_type": row['question_type'],
+                    "cognitive_skills": json.loads(row['cognitive_skills'])
+                },
+                "bncc": {
+                    "skills": json.loads(row['bncc_skills'])
+                },
+                "spaced_repetition": {"enabled": True},
+                "battle_mode": {"min_score_to_unlock_next": 85 if row['difficulty'] == 'N1' else 80}
+            }
+            
+            # Validar schema
+            if not validate_question(question):
+                print(f"❌ Questão {row['question_id']} inválida - pulando")
+                continue
+            
+            # Inserir no banco
+            cursor.execute("""
+                INSERT INTO questions (
+                    question_id, chapter, topic_id, difficulty_level, question_type,
+                    stem, options, correct_answer, justification, tip_text, tip_icon,
+                    bncc_skills, cognitive_skills, spaced_repetition_enabled,
+                    battle_unlock_score, status
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (question_id) DO UPDATE SET
+                    updated_at = NOW(),
+                    stem = EXCLUDED.stem,
+                    options = EXCLUDED.options
+            """, (
+                row['question_id'], row['chapter'], row['topic_id'], row['difficulty'],
+                row['question_type'], row['stem'], row['options_json'],
+                row['correct_answer'], row['justification'], row['tip_text'],
+                row['tip_icon'], json.loads(row['bncc_skills']),
+                json.loads(row['cognitive_skills']), True,
+                85 if row['difficulty'] == 'N1' else 80, 'published'
+            ))
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print(f"✅ Importação concluída: {reader.line_num - 1} questões processadas")
+```
+
+---
+
+## 🔍 1.5 Interface de Administração no CMS
+
+### Funcionalidades do Painel de Gestão de Questões
+
+```
+📋 Painel de Questões - Eduquest CMS
+├─ 🔍 Filtros Avançados
+│  ├─ Por capítulo: [6 ▼] [7 ▼]
+│  ├─ Por tópico: [Todos ▼] [1-9]
+│  ├─ Por dificuldade: [N1] [N2] [N3] [ELIM]
+│  ├─ Por habilidade BNCC: [EF07GE01 ▼]
+│  └─ Por cluster conceitual: [demografia_basica ▼]
+│
+├─ 📊 Métricas Rápidas
+│  ├─ Total de questões: 450
+│  ├─ Por dificuldade: N1(135) | N2(180) | N3(105) | ELIM(30)
+│  ├─ Cobertura BNCC: 100% dos objetivos do Cap. 6/7
+│  └─ Taxa de acerto média da turma: 78.4%
+│
+├─ ✏️ Editor de Questão
+│  ├─ [Stem] Campo de texto rico com formatação
+│  ├─ [Opções] Grid editável com preview em tempo real
+│  ├─ [Justificativa] Área de texto com dicas pedagógicas
+│  ├─ [Tags] Seleção visual de habilidades BNCC (drag-and-drop)
+│  ├─ [Multimídia] Upload de áudio (2-3s) + seleção de ícone
+│  └─ [Preview] Visualização mobile/desktop antes de publicar
+│
+├─ 🔄 Ações em Lote
+│  ├─ [✓ Selecionar todas] → [Atualizar tags BNCC]
+│  ├─ [✓ Selecionar por tópico] → [Ajustar dificuldade]
+│  └─ [Exportar] → CSV / JSON / PDF para impressão
+│
+└─ 📈 Analytics Integrado
+   ├─ Heatmap de erros por conceito (clique para detalhar)
+   ├─ Tempo médio de resposta por nível de dificuldade
+   └─ Questões com maior taxa de erro → sugerir revisão
+```
+
+---
+
+## ✅ Checklist de Validação do Passo 1
+
+- [ ] Schema JSON validado com jsonschema para todas as 450 questões
+- [ ] Banco de dados criado com índices otimizados para consultas frequentes
+- [ ] Script de importação testado com amostra de 50 questões (Tópico 1)
+- [ ] Interface CMS com filtros por capítulo, tópico, dificuldade e BNCC funcional
+- [ ] Sistema de tags com validação de códigos BNCC (regex: `^EF07GE\d{2}$`)
+- [ ] Preview multimodal (texto + ícone + áudio) implementado no editor
+- [ ] Exportação para CSV/JSON funcionando para backup e migração
+- [ ] Logs de importação com relatório de erros/sucesso por questão
+
+---
+
