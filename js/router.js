@@ -1032,6 +1032,11 @@ const Router = {
         if (!chapterId) { this.renderHome(container); return; }
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
 
+        // Dynamic metadata lookup — supports multiple chapters via CHAPTERS_REGISTRY
+        if (chapterId && window.CHAPTERS_REGISTRY?.[chapterId]) {
+            window.CHAPTER_METADATA = window.CHAPTERS_REGISTRY[chapterId];
+        }
+
         const meta   = window.CHAPTER_METADATA || { title: 'Capítulo', icon: '📚', description: '', totalStages: 5, stages: [] };
         const stages = meta.stages || [];
 
@@ -1145,6 +1150,11 @@ const Router = {
     renderStagePrep(container, chapterId, stageId) {
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         if (!chapterId || !stageId) { this.renderHome(container); return; }
+
+        // Sync chapter metadata from registry
+        if (chapterId && window.CHAPTERS_REGISTRY?.[chapterId]) {
+            window.CHAPTER_METADATA = window.CHAPTERS_REGISTRY[chapterId];
+        }
 
         const stageVarName = stageId.toUpperCase();
         const stageData    = window[stageVarName];

@@ -29,8 +29,8 @@ const CONFIG = {
             color: '#3b82f6',
             grade: '7º Ano',
             chapters: [
-                { id: 'mat_racionais', title: 'Cap. 1 — Números Racionais', icon: '🔢', totalStages: 8, unlocked: false, description: 'Em breve' },
-                { id: 'mat_fracoes',   title: 'Cap. 2 — Frações',           icon: '➗', totalStages: 8, unlocked: false, description: 'Em breve' },
+                { id: 'mat_racionais', title: 'Cap. 1 — Números Racionais', icon: '🔢', totalStages: 8, unlocked: true,  description: 'Domine frações, decimais e negativos!' },
+                { id: 'mat_fracoes',   title: 'Cap. 2 — Frações Avançadas', icon: '➗', totalStages: 8, unlocked: false, description: 'Em breve' },
                 { id: 'mat_geom',      title: 'Cap. 3 — Geometria',         icon: '📐', totalStages: 8, unlocked: false, description: 'Em breve' }
             ]
         },
@@ -52,7 +52,7 @@ const CONFIG = {
             color: '#ec4899',
             grade: '7º Ano',
             chapters: [
-                { id: 'port_gram',   title: 'Cap. 1 — Gramática', icon: '📝', totalStages: 8, unlocked: false, description: 'Em breve' },
+                { id: 'port_gram',   title: 'Cap. 1 — Gramática', icon: '📝', totalStages: 8, unlocked: true,  description: 'Domine classes de palavras e sintaxe!' },
                 { id: 'port_redac',  title: 'Cap. 2 — Redação',   icon: '✍️', totalStages: 6, unlocked: false, description: 'Em breve' }
             ]
         },
@@ -120,6 +120,26 @@ const CONFIG = {
             totalStages: 12,
             unlocked: true,
             description: 'Combata os vilões microscópicos!'
+        },
+        {
+            id: 'mat_racionais',
+            title: 'Números Racionais',
+            subject: 'Matemática',
+            grade: '7º Ano',
+            icon: '🔢',
+            totalStages: 8,
+            unlocked: true,
+            description: 'Domine frações, decimais e negativos!'
+        },
+        {
+            id: 'port_gram',
+            title: 'Gramática',
+            subject: 'Português',
+            grade: '7º Ano',
+            icon: '📝',
+            totalStages: 8,
+            unlocked: true,
+            description: 'Domine classes de palavras e sintaxe!'
         }
     ],
 
