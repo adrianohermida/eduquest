@@ -97,6 +97,7 @@ const Router = {
             case 'speed-drill':   if (typeof SpeedDrill !== 'undefined') SpeedDrill.start(); else container.innerHTML = '<div class="screen"><p style="padding:32px">Speed Drill não carregado.</p></div>'; break;
             case 'flashcards':    this._renderFlashcardsRoute(container); break;
             case 'reading':       if (typeof ReadingFocus !== 'undefined') ReadingFocus.start(parts[1], parts[2]); else container.innerHTML = '<div class="screen"><p style="padding:32px">Reading Focus não carregado.</p></div>'; break;
+            case 'builder':       if (typeof Builder !== 'undefined') Builder.start(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Builder não carregado.</p></div>'; break;
             default:              this.renderHome(container);
         }
 
@@ -2713,105 +2714,208 @@ const Router = {
 
     // ── AI STUDIO ────────────────────────────────────────────
     renderAIStudio(container) {
-        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
-        const sets = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
+        const _ic     = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const sets    = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
+        const isAdmin = typeof State !== 'undefined' && State.isAdmin();
+        const isPrem  = typeof State !== 'undefined' && State.isPremiumOrAdmin();
+        const maxQ    = typeof AIStudio !== 'undefined' ? AIStudio.maxQuestions : 7;
 
         const setsHTML = sets.length
             ? sets.map(s => `
-                <div class="ai-set-card" onclick="Router._playAISet('${s.id}')">
-                    <div class="ai-set-icon">${_ic('scroll', {size:'sm', color:'science'})}</div>
-                    <div class="ai-set-body">
-                        <div class="ai-set-name">${s.name}</div>
-                        <div class="ai-set-meta">${s.questions.length} questoes &middot; ${new Date(s.createdAt).toLocaleDateString('pt-BR')}</div>
-                    </div>
-                    <button class="ai-set-delete" onclick="event.stopPropagation();Router._deleteAISet('${s.id}')" title="Excluir">x</button>
-                </div>`).join('')
-            : `<div class="ai-no-sets">${_ic('scroll',{size:'lg',color:'locked'})} <br>Nenhum estudo criado ainda.<br>Cole um texto acima e clique em Analisar!</div>`;
+            <div class="ai-set-card">
+                <div class="ai-set-icon">${_ic('scroll',{size:'sm',color:'science'})}</div>
+                <div class="ai-set-body" onclick="Router._playAISet('${s.id}')" style="cursor:pointer">
+                    <div class="ai-set-name">${s.name}</div>
+                    <div class="ai-set-meta">${s.questions.length} questões · ${new Date(s.createdAt).toLocaleDateString('pt-BR')}</div>
+                </div>
+                <div class="ai-set-actions">
+                    <button class="ai-set-action-btn" title="Flashcards" onclick="event.stopPropagation();Router._aiSetFlashcards('${s.id}')">🃏</button>
+                    <button class="ai-set-action-btn ai-set-play-btn" title="Jogar" onclick="event.stopPropagation();Router._playAISet('${s.id}')">▶</button>
+                    ${isAdmin ? `<button class="ai-set-action-btn" title="Salvar como Fase no Builder" onclick="event.stopPropagation();Router._aiSetToBuilder('${s.id}')">📦</button>` : ''}
+                    <button class="ai-set-delete" onclick="event.stopPropagation();Router._deleteAISet('${s.id}')" title="Excluir">✕</button>
+                </div>
+            </div>`).join('')
+            : `<div class="ai-no-sets">${_ic('scroll',{size:'lg',color:'locked'})}<br>Nenhum estudo criado ainda.<br>Cole um texto acima e clique em Analisar!</div>`;
 
         container.innerHTML = `
         <div class="ai-studio-screen">
+            ${isAdmin ? `
+            <div class="ai-admin-banner">
+                ${_ic('crown',{size:'xs',color:'final'})} <strong>Admin Mode</strong> — limite ${maxQ} questões · conteúdo exportável para plataforma
+                <a href="#builder" style="margin-left:auto;font-size:.78rem;color:var(--brand);font-weight:900">Abrir Builder →</a>
+            </div>` : ''}
+
             <div class="ai-studio-hero">
                 <div class="ai-studio-hero-badge">${_ic('ai-tutor',{size:'xs'})} IA Generativa</div>
                 <div class="ai-studio-hero-title">AI Studio</div>
-                <div class="ai-studio-hero-desc">Cole qualquer texto de estudo e eu gero questoes automaticamente para voce praticar.</div>
+                <div class="ai-studio-hero-desc">Cole texto ou envie um PDF e gero questões automaticamente para praticar em qualquer módulo.</div>
             </div>
 
             <div class="ai-input-card">
-                <div class="ai-input-label">${_ic('scroll',{size:'xs',color:'science'})} Cole seu texto aqui</div>
-                <textarea class="ai-textarea" id="ai-text-input" placeholder="Cole aqui um trecho do seu material de estudo: apostila, livro, artigo, resumo..." maxlength="5000" oninput="document.getElementById('ai-char-count').textContent=this.value.length+'/5000'"></textarea>
-                <div class="ai-char-count" id="ai-char-count">0/5000</div>
-                <button class="ai-analyze-btn" id="ai-analyze-btn" onclick="Router._analyzeAIText()">
-                    ${_ic('ai-tutor',{size:'sm'})} Analisar com IA
-                </button>
+                <div class="ai-input-tabs" id="ai-input-tabs">
+                    <button class="ai-input-tab active" id="ai-tab-text" onclick="Router._switchAITab('text')">
+                        ${_ic('scroll',{size:'xs',color:'science'})} Colar Texto
+                    </button>
+                    <button class="ai-input-tab${isPrem ? '' : ' ai-tab-locked'}" id="ai-tab-pdf" onclick="Router._switchAITab('pdf')" ${isPrem?'':'title="Recurso Premium"'}>
+                        📄 PDF ${isPrem ? '' : '👑'}
+                    </button>
+                </div>
+
+                <!-- TEXT INPUT -->
+                <div id="ai-pane-text">
+                    <textarea class="ai-textarea" id="ai-text-input"
+                        placeholder="Cole aqui seu material: apostila, livro, artigo, resumo..."
+                        maxlength="8000"
+                        oninput="document.getElementById('ai-char-count').textContent=this.value.length+'/8000'"></textarea>
+                    <div class="ai-char-count" id="ai-char-count">0/8000</div>
+                </div>
+
+                <!-- PDF INPUT -->
+                <div id="ai-pane-pdf" style="display:none">
+                    ${isPrem ? `
+                    <div class="ai-pdf-drop" id="ai-pdf-drop"
+                        onclick="document.getElementById('ai-pdf-input').click()"
+                        ondragover="event.preventDefault();this.classList.add('dragover')"
+                        ondragleave="this.classList.remove('dragover')"
+                        ondrop="event.preventDefault();this.classList.remove('dragover');Router._handlePDFDrop(event)">
+                        <div class="ai-pdf-icon">📄</div>
+                        <div class="ai-pdf-label">Clique ou arraste um PDF aqui</div>
+                        <div class="ai-pdf-sub">Máximo 30 páginas · OCR automático</div>
+                        <input type="file" id="ai-pdf-input" accept=".pdf" style="display:none"
+                            onchange="Router._handlePDFFile(this)">
+                    </div>
+                    <div class="ai-pdf-status" id="ai-pdf-status" style="display:none"></div>
+                    ` : `
+                    <div class="ai-pdf-gate">
+                        ${_ic('crown',{size:'lg',color:'final'})}
+                        <p>Upload de PDF disponível para usuários <strong>Premium</strong>.</p>
+                        <button class="btn-primary" onclick="Router.navigate('#shop')">Upgrade Premium</button>
+                    </div>`}
+                </div>
+
+                <div class="ai-analyze-row">
+                    <button class="ai-analyze-btn" id="ai-analyze-btn" onclick="Router._analyzeAIText()">
+                        ${_ic('ai-tutor',{size:'sm'})} Analisar com IA
+                        <span class="ai-limit-chip">até ${maxQ} questões</span>
+                    </button>
+                </div>
             </div>
 
             <div id="ai-results-area"></div>
 
             <div class="ai-saved-section">
-                <div class="ai-saved-title">${_ic('backpack',{size:'xs',color:'science'})} Meus Estudos Salvos</div>
+                <div class="ai-saved-title">
+                    ${_ic('backpack',{size:'xs',color:'science'})} Meus Estudos Salvos
+                    <span class="ai-saved-count">${sets.length}</span>
+                </div>
                 ${setsHTML}
             </div>
         </div>`;
     },
 
+    _switchAITab(tab) {
+        const isPrem = typeof State !== 'undefined' && State.isPremiumOrAdmin();
+        if (tab === 'pdf' && !isPrem) { Router.navigate('#shop'); return; }
+        document.querySelectorAll('.ai-input-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`ai-tab-${tab}`)?.classList.add('active');
+        document.getElementById('ai-pane-text').style.display = tab === 'text' ? '' : 'none';
+        document.getElementById('ai-pane-pdf').style.display  = tab === 'pdf'  ? '' : 'none';
+    },
+
+    async _handlePDFFile(input) {
+        const file = input.files?.[0];
+        if (!file) return;
+        await this._processPDF(file);
+        input.value = '';
+    },
+
+    async _handlePDFDrop(event) {
+        const file = Array.from(event.dataTransfer.files).find(f => f.type === 'application/pdf');
+        if (!file) return;
+        await this._processPDF(file);
+    },
+
+    async _processPDF(file) {
+        const status = document.getElementById('ai-pdf-status');
+        const drop   = document.getElementById('ai-pdf-drop');
+        const btn    = document.getElementById('ai-analyze-btn');
+        if (status) { status.style.display = ''; status.innerHTML = `<span class="ai-pdf-progress">📄 Extraindo texto de "${file.name}"...</span>`; }
+        if (drop) drop.style.display = 'none';
+        if (btn) btn.disabled = true;
+
+        try {
+            const text = await AIStudio.extractFromPDF(file);
+            window._aiCurrentPDFText = text;
+            if (status) status.innerHTML = `<div class="ai-pdf-done">✅ ${file.name} · ${text.split(/\s+/).length.toLocaleString()} palavras extraídas<button class="ai-pdf-clear" onclick="Router._clearPDF()">✕</button></div>`;
+        } catch (err) {
+            if (status) status.innerHTML = `<span style="color:var(--error)">❌ Erro ao ler PDF: ${err.message}</span>`;
+            if (drop) drop.style.display = '';
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    },
+
+    _clearPDF() {
+        window._aiCurrentPDFText = null;
+        const drop   = document.getElementById('ai-pdf-drop');
+        const status = document.getElementById('ai-pdf-status');
+        if (drop) drop.style.display = '';
+        if (status) status.style.display = 'none';
+    },
+
     _analyzeAIText() {
-        const textarea = document.getElementById('ai-text-input');
-        const btn      = document.getElementById('ai-analyze-btn');
-        const area     = document.getElementById('ai-results-area');
-        const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
-        if (!textarea || !area) return;
-        const text = textarea.value.trim();
+        const _ic    = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const btn    = document.getElementById('ai-analyze-btn');
+        const area   = document.getElementById('ai-results-area');
+        if (!area || typeof AIStudio === 'undefined') return;
+
+        // Determine text source (PDF or textarea)
+        const isPDFTab = document.getElementById('ai-pane-pdf')?.style.display !== 'none';
+        const text     = isPDFTab ? (window._aiCurrentPDFText || '') : (document.getElementById('ai-text-input')?.value.trim() || '');
+
         if (text.length < 100) {
-            if (typeof ModalEngine !== 'undefined') ModalEngine.enqueue('info', { title: 'Texto muito curto', desc: 'Cole pelo menos 100 caracteres para gerar questoes.' });
+            if (typeof ModalEngine !== 'undefined') ModalEngine.interrupt('simpleAlert',{icon:'⚠️',title:'Texto muito curto',message:'São necessários pelo menos 100 caracteres para gerar questões.'});
             return;
         }
-        if (typeof AIStudio === 'undefined') return;
 
-        btn.disabled = true;
-        const steps  = ['Lendo o texto...', 'Identificando conceitos-chave...', 'Gerando questoes...', 'Validando alternativas...'];
-        let stepIdx  = 0;
+        if (btn) btn.disabled = true;
+        const steps = ['Lendo o texto...','Identificando conceitos-chave...','Gerando questões...','Validando alternativas...'];
+        let si = 0;
         area.innerHTML = `
         <div class="ai-processing">
             <div class="ai-processing-dots">
-                <div class="ai-processing-dot"></div>
-                <div class="ai-processing-dot"></div>
-                <div class="ai-processing-dot"></div>
+                <div class="ai-processing-dot"></div><div class="ai-processing-dot"></div><div class="ai-processing-dot"></div>
             </div>
             <div class="ai-processing-text">Analisando com IA...</div>
             <div class="ai-processing-steps" id="ai-step-text">${steps[0]}</div>
         </div>`;
 
-        const stepTimer = setInterval(() => {
-            stepIdx = (stepIdx + 1) % steps.length;
-            const el = document.getElementById('ai-step-text');
-            if (el) el.textContent = steps[stepIdx];
-        }, 500);
+        const stepT = setInterval(() => { si=(si+1)%steps.length; const el=document.getElementById('ai-step-text'); if(el) el.textContent=steps[si]; }, 500);
 
         AIStudio.analyze(text, questions => {
-            clearInterval(stepTimer);
-            btn.disabled = false;
+            clearInterval(stepT);
+            if (btn) btn.disabled = false;
             if (!questions.length) {
-                area.innerHTML = `<div class="ai-processing"><div class="ai-processing-text" style="color:#ef4444">Nao consegui gerar questoes com este texto.<br>Tente um texto mais longo com definicoes claras.</div></div>`;
+                area.innerHTML = `<div class="ai-processing"><div class="ai-processing-text" style="color:var(--error)">Não consegui gerar questões com este texto.<br>Tente um texto mais longo com definições claras.</div></div>`;
                 return;
             }
             window._aiCurrentQuestions = questions;
             window._aiCurrentText      = text;
-            const letters = ['A', 'B', 'C', 'D'];
-            const qHTML   = questions.map((q, qi) => `
-                <div class="ai-question-item">
-                    <div class="ai-question-text">${qi+1}. ${q.text}</div>
-                    <div class="ai-question-opts">
-                        ${q.options.map((opt, oi) => `
-                        <div class="ai-question-opt${oi === q.correctIndex ? ' correct' : ''}">
-                            <span class="ai-opt-letter">${letters[oi]||oi+1}</span>
-                            ${opt}
-                        </div>`).join('')}
-                    </div>
-                </div>`).join('');
+            const letters = ['A','B','C','D'];
+            const qHTML   = questions.map((q,qi) => `
+            <div class="ai-question-item">
+                <div class="ai-question-text">${qi+1}. ${q.text}</div>
+                <div class="ai-question-opts">
+                    ${q.options.map((opt,oi) => `
+                    <div class="ai-question-opt${oi===q.correctIndex?' correct':''}">
+                        <span class="ai-opt-letter">${letters[oi]||oi+1}</span>${opt}
+                    </div>`).join('')}
+                </div>
+            </div>`).join('');
             area.innerHTML = `
             <div class="ai-results-card">
                 <div class="ai-results-header">
-                    <div class="ai-results-title">${_ic('star',{size:'sm',color:'xp'})} Questoes Geradas <span class="ai-questions-count">${questions.length}</span></div>
+                    <div class="ai-results-title">${_ic('star',{size:'sm',color:'xp'})} Questões Geradas <span class="ai-questions-count">${questions.length}</span></div>
                 </div>
                 ${qHTML}
                 <div class="ai-save-row">
@@ -2824,15 +2928,12 @@ const Router = {
 
     _saveAISet() {
         if (typeof AIStudio === 'undefined') return;
-        const nameEl    = document.getElementById('ai-set-name');
-        const name      = nameEl ? nameEl.value.trim() : '';
+        const name      = document.getElementById('ai-set-name')?.value.trim() || '';
         const questions = window._aiCurrentQuestions || [];
-        const text      = window._aiCurrentText || '';
+        const text      = window._aiCurrentText      || '';
         if (!questions.length) return;
         AIStudio.saveStudySet(name || 'Estudo Personalizado', text, questions);
-        if (typeof ModalEngine !== 'undefined') {
-            ModalEngine.enqueue('reward', { title: 'Estudo Salvo!', desc: `"${name || 'Estudo Personalizado'}" adicionado aos seus estudos.`, xp: 0, gems: 0 });
-        }
+        if (typeof ModalEngine !== 'undefined') ModalEngine.enqueue('reward',{title:'Estudo Salvo!',desc:`"${name||'Estudo Personalizado'}" adicionado.`,xp:0,gems:0});
         this.renderAIStudio(document.getElementById('app-container'));
     },
 
@@ -2842,82 +2943,146 @@ const Router = {
         this.renderAIStudio(document.getElementById('app-container'));
     },
 
+    _aiSetFlashcards(id) {
+        const sets = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
+        const idx  = sets.findIndex(s => s.id === id);
+        if (idx < 0) return;
+        if (typeof FlashcardEngine !== 'undefined') FlashcardEngine.start({ cards: FlashcardEngine.buildCardsFromStudySet(idx), source:'ai-studio', title: sets[idx].name });
+    },
+
+    _aiSetToBuilder(id) {
+        const sets  = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
+        const set   = sets.find(s => s.id === id);
+        if (!set || typeof State === 'undefined' || !State.isAdmin()) return;
+        const stage = typeof AIStudio !== 'undefined' ? AIStudio.setToStage(set) : null;
+        if (!stage) return;
+
+        // Ensure a default admin chapter exists
+        const adminChId = 'ch_admin_default';
+        const existing  = State.getCustomContent().chapters.find(c => c.id === adminChId);
+        if (!existing) State.addCustomChapter({ id: adminChId, icon:'🤖', title:'AI Studio — Conteúdo Gerado', subject:'IA', grade:'' });
+        stage.chapterId = adminChId;
+        State.addCustomStage(stage);
+        if (typeof ModalEngine !== 'undefined') ModalEngine.enqueue('reward',{title:'Fase criada no Builder!',desc:`"${set.name}" disponível em Builder → Disciplinas.`,xp:0,gems:0});
+    },
+
     _playAISet(id) {
         const sets = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
         const set  = sets.find(s => s.id === id);
         if (!set || !set.questions.length) return;
-        window._aiPlaySet   = set;
-        window._aiPlayIdx   = 0;
-        window._aiPlayScore = 0;
-        this._renderAIPlay(document.getElementById('app-container'));
+        window._aiPlaySet    = set;
+        window._aiPlayIdx    = 0;
+        window._aiPlayScore  = 0;
+        window._aiPlayHearts = typeof State !== 'undefined' ? (State.data.user.hearts ?? 5) : 5;
+        window._aiPlayCombo  = 0;
+        this._renderEnhancedPlay(document.getElementById('app-container'));
     },
 
-    _renderAIPlay(container) {
+    // ── ENHANCED MCQ PLAY (hearts · XP · combo) ────────────────────
+    _renderEnhancedPlay(container, titleOverride) {
         const _ic  = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const set  = window._aiPlaySet;
         const idx  = window._aiPlayIdx || 0;
+
         if (!set || idx >= set.questions.length) {
-            const total = set ? set.questions.length : 0;
-            const score = window._aiPlayScore || 0;
+            const total  = set ? set.questions.length : 0;
+            const score  = window._aiPlayScore || 0;
+            const xp     = 20 + score * 12;
+            const pct    = total > 0 ? Math.round((score/total)*100) : 100;
+            if (typeof State !== 'undefined') State.addXP(xp);
+            if (typeof EventsEngine !== 'undefined') { EventsEngine.onXPGained(xp); EventsEngine.trackMissionComplete(); }
             container.innerHTML = `
-            <div class="ai-studio-screen">
-                <div style="text-align:center;padding:40px 20px;">
-                    <div style="font-size:2.5rem;margin-bottom:16px">${_ic('trophy',{size:'xl',color:'final'})}</div>
-                    <div style="font-size:1.4rem;font-weight:900;color:var(--text-main);margin-bottom:8px">Estudo Concluido!</div>
-                    <div style="font-size:1rem;color:var(--text-muted);margin-bottom:20px">${score} / ${total} questoes corretas</div>
-                    <a href="#ai-studio" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:800">
-                        ${_ic('scroll',{size:'sm'})} Voltar ao AI Studio
-                    </a>
-                </div>
+            <div class="ai-studio-screen" style="text-align:center;padding:40px 20px">
+                <div style="margin-bottom:16px">${_ic('trophy',{size:'4xl',color:'final'})}</div>
+                <div style="font-size:1.4rem;font-weight:900;margin-bottom:6px">Estudo Concluído!</div>
+                <div style="font-size:2rem;font-weight:900;color:var(--brand);margin-bottom:4px">${pct}%</div>
+                <div style="color:var(--text-muted);margin-bottom:4px">${score}/${total} corretas</div>
+                <div style="color:var(--brand);font-weight:900;margin-bottom:20px">+${xp} XP</div>
+                <button class="btn-primary" onclick="Router.navigate('#ai-studio')">
+                    ${_ic('scroll',{size:'sm'})} Voltar ao AI Studio
+                </button>
             </div>`;
-            if (typeof EventsEngine !== 'undefined') {
-                EventsEngine.trackMissionComplete();
-            }
             return;
         }
+
         const q       = set.questions[idx];
+        const hearts  = window._aiPlayHearts ?? 5;
+        const combo   = window._aiPlayCombo  || 0;
         const letters = ['A','B','C','D'];
+        const title   = titleOverride || set.name;
+
+        const heartsHTML = Array.from({length:5},(_,i) =>
+            `<span style="font-size:1rem;opacity:${i<hearts?1:.25}">❤️</span>`
+        ).join('');
+
         container.innerHTML = `
         <div class="ai-studio-screen">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-                <a href="#ai-studio" style="text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:700">Sair</a>
-                <span style="font-size:.85rem;color:var(--text-muted);font-weight:700">${idx+1} / ${set.questions.length}</span>
+            <div class="aip-topbar">
+                <button class="aip-exit" onclick="Router.navigate('#ai-studio')">✕</button>
+                <div class="aip-prog-wrap">
+                    <div class="aip-prog-track"><div class="aip-prog-fill" style="width:${Math.round((idx/set.questions.length)*100)}%"></div></div>
+                    <span class="aip-prog-label">${idx+1}/${set.questions.length}</span>
+                </div>
+                <div class="aip-hearts">${heartsHTML}</div>
             </div>
-            <div class="review-question-card" style="margin-bottom:16px">
-                <div style="font-size:.75rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${_ic('ai-tutor',{size:'xs',color:'science'})} ${set.name}</div>
-                <div style="font-size:1rem;font-weight:700;color:var(--text-main)">${q.text}</div>
+            ${combo >= 3 ? `<div class="aip-combo-banner">🔥 ${combo}x Combo!</div>` : ''}
+            <div class="aip-question-card">
+                <div class="aip-badge">${_ic('ai-tutor',{size:'xs',color:'science'})} ${title}</div>
+                <div class="aip-q-text">${q.text}</div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-                ${q.options.map((opt, oi) => `
-                <button class="review-option" onclick="Router._answerAIPlay(${oi})" style="text-align:left;display:flex;align-items:center;gap:10px">
-                    <span style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0">${letters[oi]||oi+1}</span>
-                    ${opt}
+            <div class="aip-options">
+                ${q.options.map((opt,oi) => `
+                <button class="aip-option" onclick="Router._answerEnhanced(${oi})">
+                    <span class="aip-opt-key">${letters[oi]}</span>${opt}
                 </button>`).join('')}
             </div>
         </div>`;
     },
 
-    _answerAIPlay(selectedIdx) {
+    _answerEnhanced(selectedIdx) {
         const set = window._aiPlaySet;
         const idx = window._aiPlayIdx || 0;
         const q   = set.questions[idx];
         const ok  = selectedIdx === q.correctIndex;
+
+        document.querySelectorAll('.aip-option').forEach((btn,i) => {
+            btn.disabled = true;
+            if (i === q.correctIndex) btn.classList.add('aip-correct');
+            else if (i === selectedIdx && !ok) btn.classList.add('aip-wrong');
+        });
+
         if (ok) {
-            window._aiPlayScore = (window._aiPlayScore || 0) + 1;
-            if (typeof State !== 'undefined') State.addXP(15);
+            window._aiPlayScore = (window._aiPlayScore||0) + 1;
+            window._aiPlayCombo = (window._aiPlayCombo||0) + 1;
+            if (typeof State !== 'undefined') State.addXP(12);
             if (typeof EventsEngine !== 'undefined') EventsEngine.trackCorrectAnswer();
+            if (typeof MemoryEngine !== 'undefined' && q._leitnerKey) {
+                const card = (State.data.leitnerBoxes||{})[q._leitnerKey];
+                if (card) MemoryEngine.processAnswer(card.chapterId,card.stageId,card.qIdx,true,3,card.question,card.answer,card.topic);
+            }
+        } else {
+            window._aiPlayCombo = 0;
+            window._aiPlayHearts = Math.max(0, (window._aiPlayHearts??5) - 1);
         }
 
-        const buttons = document.querySelectorAll('.review-option');
-        buttons.forEach((btn, i) => {
-            btn.disabled = true;
-            if (i === q.correctIndex) btn.style.background = 'rgba(34,197,94,.25)';
-            else if (i === selectedIdx && !ok) btn.style.background = 'rgba(239,68,68,.25)';
-        });
         setTimeout(() => {
             window._aiPlayIdx = idx + 1;
-            this._renderAIPlay(document.getElementById('app-container'));
-        }, 900);
+            if ((window._aiPlayHearts??5) <= 0) {
+                const container = document.getElementById('app-container');
+                if (container) {
+                    container.innerHTML = `
+                    <div class="ai-studio-screen" style="text-align:center;padding:40px 20px">
+                        <div style="font-size:3rem;margin-bottom:12px">💔</div>
+                        <div style="font-size:1.3rem;font-weight:900;margin-bottom:8px">Sem vidas!</div>
+                        <div style="color:var(--text-muted);margin-bottom:20px">Compre vidas na loja e continue estudando.</div>
+                        <button class="btn-primary" onclick="Router.navigate('#shop')">🛒 Comprar Vidas</button>
+                        <button class="btn-secondary" style="margin-top:8px" onclick="Router.navigate('#ai-studio')">Voltar</button>
+                    </div>`;
+                }
+                return;
+            }
+            this._renderEnhancedPlay(document.getElementById('app-container'));
+        }, 800);
     },
 
     // ── PVP ────────────────────────────────────────────────────

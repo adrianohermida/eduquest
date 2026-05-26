@@ -22,6 +22,7 @@ const Sidebar = {
         { icon: 'star',     label: 'Flashcards',  route: 'flashcards',  hash: '#flashcards'  },
         { icon: 'xp',       label: 'Speed Drill', route: 'speed-drill', hash: '#speed-drill' },
         { icon: 'compass',  label: 'Modo Foco',  action: 'DeepFocus.toggle()', route: 'deep-focus' },
+        { icon: 'backpack', label: 'Builder',   route: 'builder',    hash: '#builder'    },
         { icon: 'avatar',   label: 'Perfil',    route: 'profile',    hash: '#profile'    },
     ],
 

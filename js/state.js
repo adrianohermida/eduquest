@@ -34,11 +34,11 @@ const ACHIEVEMENTS = [
 window.ACHIEVEMENTS = ACHIEVEMENTS;
 
 const State = {
-    SCHEMA_VERSION: 10,
+    SCHEMA_VERSION: 11,
     LS_KEY: 'eduquest_v5',
 
     data: {
-        schemaVersion: 10,
+        schemaVersion: 11,
         user: {
             name:         'Herói',
             level:        1,
@@ -90,6 +90,7 @@ const State = {
         eventMissions: {},
         aiStudySets:   [],
         leitnerBoxes:  {},
+        customContent: { chapters: [], stages: [] },
     },
 
     _syncTimer:  null,
@@ -188,6 +189,7 @@ const State = {
         this.data.eventMissions = parsed.eventMissions  || {};
         this.data.aiStudySets   = parsed.aiStudySets    || [];
         this.data.leitnerBoxes  = parsed.leitnerBoxes   || {};
+        this.data.customContent = parsed.customContent  || { chapters: [], stages: [] };
         this.data.schemaVersion = this.SCHEMA_VERSION;
     },
 
@@ -337,6 +339,8 @@ const State = {
         if (this.data.user.premiumUntil) return new Date(this.data.user.premiumUntil) > new Date();
         return false;
     },
+    isAdmin()          { return this.data.user.email === 'jghermidamaia@gmail.com'; },
+    isPremiumOrAdmin() { return this.isPremium() || this.isAdmin(); },
 
     getXPForLevel(level) { return level * 500; },
 
@@ -695,6 +699,38 @@ const State = {
     // ── AUTH (Supabase-backed) ────────────────────────────────
     isAuthenticated() { return this.data.user.authenticated === true; },
     isOnboarded()     { return this.data.user.onboarded === true; },
+
+    // ── CUSTOM CONTENT (Builder + AI Studio) ─────────────────────
+    getCustomContent() { return this.data.customContent || { chapters: [], stages: [] }; },
+
+    addCustomChapter(ch) {
+        if (!this.data.customContent) this.data.customContent = { chapters: [], stages: [] };
+        const idx = this.data.customContent.chapters.findIndex(c => c.id === ch.id);
+        if (idx >= 0) this.data.customContent.chapters[idx] = ch;
+        else this.data.customContent.chapters.unshift(ch);
+        this.save();
+    },
+
+    addCustomStage(stage) {
+        if (!this.data.customContent) this.data.customContent = { chapters: [], stages: [] };
+        const idx = this.data.customContent.stages.findIndex(s => s.id === stage.id);
+        if (idx >= 0) this.data.customContent.stages[idx] = stage;
+        else this.data.customContent.stages.unshift(stage);
+        this.save();
+    },
+
+    deleteCustomChapter(id) {
+        if (!this.data.customContent) return;
+        this.data.customContent.chapters = this.data.customContent.chapters.filter(c => c.id !== id);
+        this.data.customContent.stages   = this.data.customContent.stages.filter(s => s.chapterId !== id);
+        this.save();
+    },
+
+    deleteCustomStage(id) {
+        if (!this.data.customContent) return;
+        this.data.customContent.stages = this.data.customContent.stages.filter(s => s.id !== id);
+        this.save();
+    },
 
     async loginAsync(email, password) {
         if (typeof SupaAuth === 'undefined') return this.login(email, password);

@@ -6,33 +6,80 @@
 
 const AIStudio = {
 
-    MAX_QUESTIONS: 7,
     MIN_SENTENCE_LEN: 25,
+
+    get maxQuestions() {
+        if (typeof State === 'undefined') return 7;
+        if (State.isAdmin())   return 50;
+        if (State.isPremium()) return 20;
+        return 7;
+    },
+
+    // ── PDF OCR ────────────────────────────────────────────────────
+
+    async extractFromPDF(file) {
+        if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js não disponível');
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const buffer = await file.arrayBuffer();
+        const pdf    = await pdfjsLib.getDocument({ data: buffer }).promise;
+        const maxPg  = Math.min(pdf.numPages, 30);
+        let text = '';
+        for (let i = 1; i <= maxPg; i++) {
+            const page    = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(' ') + '\n\n';
+        }
+        return text.trim();
+    },
 
     // ── PUBLIC API ─────────────────────────────────────────────────
 
     analyze(text, onDone) {
-        // Simulate AI processing delay for the "magic" feel
         setTimeout(() => {
             const questions = this._generateQuestions(text);
             onDone(questions);
         }, 1800 + Math.floor(Math.random() * 800));
     },
 
-    saveStudySet(name, text, questions) {
+    saveStudySet(name, text, questions, meta = {}) {
         if (typeof State === 'undefined') return null;
+        const limit = State.isAdmin() ? 100 : State.isPremium() ? 30 : 10;
         const set = {
             id:        `ai_${Date.now()}`,
             name:      name || 'Estudo Personalizado',
             createdAt: Date.now(),
-            text:      text.slice(0, 2000),
+            text:      text.slice(0, 5000),
             questions,
+            ...meta,
         };
         if (!State.data.aiStudySets) State.data.aiStudySets = [];
         State.data.aiStudySets.unshift(set);
-        if (State.data.aiStudySets.length > 10) State.data.aiStudySets.length = 10;
+        if (State.data.aiStudySets.length > limit) State.data.aiStudySets.length = limit;
         State.save();
         return set;
+    },
+
+    // Convert a study set into a GameEngine-compatible stage object
+    setToStage(set) {
+        if (!set) return null;
+        return {
+            id:                set.id,
+            title:             set.name,
+            icon:              '🤖',
+            difficulty:        'normal',
+            estimatedTime:     Math.max(5, Math.ceil(set.questions.length * 0.5)),
+            learningObjectives: [],
+            questions:         set.questions.map(q => ({
+                question:     q.text,
+                options:      q.options,
+                correctIndex: q.correctIndex,
+                topic:        'AI Studio',
+            })),
+            rewards:  { xp: 20 + set.questions.length * 10, gems: Math.floor(set.questions.length / 2) },
+            summary:  { flashcards: [], mnemonics: [], content: [] },
+            _isAISet: true,
+        };
     },
 
     getStudySets() {
@@ -57,7 +104,7 @@ const AIStudio = {
 
         // Strategy 1: Definition questions ("X é/são Y")
         sentences.forEach(s => {
-            if (questions.length >= this.MAX_QUESTIONS) return;
+            if (questions.length >= this.maxQuestions) return;
             const m = s.match(/^(.{3,40}?)\s+(é|são|consiste em|representa|define-se como|pode ser definido como)\s+(.{10,})/i);
             if (!m) return;
             const subject   = m[1].trim();
@@ -78,7 +125,7 @@ const AIStudio = {
         const eligible = sentences.filter(s => s.length >= this.MIN_SENTENCE_LEN && s.length <= 200);
         const picked   = this._seededPick(eligible, 3, seed);
         picked.forEach(s => {
-            if (questions.length >= this.MAX_QUESTIONS) return;
+            if (questions.length >= this.maxQuestions) return;
             const correct     = s.replace(/[.!?]$/, '').trim();
             const distorted   = this._distortSentence(s, sentences, seed);
             const other       = this._getDistractors(correct, sentences, seed + 1).slice(0, 2);
@@ -95,7 +142,7 @@ const AIStudio = {
         // Strategy 3: Keyword fill-in-the-blank
         const terms = this._extractTopTerms(text, 8);
         sentences.forEach(s => {
-            if (questions.length >= this.MAX_QUESTIONS) return;
+            if (questions.length >= this.maxQuestions) return;
             const lowerS = s.toLowerCase();
             const term   = terms.find(t => lowerS.includes(t.toLowerCase()) && t.length >= 4);
             if (!term) return;
@@ -112,7 +159,7 @@ const AIStudio = {
             });
         });
 
-        return questions.slice(0, this.MAX_QUESTIONS);
+        return questions.slice(0, this.maxQuestions);
     },
 
     _getSentences(text) {
