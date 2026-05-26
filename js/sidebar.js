@@ -417,11 +417,7 @@ const HUD = {
     },
 
     _openStat(type) {
-        const ddEl  = document.getElementById(`hud-dd-${type}`);
-        const btnEl = document.getElementById(`hud-${type === 'notifications' ? 'notif' : type}-btn`) ||
-                      document.getElementById(`hud-${type}s-btn`) ||
-                      document.getElementById(`hud-streak-btn`);
-
+        const ddEl = document.getElementById(`hud-dd-${type}`);
         const btnId = {
             streak:        'hud-streak-btn',
             gems:          'hud-gems-btn',
@@ -430,7 +426,6 @@ const HUD = {
             notifications: 'hud-notif-btn',
             discipline:    'hud-disc-btn',
         }[type];
-
         const btn = document.getElementById(btnId);
         if (!ddEl) return;
 
@@ -440,6 +435,7 @@ const HUD = {
         ddEl.setAttribute('aria-hidden', 'false');
         btn?.setAttribute('aria-expanded', 'true');
         if (typeof EduSprings !== 'undefined') EduSprings.pop(btn, 0.55);
+        requestAnimationFrame(() => this._afterRender(type, ddEl));
         this._bindOutside();
     },
 
@@ -465,6 +461,7 @@ const HUD = {
     _closeAll() {
         ['streak','gems','xp','hearts','notifications','discipline'].forEach(t => this._closeDropdown(t));
         this.closeAvatarDropdown();
+        this._stopHeartsTimer();
         if (this._outsideHandler) {
             document.removeEventListener('click', this._outsideHandler);
             this._outsideHandler = null;
@@ -507,10 +504,24 @@ const HUD = {
         const pct      = Math.min(100, Math.round((xpInLvl / xpPerLvl) * 100));
         const toNext   = xpPerLvl - xpInLvl;
         const gemRwd   = Math.floor(level / 5) * 10 + 10;
+        const nextLvl5 = Math.ceil((level + 1) / 5) * 5;
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
+
+        const history = this._buildXPHistory(u);
+        const histHTML = history.length ? `
+            <div class="hdd-xp-history">
+                <div class="hdd-xp-hist-label">Atividade recente</div>
+                ${history.map(h => `
+                <div class="hdd-xp-hist-item">
+                    <span class="hdd-xp-hist-icon">${h.icon}</span>
+                    <span class="hdd-xp-hist-text">${h.text}</span>
+                    <span class="hdd-xp-hist-val">+${h.xp} XP</span>
+                </div>`).join('')}
+            </div>` : '';
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('xp',{size:'lg',color:'xp'}) : '⚡'}</span>
+            <span class="hdd-head-icon">${_ic('xp',{size:'lg',color:'xp'})}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">XP &amp; Nível</div>
                 <div class="hdd-head-sub">${xp.toLocaleString('pt-BR')} XP total</div>
@@ -519,20 +530,21 @@ const HUD = {
         <div class="hdd-body">
             <div class="hdd-level-row">
                 <div>
-                    <div style="font-size:0.62rem;font-weight:700;color:var(--text-muted);margin-bottom:2px">NÍVEL ATUAL</div>
+                    <div class="hdd-lvl-label">NÍVEL ATUAL</div>
                     <div class="hdd-lvl-big">${level}</div>
                 </div>
                 <div style="text-align:right">
-                    <div class="hdd-next-reward">Próxima recompensa</div>
-                    <div style="font-size:0.8rem;font-weight:900;color:var(--gold,#f59e0b)">+${gemRwd} ${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xs',color:'gem'}) : '💎'}</div>
+                    <div class="hdd-next-reward">Recomp. Nv.${nextLvl5}</div>
+                    <div style="font-size:.82rem;font-weight:900;color:var(--gold,#f59e0b)">+${gemRwd} ${_ic('gem',{size:'xs',color:'gem'})}</div>
                 </div>
             </div>
             <div>
                 <div class="hdd-bar-wrap">
-                    <div class="hdd-bar-fill" style="width:${pct}%"></div>
+                    <div class="hdd-bar-fill hdd-bar-animated" data-pct="${pct}" style="width:0%"></div>
                 </div>
-                <div class="hdd-bar-text">${xpInLvl} / ${xpPerLvl} XP · faltam ${toNext}</div>
+                <div class="hdd-bar-text">${xpInLvl.toLocaleString('pt-BR')} / ${xpPerLvl} XP · faltam ${toNext.toLocaleString('pt-BR')}</div>
             </div>
+            ${histHTML}
         </div>
         <div class="hdd-footer">
             <a href="#profile" class="hdd-action" onclick="HUD._closeAll()">Ver progresso completo →</a>
@@ -542,8 +554,12 @@ const HUD = {
     _ddStreak(u) {
         const streak   = u.streak || 1;
         const calendar = (typeof State !== 'undefined') ? State.getStreakCalendar(30) : [];
-        const hasFrz   = (u.inventory?.['streak-freeze'] || 0) > 0;
+        const frzCount = u.inventory?.['streak-freeze'] || 0;
+        const hasFrz   = frzCount > 0;
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
+
+        const todayActive = calendar.find(d => d.isToday)?.active;
+        const atRisk = !todayActive;
 
         const calHTML = calendar.map(d => `
             <div class="hdd-cal-day${d.active ? ' sc-active' : ''}${d.isToday ? ' sc-today' : ''}" title="${d.label} ${d.dayNum}${d.active ? ' ✓' : ''}">
@@ -557,56 +573,88 @@ const HUD = {
             const next = !done && MILESTONES.find(m => m > streak) === days;
             return `
             <div class="hdd-milestone${done ? ' ms-done' : next ? ' ms-next' : ''}">
-                <span class="hdd-milestone-icon">${done ? (typeof IconSystem !== 'undefined' ? IconSystem.html('check',{size:'xs',color:'success'}) : '✅') : next ? (typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'xs',color:'xp'}) : '🎯') : '○'}</span>
-                <span class="hdd-milestone-days">${days} dias</span>
+                <span class="hdd-milestone-icon">${done ? _ic('check',{size:'xs',color:'success'}) : next ? _ic('star',{size:'xs',color:'xp'}) : '○'}</span>
+                <span class="hdd-milestone-days">${days}d</span>
                 <span>${done ? 'Concluído!' : next ? 'Próximo!' : ''}</span>
-                <span class="hdd-milestone-reward">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xs',color:'gem'}) : '💎'} +${days < 10 ? 5 : days < 20 ? 10 : 25}</span>
+                <span class="hdd-milestone-reward">${_ic('gem',{size:'xs',color:'gem'})} +${days < 10 ? 5 : days < 20 ? 10 : 25}</span>
             </div>`;
         }).join('');
 
+        const riskHTML = atRisk
+            ? `<div class="hdd-streak-risk">
+                <span class="hdd-risk-icon">⚠️</span>
+                <div class="hdd-risk-body">
+                    <div class="hdd-risk-text">Sequência em risco!</div>
+                    <div class="hdd-risk-sub">Complete uma lição hoje</div>
+                </div>
+                <a href="#home" class="hdd-risk-btn" onclick="HUD._closeAll()">Jogar</a>
+               </div>`
+            : `<div class="hdd-streak-safe">${_ic('check',{size:'sm',color:'success'})} <span>Sequência protegida hoje!</span></div>`;
+
+        const frzHTML = hasFrz ? `
+            <div class="hdd-freeze-row">
+                <span class="hdd-freeze-icon">🧊</span>
+                <div style="flex:1">
+                    <div style="font-size:.76rem;font-weight:800;color:var(--text)">${frzCount}× Streak Freeze</div>
+                    <div style="font-size:.63rem;font-weight:700;color:var(--text-muted)">Protege a sequência por 1 dia</div>
+                </div>
+                <button class="hdd-freeze-use${atRisk ? '' : ' hfu-inactive'}" onclick="${atRisk ? 'HUD._useFreeze()' : ''}" ${atRisk ? '' : 'disabled'}>
+                    ${atRisk ? 'Usar agora' : 'Em dia'}
+                </button>
+            </div>` : '';
+
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'lg',color:'streak'}) : '🔥'}</span>
+            <span class="hdd-head-icon hdd-streak-icon-live">${_ic('streak',{size:'lg',color:'streak'})}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">${streak} dia${streak !== 1 ? 's' : ''} seguidos!</div>
-                <div class="hdd-head-sub">${hasFrz ? '🧊 1 freeze disponível' : 'Sem proteção ativa'}</div>
+                <div class="hdd-head-sub">${hasFrz ? `🧊 ${frzCount} freeze disponível` : 'Sem proteção ativa'}</div>
             </div>
         </div>
         <div class="hdd-body">
+            ${riskHTML}
             <div class="hdd-streak-cal">${calHTML}</div>
             <div class="hdd-streak-row">
                 <div class="hdd-streak-chip">
-                    <span class="hdd-streak-chip-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'sm',color:'streak'}) : '🔥'}</span>
+                    <span class="hdd-streak-chip-icon">${_ic('streak',{size:'sm',color:'streak'})}</span>
                     <span class="hdd-streak-chip-val">${streak}</span>
                     <span class="hdd-streak-chip-lbl">Atual</span>
                 </div>
                 <div class="hdd-streak-chip">
-                    <span class="hdd-streak-chip-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'sm',color:'final'}) : '⭐'}</span>
+                    <span class="hdd-streak-chip-icon">${_ic('star',{size:'sm',color:'final'})}</span>
                     <span class="hdd-streak-chip-val">${Math.max(streak, u.maxStreak || streak)}</span>
                     <span class="hdd-streak-chip-lbl">Recorde</span>
                 </div>
                 <div class="hdd-streak-chip">
-                    <span class="hdd-streak-chip-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'sm',color:'gem'}) : '💎'}</span>
+                    <span class="hdd-streak-chip-icon">${_ic('gem',{size:'sm',color:'gem'})}</span>
                     <span class="hdd-streak-chip-val">+5</span>
                     <span class="hdd-streak-chip-lbl">Por dia</span>
                 </div>
             </div>
             <div class="hdd-milestones">${msHTML}</div>
+            ${frzHTML}
         </div>
         <div class="hdd-footer">
-            <a href="#shop" class="hdd-action" onclick="HUD._closeAll()">🧊 Comprar Freeze na Loja</a>
+            <a href="#shop" class="hdd-action" onclick="HUD._closeAll()">Comprar Streak Freeze na Loja</a>
         </div>`;
     },
 
     _ddGems(u) {
-        const gems   = u.gems || 0;
-        const today  = new Date().toDateString();
-        const lastRw = u.lastDailyReward || '';
-        const claimed = lastRw === today;
+        const gems    = u.gems || 0;
+        const today   = new Date().toDateString();
+        const claimed = (u.lastDailyReward || '') === today;
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
+
+        const ways = [
+            { icon: _ic('xp',{size:'xs',color:'xp'}),      text: 'Completar fase',    val: '+10' },
+            { icon: _ic('streak',{size:'xs',color:'streak'}), text: 'Sequência 7 dias', val: '+25' },
+            { icon: _ic('trophy',{size:'xs',color:'final'}), text: 'Missão diária',     val: '+5'  },
+            { icon: _ic('boss',{size:'xs',color:'rpg'}),    text: 'Boss semanal',       val: '+50' },
+        ];
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'lg',color:'gem'}) : '💎'}</span>
+            <span class="hdd-head-icon hdd-gem-anim">${_ic('gem',{size:'lg',color:'gem'})}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">Gemas</div>
                 <div class="hdd-head-sub">Moeda premium do EduQuest</div>
@@ -614,27 +662,32 @@ const HUD = {
         </div>
         <div class="hdd-body">
             <div class="hdd-gems-hero">
-                <span class="hdd-gems-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('gem',{size:'xl',color:'gem'}) : '💎'}</span>
+                <span class="hdd-gems-icon hdd-gem-anim">${_ic('gem',{size:'xl',color:'gem'})}</span>
                 <div>
-                    <div class="hdd-gems-count">${gems}</div>
+                    <div class="hdd-gems-count" id="hdd-gems-display">${gems}</div>
                     <div class="hdd-gems-label">gemas disponíveis</div>
                 </div>
             </div>
-            <div class="hdd-daily-reward">
-                <span class="hdd-dr-icon">${claimed ? (typeof IconSystem !== 'undefined' ? IconSystem.html('check',{size:'sm',color:'success'}) : '✅') : '🎁'}</span>
+            <div class="hdd-daily-reward${claimed ? '' : ' dr-available'}" ${claimed ? '' : 'onclick="HUD._claimDaily(this)" style="cursor:pointer"'}>
+                <span class="hdd-dr-icon">${claimed ? _ic('check',{size:'sm',color:'success'}) : '🎁'}</span>
                 <div>
                     <div class="hdd-dr-text">Recompensa diária</div>
-                    <div class="hdd-dr-sub">${claimed ? 'Coletada hoje!' : '+5 gemas disponíveis'}</div>
+                    <div class="hdd-dr-sub">${claimed ? 'Coletada hoje! Volte amanhã.' : '+5 gemas — toque para coletar!'}</div>
                 </div>
-                <span class="hdd-dr-badge ${claimed ? '' : 'pending'}">${claimed ? 'Coletado' : 'Coletar!'}</span>
+                <span class="hdd-dr-badge${claimed ? '' : ' pending'}">${claimed ? 'Coletado' : 'Coletar!'}</span>
             </div>
-            <div class="hdd-milestone">
-                <span class="hdd-milestone-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('trophy',{size:'sm',color:'final'}) : '🏆'}</span>
-                <span style="flex:1;font-size:0.74rem;font-weight:700">Complete missões para ganhar mais</span>
+            <div class="hdd-gems-ways">
+                <div class="hdd-ways-label">Como ganhar gemas</div>
+                ${ways.map(w => `
+                <div class="hdd-ways-item">
+                    <span class="hdd-ways-icon">${w.icon}</span>
+                    <span class="hdd-ways-text">${w.text}</span>
+                    <span class="hdd-ways-val">${w.val} ${_ic('gem',{size:'xs',color:'gem'})}</span>
+                </div>`).join('')}
             </div>
         </div>
         <div class="hdd-footer">
-            <a href="#shop" class="hdd-action" onclick="HUD._closeAll()">🛒 Ir para a Loja</a>
+            <a href="#shop" class="hdd-action" onclick="HUD._closeAll()">Ir para a Loja</a>
         </div>`;
     },
 
