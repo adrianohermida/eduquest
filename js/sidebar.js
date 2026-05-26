@@ -13,11 +13,13 @@ const Sidebar = {
         { icon: 'star',        label: 'Flashcards',  route: 'flashcards',  hash: '#flashcards'  },
         { icon: 'scroll',      label: 'Memória',     route: 'memory',      hash: '#memory'      },
         { icon: 'xp',          label: 'Speed Drill', route: 'speed-drill', hash: '#speed-drill' },
+        { divider: true },
         { icon: 'trophy',      label: 'Ranking',     route: 'ranking',     hash: '#ranking'     },
         { icon: 'guild',       label: 'Guilda',      route: 'guild',       hash: '#guild'       },
         { icon: 'friends',     label: 'Amigos',      route: 'friends',     hash: '#friends'     },
         { icon: 'achievement', label: 'Conquistas',  route: 'achievements',hash: '#achievements'},
         { icon: 'shop',        label: 'Loja',        route: 'shop',        hash: '#shop',  badge: 'Novo' },
+        { divider: true },
         { icon: 'flag',        label: 'Eventos',     route: 'events',      hash: '#events'      },
         { icon: 'crown',       label: 'Battle Pass', route: 'battle-pass', hash: '#battle-pass' },
         { icon: 'ai-tutor',    label: 'AI Studio',   route: 'ai-studio',   hash: '#ai-studio'   },
@@ -115,6 +117,7 @@ const Sidebar = {
         if (!el) return;
 
         const itemsHTML = this.NAV_ITEMS.map(item => {
+            if (item.divider) return '<div class="sidebar-divider" role="separator" aria-hidden="true"></div>';
             const iconHTML  = `<span class="sidebar-item-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(item.icon,{size:'md'}) : item.icon}</span>`;
             const lblHTML   = `<span class="sidebar-item-label">${item.label}</span>`;
             const soonHTML  = item.soon  ? '<span class="sidebar-soon-chip" aria-hidden="true">breve</span>' : '';
@@ -144,17 +147,19 @@ const Sidebar = {
             </nav>
 
             <div class="sidebar-footer" aria-label="Usuário atual">
-                <a class="sidebar-user" href="#profile" aria-label="Ver perfil de ${u.name}">
-                    <span class="sidebar-user-avatar" id="sb-user-avatar" aria-hidden="true">${u.avatar || '🦸'}</span>
-                    <div class="sidebar-user-info">
-                        <span class="sidebar-user-name"  id="sb-user-name">${u.name || 'Herói'}</span>
-                        <span class="sidebar-user-level" id="sb-user-level">Nível ${u.level || 1}</span>
-                    </div>
-                </a>
-                <div class="sidebar-user-xp-row">
-                    <span class="sidebar-user-xp-text" id="sb-xp-text">${xpProg.current} / ${xpProg.needed} XP</span>
-                    <div class="sidebar-user-xp-bar">
-                        <div class="sidebar-user-xp-fill" id="sb-xp-fill" style="width:${xpProg.percent}%"></div>
+                <div class="sidebar-user-card">
+                    <a class="sidebar-user" href="#profile" aria-label="Ver perfil de ${u.name}">
+                        <span class="sidebar-user-avatar" id="sb-user-avatar" aria-hidden="true">${u.avatar || '🦸'}</span>
+                        <div class="sidebar-user-info">
+                            <span class="sidebar-user-name"  id="sb-user-name">${u.name || 'Herói'}</span>
+                            <span class="sidebar-user-level" id="sb-user-level">Nível ${u.level || 1}</span>
+                        </div>
+                    </a>
+                    <div class="sidebar-user-xp-row">
+                        <span class="sidebar-user-xp-text" id="sb-xp-text">${xpProg.current} / ${xpProg.needed} XP</span>
+                        <div class="sidebar-user-xp-bar">
+                            <div class="sidebar-user-xp-fill" id="sb-xp-fill" style="width:${xpProg.percent}%"></div>
+                        </div>
                     </div>
                 </div>
             </div>
