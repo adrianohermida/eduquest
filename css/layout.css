@@ -653,10 +653,10 @@
         padding-right: var(--rp-w);
     }
 
-    /* HUD: full offset */
+    /* HUD: full width on desktop — sidebar and right panel sit below it */
     .top-hud {
-        left: var(--sidebar-w);
-        right: var(--rp-w);
+        left: 0;
+        right: 0;
     }
 
     /* Sidebar: full expanded */
@@ -734,7 +734,7 @@ body[data-layout="full"] .sidebar-overlay { display: none !important; }
         padding-right: 0;
     }
     body[data-map-pref="compact"] .top-hud {
-        left: var(--sidebar-w-compact);
+        left: 0;
         right: 0;
     }
     body[data-map-pref="compact"] .sidebar {
