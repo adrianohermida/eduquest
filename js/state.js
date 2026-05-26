@@ -472,20 +472,27 @@ const State = {
     // ── HUD ──────────────────────────────────────────────────
     updateHUD() {
         const u = this.data.user;
-        const chips = { 'hud-streak': u.streak || 1, 'hud-gems': u.gems, 'hud-xp': u.xp, 'hud-hearts': u.hearts };
+        const chips = {
+            'hud-streak': String(u.streak || 1),
+            'hud-gems':   String(u.gems   || 0),
+            'hud-xp':     (u.xp || 0).toLocaleString('pt-BR'),
+            'hud-hearts': String(u.hearts ?? 5),
+        };
         for (const [id, val] of Object.entries(chips)) {
             const el = document.getElementById(id);
             if (!el) continue;
-            if (el.textContent !== String(val)) {
+            if (el.textContent !== val) {
                 el.textContent = val;
                 const chip = el.closest('.hud-chip');
                 if (chip) { chip.classList.remove('hud-pulse'); void chip.offsetWidth; chip.classList.add('hud-pulse'); }
             }
         }
-        const avatarEl = document.getElementById('hud-avatar-btn');
-        if (avatarEl) avatarEl.textContent = u.avatar || '🦸';
-        const levelEl = document.getElementById('hud-level');
-        if (levelEl) levelEl.textContent = `Nv.${u.level}`;
+        // Avatar button uses structured children — update each span individually
+        const avIcon  = document.getElementById('hud-av-icon');
+        const avLevel = document.getElementById('hud-av-level');
+        if (avIcon)  avIcon.textContent  = u.avatar || '🦸';
+        if (avLevel) avLevel.textContent = `Nível ${u.level || 1}`;
+        if (typeof HUD !== 'undefined') HUD.refreshNotifBadge();
     },
 
     // ── RANK & CLASS ─────────────────────────────────────────

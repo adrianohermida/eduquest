@@ -197,6 +197,16 @@
     -webkit-tap-highlight-color: transparent;
     outline: none;
 }
+/* Icon + value row inside the vertical chip */
+.hud-chip-val {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.78rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
 .hud-chip-lbl {
     font-size: 0.55rem;
     font-weight: 700;
@@ -831,6 +841,11 @@
 }
 
 /* ── RESPONSIVE ────────────────────────────────────────────── */
+
+/* On tablet+: notification bell moved to avatar dropdown */
+@media (min-width: 768px) {
+    .hud-notif-wrap { display: none; }
+}
 
 /* On small mobile: hide XP chip (lower priority) */
 @media (max-width: 440px) {

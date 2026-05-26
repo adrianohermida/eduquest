@@ -970,7 +970,7 @@ const HUD = {
         const txt  = document.getElementById('hud-disc-text');
         const mapa = document.getElementById('hud-mapa-btn');
         if (nav)  nav.style.removeProperty('display');
-        if (txt)  txt.textContent = `${data.subject} • 7º Ano`;
+        if (txt)  txt.textContent = `${data.subject} • ${data.grade || '7º Ano'}`;
         if (mapa) mapa.href = data.href || '#home';
     },
 
@@ -1099,13 +1099,14 @@ const HUD = {
         if (typeof State === 'undefined') return;
         const u  = State.data.user;
         const $  = id => document.getElementById(id);
-        if ($('hud-xp'))      $('hud-xp').textContent     = (u.xp || 0).toLocaleString('pt-BR');
-        if ($('hud-gems'))    $('hud-gems').textContent   = u.gems  || 0;
-        if ($('hud-streak'))  $('hud-streak').textContent = u.streak || 1;
-        if ($('hud-hearts'))  $('hud-hearts').textContent = u.hearts ?? 5;
+        if ($('hud-xp'))      $('hud-xp').textContent      = (u.xp || 0).toLocaleString('pt-BR');
+        if ($('hud-gems'))    $('hud-gems').textContent    = u.gems   || 0;
+        if ($('hud-streak'))  $('hud-streak').textContent  = u.streak || 1;
+        if ($('hud-hearts'))  $('hud-hearts').textContent  = u.hearts ?? 5;
         if ($('hud-av-icon')) $('hud-av-icon').textContent = u.avatar || '🦸';
         if ($('hud-av-level'))$('hud-av-level').textContent = `Nível ${u.level || 1}`;
         this.refreshNotifBadge();
+        if (typeof Sidebar !== 'undefined') Sidebar.updateUser();
     },
 
     // ── INIT ──────────────────────────────────────────────

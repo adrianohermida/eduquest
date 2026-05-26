@@ -127,19 +127,19 @@ const Router = {
                         return typeof State !== 'undefined' && !State.getChapterProgress(ch.id).completed;
                     }) || chapters[0];
                     if (activeChapter) {
-                        HUD.setContext({ icon: activeChapter.icon, subject: activeChapter.subject, stage: 'Mapa', href: `#chapter/${activeChapter.id}` });
+                        HUD.setContext({ icon: activeChapter.icon, subject: activeChapter.subject, grade: activeChapter.grade, stage: 'Mapa', href: `#chapter/${activeChapter.id}` });
                     } else {
                         HUD.clearContext();
                     }
                 } else if (route === 'chapter' && parts[1]) {
                     const meta = window.CHAPTER_METADATA;
-                    if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.title, stage: 'Mapa', href: `#chapter/${parts[1]}` });
+                    if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.subject || meta.title, grade: meta.grade, stage: 'Mapa', href: `#chapter/${parts[1]}` });
                 } else if (route === 'stage' && parts[1] && parts[2]) {
                     const meta = window.CHAPTER_METADATA;
-                    if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.title, stage: `Fase ${parts[2]}`, href: `#chapter/${parts[1]}` });
+                    if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.subject || meta.title, grade: meta.grade, stage: `Fase ${parts[2]}`, href: `#chapter/${parts[1]}` });
                 } else if (route === 'adventure' && parts[1]) {
                     const meta = window.CHAPTER_METADATA;
-                    if (meta) HUD.setContext({ icon: meta.icon || '🗺️', subject: meta.title, stage: 'Mapa Aventura', href: `#chapter/${parts[1]}` });
+                    if (meta) HUD.setContext({ icon: meta.icon || '🗺️', subject: meta.subject || meta.title, grade: meta.grade, stage: 'Mapa Aventura', href: `#chapter/${parts[1]}` });
                 }
             }, 0);
         }
