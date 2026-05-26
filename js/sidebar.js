@@ -388,6 +388,7 @@ const HUD = {
         dd.classList.add('open');
         dd.setAttribute('aria-hidden', 'false');
         btn?.setAttribute('aria-expanded', 'true');
+        if (typeof EduSprings !== 'undefined') EduSprings.pop(btn, 0.55);
         this._updateAvatarDropdown();
         this._updateLayoutPrefUI();
         this._bindOutside();
@@ -436,6 +437,7 @@ const HUD = {
         ddEl.classList.add('open');
         ddEl.setAttribute('aria-hidden', 'false');
         btn?.setAttribute('aria-expanded', 'true');
+        if (typeof EduSprings !== 'undefined') EduSprings.pop(btn, 0.55);
         this._bindOutside();
     },
 
