@@ -92,9 +92,16 @@ const Sidebar = {
         const nameEl   = document.getElementById('sb-user-name');
         const levelEl  = document.getElementById('sb-user-level');
         const avatarEl = document.getElementById('sb-user-avatar');
+        const xpTextEl = document.getElementById('sb-xp-text');
+        const xpFillEl = document.getElementById('sb-xp-fill');
         if (nameEl)   nameEl.textContent   = u.name  || 'Herói';
         if (levelEl)  levelEl.textContent  = `Nível ${u.level || 1}`;
         if (avatarEl) avatarEl.textContent = u.avatar || '🦸';
+        if (xpTextEl || xpFillEl) {
+            const xp = State.getXPProgress();
+            if (xpTextEl) xpTextEl.textContent = `${xp.current} / ${xp.needed} XP`;
+            if (xpFillEl) xpFillEl.style.width = `${xp.percent}%`;
+        }
     },
 
     // ── REFRESH RIGHT PANEL ───────────────────────────────
@@ -145,7 +152,7 @@ const Sidebar = {
                     </div>
                 </a>
                 <div class="sidebar-user-xp-row">
-                    <span class="sidebar-user-xp-text">${xpProg.current} / ${xpProg.needed} XP</span>
+                    <span class="sidebar-user-xp-text" id="sb-xp-text">${xpProg.current} / ${xpProg.needed} XP</span>
                     <div class="sidebar-user-xp-bar">
                         <div class="sidebar-user-xp-fill" id="sb-xp-fill" style="width:${xpProg.percent}%"></div>
                     </div>
