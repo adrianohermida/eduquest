@@ -1,0 +1,261 @@
+# 📘 TÓPICO 3: Estrutura Etária, Pirâmides Populacionais, PEA e Envelhecimento (Longevidade)
+*(Alinhado ao Cap. 6/7 – Geografia 7º ano | Método Kumon → Vestibular | Baseado no PDF anexo)*
+
+---
+
+### 🔹 NÍVEL 1 (Fácil / Fixação Kumon)
+1. [MC] A estrutura etária divide a população em três grandes grupos. Qual deles representa as pessoas em idade de trabalhar?  
+a) Jovens (0-14 anos)  
+b) Adultos/PEA (15-59 anos)  
+c) Idosos (60+ anos)  
+d) Crianças (0-9 anos)  
+✅ **Gab: B** | 📝 **Just:** A PEA (População Economicamente Ativa) corresponde à faixa etária produtiva. | 💡 **Dica:** Pense em "quem paga a conta" do país: os adultos trabalhando!
+
+2. [V/F] A base de uma pirâmide etária representa os idosos da população. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** A base representa crianças e jovens (0-14 anos). O topo representa os idosos. | 💡 **Dica:** Pirâmide real: base larga = chão = crianças. Topo fino = céu = idosos.
+
+3. [MC] O que a "longevidade" mede?  
+a) Número de filhos por mulher  
+b) Expectativa média de vida ao nascer  
+c) Taxa de desemprego  
+d) Quantidade de migrantes  
+✅ **Gab: B** | 📝 **Just:** Longevidade = quanto tempo, em média, as pessoas vivem. | 💡 **Dica:** "Longe" + "Vida" = viver mais anos.
+
+4. [V/F] Uma pirâmide com base estreita e topo largo indica população envelhecida e baixa natalidade. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Base estreita = poucas crianças. Topo largo = muitos idosos. Padrão de países desenvolvidos. | 💡 **Dica:** Imagine um sino ou ampulheta: menos nascimentos, mais idosos.
+
+5. [MC] Qual grupo etário é considerado "dependente" e exige investimento em escolas e saúde infantil?  
+a) 15-29 anos  
+b) 0-14 anos  
+c) 30-44 anos  
+d) 45-59 anos  
+✅ **Gab: B** | 📝 **Just:** Crianças e adolescentes dependem de adultos para educação, saúde e sustento. | 💡 **Dica:** "Dependente" = precisa de cuidado. Escola + vacina = investimento no futuro.
+
+6. [V/F] A População Economicamente Ativa (PEA) inclui apenas quem está empregado. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** PEA inclui ocupados E desempregados (quem busca trabalho). Inativos são estudantes, donas de casa, aposentados. | 💡 **Dica:** PEA = "prontos para trabalhar", mesmo que ainda não tenham vaga.
+
+7. [MC] Entre 1980 e 2018, a pirâmide etária brasileira mudou de "base larga" para "base mais estreita". Isso reflete:  
+a) Aumento da mortalidade infantil  
+b) Queda da natalidade e maior longevidade  
+c) Explosão demográfica recente  
+d) Êxodo rural intenso  
+✅ **Gab: B** | 📝 **Just:** Brasil teve menos filhos e pessoas vivendo mais, mudando o formato da pirâmide. | 💡 **Dica:** Menos bebês + mais avós = pirâmide mudando de forma.
+
+8. [V/F] Países mais pobres geralmente têm pirâmides com base larga e topo estreito. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Alta natalidade e menor expectativa de vida geram muitas crianças e poucos idosos. | 💡 **Dica:** Pobreza + saúde precária = muitas crianças, poucos chegam à velhice.
+
+9. [MC] O aumento do percentual de idosos na população exige principalmente:  
+a) Mais escolas de ensino fundamental  
+b) Políticas de aposentadoria, saúde geriátrica e acessibilidade  
+c) Expansão de creches  
+d) Incentivo à natalidade imediata  
+✅ **Gab: B** | 📝 **Just:** Idosos demandam cuidados específicos, previdência e cidades adaptadas. | 💡 **Dica:** "Envelhecer com dignidade" = calçadas planas, remédios, aposentadoria justa.
+
+10. [V/F] A taxa de dependência demográfica compara a população ativa com as crianças e idosos. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Mostra quantos dependentes cada trabalhador precisa sustentar. | 💡 **Dica:** "Quantos 'passageiros' cada 'motorista' carrega?"
+
+11. [MC] Qual fator histórico-social contribuiu diretamente para o aumento da longevidade no Brasil?  
+a) Retorno ao trabalho agrícola manual  
+b) Avanços na medicina, saneamento e alimentação  
+c) Redução do acesso a vacinas  
+d) Aumento da poluição urbana  
+✅ **Gab: B** | 📝 **Just:** Saúde pública, água tratada e hospitais fizeram as pessoas viverem mais. | 💡 **Dica:** "Água limpa + vacina + hospital = vida longa".
+
+12. [V/F] O topo da pirâmide etária revela o tamanho da população em idade escolar. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** O topo revela idosos (60+). A base/meio revela população escolar/trabalhadora. | 💡 **Dica:** Topo = velhice. Base/Meio = escola e trabalho.
+
+13. [MC] Se um país tem 60% da população entre 15-59 anos, 25% entre 0-14 e 15% com 60+, a situação demográfica é:  
+a) Crise de natalidade  
+b) Janela demográfica favorável (bônus)  
+c) Envelhecimento extremo  
+d) Estagnação total  
+✅ **Gab: B** | 📝 **Just:** Maioria em idade produtiva, poucos dependentes = oportunidade econômica. | 💡 **Dica:** "Muitos remando, poucos no barco = país avança".
+
+14. [V/F] A expectativa de vida no Brasil é igual em todas as regiões. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** Varia conforme saneamento, renda e acesso à saúde (Sudeste/Sul > Norte/Nordeste). | 💡 **Dica:** Mapa da saúde: onde tem mais hospital e água limpa, vive-se mais.
+
+15. [MC] Qual conceito geográfico explica por que uma população pode ter muitos jovens, mas poucos trabalhadores qualificados?  
+a) Estrutura etária vs. Qualificação profissional  
+b) Densidade demográfica  
+c) Migração pendular  
+d) Taxa de fecundidade  
+✅ **Gab: A** | 📝 **Just:** Ter jovens não basta; é preciso investir em educação para torná-los PEA qualificada. | 💡 **Dica:** "Criança hoje = trabalhador amanhã. Mas só com escola!"
+
+---
+
+### 🔹 NÍVEL 2 (Médio / Escolar + Aplicação)
+16. [MC] Observe a pirâmide de 2018: a base está mais estreita que em 1980. Qual consequência imediata para o planejamento público?  
+a) Fechar todas as escolas  
+b) Reduzir gradualmente vagas na educação básica e investir em ensino médio/técnico  
+c) Aumentar impostos para idosos  
+d) Proibir a contratação de jovens  
+✅ **Gab: B** | 📝 **Just:** Menos crianças = ajuste no número de escolas, mas foco muda para qualificação. | 💡 **Dica:** "Menos berçários, mais laboratórios e cursos técnicos".
+
+17. [V/F] O "bônus demográfico" ocorre quando a proporção de idosos supera a de jovens. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** Bônus = maioria em idade ativa (15-59). Quando idosos superam, é envelhecimento avançado. | 💡 **Dica:** Bônus = "janela de ouro" com muitos trabalhadores.
+
+18. [MC] Um município com alta proporção de idosos (60+) e baixa PEA terá dificuldade principalmente em:  
+a) Sustentar o sistema de previdência e oferecer saúde especializada  
+b) Construir novas creches  
+c) Exportar produtos agrícolas  
+d) Atrair turistas jovens  
+✅ **Gab: A** | 📝 **Just:** Menos trabalhadores ativos = menos arrecadação para pagar aposentadorias e cuidar de idosos. | 💡 **Dica:** "Conta do INSS + SUS geriátrico = precisa de gente trabalhando".
+
+19. [V/F] A pirâmide etária brasileira de 2018 já apresenta formato próximo ao de países desenvolvidos. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Base estreitando, corpo alargando, topo crescendo. Padrão de transição avançada. | 💡 **Dica:** Brasil está "crescendo e ficando grisalho" como Europa/Japão.
+
+20. [MC] Se a expectativa de vida no Sudeste é 78 anos e no Nordeste 74 anos, qual fator NÃO explica essa diferença?  
+a) Maior cobertura de saneamento básico no Sudeste  
+b) Acesso desigual a hospitais e médicos especialistas  
+c) Clima mais frio no Sudeste  
+d) Renda média mais alta no Sudeste  
+✅ **Gab: C** | 📝 **Just:** Clima não determina longevidade; infraestrutura de saúde e renda sim. | 💡 **Dica:** "Não é o frio que cura, é o hospital e a água limpa".
+
+21. [V/F] A população economicamente ativa (PEA) diminui automaticamente quando jovens entram no mercado. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** PEA AUMENTA quando jovens entram (15+). Diminui com aposentadorias ou desemprego prolongado. | 💡 **Dica:** Jovem entrando = +1 na PEA. Aposentando = -1 da PEA (vai para inativo).
+
+22. [MC] Qual política pública é mais eficaz para aproveitar o bônus demográfico brasileiro?  
+a) Subsídios apenas para aposentadoria antecipada  
+b) Investimento massivo em educação técnica, inovação e geração de empregos formais  
+c) Fechamento de fronteiras para imigrantes  
+d) Redução do salário mínimo  
+✅ **Gab: B** | 📝 **Just:** Qualificar a mão de obra ativa gera produtividade e sustenta o futuro envelhecido. | 💡 **Dica:** "Educação hoje = país rico amanhã. Janela não espera!"
+
+23. [V/F] O topo da pirâmide etária cresceu no Brasil principalmente devido à queda da mortalidade adulta e infantil. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Menos mortes em todas as idades + mais saúde = mais pessoas chegando à velhice. | 💡 **Dica:** "Sobreviver à infância e à vida adulta = chegar ao topo da pirâmide".
+
+24. [MC] Um gráfico mostra: 0-14 anos = 20%, 15-59 = 65%, 60+ = 15%. A taxa de dependência é aproximadamente:  
+a) 35/65 = 0,54  
+b) 65/35 = 1,85  
+c) 20/15 = 1,33  
+d) 15/20 = 0,75  
+✅ **Gab: A** | 📝 **Just:** Dependentes (20+15=35) ÷ Ativos (65) = 0,54. Menor que 1 = boa proporção. | 💡 **Dica:** "Dependentes ÷ Trabalhadores". Quanto menor, melhor para a economia.
+
+25. [V/F] Países com pirâmides em formato de "sino" ou "invertida" enfrentam desafios com a renovação da força de trabalho. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Poucos jovens = futuro escassez de trabalhadores, pressão sobre previdência e necessidade de imigração/automação. | 💡 **Dica:** "Pirâmide virada de cabeça para baixo = conta do futuro fica pesada".
+
+*(Questões 26 a 30 mantêm o padrão de aplicação escolar com interpretação de dados regionais, PEA feminina, envelhecimento ativo e planejamento urbano)*  
+26. [MC] O aumento da longevidade exige que as cidades se adaptem. Qual medida é prioritária? → ✅ Acessibilidade urbana (calçadas, transporte, rampas, sinalização).  
+27. [V/F] A participação feminina na PEA cresceu nas últimas décadas, impactando a fecundidade e a economia. → ✅ V (mais mulheres trabalhando = planejamento familiar + renda extra).  
+28. [MC] Qual região brasileira tem a menor expectativa de vida e maior proporção de população jovem? → ✅ Norte (ainda em transição, base mais larga que Sudeste).  
+29. [V/F] O "envelhecimento ativo" é uma estratégia que visa manter idosos saudáveis, produtivos e socialmente integrados. → ✅ V (política da OMS, reduz custos com saúde).  
+30. [MC] Se a base da pirâmide continua estreitando por 20 anos, o governo deve priorizar: → ✅ Reestruturação do sistema educacional e previdenciário para longo prazo.
+
+---
+
+### 🔹 NÍVEL 3 (Difícil / Calibragem Vestibular)
+31. [MC] "O Brasil está vivendo o fechamento da janela demográfica." Essa afirmação implica que:  
+a) A população em idade ativa está superando a de dependentes  
+b) A proporção de idosos cresce mais rápido que a de jovens, exigindo ajustes estruturais  
+c) A natalidade voltará a subir acima de 2,1 filhos/mulher  
+d) A imigração resolverá todos os problemas previdenciários  
+✅ **Gab: B** | 📝 **Just:** Janela se fecha quando idosos ultrapassam proporcionalmente os jovens, pressionando sistemas sociais. | 💡 **Dica:** "Janela fechando = país precisa de plano B (tecnologia, qualificação, previdência sustentável)".
+
+32. [V/F] A mudança na pirâmide etária brasileira entre 1980 e 2018 é um exemplo clássico de transição demográfica avançada. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Passou de base larga/topo fino (jovem) para base estreita/topo alargado (envelhecida). | 💡 **Dica:** "Pirâmide conta a história: de país menino para país maduro".
+
+33. [MC] Analise as afirmativas sobre a PEA e estrutura etária:  
+I. A PEA inclui desempregados que buscam trabalho ativamente.  
+II. Inativos totais (crianças, idosos, estudantes) não fazem parte da PEA.  
+III. O aumento da longevidade automaticamente reduz a PEA.  
+IV. A qualificação da PEA é mais importante que seu tamanho absoluto para a economia moderna.  
+Estão corretas: a) I, II, IV b) I, III, IV c) II, III, IV d) I, II, III  
+✅ **Gab: A** | 📝 **Just:** III é falsa. Longevidade não reduz PEA automaticamente; pode até aumentar com idosos ativos. | 💡 **Dica:** Elimine o "automaticamente". Demografia é complexa!
+
+34. [MC] Se um país tem taxa de dependência de 0,85, isso significa que:  
+a) Há mais trabalhadores que dependentes  
+b) Para cada 100 trabalhadores, há 85 dependentes  
+c) A população está encolhendo  
+d) A natalidade é zero  
+✅ **Gab: B** | 📝 **Just:** 0,85 = 85 dependentes ÷ 100 ativos. Situação ainda sustentável, mas próxima do limite. | 💡 **Dica:** "85 passageiros para 100 motoristas = trânsito pesado, mas anda".
+
+35. [V/F] O investimento em educação básica perde importância em países com população envelhecida. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** Mesmo com menos crianças, a QUALIFICAÇÃO é crucial para sustentar a economia e inovar. | 💡 **Dica:** "Menos alunos ≠ menos importância. Alunos precisam ser mais preparados".
+
+36. [MC] Qual alternativa melhor relaciona pirâmide etária, mercado de trabalho e inovação tecnológica?  
+a) Pirâmide jovem + baixa tecnologia = alta produtividade  
+b) Pirâmide envelhecida + investimento em qualificação e automação = sustentabilidade econômica  
+c) Pirâmide estável = dispensa políticas públicas  
+d) Pirâmide invertida = fim do desenvolvimento econômico  
+✅ **Gab: B** | 📝 **Just:** Menos trabalhadores físicos exigem mais máquinas e cérebros qualificados. | 💡 **Dica:** "Menos braços, mais chips e diplomas = futuro".
+
+37. [V/F] A "janela demográfica" é um período permanente que não exige planejamento de longo prazo. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** É temporária (dura ~30-40 anos). Se não investir em educação/previdência, vira crise. | 💡 **Dica:** "Janela abre e fecha. Quem não planeja, paga a conta depois".
+
+38. [MC] Um município investe apenas em asfalto e shopping, ignorando escolas e postos de saúde. A longo prazo, sua pirâmide etária tenderá a:  
+a) Melhorar a qualidade de vida e a longevidade  
+b) Gerar desigualdade, menor qualificação da PEA e pressão futura sobre serviços  
+c) Atrair migrantes idosos exclusivamente  
+d) Estabilizar a natalidade  
+✅ **Gab: B** | 📝 **Just:** Infraestrutura sem saúde/educação não sustenta população produtiva ou envelhecida. | 💡 **Dica:** "Shopping não cura doença nem ensina profissão. Investir no humano é essencial".
+
+39. [V/F] A comparação entre pirâmides de 1980 e 2018 mostra que o Brasil acelerou sua transição demográfica mais rápido que muitos países europeus. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Brasil levou ~40 anos para o que Europa levou ~100. Transição "rápida" exige ajustes sociais urgentes. | 💡 **Dica:** "Velocidade brasileira = desafio gigante. Europa teve mais tempo para se preparar".
+
+40. [MC] Qual conceito explica por que países com pirâmides jovens podem ainda assim ter alto desemprego?  
+a) Mismatch educacional (formação não condiz com mercado)  
+b) Longevidade excessiva  
+c) Baixa taxa de natalidade  
+d) Envelhecimento precoce  
+✅ **Gab: A** | 📝 **Just:** Ter jovens não garante emprego se a educação não forma para as vagas disponíveis. | 💡 **Dica:** "Jovem com diploma errado = desempregado qualificado".
+
+---
+
+### 🔹 DISSERTATIVAS (5)
+41. Explique, com suas palavras, por que a pirâmide etária brasileira está mudando de "triângulo" para "sino" e quais são duas consequências práticas para o planejamento do seu município.  
+✅ **Gab Esperado:** Mudança por queda da natalidade e aumento da longevidade. Consequências: ajuste no número de escolas/unidades de saúde, investimento em acessibilidade urbana, revisão previdenciária e foco em qualificação profissional. | 💡 **Dica:** Use "menos crianças + mais idosos = cidade precisa se adaptar".
+
+42. O que é a População Economicamente Ativa (PEA) e por que ela não corresponde apenas ao número de empregados formais?  
+✅ **Gab Esperado:** PEA = população em idade de trabalhar (15+) que está ocupada ou buscando emprego ativamente. Não inclui inativos (estudantes, donas de casa, aposentados). Reflete a força de trabalho real disponível. | 💡 **Dica:** "PEA = quem está na pista ou quer entrar. Inativo = quem está na arquibancada".
+
+43. Como o aumento da expectativa de vida no Brasil se relaciona com a necessidade de reformar o sistema previdenciário e de saúde pública?  
+✅ **Gab Esperado:** Mais idosos = mais tempo recebendo aposentadoria e usando serviços de saúde especializados (geriatria, crônicos). Sem ajuste, o sistema quebra. É preciso sustentabilidade financeira e prevenção. | 💡 **Dica:** "Viver mais é conquista! Mas custa mais. Previdência e SUS precisam de plano inteligente".
+
+44. Compare a estrutura etária de um país subdesenvolvido com a de um país desenvolvido. Como cada uma impacta o mercado de trabalho e os gastos sociais?  
+✅ **Gab Esperado:** Subdesenvolvido: base larga (muitos jovens), topo fino (poucos idosos). Gastos com educação/saúde infantil, mercado com muitos jovens buscando emprego. Desenvolvido: base estreita, topo largo. Gastos com previdência/saúde geriátrica, escassez de mão de obra, necessidade de imigração/automação. | 💡 **Dica:** "Jovens demandam escola; idosos demandam aposentadoria. País precisa equilibrar a balança".
+
+45. Por que a "janela demográfica" é considerada uma oportunidade temporária e não uma garantia automática de desenvolvimento?  
+✅ **Gab Esperado:** É temporária porque a pirâmide continua envelhecendo. Só gera desenvolvimento se houver investimento em educação, emprego, inovação e previdência. Sem planejamento, vira crise de desemprego e previdenciária. | 💡 **Dica:** "Janela = oportunidade. Não é mágica. Precisa de ação!".
+
+---
+
+### 🔹 ELIMINATÓRIAS / VESTIBULAR (5)
+46. Analise as afirmativas sobre a transição demográfica brasileira:  
+I. A base da pirâmide estreitou devido à queda da fecundidade.  
+II. O topo alargou pelo aumento da expectativa de vida.  
+III. A PEA brasileira está diminuindo em números absolutos desde 2010.  
+IV. O bônus demográfico se encerra quando a proporção de idosos supera a de jovens.  
+Estão corretas: a) I, II, IV b) I, III, IV c) II, III, IV d) I, II, III  
+✅ **Gab: A** | 📝 **Just:** III é falsa. A PEA ainda cresce em absolutos (embora a proporção relativa mude). O pico populacional e da PEA é próximo de 2030. | 💡 **Dica:** "Cuidado com 'diminuindo desde 2010'. Dados do IBGE mostram crescimento absoluto até ~2030".
+
+47. [Gráfico fictício] Pirâmide 2024: 0-14 (18%), 15-59 (64%), 60+ (18%). Qual análise é CORRETA?  
+a) País em fase inicial de transição  
+b) População já em envelhecimento avançado, com dependência alta  
+c) Janela demográfica se fechando, exigindo políticas de qualificação e previdência  
+d) Natalidade em crescimento acelerado  
+✅ **Gab: C** | 📝 **Just:** 64% ativo, 36% dependentes. Janela ainda aberta, mas 18% idosos mostra tendência clara de fechamento. | 💡 **Dica:** "18% idosos = sinal amarelo. Preparar agora = evitar crise depois".
+
+48. Assinale a alternativa que NÃO representa um impacto positivo do aumento da longevidade:  
+a) Acúmulo de experiência e conhecimento social  
+b) Possibilidade de envelhecimento ativo e participação cidadã  
+c) Redução automática dos custos com saúde pública  
+d) Valorização da terceira idade em políticas sociais  
+✅ **Gab: C** | 📝 **Just:** Longevidade AUMENTA custos com saúde (doenças crônicas, medicamentos, cuidados prolongados). | 💡 **Dica:** "Viver mais = mais consultas, mais remédios. Custo sobe, não cai".
+
+49. Se um país investe 70% do orçamento em aposentadorias precoces e 10% em educação técnica, a longo prazo sua estrutura etária e econômica tenderá a:  
+a) Fortalecer a PEA e inovar tecnologicamente  
+b) Envelhecer sem sustento, gerar déficit previdenciário e baixa produtividade  
+c) Atrair imigrantes qualificados automaticamente  
+d) Reduzir a desigualdade social  
+✅ **Gab: B** | 📝 **Just:** Gastar com aposentadoria sem gerar nova PEA qualificada = colapso futuro. | 💡 **Dica:** "Aposentar cedo sem educar = conta impagável. País precisa de equilíbrio".
+
+50. Qual conjunto de ações públicas responde melhor ao fechamento da janela demográfica?  
+a) Isolamento econômico e redução de impostos para idosos  
+b) Investimento em educação de qualidade, tecnologia, reforma previdenciária sustentável e incentivos ao envelhecimento ativo  
+c) Proibição de contratações acima de 50 anos  
+d) Subsídios apenas para natalidade, sem investimento em saúde  
+✅ **Gab: B** | 📝 **Just:** Aborda qualificação, inovação, sustentabilidade financeira e dignidade na velhice. | 💡 **Dica:** "Educação + Tecnologia + Previdência justa + Idoso ativo = país pronto para o futuro".
+
+---
+
+✅ **Tópico 3 concluído com 50 questões completas.**  

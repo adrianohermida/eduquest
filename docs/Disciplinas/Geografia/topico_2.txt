@@ -1,0 +1,245 @@
+
+# 📘 TÓPICO 2: Crescimento Populacional (Natalidade, Mortalidade, Fecundidade e Crescimento Vegetativo)
+*(Alinhado ao Cap. 6/7 – Geografia 7º ano | Método Kumon → Vestibular)*
+
+---
+
+### 🔹 NÍVEL 1 (Fácil / Fixação Kumon)
+1. [MC] O crescimento natural ou vegetativo de uma população é calculado pela diferença entre:  
+a) Imigração e emigração  
+b) Taxa de natalidade e taxa de mortalidade  
+c) População urbana e rural  
+d) Expectativa de vida e fecundidade  
+✅ **Gab: B** | 📝 **Just:** Crescimento vegetativo = Nascimentos – Óbitos (desconsidera migrações). | 💡 **Dica:** "Natural" = nasce e morre no lugar, sem mudar de casa.
+
+2. [V/F] A taxa de natalidade indica o número de nascidos vivos para cada mil habitantes em um ano. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Padrão demográfico internacional: expressa em "por mil" (‰). | 💡 **Dica:** Pense em "1.000 pessoas na fila, quantos bebês nascem?"
+
+3. [MC] Qual fator histórico foi crucial para a queda da taxa de mortalidade no Brasil no século XX?  
+a) Guerras civis  
+b) Avanços da medicina, vacinas e saneamento básico  
+c) Aumento da pobreza  
+d) Redução da agricultura  
+✅ **Gab: B** | 📝 **Just:** Antibióticos, vacinas e água tratada reduziram mortes por doenças infecciosas. | 💡 **Dica:** "Saneamento + Vacina = Vida mais longa".
+
+4. [V/F] A taxa de fecundidade mede a quantidade média de filhos por mulher em idade fértil (15-49 anos). ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Definição técnica oficial da demografia. | 💡 **Dica:** "Fértil" = idade de poder ter filhos. Média nacional caiu para menos de 2.
+
+5. [MC] Se em uma cidade nascem 1.500 bebês e morrem 800 pessoas no mesmo ano, o crescimento vegetativo é:  
+a) -700 b) +700 c) +2.300 d) 0  
+✅ **Gab: B** | 📝 **Just:** 1.500 – 800 = +700. | 💡 **Dica:** Nascer > Morrer = população cresce. Subtração simples!
+
+6. [V/F] O Brasil atingirá seu pico populacional por volta de 2042, segundo projeções do IBGE. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Projeção oficial indica ~228 milhões em 2042, depois começa a cair. | 💡 **Dica:** "2042 = topo da montanha demográfica brasileira".
+
+7. [MC] A inserção da mulher no mercado de trabalho e o acesso a métodos contraceptivos contribuíram para:  
+a) Aumento da natalidade  
+b) Redução da fecundidade  
+c) Aumento da mortalidade infantil  
+d) Êxodo rural  
+✅ **Gab: B** | 📝 **Just:** Planejamento familiar e carreira reduzem o número médio de filhos. | 💡 **Dica:** "Mulher no trabalho + planejamento = família menor".
+
+8. [V/F] A taxa de mortalidade no Brasil tem aumentado continuamente desde 1960. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** A tendência é de queda, estabilizando-se em patamares baixos. | 💡 **Dica:** Gráfico do livro mostra linha descendo ao longo das décadas.
+
+9. [MC] Qual indicador revela quantos anos, em média, uma pessoa pode esperar viver?  
+a) Taxa de fecundidade  
+b) Expectativa de vida  
+c) Densidade demográfica  
+d) População economicamente ativa  
+✅ **Gab: B** | 📝 **Just:** Expectativa de vida (ou longevidade) é a média de anos ao nascer. | 💡 **Dica:** "Longevidade" = viver muito, com saúde.
+
+10. [V/F] O crescimento vegetativo desconsidera a entrada e saída de migrantes. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** É "natural", só conta nascimentos e óbitos. Migrações são analisadas separadamente. | 💡 **Dica:** "Natural" ≠ "Total". Migração entra no saldo migratório.
+
+11. [MC] No Brasil, o período de maior crescimento populacional ocorreu entre:  
+a) 1940 e 1960  
+b) 1990 e 2000  
+c) 2010 e 2020  
+d) 1980 e 1990  
+✅ **Gab: A** | 📝 **Just:** Pós-guerra, queda acentuada da mortalidade + natalidade ainda alta. | 💡 **Dica:** "Baby boom brasileiro" = anos 50/60.
+
+12. [V/F] A urbanização foi um dos fatores que acelerou o crescimento da natalidade no Brasil. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** A urbanização reduziu a natalidade (custo de vida, espaço, planejamento). | 💡 **Dica:** Cidade = espaço menor, vida mais cara = menos filhos.
+
+13. [MC] Qual órgão é responsável pelo Censo Demográfico e pelas projeções populacionais no Brasil?  
+a) IBGE  
+b) ANVISA  
+c) Ministério da Saúde  
+d) INEP  
+✅ **Gab: A** | 📝 **Just:** IBGE coleta, analisa e projeta dados demográficos oficiais. | 💡 **Dica:** IBGE = "Instituto Brasileiro de Geografia e Estatística".
+
+14. [V/F] A taxa de fecundidade de reposição populacional é de aproximadamente 2,1 filhos por mulher. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** 2,1 garante que a população se mantenha estável (substitui pai + mãe + compensa mortalidade). | 💡 **Dica:** "2,1 = número mágico da estabilidade".
+
+15. [MC] Se a taxa de natalidade é 15‰ e a de mortalidade é 6‰, o crescimento vegetativo é:  
+a) 9‰ b) 21‰ c) -9‰ d) 3‰  
+✅ **Gab: A** | 📝 **Just:** 15 – 6 = 9‰. | 💡 **Dica:** Mantém a unidade "por mil" (‰). Subtração direta.
+
+---
+
+### 🔹 NÍVEL 2 (Médio / Escolar + Aplicação)
+16. [MC] Observe a tendência: natalidade cai, mortalidade cai, mas natalidade ainda > mortalidade. O que acontece com a população?  
+a) Estagna  
+b) Cresce, mas em ritmo menor  
+c) Declina rapidamente  
+d) Fica igual  
+✅ **Gab: B** | 📝 **Just:** Saldo positivo, porém menor. É a fase de transição demográfica. | 💡 **Dica:** "Dois caindo, mas um na frente = crescimento desacelerado".
+
+17. [V/F] A queda da mortalidade infantil no Brasil está diretamente ligada à ampliação de postos de saúde e campanhas de vacinação. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Políticas públicas de saúde reduziram drasticamente óbitos na primeira infância. | 💡 **Dica:** "Vacina + Aleitamento + Saneamento = bebês vivos".
+
+18. [MC] Qual alternativa melhor explica a queda da fecundidade nas regiões urbanizadas do Brasil?  
+a) Clima mais frio  
+b) Acesso a educação, contraceptivos e custo elevado de criação dos filhos  
+c) Aumento da mortalidade adulta  
+d) Isolamento social  
+✅ **Gab: B** | 📝 **Just:** Fatores socioeconômicos e culturais são determinantes. | 💡 **Dica:** "Escola + Planejamento + Aluguel caro = família planejada".
+
+19. [V/F] Um país com fecundidade abaixo de 1,5 filhos por mulher enfrentará, a longo prazo, envelhecimento e redução populacional. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Abaixo da reposição (2,1), a base da pirâmide encolhe e o topo envelhece. | 💡 **Dica:** "Menos de 2 = pirâmide vira sino/invertida".
+
+20. [MC] Analise: Em 1960, natalidade = 40‰, mortalidade = 12‰. Em 2010, natalidade = 16‰, mortalidade = 6‰. Comparando os períodos, o crescimento vegetativo:  
+a) Aumentou  
+b) Diminuiu  
+c) Ficou igual  
+d) Tornou-se negativo  
+✅ **Gab: B** | 📝 **Just:** 1960: 28‰ | 2010: 10‰. Caiu significativamente. | 💡 **Dica:** 40-12=28 vs 16-6=10. 28 > 10 → desaceleração.
+
+21. [V/F] A projeção populacional do IBGE considera apenas nascimentos e óbitos, ignorando migrações internacionais. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** Projeções modernas consideram saldo migratório, tendências socioeconômicas e políticas públicas. | 💡 **Dica:** "Migração entra na conta, sim! Especialmente em fronteiras".
+
+22. [MC] Qual fator cultural e econômico levou mulheres brasileiras a adiar ou reduzir a maternidade nas últimas décadas?  
+a) Retorno ao trabalho rural  
+b) Maior escolarização e participação no mercado formal  
+c) Aumento de casamentos precoces  
+d) Redução do custo de vida  
+✅ **Gab: B** | 📝 **Just:** Educação e carreira são os maiores freios à fecundidade alta. | 💡 **Dica:** "Diploma + Emprego = Escolha consciente".
+
+23. [V/F] O "bônus demográfico" ocorre quando a população em idade ativa (PEA) é maior que a de dependentes (crianças e idosos). ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Janela de oportunidade econômica quando há muitos trabalhadores e poucos dependentes. | 💡 **Dica:** "Janela demográfica = país produz mais do que consome em cuidado".
+
+24. [MC] Se um município tem natalidade de 10‰ e mortalidade de 11‰, seu crescimento vegetativo é:  
+a) +1‰ b) -1‰ c) 0‰ d) +21‰  
+✅ **Gab: B** | 📝 **Just:** 10 – 11 = -1‰ (crescimento negativo/encolhimento natural). | 💡 **Dica:** Mortalidade > Natalidade = população encolhe naturalmente.
+
+25. [V/F] A redução da taxa de mortalidade ocorreu antes da redução da taxa de natalidade no processo de transição demográfica brasileira. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Primeiro caem as mortes (saúde), depois nascem menos filhos (planejamento/urbanização). | 💡 **Dica:** "Sobreviver primeiro, planejar depois".
+
+*(Questões 26 a 30 seguem com interpretação de gráficos, aplicação contextual e análise de dados escolares)*
+26. [MC] Gráfico fictício: Linha A (natalidade) cruza Linha B (mortalidade) em 2015. O que isso indica? → ✅ Crescimento vegetativo zero a partir desse ponto.
+27. [V/F] Países desenvolvidos geralmente têm fecundidade próxima ou abaixo de 2,1. → ✅ V (Europa, Japão, Coreia).
+28. [MC] Qual política pública impacta diretamente a queda da mortalidade materna? → ✅ Pré-natal qualificado e hospitais equipados.
+29. [V/F] A fecundidade no Nordeste brasileiro é historicamente mais alta que no Sul/Sudeste, mas vem convergindo. → ✅ V (diferenças regionais se reduzindo).
+30. [MC] Se a expectativa de vida sobe e a natalidade cai, a estrutura etária tende a: → ✅ Envelhecer (base estreita, topo largo).
+
+---
+
+### 🔹 NÍVEL 3 (Difícil / Calibragem Vestibular)
+31. [MC] "O Brasil vive a fase final da transição demográfica, com fecundidade abaixo da reposição e mortalidade estabilizada." Qual é a consequência socioeconômica mais direta a médio prazo?  
+a) Explosão do mercado de trabalho juvenil  
+b) Pressão sobre sistemas de previdência e saúde geriátrica  
+c) Aumento acelerado da natalidade  
+d) Redução da urbanização  
+✅ **Gab: B** | 📝 **Just:** Menos jovens, mais idosos = desafio para aposentadorias e cuidados de longa duração. | 💡 **Dica:** "Pirâmide invertida = conta previdenciária apertada".
+
+32. [V/F] A queda da fecundidade no Brasil foi homogênea em todas as classes sociais desde os anos 1980. ( ) V ( ) F  
+✅ **Gab: F** | 📝 **Just:** Iniciou nas classes médias/altas e urbanas, depois se espalhou. Desigualdades persistem em acesso a saúde reprodutiva. | 💡 **Dica:** "Planejamento familiar nem sempre chega a todos ao mesmo tempo".
+
+33. [MC] Analise as afirmativas sobre o crescimento vegetativo:  
+I. Pode ser negativo em municípios com forte êxodo de jovens adultos.  
+II. É o único indicador necessário para planejar escolas.  
+III. Reflete apenas fatores biológicos, ignorando políticas públicas.  
+IV. A desaceleração brasileira acompanha padrões globais de desenvolvimento.  
+Estão corretas: a) I e IV b) II e III c) I e II d) III e IV  
+✅ **Gab: A** | 📝 **Just:** I e IV são verdadeiras. II ignora migrações/PEA. III ignora saneamento/vacinas/políticas. | 💡 **Dica:** Elimine os absolutos ("único", "apenas").
+
+34. [MC] Um país com natalidade de 8‰ e mortalidade de 7‰ terá crescimento vegetativo de:  
+a) 1% b) 0,1% c) 1‰ d) 15‰  
+✅ **Gab: C** | 📝 **Just:** 8 – 7 = 1‰. Atenção à unidade: por mil, não por cento. | 💡 **Dica:** 1‰ = 0,1%. Não confunda as casas decimais!
+
+35. [V/F] O "bônus demográfico" brasileiro está se fechando, exigindo investimento em produtividade e qualificação, já que a quantidade de mão de obra jovem diminuirá. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Janela demográfica se fecha por volta de 2030-2035. Foco muda de quantidade para qualidade. | 💡 **Dica:** "Menos jovens = precisa investir em tecnologia e educação".
+
+36. [MC] Qual alternativa melhor relaciona urbanização, fecundidade e estrutura de custos familiares?  
+a) Cidades reduzem custo de moradia, estimulando mais filhos  
+b) Espaço urbano limitado e alto custo de vida incentivam famílias menores  
+c) Ruralização aumenta acesso a contraceptivos  
+d) Urbanização elimina a necessidade de planejamento familiar  
+✅ **Gab: B** | 📝 **Just:** Dinâmica urbana moderna + custo de criação = redução voluntária da fecundidade. | 💡 **Dica:** "Aluguel + Escola + Plano de saúde = família enxuta".
+
+37. [V/F] A taxa de mortalidade no Brasil pode ter picos temporais devido a pandemias, crises sanitárias ou envelhecimento populacional acelerado. ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Eventos como COVID-19 ou aumento de idosos elevam temporariamente a mortalidade. | 💡 **Dica:** "Mortalidade não é linha reta. Crises e idade a movem".
+
+38. [MC] Se a projeção indica 228 milhões em 2042 e 218 milhões em 2060, o que isso revela sobre o saldo vegetativo no período?  
+a) Sempre positivo  
+b) Torna-se negativo após o pico  
+c) Estagnado em zero  
+d) Depende apenas da imigração  
+✅ **Gab: B** | 📝 **Just:** Queda de 228 para 218 indica que óbitos superarão nascimentos (crescimento negativo). | 💡 **Dica:** "Pico = virada. Depois, começa a descer".
+
+39. [V/F] Países com fecundidade muito baixa (<1,3) frequentemente incentivam políticas de incentivo à natalidade (bolsas, licença estendida, creches). ( ) V ( ) F  
+✅ **Gab: V** | 📝 **Just:** Japão, Coreia, Itália, Alemanha adotam medidas para tentar reverter o declínio. | 💡 **Dica:** "Governo paga para ter filho = medo de envelhecimento".
+
+40. [MC] Qual conceito descreve a diferença temporal entre a queda da mortalidade e a posterior queda da natalidade, gerando um "explosão" populacional?  
+a) Bônus demográfico  
+b) Transição demográfica  
+c) Êxodo rural  
+d) Densidade crítica  
+✅ **Gab: B** | 📝 **Just:** Fase 2 da transição = mortes caem, nascimentos ainda altos = crescimento acelerado. | 💡 **Dica:** "Janela de crescimento = saúde chega antes do planejamento".
+
+---
+
+### 🔹 DISSERTATIVAS (5)
+41. Explique, com suas palavras, por que a queda da mortalidade ocorreu antes da queda da natalidade no Brasil e qual foi o impacto desse "descompasso" no crescimento populacional.  
+✅ **Gab Esperado:** A medicina e o saneamento reduziram mortes rapidamente. A cultura de famílias grandes e o acesso limitado a planejamento mantiveram nascimentos altos por mais tempo. Isso gerou um crescimento acelerado (explosão demográfica) até os anos 1980. | 💡 **Dica:** Use "saúde pública" vs "mudança cultural".
+
+42. Como a inserção da mulher no mercado de trabalho e o aumento da escolarização influenciaram a taxa de fecundidade no Brasil nas últimas décadas?  
+✅ **Gab Esperado:** Mulheres priorizaram estudos e carreira, adiaram a maternidade e tiveram acesso a contraceptivos. O custo de criar filhos em cidades também aumentou. Resultado: média de filhos caiu de ~6 para <1,7. | 💡 **Dica:** Conecte "educação + emprego + planejamento".
+
+43. O que é o "bônus demográfico" e por que ele é considerado uma janela de oportunidade econômica para o Brasil?  
+✅ **Gab Esperado:** É o período em que a população em idade ativa (15-64) é maior que a de dependentes (0-14 e 65+). Gera mais força de trabalho, consumo e arrecadação, com menos gastos em educação infantil e previdência. | 💡 **Dica:** "Muitos produzindo, poucos dependendo = país acelera".
+
+44. Por que projeções populacionais são essenciais para o planejamento de políticas públicas de saúde e previdência social?  
+✅ **Gab Esperado:** Antecipam a quantidade de idosos (exigem geriatras, aposentadorias), jovens (escolas, vagas) e adultos (emprego). Sem dados, o governo erra no investimento e gera crises futuras. | 💡 **Dica:** "Prever = preparar. Demografia é bússola do futuro".
+
+45. Compare a taxa de fecundidade de reposição (2,1) com a taxa atual do Brasil (<1,7). Quais desafios sociais essa diferença trará nas próximas décadas?  
+✅ **Gab Esperado:** Abaixo de 2,1, a população começará a encolher naturalmente. Desafios: envelhecimento acelerado, pressão sobre previdência, necessidade de imigração ou automação, redução da força de trabalho. | 💡 **Dica:** "Menos de 2,1 = pirâmide vira sino. País precisa se adaptar".
+
+---
+
+### 🔹 ELIMINATÓRIAS / VESTIBULAR (5)
+46. Analise as afirmativas sobre transição demográfica no Brasil:  
+I. A fase de crescimento acelerado ocorreu quando a mortalidade caiu e a natalidade permaneceu alta.  
+II. A urbanização foi um dos principais freios à fecundidade.  
+III. O Brasil já ultrapassou o pico populacional e está em declínio absoluto desde 2010.  
+IV. A queda da fecundidade foi impulsionada por acesso a contraceptivos e mudanças no papel da mulher.  
+Estão corretas: a) I, II, IV b) I, III, IV c) II, III, IV d) I, II, III  
+✅ **Gab: A** | 📝 **Just:** III é falsa. O pico está projetado para ~2042. | 💡 **Dica:** Elimine a que contradiz dados oficiais do IBGE.
+
+47. [Gráfico fictício] Taxa de fecundidade por região: Sudeste (1,5), Nordeste (1,6), Sul (1,5), Norte (1,8), Centro-Oeste (1,7). Qual afirmativa é CORRETA?  
+a) Todas as regiões estão acima da reposição  
+b) Norte e Centro-Oeste têm fecundidade mais alta, mas ainda abaixo de 2,1  
+c) Sudeste tem a maior fecundidade  
+d) Não há diferença regional  
+✅ **Gab: B** | 📝 **Just:** Todas < 2,1. Norte/C-O são as mais altas, mas ainda em declínio. | 💡 **Dica:** "Abaixo de 2,1 = todas encolhendo a longo prazo".
+
+48. Assinale a alternativa que NÃO representa um fator de queda da mortalidade no Brasil:  
+a) Expansão da rede de esgoto e água tratada  
+b) Campanhas de vacinação em massa  
+c) Aumento do trabalho infantil no campo  
+d) Avanços na medicina e antibioticoterapia  
+✅ **Gab: C** | 📝 **Just:** Trabalho infantil não reduz mortalidade; pode até aumentá-la por riscos e falta de estudo. | 💡 **Dica:** "Criança trabalhando ≠ saúde pública. É retrocesso".
+
+49. Se um país tem natalidade = 12‰, mortalidade = 9‰ e saldo migratório = +5‰, o crescimento populacional TOTAL é:  
+a) 3‰ b) 8‰ c) 21‰ d) -3‰  
+✅ **Gab: B** | 📝 **Just:** (12 – 9) + 5 = 8‰. Vegetativo + Migratório = Total. | 💡 **Dica:** "Não esqueça a migração! Soma tudo no final".
+
+50. Qual conjunto de políticas públicas é mais eficaz para aproveitar o "bônus demográfico" e preparar o país para o pós-bônus?  
+a) Incentivo à natalidade sem investimento em educação  
+b) Fechamento de fronteiras e redução de gastos com saúde  
+c) Investimento em educação de qualidade, qualificação profissional e reforma da previdência  
+d) Subsídios apenas para aposentadorias precoces  
+✅ **Gab: C** | 📝 **Just:** Preparar a força de trabalho e ajustar sistemas para o envelhecimento é a estratégia correta. | 💡 **Dica:** "Educação hoje = previdência sustentável amanhã".
+
+---

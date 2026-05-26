@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v15';
+const CACHE_NAME  = 'eduquest-v16';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -126,6 +126,26 @@ const CACHE_SHELL = [
     '/js/data/geografia/7ano/chapters/geo_brasil/stages/geo_s06.js',
     '/js/data/geografia/7ano/chapters/geo_brasil/stages/geo_sboss.js',
     '/js/data/geografia/7ano/chapters/geo_brasil/stages/geo_sfinal.js',
+    /* Ciências 8º Ano — Corpo Humano */
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/metadata.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s01.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s02.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s03.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s04.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s05.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s06.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_sboss.js',
+    '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_sfinal.js',
+    /* Matemática 8º Ano — Potências, Raízes e Equações */
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/metadata.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_s01.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_s02.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_s03.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_s04.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_s05.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_s06.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_sboss.js',
+    '/js/data/matematica/8ano/chapters/mat8_equacoes/stages/mat8_sfinal.js',
     /* Assets */
     '/assets/icons/icon-192.png',
     '/assets/icons/icon-512.png',
