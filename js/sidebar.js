@@ -259,9 +259,7 @@ const Sidebar = {
         el.innerHTML = `
         <div class="rp-inner">
 
-            ${missionHTML}
-
-            <!-- Streak section -->
+            <!-- Streak section — first in panel -->
             <section class="rp-section" aria-labelledby="rp-streak-lbl">
                 <div class="rp-section-header">
                     <h2 class="rp-section-title" id="rp-streak-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥'} Sequência</h2>
@@ -270,14 +268,7 @@ const Sidebar = {
                 <div class="rp-calendar" role="list" aria-label="Calendário de sequência">${calHTML}</div>
             </section>
 
-            <!-- Daily missions section -->
-            <section class="rp-section" aria-labelledby="rp-quests-lbl">
-                <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-quests-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('xp',{size:'xs',color:'xp'}) : '⚡'} Missões do Dia</h2>
-                    <span class="rp-badge" aria-label="${mDone} de ${mTotal} concluídas">${mDone}/${mTotal}</span>
-                </div>
-                <div role="list" aria-label="Lista de missões diárias">${mHTML}</div>
-            </section>
+            ${missionHTML}
 
             <!-- League section -->
             <section class="rp-section" aria-labelledby="rp-rank-lbl">
@@ -285,54 +276,29 @@ const Sidebar = {
                     <h2 class="rp-section-title" id="rp-rank-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('trophy',{size:'xs',color:'final'}) : '🏆'} Sua Liga</h2>
                     <a href="#ranking" class="rp-section-link" aria-label="Ver ranking">Ver →</a>
                 </div>
-                <div class="rp-rank-card">
-                    <span class="rp-rank-icon" aria-hidden="true">${_icT(rank.iconId, {size:'sm', color:rank.iconColor})}</span>
-                    <div class="rp-rank-info">
-                        <div class="rp-rank-name">Liga ${rank.name}</div>
-                        <div class="rp-rank-xp">${xp.toLocaleString('pt-BR')} XP total</div>
-                        <div class="rp-league-bar-wrap" aria-hidden="true">
-                            <div class="rp-league-bar-fill" style="width:${barPct}%"></div>
-                        </div>
+                <a href="#ranking" class="rp-league-card" aria-label="Liga ${rank.name} — ver ranking">
+                    <span class="rp-league-icon" aria-hidden="true">${_icT(rank.iconId, {size:'sm', color:rank.iconColor})}</span>
+                    <div class="rp-league-info">
+                        <div class="rp-league-name">Liga ${rank.name}</div>
+                        <div class="rp-league-sub">Top 15 · ${xp.toLocaleString('pt-BR')} XP</div>
                     </div>
-                </div>
-                <div class="rp-rank-tiers" aria-hidden="true">${tiersHTML}</div>
+                    <span class="rp-league-chevron" aria-hidden="true">›</span>
+                </a>
             </section>
 
             <!-- Boss section -->
             <section class="rp-section" aria-labelledby="rp-boss-lbl">
                 <div class="rp-section-header">
                     <h2 class="rp-section-title" id="rp-boss-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('boss',{size:'xs',color:'rpg'}) : '💀'} Boss da Semana</h2>
-                    <span class="rp-soon-chip" aria-label="Em breve">breve</span>
+                    <span class="rp-soon-chip" aria-label="Em breve">BREVE</span>
                 </div>
                 <div class="rp-boss-card" aria-label="Boss da semana — em breve">
                     <span class="rp-boss-icon" aria-hidden="true">🐲</span>
                     <div style="flex:1;min-width:0">
                         <div class="rp-boss-name">Dragão do Conhecimento</div>
-                        <div class="rp-boss-hp-wrap" aria-hidden="true">
-                            <div class="rp-boss-hp-fill"></div>
-                        </div>
-                        <div class="rp-boss-meta">
-                            <span class="rp-boss-hp-label">HP: 78%</span>
-                            <span class="rp-boss-timer">⏰ 5d restantes</span>
-                        </div>
+                        <div class="rp-boss-desc">Desbloqueio em breve!</div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Weekly event (decorative/teaser) -->
-            <section class="rp-section" aria-labelledby="rp-event-lbl">
-                <div class="rp-section-header">
-                    <h2 class="rp-section-title" id="rp-event-lbl">${typeof IconSystem !== 'undefined' ? IconSystem.html('flag',{size:'xs',color:'xp'}) : '🎯'} Evento</h2>
-                    <span class="rp-soon-chip">breve</span>
-                </div>
-                <a class="rp-event-card" href="#home" aria-label="Evento semanal — em breve">
-                    <span class="rp-event-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html('star',{size:'md',color:'final'}) : '🌟'}</span>
-                    <div>
-                        <div class="rp-event-title">Semana da Ciência</div>
-                        <div class="rp-event-sub">XP em dobro · Em breve!</div>
-                    </div>
-                    <span class="rp-event-timer">7d</span>
-                </a>
             </section>
 
         </div>`;

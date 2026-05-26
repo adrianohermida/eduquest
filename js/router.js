@@ -920,16 +920,18 @@ const Router = {
                 <span class="home-xp-label">${xpProg.current} / ${xpProg.needed} XP</span>
             </div>
 
+            ${companion.msg ? `
             <!-- Companion Widget -->
             <div class="companion-bar" data-mood="${companion.mood}" data-cls="${companion.cls}">
                 <div class="companion-face">${_ic('companion',{size:'xl'})}</div>
                 <div class="companion-bubble">${companion.msg}</div>
-            </div>
+            </div>` : ''}
 
             <!-- Continue Journey -->
             ${activeChapter ? `
             <div class="continue-card" onclick="Router.navigate('#chapter/${activeChapter.id}')">
                 <div class="continue-content">
+                    <div class="continue-hex-wrap" aria-hidden="true">${activeChapter.icon}</div>
                     <div class="continue-left">
                         <div class="continue-badge">▶ CONTINUAR</div>
                         <div class="continue-title">${activeChapter.title}</div>
@@ -941,10 +943,7 @@ const Router = {
                             <span class="continue-pct">${activeProg.percent}%</span>
                         </div>
                     </div>
-                    <div class="continue-art" aria-hidden="true">
-                        <div class="continue-art-icon">${activeChapter.icon}</div>
-                        <div class="continue-art-map">🗺️</div>
-                    </div>
+                    <div class="continue-art" aria-hidden="true"></div>
                 </div>
             </div>` : ''}
 
@@ -956,24 +955,28 @@ const Router = {
                     const mDone = missions.filter(m => m.completed).length;
                     const hasReward = mDone >= missions.length && missions.length > 0;
                     return [
-                        { icon: '📅', label: 'Eventos',    value: activeEvents > 0 ? `${activeEvents} ativo${activeEvents>1?'s':''}` : 'Ver todos', badge: activeEvents > 0 ? activeEvents : 0, route: '#events'    },
-                        { icon: '🏆', label: 'Desafios',   value: '1 novo',    badge: 1,               route: '#missions'   },
-                        { icon: '🎁', label: 'Recompensas',value: hasReward ? 'Pronto!' : `${mDone}/${missions.length}`, badge: hasReward ? 1 : 0, route: '#shop' },
-                        { icon: '👥', label: 'Amigos',     value: onlineFriends > 0 ? `${onlineFriends} online` : 'Ver todos', badge: 0, route: '#friends' },
+                        { icon: '📅', label: 'Eventos',    value: activeEvents > 0 ? `${activeEvents} ativo${activeEvents>1?'s':''}` : 'Ver todos', badge: activeEvents > 0 ? String(activeEvents) : '', route: '#events'    },
+                        { icon: '🏆', label: 'Desafios',   value: '1 novo',    badge: '1',               route: '#missions'   },
+                        { icon: '🎁', label: 'Recompensas',value: hasReward ? 'Pronto' : `${mDone}/${missions.length}`, badge: hasReward ? '●' : '', route: '#shop' },
+                        { icon: '👥', label: 'Amigos',     value: onlineFriends > 0 ? `${onlineFriends} online` : 'Ver todos', badge: '', route: '#friends' },
                     ].map(a => `
                     <a class="qa-chip" href="${a.route}">
-                        ${a.badge ? `<span class="qa-badge">${a.badge}</span>` : ''}
-                        <span class="qa-chip-icon">${a.icon}</span>
-                        <span class="qa-chip-label">${a.label}</span>
-                        <span class="qa-chip-value">${a.value}</span>
+                        <div class="qa-chip-icon-wrap">
+                            ${a.badge ? `<span class="qa-badge">${a.badge}</span>` : ''}
+                            <span class="qa-chip-icon">${a.icon}</span>
+                        </div>
+                        <div class="qa-chip-text">
+                            <span class="qa-chip-label">${a.label}</span>
+                            <span class="qa-chip-value">${a.value}</span>
+                        </div>
                     </a>`).join('');
                 })()}
             </div>
 
             <!-- Daily Missions -->
             <div class="section-header">
-                <span class="section-title">${_ic('missions',{size:'sm'})} Missões do Dia</span>
-                <span class="section-badge">${missions.filter(m=>m.completed).length}/${missions.length}</span>
+                <span class="section-title">${_ic('missions',{size:'sm'})} Missões do dia</span>
+                <span class="section-done-text">${missions.filter(m=>m.completed).length}/${missions.length} concluídas</span>
             </div>
             <div class="daily-missions-list">${missionsHTML}</div>
 
