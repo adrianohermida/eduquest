@@ -2253,5 +2253,11 @@ window.EduAdmin = (() => {
         _contentNav, _openStageEditor, _closeStageEditor, _applyStageEdit, _exportStageJS,
         _bufSet, _bufSetObjectives, _bufQ, _bufQCorrect, _bufFC,
         _editorAddQuestion, _editorRemoveQuestion, _editorAddFlashcard, _editorRemoveFlashcard,
+        _openCreateChapter, _saveNewChapter, _confirmDeleteChapter,
+        _openCreateStage, _saveNewStage, _confirmDeleteStage,
+        _bufMedia, _bufSCard, _addSummaryCard, _removeSummaryCard, _previewImage,
+        _changeQType, _bufQTrueFalse, _bufQItem, _addQItem, _removeQItem,
+        _bufQPair, _addQPair,
+        _setApprovalStatus,
     };
 })();

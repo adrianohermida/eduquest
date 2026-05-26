@@ -122,7 +122,7 @@ window.EduBuilder = (() => {
         </div>
         <div class="bld-tabs">
             ${[['source','📥 Fonte'],['generate','✨ Gerar'],['review',`📋 Revisão${queueLen?` <span class="bld-badge">${queueLen}</span>`:''}`,],['monitor','📊 Monitor']].map(([id,lbl])=>`
-            <button onclick="EduBuilder._tab('${id}')" class="bld-tab${_tab===id?' active':''}">${lbl}</button>`).join('')}
+            <button onclick="EduBuilder._switchTab('${id}')" class="bld-tab${_tab===id?' active':''}">${lbl}</button>`).join('')}
         </div>
         <div id="bld-body">
             ${_tab==='source'   ? _htmlSource()   :
@@ -167,7 +167,7 @@ window.EduBuilder = (() => {
                         <div><label class="bld-label">Dificuldade</label>
                             <select onchange="EduBuilder._bs('difficulty',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
                             ${['easy','medium','hard'].map(d=>`<option value="${d}" ${_bState.difficulty===d?'selected':''}>${d}</option>`).join('')}</select></div>
-                        <button onclick="EduBuilder._tab('generate')" class="admin-topbar-btn admin-topbar-btn-primary" style="width:100%;padding:10px"
+                        <button onclick="EduBuilder._switchTab('generate')" class="admin-topbar-btn admin-topbar-btn-primary" style="width:100%;padding:10px"
                         ${_sourceText.trim().length<20?'disabled':''}>Avançar para Gerar →</button>
                     </div>
                 </div>
@@ -190,7 +190,7 @@ window.EduBuilder = (() => {
         <div style="text-align:center;padding:60px;color:#64748b">
             <div style="font-size:3rem;margin-bottom:12px">📥</div>
             <div style="font-weight:600;margin-bottom:10px">Nenhuma fonte carregada</div>
-            <button onclick="EduBuilder._tab('source')" class="admin-topbar-btn admin-topbar-btn-primary">← Fonte de Conteúdo</button>
+            <button onclick="EduBuilder._switchTab('source')" class="admin-topbar-btn admin-topbar-btn-primary">← Fonte de Conteúdo</button>
         </div>`;
         const hasKey = !!_getKey();
         const chapters = Object.values(window.CHAPTERS_REGISTRY||{});
@@ -444,7 +444,7 @@ window.EduBuilder = (() => {
     }
 
     /* ── Tab Switch ─────────────────────────────────────────── */
-    function _tab(id) {
+    function _switchTab(id) {
         _tab = id;
         document.querySelectorAll('.bld-tab').forEach(el=>{
             const isActive = el.getAttribute('onclick')?.includes(`'${id}'`);
@@ -511,7 +511,7 @@ window.EduBuilder = (() => {
 
     return {
         render, getStatus, getStatusBadge,
-        _tab, _bs, _srcChange, _onFile, _onDrop,
+        _switchTab, _bs, _srcChange, _onFile, _onDrop,
         _openKeyModal, _saveKeyTest,
         _generate, _sendReview,
         _selectReview, _approve, _reject, _publish, _postComment,

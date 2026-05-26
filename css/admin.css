@@ -1158,3 +1158,218 @@
 [data-theme="dark"] .admin-mobile-menu-btn  { background: #1e293b; color: #94a3b8; }
 [data-theme="dark"] .admin-topbar-back-mobile { background: #1e293b; color: #94a3b8; }
 [data-theme="dark"] .admin-sidebar-backdrop  { background: rgba(0,0,0,0.7); }
+
+
+/* ════════════════════════════════════════════════════════════
+   AI BUILDER — bld-* component styles
+   ════════════════════════════════════════════════════════════ */
+
+/* Tab bar */
+.bld-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 2px;
+}
+
+.bld-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -4px;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bld-tab:hover {
+    color: #f1f5f9;
+    background: #1e293b;
+}
+
+.bld-tab.active {
+    color: #f97316;
+    border-bottom-color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+}
+
+/* Notification badge on tabs */
+.bld-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Drop zone */
+.bld-dropzone {
+    border: 2px dashed #334155;
+    border-radius: 10px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 12px;
+}
+
+.bld-dropzone:hover,
+.bld-dropzone.active {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.06);
+}
+
+/* Two-column grid */
+.bld-grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Generate tab layout: sidebar + preview */
+.bld-gen-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Review tab layout: list + comments panel */
+.bld-review-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Review item card */
+.bld-rev-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.bld-rev-card:hover {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.04);
+}
+
+.bld-rev-card.sel {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.08);
+}
+
+/* Content type radio option */
+.bld-type-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.bld-type-opt:hover {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.04);
+}
+
+.bld-type-opt.sel {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.1);
+}
+
+/* Form field label */
+.bld-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Preview question cards */
+.bld-q-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+}
+
+.bld-q-num {
+    font-size: 0.7rem;
+    color: #f97316;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.bld-q-prompt {
+    font-size: 0.85rem;
+    color: #f1f5f9;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.bld-q-expl {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-style: italic;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* Section label inside preview */
+.bld-preview-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #f97316;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 14px 0 6px;
+}
+
+/* Spinner animation */
+.bld-spin {
+    display: inline-block;
+    font-size: 2rem;
+    animation: bld-spin-anim 1s linear infinite;
+}
+
+@keyframes bld-spin-anim {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Responsive: stack columns on smaller screens */
+@media (max-width: 900px) {
+    .bld-grid2,
+    .bld-gen-layout,
+    .bld-review-layout {
+        grid-template-columns: 1fr;
+    }
+}
