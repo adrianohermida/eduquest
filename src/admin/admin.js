@@ -8,10 +8,15 @@
 window.EduAdmin = (() => {
 
     /* ── State ──────────────────────────────────────────────── */
-    let _section   = 'overview';
-    let _container = null;
-    let _cmdOpen   = false;
-    let _cmdIdx    = 0;
+    let _section          = 'overview';
+    let _container        = null;
+    let _cmdOpen          = false;
+    let _cmdIdx           = 0;
+    let _contentTab       = 'chapters';
+    let _contentChapterId = null;
+    let _contentStageVar  = null;
+    let _editBuffer       = null;
+    let _editVarName      = null;
 
     /* ── Mock Data ──────────────────────────────────────────── */
     const MOCK = {
@@ -616,47 +621,410 @@ window.EduAdmin = (() => {
         </div>`;
     }
 
-    /* ── Content ─────────────────────────────────────────────── */
+    /* ── Content — Real Data ─────────────────────────────────── */
+
+    function _loadContentData() {
+        const registry = window.CHAPTERS_REGISTRY || {};
+        const subjectLabels = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', portugues: 'Português', geografia: 'Geografia' };
+        return Object.values(registry).map(meta => {
+            const stages = meta.stages || [];
+            const loaded = stages.filter(s => !!window[s.varName]);
+            const qCount = loaded.reduce((n, s) => n + ((window[s.varName]?.questions?.length) || 0), 0);
+            const fcCount = loaded.reduce((n, s) => n + ((window[s.varName]?.summary?.flashcards?.length) || 0), 0);
+            return {
+                id: meta.id, title: meta.title, subject: meta.subject,
+                subjectLabel: subjectLabels[meta.subject] || meta.subject,
+                grade: (meta.grade || '').replace('7ano','7º Ano').replace('8ano','8º Ano').replace('9ano','9º Ano'),
+                icon: meta.icon || '📚', totalStages: meta.totalStages || stages.length,
+                stagesLoaded: loaded.length, questionCount: qCount, flashcardCount: fcCount, stages
+            };
+        });
+    }
+
     function _renderContent() {
+        const data = _loadContentData();
+        const totalStages    = data.reduce((s, c) => s + c.stagesLoaded, 0);
+        const totalQuestions = data.reduce((s, c) => s + c.questionCount, 0);
+        const totalFC        = data.reduce((s, c) => s + c.flashcardCount, 0);
+        let crumbs = '', body = '';
+
+        if (!_contentChapterId || _contentTab === 'chapters') {
+            crumbs = `Todos os capítulos`;
+            body = _renderContentChapters(data);
+        } else if (_contentTab === 'stages') {
+            const cap = data.find(c => c.id === _contentChapterId);
+            crumbs = `<button onclick="EduAdmin._contentNav('chapters')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:2px 8px;font-size:0.75rem">← Capítulos</button>
+                <span style="margin:0 6px;color:#64748b">›</span><strong style="color:#f1f5f9">${cap?.title || _contentChapterId}</strong>`;
+            body = _renderContentStages(_contentChapterId, data);
+        } else if (_contentTab === 'questions') {
+            const cap = data.find(c => c.id === _contentChapterId);
+            const sd  = window[_contentStageVar] || {};
+            crumbs = `<button onclick="EduAdmin._contentNav('chapters')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:2px 8px;font-size:0.75rem">← Capítulos</button>
+                <span style="margin:0 6px;color:#64748b">›</span>
+                <button onclick="EduAdmin._contentNav('stages','${_contentChapterId}')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:2px 8px;font-size:0.75rem">${cap?.title || _contentChapterId}</button>
+                <span style="margin:0 6px;color:#64748b">›</span><strong style="color:#f1f5f9">${sd.title || _contentStageVar}</strong>`;
+            body = _renderContentQuestions(_contentStageVar);
+        }
+
         return `
         <div class="admin-page-header">
-            <div><div class="admin-page-title">Conteúdo</div>
-            <div class="admin-page-sub">Capítulos, estágios e questões</div></div>
+            <div>
+                <div class="admin-page-title">Conteúdo</div>
+                <div class="admin-page-sub" style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${crumbs}</div>
+            </div>
             <div class="admin-page-actions">
                 <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._navigate('ai')">🤖 Gerar com IA</button>
             </div>
         </div>
-
         <div class="admin-metric-row">
-            ${[['📚','Capítulos','47'],['🗺️','Estágios','438'],['❓','Questões','6.821'],['📝','Rascunhos','12']].map(([i,l,v]) => `
+            ${[['📚','Capítulos',data.length],['🗺️','Estágios',totalStages],['❓','Questões',totalQuestions],['🃏','Flashcards',totalFC]].map(([i,l,v]) => `
             <div class="admin-metric-pill"><div class="admin-metric-pill-icon">${i}</div>
             <div><div class="admin-metric-pill-label">${l}</div><div class="admin-metric-pill-val">${v}</div></div></div>`).join('')}
         </div>
+        ${body}`;
+    }
 
-        <div class="admin-tabs">
-            <button class="admin-tab active">Capítulos</button>
-            <button class="admin-tab">Estágios</button>
-            <button class="admin-tab">Questões</button>
-            <button class="admin-tab">Mídia</button>
-        </div>
-
+    function _renderContentChapters(data) {
+        const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow' };
+        return `
         <div class="admin-wide-table-wrap">
             <table class="admin-table">
-                <thead><tr><th>Título</th><th>Matéria</th><th>Ano</th><th>Estágios</th><th>Conclusões</th><th>Avaliação</th><th>Status</th><th>Ação</th></tr></thead>
-                <tbody>${MOCK.chapters.map(c => `
-                    <tr>
-                        <td>${c.title}</td>
-                        <td>${badge(c.subject, 'blue')}</td>
-                        <td>${c.year}</td>
-                        <td>${c.stages}</td>
-                        <td>${c.completions.toLocaleString('pt-BR')}</td>
-                        <td>⭐ ${c.rating}</td>
-                        <td>${badge('Publicado','green')}</td>
-                        <td><button class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:4px 10px;font-size:0.7rem;">Editar</button></td>
-                    </tr>`).join('')}
+                <thead><tr><th>Capítulo</th><th>Matéria</th><th>Ano</th><th>Estágios</th><th>Questões</th><th>Flashcards</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody>${data.map(c => `
+                <tr>
+                    <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">${c.icon}</span><strong>${c.title}</strong></div></td>
+                    <td>${badge(c.subjectLabel, sc[c.subject] || 'grey')}</td>
+                    <td>${c.grade}</td>
+                    <td>${c.stagesLoaded}/${c.totalStages}</td>
+                    <td>${c.questionCount}</td>
+                    <td>${c.flashcardCount}</td>
+                    <td>${badge('Publicado','green')}</td>
+                    <td><button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('stages','${c.id}')" style="padding:4px 10px;font-size:0.7rem">Ver Estágios →</button></td>
+                </tr>`).join('')}
                 </tbody>
             </table>
         </div>`;
+    }
+
+    function _renderContentStages(chapterId, data) {
+        const chapter = (data || _loadContentData()).find(c => c.id === chapterId);
+        if (!chapter) return `<div style="padding:40px;text-align:center;color:#94a3b8">Capítulo não encontrado.</div>`;
+        const dc = { easy:'green', medium:'blue', hard:'orange', boss:'red' };
+        return `
+        <div class="admin-wide-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Estágio</th><th>Dificuldade</th><th>Tempo</th><th>Total Questões</th><th>Flashcards</th><th>Ações</th></tr></thead>
+                <tbody>${chapter.stages.map(s => {
+                    const sd = window[s.varName];
+                    if (!sd) return `<tr><td colspan="6" style="color:#94a3b8;font-style:italic;padding:12px">${s.id} — não carregado</td></tr>`;
+                    const total = (sd.warmup?.length||0) + (sd.guidedPractice?.length||0) + (sd.questions?.length||0) + (sd.adaptiveReview?.length||0);
+                    const fc    = sd.summary?.flashcards?.length || 0;
+                    const diff  = sd.difficulty || (s.isBoss ? 'boss' : 'medium');
+                    return `<tr>
+                        <td><span style="font-size:1.1rem">${sd.icon||'📖'}</span> <strong>${sd.title}</strong>${s.isBoss ? ' <span style="color:#ef4444">💀</span>' : ''}${s.isFinal ? ' <span style="color:#f59e0b">🏆</span>' : ''}</td>
+                        <td>${badge(diff, dc[diff]||'grey')}</td>
+                        <td>${sd.estimatedTime||'—'}min</td>
+                        <td>${total}</td>
+                        <td>${fc}</td>
+                        <td style="display:flex;gap:4px">
+                            <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('questions','${chapterId}','${s.varName}')" style="padding:4px 10px;font-size:0.7rem">Ver</button>
+                            <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._openStageEditor('${s.varName}')" style="padding:4px 10px;font-size:0.7rem">✏️ Editar</button>
+                        </td>
+                    </tr>`;
+                }).join('')}
+                </tbody>
+            </table>
+        </div>`;
+    }
+
+    function _renderContentQuestions(stageVar) {
+        const sd = window[stageVar];
+        if (!sd) return `<div style="padding:40px;text-align:center;color:#94a3b8">Stage não encontrado.</div>`;
+        const secs = [
+            { label:'🔥 Aquecimento',        qs: sd.warmup || [] },
+            { label:'🔍 Prática Guiada',     qs: sd.guidedPractice || [] },
+            { label:'⚔️ Questões Principais', qs: sd.questions || [] },
+            { label:'🧠 Revisão Adaptativa',  qs: sd.adaptiveReview || [] },
+        ].filter(s => s.qs.length);
+        return `
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._openStageEditor('${stageVar}')">✏️ Editar Stage Completo</button>
+        </div>
+        ${secs.map(sec => `
+        <div class="admin-section-card" style="margin-bottom:16px">
+            <div class="admin-section-card-header"><div class="admin-chart-title">${sec.label} — ${sec.qs.length} questões</div></div>
+            <table class="admin-table">
+                <thead><tr><th>#</th><th>Enunciado</th><th>Opções (✓=correta)</th><th>Explicação</th></tr></thead>
+                <tbody>${sec.qs.map((q, i) => `
+                <tr>
+                    <td style="color:#64748b">${i+1}</td>
+                    <td style="max-width:200px;font-size:0.82rem">${_esc((q.prompt||'').substring(0,100))}</td>
+                    <td style="font-size:0.75rem">${(q.options||[]).map(o => `<span style="display:block;color:${o.correct?'#22c55e':'#94a3b8'}">${o.correct?'✓':'○'} ${_esc(o.text||'')}</span>`).join('')}</td>
+                    <td style="max-width:160px;font-size:0.74rem;color:#94a3b8;font-style:italic">${_esc((q.explanation||'').substring(0,80))}</td>
+                </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`).join('')}`;
+    }
+
+    /* ── Stage Editor ─────────────────────────────────────────── */
+
+    function _esc(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function _openStageEditor(varName) {
+        _editVarName = varName;
+        const sd = window[varName];
+        if (!sd) { alert(`Stage ${varName} não encontrado.`); return; }
+        _editBuffer = JSON.parse(JSON.stringify(sd));
+        const modal = document.createElement('div');
+        modal.id = 'stage-editor-overlay';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.97);z-index:2000;display:flex;flex-direction:column;font-family:inherit';
+        modal.innerHTML = _buildStageEditorHTML();
+        document.body.appendChild(modal);
+    }
+
+    function _buildStageEditorHTML() {
+        if (!_editBuffer) return '';
+        const sd = _editBuffer;
+        const varName = _editVarName;
+        const qSections = [
+            { key:'warmup',         label:'🔥 Aquecimento' },
+            { key:'guidedPractice', label:'🔍 Prática Guiada' },
+            { key:'questions',      label:'⚔️ Questões Principais' },
+            { key:'adaptiveReview', label:'🧠 Revisão Adaptativa' },
+        ];
+        const metaHTML = `
+        <div style="display:grid;grid-template-columns:1fr 90px 160px 110px;gap:12px;margin-bottom:14px">
+            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Título</label>
+                <input type="text" value="${_esc(sd.title||'')}" oninput="EduAdmin._bufSet('title',this.value)"
+                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px 10px;border-radius:6px;font-size:0.9rem;box-sizing:border-box"></div>
+            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Ícone</label>
+                <input type="text" value="${_esc(sd.icon||'')}" oninput="EduAdmin._bufSet('icon',this.value)"
+                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:1.3rem;text-align:center;box-sizing:border-box"></div>
+            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Dificuldade</label>
+                <select onchange="EduAdmin._bufSet('difficulty',this.value)"
+                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;box-sizing:border-box">
+                    ${['easy','medium','hard','boss'].map(d => `<option value="${d}" ${sd.difficulty===d?'selected':''}>${d}</option>`).join('')}
+                </select></div>
+            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Tempo (min)</label>
+                <input type="number" value="${sd.estimatedTime||10}" oninput="EduAdmin._bufSet('estimatedTime',parseInt(this.value)||0)"
+                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;box-sizing:border-box"></div>
+        </div>
+        <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Objetivos de Aprendizagem (um por linha)</label>
+            <textarea rows="4" oninput="EduAdmin._bufSetObjectives(this.value)"
+            style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;resize:vertical;box-sizing:border-box">${_esc((sd.learningObjectives||[]).join('\n'))}</textarea>
+        </div>`;
+
+        const questionsHTML = qSections.map(sec => {
+            const qs = sd[sec.key] || [];
+            return `
+            <div style="margin-bottom:20px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <h4 style="margin:0;color:#f97316;font-size:0.9rem">${sec.label} <span style="color:#64748b;font-weight:400">(${qs.length})</span></h4>
+                    <button onclick="EduAdmin._editorAddQuestion('${sec.key}')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:4px 10px;font-size:0.75rem">+ Questão</button>
+                </div>
+                <div id="ed-${sec.key}-list">${qs.map((q,i) => _buildQuestionEditor(sec.key, i, q)).join('')}</div>
+            </div>`;
+        }).join('');
+
+        const flashcardsHTML = `
+        <div style="margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <h4 style="margin:0;color:#f97316;font-size:0.9rem">🃏 Flashcards <span style="color:#64748b;font-weight:400">(${(sd.summary?.flashcards||[]).length})</span></h4>
+                <button onclick="EduAdmin._editorAddFlashcard()" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:4px 10px;font-size:0.75rem">+ Flashcard</button>
+            </div>
+            <div id="ed-flashcard-list">${(sd.summary?.flashcards||[]).map((fc,i) => _buildFlashcardEditor(i, fc)).join('')}</div>
+        </div>`;
+
+        return `
+        <div style="background:#1e293b;border-bottom:1px solid #334155;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px">
+            <div style="min-width:0">
+                <div style="font-size:1.05rem;font-weight:700;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">✏️ ${_esc(sd.title||varName)}</div>
+                <div style="font-size:0.72rem;color:#64748b;margin-top:2px">${varName} · alterações em memória até exportar</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0">
+                <button onclick="EduAdmin._exportStageJS()" class="admin-topbar-btn admin-topbar-btn-ghost">⬇ Exportar .js</button>
+                <button onclick="EduAdmin._applyStageEdit()" class="admin-topbar-btn admin-topbar-btn-primary" style="background:linear-gradient(135deg,#22c55e,#16a34a)">✅ Aplicar na Sessão</button>
+                <button onclick="EduAdmin._closeStageEditor()" class="admin-topbar-btn admin-topbar-btn-ghost" style="color:#ef4444;border-color:#ef4444">✕</button>
+            </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:24px">
+            <div style="max-width:1080px;margin:0 auto">
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:20px">
+                    <h3 style="margin:0 0 14px;color:#f97316;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em">📋 Metadados</h3>
+                    ${metaHTML}
+                </div>
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:20px">
+                    <h3 style="margin:0 0 14px;color:#f97316;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em">❓ Questões</h3>
+                    ${questionsHTML}
+                </div>
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:20px">
+                    <h3 style="margin:0 0 14px;color:#f97316;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em">🃏 Flashcards</h3>
+                    ${flashcardsHTML}
+                </div>
+                <div style="padding:32px 0;text-align:center;display:flex;gap:12px;justify-content:center">
+                    <button onclick="EduAdmin._exportStageJS()" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:10px 28px">⬇ Exportar .js</button>
+                    <button onclick="EduAdmin._applyStageEdit()" class="admin-topbar-btn admin-topbar-btn-primary" style="padding:10px 28px;background:linear-gradient(135deg,#22c55e,#16a34a)">✅ Aplicar na Sessão</button>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function _buildQuestionEditor(section, idx, q) {
+        const opts = q.options || [
+            {text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}
+        ];
+        return `
+        <div id="qed-${section}-${idx}" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:0.72rem;color:#64748b;font-weight:700;letter-spacing:0.05em">QUESTÃO ${idx+1}</span>
+                <button onclick="EduAdmin._editorRemoveQuestion('${section}',${idx})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:4px" title="Remover">✕</button>
+            </div>
+            <div style="margin-bottom:10px">
+                <label style="font-size:0.7rem;color:#94a3b8;display:block;margin-bottom:3px">Enunciado</label>
+                <textarea rows="2" oninput="EduAdmin._bufQ('${section}',${idx},'prompt',this.value)"
+                style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;resize:vertical;box-sizing:border-box">${_esc(q.prompt||'')}</textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+                ${opts.map((o, oi) => `
+                <div style="display:flex;align-items:center;gap:6px">
+                    <input type="radio" name="correct-${section}-${idx}" value="${oi}" ${o.correct?'checked':''} onchange="EduAdmin._bufQCorrect('${section}',${idx},${oi})" style="accent-color:#f97316;flex-shrink:0" title="Marcar como correta">
+                    <input type="text" value="${_esc(o.text||'')}" oninput="EduAdmin._bufQ('${section}',${idx},'options.${oi}.text',this.value)" placeholder="Opção ${String.fromCharCode(65+oi)}"
+                    style="flex:1;background:#1e293b;border:1px solid ${o.correct?'#22c55e':'#334155'};color:#f1f5f9;padding:6px 8px;border-radius:6px;font-size:0.8rem;min-width:0;box-sizing:border-box">
+                </div>`).join('')}
+            </div>
+            <div>
+                <label style="font-size:0.7rem;color:#94a3b8;display:block;margin-bottom:3px">Explicação (feedback após resposta)</label>
+                <textarea rows="2" oninput="EduAdmin._bufQ('${section}',${idx},'explanation',this.value)"
+                style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;resize:vertical;box-sizing:border-box">${_esc(q.explanation||'')}</textarea>
+            </div>
+        </div>`;
+    }
+
+    function _buildFlashcardEditor(idx, fc) {
+        return `
+        <div id="fced-${idx}" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:0.7rem;color:#64748b">FC ${idx+1}</span>
+                <button onclick="EduAdmin._editorRemoveFlashcard(${idx})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.85rem;padding:2px 6px;border-radius:4px">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div>
+                    <label style="font-size:0.7rem;color:#94a3b8;display:block;margin-bottom:3px">Pergunta</label>
+                    <textarea rows="2" oninput="EduAdmin._bufFC(${idx},'q',this.value)"
+                    style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:6px;border-radius:6px;font-size:0.8rem;resize:vertical;box-sizing:border-box">${_esc(fc.q||'')}</textarea>
+                </div>
+                <div>
+                    <label style="font-size:0.7rem;color:#94a3b8;display:block;margin-bottom:3px">Resposta</label>
+                    <textarea rows="2" oninput="EduAdmin._bufFC(${idx},'a',this.value)"
+                    style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:6px;border-radius:6px;font-size:0.8rem;resize:vertical;box-sizing:border-box">${_esc(fc.a||'')}</textarea>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /* ── Editor Buffer Helpers ────────────────────────────────── */
+
+    function _bufSet(key, val) { if (_editBuffer) _editBuffer[key] = val; }
+
+    function _bufSetObjectives(text) {
+        if (_editBuffer) _editBuffer.learningObjectives = text.split('\n').map(l => l.trim()).filter(Boolean);
+    }
+
+    function _bufQ(section, idx, path, val) {
+        if (!_editBuffer?.[section]?.[idx]) return;
+        const parts = path.split('.');
+        let obj = _editBuffer[section][idx];
+        for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+        obj[parts[parts.length - 1]] = val;
+    }
+
+    function _bufQCorrect(section, idx, correctIdx) {
+        if (!_editBuffer?.[section]?.[idx]?.options) return;
+        _editBuffer[section][idx].options.forEach((o, i) => { o.correct = (i === correctIdx); });
+    }
+
+    function _bufFC(idx, key, val) {
+        if (_editBuffer?.summary?.flashcards?.[idx]) _editBuffer.summary.flashcards[idx][key] = val;
+    }
+
+    function _editorAddQuestion(section) {
+        if (!_editBuffer) return;
+        if (!_editBuffer[section]) _editBuffer[section] = [];
+        const newQ = { prompt: 'Nova questão', options: [
+            {text:'Opção A',correct:true},{text:'Opção B',correct:false},
+            {text:'Opção C',correct:false},{text:'Opção D',correct:false}
+        ], explanation: 'Explicação da resposta correta.' };
+        _editBuffer[section].push(newQ);
+        const list = document.getElementById(`ed-${section}-list`);
+        if (list) list.insertAdjacentHTML('beforeend', _buildQuestionEditor(section, _editBuffer[section].length - 1, newQ));
+    }
+
+    function _editorRemoveQuestion(section, idx) {
+        if (!_editBuffer?.[section]) return;
+        _editBuffer[section].splice(idx, 1);
+        const list = document.getElementById(`ed-${section}-list`);
+        if (list) list.innerHTML = _editBuffer[section].map((q, i) => _buildQuestionEditor(section, i, q)).join('');
+    }
+
+    function _editorAddFlashcard() {
+        if (!_editBuffer) return;
+        if (!_editBuffer.summary) _editBuffer.summary = {};
+        if (!_editBuffer.summary.flashcards) _editBuffer.summary.flashcards = [];
+        const newFC = { q: 'Pergunta', a: 'Resposta' };
+        _editBuffer.summary.flashcards.push(newFC);
+        const list = document.getElementById('ed-flashcard-list');
+        if (list) list.insertAdjacentHTML('beforeend', _buildFlashcardEditor(_editBuffer.summary.flashcards.length - 1, newFC));
+    }
+
+    function _editorRemoveFlashcard(idx) {
+        if (!_editBuffer?.summary?.flashcards) return;
+        _editBuffer.summary.flashcards.splice(idx, 1);
+        const list = document.getElementById('ed-flashcard-list');
+        if (list) list.innerHTML = _editBuffer.summary.flashcards.map((fc, i) => _buildFlashcardEditor(i, fc)).join('');
+    }
+
+    function _applyStageEdit() {
+        if (!_editBuffer || !_editVarName) return;
+        window[_editVarName] = JSON.parse(JSON.stringify(_editBuffer));
+        _editorToast('✅ Aplicado! O estágio foi atualizado na sessão. Feche e teste no jogo.');
+    }
+
+    function _exportStageJS() {
+        if (!_editBuffer || !_editVarName) return;
+        const varName = _editVarName;
+        const content = `// ${varName} — ${_editBuffer.title || varName}\n// Exportado pelo EduQuest Admin em ${new Date().toLocaleString('pt-BR')}\n\nconst ${varName} = ${JSON.stringify(_editBuffer, null, 2)};\n\nwindow.${varName} = ${varName};\n`;
+        const blob = new Blob([content], { type: 'text/javascript;charset=utf-8' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = `${varName.toLowerCase()}.js`;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+        _editorToast(`⬇ ${varName.toLowerCase()}.js baixado! Substitua o arquivo original no repositório.`);
+    }
+
+    function _editorToast(msg) {
+        const t = document.createElement('div');
+        t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:12px 24px;border-radius:8px;font-size:0.88rem;font-weight:600;z-index:3000;box-shadow:0 4px 24px rgba(0,0,0,0.5);white-space:nowrap';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+    }
+
+    function _closeStageEditor() {
+        document.getElementById('stage-editor-overlay')?.remove();
+        _editBuffer = null;
+        _editVarName = null;
+    }
+
+    function _contentNav(tab, chapterId, stageVar) {
+        _contentTab       = tab || 'chapters';
+        _contentChapterId = chapterId || null;
+        _contentStageVar  = stageVar  || null;
+        const main = document.getElementById('admin-main');
+        if (main) main.innerHTML = _renderContent();
     }
 
     /* ── Gamification ────────────────────────────────────────── */
@@ -1282,5 +1650,11 @@ window.EduAdmin = (() => {
         CMD_ITEMS[idx]?.action?.();
     }
 
-    return { init, render, _navigate, _exit, _openCmd, _closeCmd, _cmdSearch, _cmdKey, _execCmd, _refresh, _openMobileSidebar, _closeMobileSidebar };
+    return {
+        init, render, _navigate, _exit, _openCmd, _closeCmd, _cmdSearch, _cmdKey, _execCmd, _refresh,
+        _openMobileSidebar, _closeMobileSidebar,
+        _contentNav, _openStageEditor, _closeStageEditor, _applyStageEdit, _exportStageJS,
+        _bufSet, _bufSetObjectives, _bufQ, _bufQCorrect, _bufFC,
+        _editorAddQuestion, _editorRemoveQuestion, _editorAddFlashcard, _editorRemoveFlashcard,
+    };
 })();
