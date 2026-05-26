@@ -157,14 +157,26 @@
 }
 .hud-avatar-btn:hover { background: var(--surface-3); border-color: var(--brand); }
 .hud-avatar-btn:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
-.hud-av-icon    { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+.hud-av-icon {
+    font-size: 1.2rem;
+    width: 34px;
+    height: 34px;
+    background: #4b7be5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    line-height: 1;
+}
 .hud-av-level   { font-size: 0.7rem; font-weight: 900; color: var(--text); white-space: nowrap; }
-.hud-av-chevron { font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; }
+.hud-av-chevron { font-size: 0.65rem; color: var(--text-muted); flex-shrink: 0; }
 
-/* Hide level text on very small screens — show icon only */
+/* Hide level text on very small screens — show just the avatar circle */
 @media (max-width: 479px) {
     .hud-av-level, .hud-av-chevron { display: none; }
-    .hud-avatar-btn { padding: 4px 6px; border-radius: 50%; border: none; background: transparent; }
+    .hud-avatar-btn { padding: 4px; border-radius: 50%; border: none; background: transparent; min-height: 44px; min-width: 44px; justify-content: center; }
 }
 
 /* ── CHIP WRAPS (dropdown anchors) ─────────────────────────── */
@@ -219,16 +231,16 @@
 .hud-chip:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
 
 /* Chip type colors */
-.hud-chip.streak-chip { background: #fff7ed; color: #c2410c; }
+.hud-chip.streak-chip { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
 .hud-chip.streak-chip:hover  { background: #fef3c7; border-color: #fbbf24; }
 
-.hud-chip.gem-chip    { background: #e0f2fe; color: #0369a1; }
+.hud-chip.gem-chip    { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
 .hud-chip.gem-chip:hover     { background: #bae6fd; border-color: #7dd3fc; }
 
-.hud-chip.xp-chip     { background: var(--brand-light); color: var(--brand-dark); }
+.hud-chip.xp-chip     { background: var(--brand-light); color: var(--brand-dark); border-color: #fed7aa; }
 .hud-chip.xp-chip:hover      { background: #fed7aa; border-color: var(--brand); }
 
-.hud-chip.heart-chip  { background: #fee2e2; color: #dc2626; }
+.hud-chip.heart-chip  { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
 .hud-chip.heart-chip:hover   { background: #fecaca; border-color: #f87171; }
 
 /* ── DROPDOWN PANEL ────────────────────────────────────────── */

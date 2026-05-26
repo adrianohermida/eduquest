@@ -1118,7 +1118,7 @@ const HUD = {
     init() {
         this._loadLayoutPref();
         this._updateLayoutPrefUI();
-        this.refreshNotifBadge();
+        this.update();
     },
 };
 
