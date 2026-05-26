@@ -43,15 +43,15 @@
 }
 
 .hud-brand-text {
-    font-size: 0.92rem;
+    font-size: 1.05rem;
     font-weight: 900;
-    color: var(--text);
+    color: var(--brand);
     letter-spacing: -0.3px;
     white-space: nowrap;
 }
 
 /* Hide brand text on very small screens */
-@media (max-width: 399px) { .hud-brand-text { display: none; } }
+@media (max-width: 359px) { .hud-brand-text { display: none; } }
 
 /* ── CONTEXT BAR (center section) ──────────────────────────── */
 
@@ -89,6 +89,83 @@
 .hud-ctx-sep     { color: var(--text-muted); opacity: 0.7; }
 .hud-ctx-stage   { color: var(--brand); font-weight: 900; }
 .hud-ctx-icon    { font-size: 0.9rem; flex-shrink: 0; }
+
+/* ── CENTER NAV (discipline + mapa) ────────────────────────── */
+.hud-ctx-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hud-disc-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: var(--r-full);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: var(--font);
+    height: 36px;
+    white-space: nowrap;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
+    outline: none;
+}
+.hud-disc-chip:hover  { background: var(--brand-light); border-color: var(--brand); color: var(--brand); }
+.hud-disc-chip:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+.hud-disc-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+.hud-mapa-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: var(--r-full);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-decoration: none;
+    height: 36px;
+    white-space: nowrap;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
+    flex-shrink: 0;
+}
+.hud-mapa-btn:hover { background: var(--brand-light); border-color: var(--brand); color: var(--brand); }
+.hud-mapa-btn:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+
+/* ── AVATAR BUTTON — structured (icon + level + chevron) ───── */
+.hud-avatar-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px 4px 4px;
+    border-radius: var(--r-full);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    font-family: var(--font);
+    min-height: 44px;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+.hud-avatar-btn:hover { background: var(--surface-3); border-color: var(--brand); }
+.hud-avatar-btn:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+.hud-av-icon    { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+.hud-av-level   { font-size: 0.7rem; font-weight: 900; color: var(--text); white-space: nowrap; }
+.hud-av-chevron { font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; }
+
+/* Hide level text on very small screens — show icon only */
+@media (max-width: 479px) {
+    .hud-av-level, .hud-av-chevron { display: none; }
+    .hud-avatar-btn { padding: 4px 6px; border-radius: 50%; border: none; background: transparent; }
+}
 
 /* ── CHIP WRAPS (dropdown anchors) ─────────────────────────── */
 

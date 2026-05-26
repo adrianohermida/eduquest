@@ -51,7 +51,7 @@
     <!-- HUD Superior — Premium v2.0 -->
     <header class="top-hud" id="top-hud" role="banner">
 
-        <!-- LEFT: hamburger · logo · level -->
+        <!-- LEFT: hamburger · logo -->
         <div class="hud-left">
             <button
                 class="hud-menu-btn"
@@ -63,25 +63,27 @@
             >☰</button>
 
             <a class="hud-brand" href="#home" aria-label="EduQuest — Início">
-                <img src="assets/icons/icon-192.png" alt="" class="hud-brand-logo" aria-hidden="true">
                 <span class="hud-brand-text">EduQuest</span>
             </a>
-
-            <span class="hud-level-chip" id="hud-level" aria-label="Nível atual">Nv.1</span>
-            <!-- Discipline selector — shown on tablet+, populated by HUD when chapter is active -->
-            <div class="hud-chip-wrap hud-disc-wrap" id="hud-disc-wrap" style="display:none">
-                <button class="hud-chip hud-disc-chip" id="hud-disc-btn"
-                    onclick="HUD.toggleDropdown('discipline')"
-                    aria-expanded="false"
-                    aria-controls="hud-dd-discipline"
-                    aria-label="Selecionar disciplina"
-                ><span id="hud-disc-text">Ciências • 7º Ano</span> <span aria-hidden="true">▾</span></button>
-                <div class="hud-dropdown" id="hud-dd-discipline" aria-hidden="true"></div>
-            </div>
         </div>
 
-        <!-- CENTER: context breadcrumb (tablet/desktop only) -->
-        <div class="hud-context" id="hud-context" aria-live="polite"></div>
+        <!-- CENTER: discipline + mapa (tablet/desktop only) -->
+        <div class="hud-context" id="hud-context" aria-live="polite">
+            <div class="hud-ctx-nav" id="hud-ctx-nav" style="display:none" role="navigation" aria-label="Disciplina ativa">
+                <div class="hud-chip-wrap hud-disc-wrap" id="hud-disc-wrap">
+                    <button class="hud-disc-chip" id="hud-disc-btn"
+                        onclick="HUD.toggleDropdown('discipline')"
+                        aria-expanded="false"
+                        aria-controls="hud-dd-discipline"
+                        aria-label="Selecionar disciplina"
+                    ><span class="hud-disc-icon" aria-hidden="true">🔍</span><span id="hud-disc-text">Ciências • 7º Ano</span><span aria-hidden="true">▾</span></button>
+                    <div class="hud-dropdown" id="hud-dd-discipline" aria-hidden="true"></div>
+                </div>
+                <a class="hud-mapa-btn" href="#home" id="hud-mapa-btn" aria-label="Ver mapa do capítulo">
+                    🗺️ Mapa
+                </a>
+            </div>
+        </div>
 
         <!-- RIGHT: interactive stat chips + notifications + avatar -->
         <div class="hud-stats" role="status" aria-label="Estatísticas do jogador">
@@ -151,7 +153,11 @@
                     aria-expanded="false"
                     aria-controls="hud-avatar-dropdown"
                     title="Meu Perfil"
-                >🦸</button>
+                >
+                    <span class="hud-av-icon" id="hud-av-icon" aria-hidden="true">🦸</span>
+                    <span class="hud-av-level" id="hud-av-level">Nível 1</span>
+                    <span class="hud-av-chevron" aria-hidden="true">▾</span>
+                </button>
                 <div class="hud-avatar-dropdown" id="hud-avatar-dropdown" aria-hidden="true" role="menu">
                     <div class="had-user">
                         <span class="had-avatar" id="had-avatar">🦸</span>
