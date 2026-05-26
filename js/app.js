@@ -45,6 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => State.checkDailyLogin(), 800);
     }
 
+    // Session guard — start if already authenticated on load
+    if (typeof SessionGuard !== 'undefined' && State.isAuthenticated()) {
+        SessionGuard.start();
+    }
+
     // Register service worker for PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
