@@ -70,7 +70,7 @@
     /* Layout */
     --hud-h: 56px;
     --nav-h: 68px;
-    --max-w: 600px;
+    --max-w: 700px;
 
     /* iOS safe area (notch / Dynamic Island) */
     --safe-top:    env(safe-area-inset-top,    0px);
@@ -3333,7 +3333,7 @@ img { max-width: 100%; }
     justify-content: space-between;
     padding-bottom: var(--sp-2);
 }
-.home-greeting-hi  { font-size: 1.15rem; font-weight: 900; color: var(--text); }
+.home-greeting-hi  { font-size: 1.65rem; font-weight: 900; color: var(--text); }
 .home-greeting-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 .home-greeting-avatar {
     cursor: pointer;
