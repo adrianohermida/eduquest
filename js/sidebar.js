@@ -171,9 +171,8 @@ const Sidebar = {
             <div class="rp-cal-day${d.active ? ' active' : ''}${d.isToday ? ' today' : ''}"
                  role="listitem"
                  aria-label="${d.label}${d.active ? ', streak ativo' : ''}">
-                <span class="rp-cal-dot" aria-hidden="true">${d.active ? (typeof IconSystem !== 'undefined' ? IconSystem.html('streak',{size:'xs',color:'streak'}) : '🔥') : '○'}</span>
+                <span class="rp-cal-dot" aria-hidden="true"></span>
                 <span class="rp-cal-label">${d.label}</span>
-                <span class="rp-cal-num">${d.dayNum}</span>
             </div>`).join('');
 
         // ── Missions ──
