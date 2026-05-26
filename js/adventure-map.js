@@ -6,75 +6,11 @@
 
 const AdventureMap = {
 
-    WORLD_W: 520,
-    WORLD_H: 2700,
+    WORLD_W: 480,
+    WORLD_H: 1800,
     _layoutMode: 'vertical',
-
-    _worldLayouts: {
-        vertical: {
-            minWidth: 0,
-            width: 520,
-            height: 2780,
-            modeLabel: 'Rota vertical',
-            positions: [
-                [50, 0.07], [28, 0.15], [72, 0.23], [24, 0.31],
-                [66, 0.39], [30, 0.47], [70, 0.55], [26, 0.63],
-                [64, 0.71], [36, 0.79], [50, 0.88], [50, 0.96],
-            ],
-        },
-        hybrid: {
-            minWidth: 720,
-            width: 900,
-            height: 2200,
-            modeLabel: 'Rota livre',
-            positions: [
-                [22, 0.08], [45, 0.15], [72, 0.22], [62, 0.32],
-                [32, 0.39], [18, 0.51], [49, 0.57], [76, 0.64],
-                [68, 0.74], [38, 0.80], [22, 0.90], [50, 0.97],
-            ],
-        },
-        horizontal: {
-            minWidth: 1100,
-            width: 1180,
-            height: 1680,
-            modeLabel: 'Rota panorâmica',
-            positions: [
-                [14, 0.12], [29, 0.21], [48, 0.15], [69, 0.25],
-                [84, 0.39], [63, 0.49], [40, 0.42], [20, 0.58],
-                [34, 0.73], [58, 0.66], [78, 0.82], [88, 0.94],
-            ],
-        },
-    },
-
-    // Biomes top → bottom (forest=start at top, citadel=end at bottom)
-    _biomes: [
-        { topPct: 0.00, bottomPct: 0.19, id: 'forest',  name: 'Floresta de Início',  svgIcon: 'compass',    iconColor: 'success', bg1: '#d1fae5', bg2: '#a7f3d0' },
-        { topPct: 0.19, bottomPct: 0.39, id: 'village', name: 'Aldeia do Saber',      svgIcon: 'home',       iconColor: '',        bg1: '#fef9c3', bg2: '#fde68a' },
-        { topPct: 0.39, bottomPct: 0.60, id: 'lab',     name: 'Laboratório Arcano',   svgIcon: 'microscope', iconColor: 'science', bg1: '#dbeafe', bg2: '#bfdbfe' },
-        { topPct: 0.60, bottomPct: 0.80, id: 'tower',   name: 'Torre do Saber',       svgIcon: 'portal',     iconColor: 'rpg',     bg1: '#ede9fe', bg2: '#ddd6fe' },
-        { topPct: 0.80, bottomPct: 1.00, id: 'citadel', name: 'Cidadela Final',       svgIcon: 'crown',      iconColor: 'final',   bg1: '#fef3c7', bg2: '#fde68a' },
-    ],
-
-    _decorations: [
-        { x: 12, yPct: 0.06, icon: 'tree', cls: 'wm-deco-tree' },
-        { x: 84, yPct: 0.05, icon: 'tree', cls: 'wm-deco-tree wm-deco-lg' },
-        { x: 40, yPct: 0.11, icon: 'stone', cls: 'wm-deco-rock' },
-        { x: 82, yPct: 0.16, icon: 'spark', cls: 'wm-deco-small wm-float' },
-        { x: 14, yPct: 0.22, icon: 'mushroom', cls: 'wm-deco-small' },
-        { x: 12, yPct: 0.28, icon: 'home', cls: 'wm-deco-building' },
-        { x: 84, yPct: 0.30, icon: 'sunflower', cls: 'wm-deco-tree' },
-        { x: 18, yPct: 0.38, icon: 'npc', cls: 'wm-deco-npc', label: 'Mentor' },
-        { x: 86, yPct: 0.43, icon: 'lab', cls: 'wm-deco-building wm-deco-lg' },
-        { x: 13, yPct: 0.49, icon: 'flask', cls: 'wm-deco-building' },
-        { x: 50, yPct: 0.56, icon: 'lens', cls: 'wm-deco-small wm-pulse' },
-        { x: 84, yPct: 0.62, icon: 'crystal', cls: 'wm-deco-crystal wm-pulse' },
-        { x: 13, yPct: 0.69, icon: 'portal', cls: 'wm-deco-crystal wm-pulse' },
-        { x: 34, yPct: 0.76, icon: 'book', cls: 'wm-deco-building' },
-        { x: 84, yPct: 0.80, icon: 'star', cls: 'wm-deco-small wm-float' },
-        { x: 80, yPct: 0.86, icon: 'castle', cls: 'wm-deco-building wm-deco-xl' },
-        { x: 14, yPct: 0.91, icon: 'flag', cls: 'wm-deco-small' },
-        { x: 50, yPct: 0.97, icon: 'crown', cls: 'wm-deco-crystal wm-pulse' },
-    ],
+    _worldConfig: null,
+    _biomes: [],
 
     // ── STATE ────────────────────────────────────────────────────
     chapterId:     null,
@@ -103,53 +39,9 @@ const AdventureMap = {
     _charEl:       null,
     _zoneEl:       null,
 
-    _configureResponsiveWorld() {
+    _viewportWidth() {
         const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-        const layouts = Object.values(this._worldLayouts)
-            .sort((a, b) => a.minWidth - b.minWidth);
-        const layout = layouts.reduce((current, item) => vw >= item.minWidth ? item : current, layouts[0]);
-        this.WORLD_W = layout.width;
-        this.WORLD_H = layout.height;
-        this._layoutMode = Object.keys(this._worldLayouts).find(k => this._worldLayouts[k] === layout) || 'vertical';
-        return layout;
-    },
-
-    _stagePointAt(index) {
-        const layout = this._worldLayouts[this._layoutMode] || this._worldLayouts.vertical;
-        const pos = layout.positions[index] || [50, 0.1 + index * 0.07];
-        return {
-            xPct: pos[0],
-            worldY: Math.round(pos[1] * this.WORLD_H),
-        };
-    },
-
-    _biomeBounds(biome) {
-        const top = Number.isFinite(biome.top) ? biome.top : Math.round(biome.topPct * this.WORLD_H);
-        const bottom = Number.isFinite(biome.bottom) ? biome.bottom : Math.round(biome.bottomPct * this.WORLD_H);
-        return { top, bottom, height: bottom - top };
-    },
-
-    _decoGlyph(icon) {
-        const glyphs = {
-            tree: '🌲',
-            stone: '🪨',
-            spark: '✨',
-            mushroom: '🍄',
-            home: '🏠',
-            sunflower: '🌻',
-            npc: '🧑‍🏫',
-            lab: '🏥',
-            flask: '🧪',
-            lens: '🔬',
-            crystal: '💠',
-            portal: '🔮',
-            book: '📚',
-            star: '🌟',
-            castle: '🏰',
-            flag: '🚩',
-            crown: '👑',
-        };
-        return glyphs[icon] || icon || '';
+        return vw;
     },
 
     // ── ENTRY POINT ──────────────────────────────────────────────
@@ -173,24 +65,19 @@ const AdventureMap = {
         const meta = window.CHAPTER_METADATA;
         if (!meta) { Router.navigate(`#chapter/${chapterId}`); return; }
 
-        const layout = this._configureResponsiveWorld();
-
-        this.stages = (meta.stages || []).map((s, i) => {
-            const pos  = this._stagePointAt(i);
-            const data = window[s.varName] || {};
-            return {
-                id:        s.id,
-                index:     s.index,
-                isBoss:    s.isBoss  || false,
-                isFinal:   s.isFinal || false,
-                title:     data.title || `Missão ${s.index}`,
-                xPct:      pos.xPct,
-                worldY:    pos.worldY,
-                unlocked:  State.isStageUnlocked(chapterId, s.index),
-                completed: State.isStageCompleted(chapterId, s.index),
-                stars:     State.getStageStars(chapterId, s.index),
-            };
-        });
+        const mapData = AdventurePathGenerator.buildNodes(
+            meta.stages || [],
+            chapterId,
+            varName => window[varName] || {},
+            State,
+            this._viewportWidth()
+        );
+        this._worldConfig = mapData.world;
+        this.WORLD_W = mapData.world.width;
+        this.WORLD_H = mapData.world.height;
+        this._layoutMode = mapData.world.mode;
+        this.stages = mapData.nodes;
+        this._biomes = AdventureBiomeGenerator.build(mapData.world);
 
         // Place character near first active (unlocked but incomplete) stage
         const firstActive = this.stages.find(s => s.unlocked && !s.completed) || this.stages[0];
@@ -209,7 +96,7 @@ const AdventureMap = {
             container.dataset.mapMode = this._layoutMode;
             container.style.setProperty('--wm-world-w', `${this.WORLD_W}px`);
             container.style.setProperty('--wm-world-h', `${this.WORLD_H}px`);
-            container.style.setProperty('--wm-mode-label', `"${layout.modeLabel}"`);
+            container.style.setProperty('--wm-mode-label', `"${this._layoutMode}"`);
         }
 
         // Hide global right panel (app layout) — our wm-right-panel replaces it
@@ -276,11 +163,12 @@ const AdventureMap = {
             <div class="wm-viewport" id="wm-viewport" role="main">
                 <div class="wm-world" id="wm-world" style="width:${W}px;height:${H}px">
 
-                    ${this._buildBiomes()}
-                    ${this._buildPathsSVG()}
-                    ${this._buildDecorations()}
-                    ${this._buildNodes()}
-                    ${this._buildLabels()}
+                    ${AdventureWorldRenderer.build({
+                        world: this._worldConfig,
+                        biomes: this._biomes,
+                        nodes: this.stages,
+                        iconSystem: ic,
+                    })}
 
                     <div class="wm-char" id="wm-char"
                          style="left:${this.world.charX}px;top:${this.world.charY}px"
@@ -328,143 +216,6 @@ const AdventureMap = {
             icon: document.getElementById('wm-zone-icon'),
             name: document.getElementById('wm-zone-name'),
         };
-    },
-
-    // ── BIOMES ───────────────────────────────────────────────────
-    _buildBiomes() {
-        return this._biomes.map((b, i) => {
-            const bounds  = this._biomeBounds(b);
-            const divider = i > 0 ? `<div class="wm-biome-divide" style="top:${bounds.top}px"></div>` : '';
-            return `${divider}
-            <div class="wm-biome wm-biome-${b.id}"
-                 style="top:${bounds.top}px;height:${bounds.height}px;background:linear-gradient(180deg,${b.bg1} 0%,${b.bg2} 100%)">
-                <div class="wm-biome-name" aria-hidden="true">${IconSystem.html(b.svgIcon,{size:'sm',color:b.iconColor||'muted'})} ${b.name}</div>
-            </div>`;
-        }).join('');
-    },
-
-    // ── COBBLESTONE PATHS — double SVG layer ─────────────────────
-    _buildPathsSVG() {
-        const W = this.WORLD_W;
-        const H = this.WORLD_H;
-        let base = '', tiles = '', doneBase = '', doneTiles = '';
-
-        for (let i = 0; i < this.stages.length - 1; i++) {
-            const a    = this.stages[i];
-            const b    = this.stages[i + 1];
-            const x1   = (a.xPct / 100) * W;
-            const y1   = a.worldY;
-            const x2   = (b.xPct / 100) * W;
-            const y2   = b.worldY;
-            const sign = (i % 2 === 0) ? 1 : -1;
-            const bulge = 44 * sign;
-            const cp1x = x1 + bulge,  cp1y = y1 + (y2 - y1) * 0.38;
-            const cp2x = x2 - bulge,  cp2y = y1 + (y2 - y1) * 0.62;
-            const d = `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
-
-            if (a.completed) {
-                doneBase  += `<path class="wm-path-base wm-path-done-base"  d="${d}" />`;
-                doneTiles += `<path class="wm-path-tiles wm-path-done-tiles" d="${d}" />`;
-            } else {
-                base  += `<path class="wm-path-base"  d="${d}" />`;
-                tiles += `<path class="wm-path-tiles" d="${d}" />`;
-            }
-        }
-
-        return `<svg class="wm-paths-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-                <linearGradient id="pathDone" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#4ade80" />
-                    <stop offset="100%" stop-color="#22c55e" />
-                </linearGradient>
-            </defs>
-            ${base}${doneBase}${tiles}${doneTiles}
-        </svg>`;
-    },
-
-    // ── DECORATIONS ──────────────────────────────────────────────
-    _buildDecorations() {
-        return this._decorations.map(d => {
-            const x     = (d.x / 100) * this.WORLD_W;
-            const y     = Number.isFinite(d.y) ? d.y : d.yPct * this.WORLD_H;
-            const label = d.label ? `<div class="wm-npc-label">${d.label}</div>` : '';
-            return `<div class="${d.cls} wm-deco" style="left:${x}px;top:${y}px" aria-hidden="true">${d.emoji || this._decoGlyph(d.icon)}${label}</div>`;
-        }).join('');
-    },
-
-    // ── STAGE NODES ──────────────────────────────────────────────
-    _buildNodes() {
-        return this.stages.map((s, i) => {
-            const x          = (s.xPct / 100) * this.WORLD_W;
-            const stateClass = s.completed ? 'wm-done' : s.unlocked ? 'wm-active' : 'wm-locked';
-            const typeClass  = s.isFinal ? 'wm-final' : s.isBoss ? 'wm-boss' : '';
-            const ic = IconSystem;
-            const icon = s.completed
-                ? ic.html('check',  { size: 'lg' })
-                : s.isFinal
-                    ? ic.html('crown',  { size: 'xl', variant: 'glow' })
-                    : s.isBoss
-                        ? ic.html('boss',   { size: 'lg' })
-                        : s.unlocked
-                            ? `<span class="wm-node-num">${s.index}</span>`
-                            : ic.html('lock', { size: 'md' });
-            const typeLabel = s.isFinal
-                ? `${ic.html('star',{size:'xs'})} FINAL`
-                : s.isBoss
-                    ? `${ic.html('boss',{size:'xs'})} CHEFE`
-                    : '';
-            const starsHTML  = s.completed
-                ? `<div class="wm-node-stars" aria-label="${s.stars} estrelas">
-                     ${[1,2,3].map(n => `<span class="${n <= s.stars ? 'wm-star-lit' : 'wm-star-dim'}">★</span>`).join('')}
-                   </div>`
-                : '';
-
-            return `
-            <div class="wm-node ${stateClass} ${typeClass}" id="wmn-${i}"
-                 style="left:${x}px;top:${s.worldY}px"
-                 onclick="AdventureMap._clickNode(${i})"
-                 role="button"
-                 aria-label="${s.title} — ${s.completed ? 'concluído' : s.unlocked ? 'disponível' : 'bloqueado'}"
-                 tabindex="${s.unlocked ? 0 : -1}">
-                <div class="wm-node-shadow" aria-hidden="true"></div>
-                <div class="wm-node-body" aria-hidden="true">
-                    <div class="wm-node-icon">${icon}</div>
-                </div>
-                ${starsHTML}
-                ${typeLabel ? `<div class="wm-node-type-badge" aria-hidden="true">${typeLabel}</div>` : ''}
-            </div>`;
-        }).join('');
-    },
-
-    // ── CALLOUT LABELS ────────────────────────────────────────────
-    _buildLabels() {
-        return this.stages.map((s, i) => {
-            const nodeX     = (s.xPct / 100) * this.WORLD_W;
-            const isRight   = s.xPct < 52;  // node on left half -> label extends right
-            const ic2 = IconSystem;
-            const statusText = s.completed
-                ? `${ic2.html('check',{size:'xs',color:'success'})} Concluído`
-                : s.unlocked
-                    ? `${ic2.html('chevron-right',{size:'xs',color:'xp'})} Disponível`
-                    : `${ic2.html('lock',{size:'xs'})} Bloqueado`;
-            const statusCls  = s.completed ? 'wm-status-done' : s.unlocked ? 'wm-status-active' : 'wm-status-locked';
-            const labelW = this.WORLD_W < 620 ? 138 : 168;
-            let labelX = isRight ? nodeX + 38 : nodeX - 38 - labelW;
-            labelX = Math.max(12, Math.min(this.WORLD_W - labelW - 12, labelX));
-            const posStyle = `left:${labelX}px;top:${s.worldY}px;--wm-label-w:${labelW}px`;
-
-            return `
-            <div class="wm-label ${isRight ? 'wm-label-right' : 'wm-label-left'}" id="wml-${i}" style="${posStyle}">
-                <div class="wm-label-card">
-                    <div class="wm-label-title">${s.title}</div>
-                    <div class="wm-label-status ${statusCls}">${statusText}</div>
-                    <button class="wm-label-enter-btn" onclick="AdventureMap._enterStage(${i})">
-                        Entrar <span aria-hidden="true">→</span>
-                    </button>
-                </div>
-            </div>`;
-        }).join('');
     },
 
     // ── GAME LOOP ─────────────────────────────────────────────────
@@ -555,22 +306,7 @@ const AdventureMap = {
     // ── SCROLL ───────────────────────────────────────────────────
     _scrollToChar(instant) {
         const vp = document.getElementById('wm-viewport');
-        if (!vp) return;
-        const viewW = vp.clientWidth || window.innerWidth;
-        const viewH = vp.clientHeight || window.innerHeight - 100;
-        let scrollX = this.world.charX - viewW / 2;
-        let scrollY = this.world.charY - viewH / 2;
-        scrollX = Math.max(0, Math.min(this.WORLD_W - viewW, scrollX));
-        scrollY = Math.max(0, Math.min(this.WORLD_H - viewH, scrollY));
-        if (instant) {
-            vp.scrollLeft = scrollX;
-            vp.scrollTop = scrollY;
-        } else {
-            const diffX = scrollX - vp.scrollLeft;
-            const diff = scrollY - vp.scrollTop;
-            if (Math.abs(diffX) > 0.5) vp.scrollLeft += diffX * 0.09;
-            if (Math.abs(diff) > 0.5) vp.scrollTop += diff * 0.09;
-        }
+        AdventureMapCamera.follow(vp, { x: this.world.charX, y: this.world.charY }, this._worldConfig, instant);
     },
 
     // ── NEAR STAGE CHECK ─────────────────────────────────────────
@@ -603,20 +339,15 @@ const AdventureMap = {
     // ── BIOME LABEL ──────────────────────────────────────────────
     _updateBiomeLabel() {
         if (!this._zoneEl?.name) return;
-        for (const b of this._biomes) {
-            const bounds = this._biomeBounds(b);
-            if (this.world.charY >= bounds.top && this.world.charY < bounds.bottom) {
-                if (this._currentBiome !== b.id) {
-                    this._currentBiome = b.id;
-                    this._zoneEl.icon.innerHTML = IconSystem.html(b.svgIcon, { size: 'sm', color: b.iconColor || '' });
-                    this._zoneEl.name.textContent = b.name;
-                    const pill = document.getElementById('wm-zone-pill');
-                    if (pill) {
-                        pill.classList.add('wm-zone-flash');
-                        setTimeout(() => pill.classList.remove('wm-zone-flash'), 800);
-                    }
-                }
-                break;
+        const b = AdventureBiomeGenerator.currentAtY(this._biomes, this.world.charY);
+        if (b && this._currentBiome !== b.id) {
+            this._currentBiome = b.id;
+            this._zoneEl.icon.innerHTML = IconSystem.html(b.icon || 'compass', { size: 'sm', color: b.color || '' });
+            this._zoneEl.name.textContent = b.title;
+            const pill = document.getElementById('wm-zone-pill');
+            if (pill) {
+                pill.classList.add('wm-zone-flash');
+                setTimeout(() => pill.classList.remove('wm-zone-flash'), 800);
             }
         }
     },
@@ -627,11 +358,7 @@ const AdventureMap = {
         const sx = (s.xPct / 100) * this.WORLD_W;
 
         if (!s.unlocked) {
-            const el = document.getElementById(`wmn-${idx}`);
-            el?.classList.remove('wm-node-shake');
-            void el?.offsetWidth;
-            el?.classList.add('wm-node-shake');
-            setTimeout(() => el?.classList.remove('wm-node-shake'), 500);
+            AdventureNodeAnimations.locked(`wmn-${idx}`);
             this._playLock();
             return;
         }
@@ -850,7 +577,8 @@ const AdventureMap = {
         this._resizeTimer = setTimeout(() => {
             if (!this.running) return;
             const previous = this._layoutMode;
-            this._configureResponsiveWorld();
+            const next = AdventurePathGenerator.resolveLayout(this._viewportWidth(), this.stages.length).world.mode;
+            this._layoutMode = next;
             if (previous !== this._layoutMode) this.start(this.chapterId);
         }, 220);
     },

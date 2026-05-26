@@ -555,6 +555,27 @@
         linear-gradient(180deg, #fef6e4 0%, #fdf0d5 100%);
 }
 
+.wm-layer {
+    position: absolute;
+    pointer-events: none;
+}
+
+.wm-background-layer,
+.wm-node-layer,
+.wm-label-layer,
+.wm-landmark-layer,
+.wm-ambient-layer,
+.wm-fx-layer {
+    inset: 0;
+}
+
+.wm-background-layer {
+    z-index: 0;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0)),
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.35), transparent 36%);
+}
+
 /* ── BIOMES ────────────────────────────────────────────────── */
 
 .wm-biome {
@@ -563,6 +584,53 @@
     right: 0;
     overflow: hidden;
     /* top/height set inline */
+    z-index: 1;
+    background: linear-gradient(180deg, var(--biome-a), var(--biome-b)) !important;
+}
+
+.wm-biome-terrain,
+.wm-biome-water,
+.wm-biome-depth {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.wm-biome-terrain {
+    background-image: var(--biome-asset);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.36;
+}
+
+.wm-biome-water {
+    opacity: 0.22;
+    background:
+        linear-gradient(120deg, transparent 0 20%, rgba(14,165,233,0.40) 21% 30%, transparent 31% 100%);
+    background-size: 360px 220px;
+    animation: wmWaterMove 12s linear infinite;
+}
+
+.wm-water-lava {
+    background:
+        linear-gradient(120deg, transparent 0 18%, rgba(239,68,68,0.35) 19% 27%, transparent 28% 100%);
+}
+
+.wm-water-corrupt {
+    background:
+        repeating-linear-gradient(90deg, transparent 0 24px, rgba(15,23,42,0.22) 25px 31px, transparent 32px 68px);
+}
+
+.wm-biome-depth {
+    background:
+        radial-gradient(circle at 18% 45%, rgba(15,23,42,0.10), transparent 28%),
+        radial-gradient(circle at 82% 62%, rgba(255,255,255,0.16), transparent 24%);
+    opacity: 0.65;
+}
+
+@keyframes wmWaterMove {
+    from { background-position: 0 0; }
+    to   { background-position: 360px 220px; }
 }
 
 .wm-biome-name {
@@ -627,27 +695,58 @@
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 3;
+    z-index: 4;
     overflow: visible;
 }
 
-/* Layer 1: sandy base */
+.wm-path-rail,
 .wm-path-base {
     fill: none;
-    stroke: #d4c4a0;
-    stroke-width: 13;
+    stroke: #ead7a1;
+    stroke-width: 18;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
-/* Layer 2: tile dashes */
 .wm-path-tiles {
     fill: none;
-    stroke: rgba(0, 0, 0, 0.18);
-    stroke-width: 10;
+    stroke: rgba(120, 53, 15, 0.30);
+    stroke-width: 13;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 18 8;
+    stroke-dasharray: 22 10;
+}
+
+.wm-path-glow {
+    fill: none;
+    stroke: rgba(249, 115, 22, 0.52);
+    stroke-width: 26;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: url(#wmPathSoftGlow);
+    animation: wmPathGlow 1.8s ease-in-out infinite;
+}
+
+.wm-path-rail.is-done,
+.wm-path-base.is-done {
+    stroke: #98e87f;
+}
+
+.wm-path-tiles.is-done {
+    stroke: rgba(22, 101, 52, 0.48);
+}
+
+.wm-path-rail.is-active {
+    stroke: #fed7aa;
+}
+
+.wm-path-tiles.is-active {
+    stroke: rgba(249, 115, 22, 0.58);
+}
+
+@keyframes wmPathGlow {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 0.78; }
 }
 
 /* Done variants */

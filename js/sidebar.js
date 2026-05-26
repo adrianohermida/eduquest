@@ -199,7 +199,7 @@ const Sidebar = {
 
         const tiersHTML = TIERS.map((t, i) => `
             <div class="rp-rank-tier${i < curTierIdx ? ' rt-done' : i === curTierIdx ? ' rt-cur' : ''}" aria-hidden="true">
-                <div class="rp-rank-tier-dot">${i <= curTierIdx ? t.icon : ''}</div>
+                <div class="rp-rank-tier-dot">${i <= curTierIdx ? _icT(t.iconId, {size:'xs', color:t.iconColor}) : ''}</div>
                 <span class="rp-rank-tier-lbl">${t.name.substring(0, 3)}</span>
             </div>`).join('');
 
@@ -258,7 +258,7 @@ const Sidebar = {
                     <a href="#ranking" class="rp-section-link" aria-label="Ver ranking">Ver →</a>
                 </div>
                 <div class="rp-rank-card">
-                    <span class="rp-rank-icon" aria-hidden="true">${rank.icon}</span>
+                    <span class="rp-rank-icon" aria-hidden="true">${_icT(rank.iconId, {size:'sm', color:rank.iconColor})}</span>
                     <div class="rp-rank-info">
                         <div class="rp-rank-name">Liga ${rank.name}</div>
                         <div class="rp-rank-xp">${xp.toLocaleString('pt-BR')} XP total</div>
@@ -808,9 +808,10 @@ const HUD = {
         const u    = State.data.user;
         const rank = State.getRank();
         const id   = s => document.getElementById(s);
+        const _icT = (rid, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(rid, o) : '';
         if (id('had-avatar'))     id('had-avatar').textContent     = u.avatar || '🦸';
         if (id('had-name'))       id('had-name').textContent       = u.name   || 'Herói';
-        if (id('had-lvl-txt'))    id('had-lvl-txt').textContent    = `Nível ${u.level} · ${rank.icon} ${rank.name}`;
+        if (id('had-lvl-txt'))    id('had-lvl-txt').innerHTML      = `Nível ${u.level} · ${_icT(rank.iconId, {size:'xs', color:rank.iconColor})} ${rank.name}`;
         if (id('had-xp-val'))     id('had-xp-val').textContent     = `${(u.xp||0).toLocaleString('pt-BR')} XP`;
         if (id('had-streak-val')) id('had-streak-val').textContent = `${u.streak || 1} dias`;
         if (id('had-gems-val'))   id('had-gems-val').textContent   = `${u.gems || 0}`;
