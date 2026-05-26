@@ -53,8 +53,8 @@ const Router = {
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        const isAdmin      = route === 'admin';
-        const isFullscreen = isGame || isAuth || route === 'speed-drill' || route === 'reading' || isAdmin;
+        // admin, ai-studio, etc. are normal app pages — keep HUD/sidebar visible
+        const isFullscreen = isGame || isAuth || route === 'speed-drill' || route === 'reading';
 
         // Layout mode: full-screen (auth/game) vs app (normal)
         document.body.dataset.layout = isFullscreen ? 'full' : 'app';
@@ -118,19 +118,16 @@ const Router = {
         if (typeof HUD !== 'undefined') {
             setTimeout(() => {
                 HUD.refreshNotifBadge();
+                const _getActiveChapter = () => {
+                    const chs = (typeof CONFIG !== 'undefined' && CONFIG.chapters) || [];
+                    return chs.find(ch => ch.unlocked && typeof State !== 'undefined' && !State.getChapterProgress(ch.id).completed) || chs[0];
+                };
                 if (isFullscreen) {
                     HUD.clearContext();
                 } else if (route === 'home' || route === '') {
-                    const chapters     = (typeof CONFIG !== 'undefined' && CONFIG.chapters) || [];
-                    const activeChapter = chapters.find(ch => {
-                        if (!ch.unlocked) return false;
-                        return typeof State !== 'undefined' && !State.getChapterProgress(ch.id).completed;
-                    }) || chapters[0];
-                    if (activeChapter) {
-                        HUD.setContext({ icon: activeChapter.icon, subject: activeChapter.subject, grade: activeChapter.grade, stage: 'Mapa', href: `#chapter/${activeChapter.id}` });
-                    } else {
-                        HUD.clearContext();
-                    }
+                    const ch = _getActiveChapter();
+                    if (ch) HUD.setContext({ icon: ch.icon, subject: ch.subject, grade: ch.grade, stage: 'Mapa', href: `#chapter/${ch.id}` });
+                    else    HUD.clearContext();
                 } else if (route === 'chapter' && parts[1]) {
                     const meta = window.CHAPTER_METADATA;
                     if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.subject || meta.title, grade: meta.grade, stage: 'Mapa', href: `#chapter/${parts[1]}` });
@@ -140,6 +137,10 @@ const Router = {
                 } else if (route === 'adventure' && parts[1]) {
                     const meta = window.CHAPTER_METADATA;
                     if (meta) HUD.setContext({ icon: meta.icon || '🗺️', subject: meta.subject || meta.title, grade: meta.grade, stage: 'Mapa Aventura', href: `#chapter/${parts[1]}` });
+                } else {
+                    // All other app pages: show default chapter context (discipline + mapa always visible)
+                    const ch = _getActiveChapter();
+                    if (ch) HUD.setContext({ icon: ch.icon, subject: ch.subject, grade: ch.grade, stage: 'Mapa', href: `#chapter/${ch.id}` });
                 }
             }, 0);
         }
