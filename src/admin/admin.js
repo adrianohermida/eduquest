@@ -181,8 +181,8 @@ window.EduAdmin = (() => {
         const sectionLabel = NAV.find(n => n.id === _section)?.label || 'Dashboard';
 
         return `
-        <div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop" onclick="EduAdmin._closeMobileSidebar()"></div>
         <div class="admin-layout" id="admin-layout">
+            <div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop" onclick="EduAdmin._closeMobileSidebar()"></div>
             <aside class="admin-sidebar" id="admin-sidebar">
                 <div class="admin-sidebar-logo" onclick="EduAdmin._navigate('overview')">
                     <div class="admin-sidebar-logo-icon">⚡</div>

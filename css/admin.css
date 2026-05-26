@@ -945,16 +945,20 @@
 }
 .admin-mobile-menu-btn:hover { background: #e2e8f0; }
 
-/* Overlay backdrop for mobile sidebar */
+/* Overlay backdrop for mobile sidebar — inside admin-layout stacking context */
 .admin-sidebar-backdrop {
     display: none;
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(15, 23, 42, 0.5);
     backdrop-filter: blur(2px);
     z-index: 9010;
+    pointer-events: none;
 }
-.admin-sidebar-backdrop.open { display: block; }
+.admin-sidebar-backdrop.open {
+    display: block;
+    pointer-events: auto;
+}
 
 /* ── BASE (Mobile < 768px) ────────────────────────────────── */
 
