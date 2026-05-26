@@ -34,11 +34,11 @@ const ACHIEVEMENTS = [
 window.ACHIEVEMENTS = ACHIEVEMENTS;
 
 const State = {
-    SCHEMA_VERSION: 8,
+    SCHEMA_VERSION: 9,
     LS_KEY: 'eduquest_v5',
 
     data: {
-        schemaVersion: 8,
+        schemaVersion: 9,
         user: {
             name:         'Herói',
             level:        1,
@@ -75,10 +75,20 @@ const State = {
             lastStreakMilestone:  0,
             // v9 additions (Sprint 4)
             loreSeenChapters:     [],
+            // v10 additions (Sprint 5)
+            battlePassXP:         0,
+            battlePassSeason:     1,
+            battlePassClaimed:    [],
+            eventMissionsClaimed: [],
+            pvpWins:              0,
+            pvpLosses:            0,
+            pvpElo:               1000,
         },
         progress: {},
         dailyMissions: { date: null, completed: [] },
         wrongAnswers:  {},
+        eventMissions: {},
+        aiStudySets:   [],
     },
 
     _syncTimer:  null,
@@ -161,11 +171,21 @@ const State = {
                 avatarClass:          parsed.user.avatarClass          || 'guerreiro',
                 lastStreakMilestone:  parsed.user.lastStreakMilestone  || 0,
                 loreSeenChapters:     parsed.user.loreSeenChapters     || [],
+                // v10 Sprint 5
+                battlePassXP:         parsed.user.battlePassXP         || 0,
+                battlePassSeason:     parsed.user.battlePassSeason      || 1,
+                battlePassClaimed:    parsed.user.battlePassClaimed     || [],
+                eventMissionsClaimed: parsed.user.eventMissionsClaimed  || [],
+                pvpWins:              parsed.user.pvpWins               || 0,
+                pvpLosses:            parsed.user.pvpLosses             || 0,
+                pvpElo:               parsed.user.pvpElo                ?? 1000,
             };
         }
-        this.data.progress      = parsed.progress || {};
-        this.data.dailyMissions = parsed.dailyMissions || { date: null, completed: [] };
-        this.data.wrongAnswers  = parsed.wrongAnswers  || {};
+        this.data.progress      = parsed.progress      || {};
+        this.data.dailyMissions = parsed.dailyMissions  || { date: null, completed: [] };
+        this.data.wrongAnswers  = parsed.wrongAnswers   || {};
+        this.data.eventMissions = parsed.eventMissions  || {};
+        this.data.aiStudySets   = parsed.aiStudySets    || [];
         this.data.schemaVersion = this.SCHEMA_VERSION;
     },
 

@@ -83,6 +83,10 @@ const Router = {
             case 'review':        this.renderReview(container);             break;
             case 'achievements':  this.renderAchievements(container);       break;
             case 'word-search':   this.renderWordSearch(container, parts[1], parts[2]); break;
+            case 'events':        this.renderEvents(container);                          break;
+            case 'battle-pass':   this.renderBattlePass(container);                     break;
+            case 'ai-studio':     this.renderAIStudio(container);                       break;
+            case 'pvp':           this.renderPvP(container);                            break;
             default:              this.renderHome(container);
         }
 
