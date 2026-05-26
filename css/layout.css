@@ -162,11 +162,11 @@
     display: flex;
     align-items: center;
     gap: var(--sp-3);
-    padding: var(--sp-3) var(--sp-3);
-    border-radius: var(--r-lg);
+    padding: 10px 16px;
+    border-radius: var(--r-md);
     cursor: pointer;
     color: var(--text-2);
-    font-size: 0.88rem;
+    font-size: 0.94rem;
     font-weight: 700;
     text-decoration: none;
     transition:
@@ -195,7 +195,7 @@
     background: var(--surface-3);
 }
 .sidebar-item.active {
-    background: rgba(249, 115, 22, 0.10);
+    background: #fff5ee;
     color: var(--brand);
     font-weight: 900;
 }
@@ -215,9 +215,9 @@
 
 /* Divider between nav groups */
 .sidebar-divider {
-    height: 1px;
+    height: 2px;
     background: var(--border);
-    margin: var(--sp-2) var(--sp-3);
+    margin: 8px 12px;
     flex-shrink: 0;
 }
 
@@ -273,8 +273,8 @@
 
 .sidebar-user-card {
     background: var(--surface-2);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-xl);
+    border: 2px solid var(--border);
+    border-radius: var(--r-lg);
     overflow: hidden;
 }
 
@@ -296,8 +296,8 @@
 .sidebar-user:focus-visible { outline: 2.5px solid var(--brand); outline-offset: -2px; border-radius: var(--r-xl); }
 
 .sidebar-user-avatar {
-    width: 40px; height: 40px;
-    background: #4b7be5;
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.5rem;
@@ -319,8 +319,8 @@
     gap: 4px;
 }
 .sidebar-user-xp-text { font-size: 0.62rem; font-weight: 700; color: var(--text-2); }
-.sidebar-user-xp-bar  { height: 8px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
-.sidebar-user-xp-fill { height: 100%; border-radius: var(--r-full); background: linear-gradient(90deg, var(--brand), #ea580c); transition: width 0.6s ease; min-width: 4px; }
+.sidebar-user-xp-bar  { height: 8px; border-radius: var(--r-full); background: var(--border); overflow: hidden; }
+.sidebar-user-xp-fill { height: 100%; border-radius: var(--r-full); background: linear-gradient(90deg, #ff6b1a, #ff9a44); transition: width 0.6s ease; min-width: 4px; }
 
 /* ── Tooltip for compact mode ── */
 @media (min-width: 768px) and (max-width: 1279px) {
@@ -387,9 +387,14 @@
     padding: var(--sp-5) var(--sp-4);
     display: flex;
     flex-direction: column;
-    gap: var(--sp-5);
+    gap: var(--sp-4);
 }
-.rp-section {}
+.rp-section {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: var(--sp-4);
+}
 .rp-section-header {
     display: flex;
     align-items: center;
@@ -450,7 +455,7 @@
 .rp-mission {
     display: flex; align-items: center; gap: var(--sp-2);
     padding: var(--sp-2) var(--sp-3);
-    background: var(--surface-3); border-radius: var(--r-lg);
+    background: var(--surface); border: 2px solid var(--border); border-radius: var(--r-lg);
     margin-bottom: var(--sp-2);
     transition: opacity var(--dur-fast);
 }
@@ -465,7 +470,7 @@
 .rp-rank-card {
     display: flex; align-items: center; gap: var(--sp-3);
     padding: var(--sp-3);
-    background: var(--surface-3); border-radius: var(--r-lg);
+    background: var(--surface); border: 2px solid var(--border); border-radius: var(--r-xl);
 }
 .rp-rank-icon { font-size: 1.7rem; flex-shrink: 0; }
 .rp-rank-info { flex: 1; }
@@ -477,11 +482,11 @@
 .rp-league-card {
     display: flex; align-items: center; gap: var(--sp-3);
     padding: var(--sp-3);
-    background: var(--surface-3); border-radius: var(--r-lg);
+    background: var(--surface); border: 2px solid var(--border); border-radius: var(--r-xl);
     text-decoration: none;
-    transition: background var(--dur-fast);
+    transition: background var(--dur-fast), border-color var(--dur-fast);
 }
-.rp-league-card:hover { background: var(--surface-2); }
+.rp-league-card:hover { background: var(--surface-2); border-color: var(--brand); }
 .rp-league-icon   { flex-shrink: 0; }
 .rp-league-info   { flex: 1; min-width: 0; }
 .rp-league-name   { font-size: 0.82rem; font-weight: 900; color: var(--text); }
@@ -492,7 +497,7 @@
 .rp-boss-card {
     display: flex; align-items: center; gap: var(--sp-3);
     padding: var(--sp-3);
-    background: var(--surface-3); border-radius: var(--r-lg);
+    background: var(--surface); border: 2px solid var(--border); border-radius: var(--r-xl);
     opacity: 0.7;
 }
 .rp-boss-icon { font-size: 2rem; }
@@ -539,7 +544,7 @@
     .sidebar-item-label { display: none; }
     .sidebar-item.active::before { display: none; }
     .sidebar-item.active {
-        background: rgba(249, 115, 22, 0.14);
+        background: rgba(255, 107, 26, 0.14);
         box-shadow: inset 0 0 0 2px var(--brand);
     }
     .sidebar-soon-chip { display: none; }
