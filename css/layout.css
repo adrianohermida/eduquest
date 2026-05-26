@@ -453,16 +453,31 @@
 .rp-rank-xp   { font-size: 0.68rem; color: var(--brand); font-weight: 800; }
 .rp-rank-btn  { font-size: 0.72rem; font-weight: 900; color: var(--brand); text-decoration: none; white-space: nowrap; flex-shrink: 0; }
 
+/* League card — simplified clickable card */
+.rp-league-card {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3);
+    background: var(--surface-3); border-radius: var(--r-lg);
+    text-decoration: none;
+    transition: background var(--dur-fast);
+}
+.rp-league-card:hover { background: var(--surface-2); }
+.rp-league-icon   { flex-shrink: 0; }
+.rp-league-info   { flex: 1; min-width: 0; }
+.rp-league-name   { font-size: 0.82rem; font-weight: 900; color: var(--text); }
+.rp-league-sub    { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; }
+.rp-league-chevron{ font-size: 1.1rem; font-weight: 900; color: var(--text-muted); flex-shrink: 0; }
+
 /* Boss card */
 .rp-boss-card {
     display: flex; align-items: center; gap: var(--sp-3);
     padding: var(--sp-3);
     background: var(--surface-3); border-radius: var(--r-lg);
-    opacity: 0.65;
+    opacity: 0.7;
 }
 .rp-boss-icon { font-size: 2rem; }
 .rp-boss-name { font-size: 0.78rem; font-weight: 900; color: var(--text); }
-.rp-boss-sub  { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; }
+.rp-boss-desc { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; }
 
 /* ═══════════════════════════════════════════════════════
    BODY LAYOUT ADJUSTMENTS — TABLET (768px+)
