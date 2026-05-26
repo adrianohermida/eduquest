@@ -3,16 +3,30 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v1';
+const CACHE_NAME  = 'eduquest-v3';
 const CACHE_SHELL = [
     '/',
     '/index.html',
+    '/manifest.json',
+    /* CSS */
+    '/css/animations.css',
     '/css/styles.css',
     '/css/layout.css',
-    '/css/animations.css',
     '/css/modal-hud.css',
+    '/css/design-system-v3.css',
+    '/css/world-map.css',
+    '/css/hud-dropdowns.css',
+    '/css/icons.css',
+    '/css/social.css',
     '/css/sprint5.css',
     '/css/game-feel.css',
+    '/css/learning.css',
+    '/css/builder.css',
+    '/css/depth.css',
+    '/css/cards.css',
+    '/css/spacing.css',
+    '/css/admin.css',
+    /* Core JS */
     '/js/config.js',
     '/js/state.js',
     '/js/utils.js',
@@ -20,6 +34,12 @@ const CACHE_SHELL = [
     '/js/ui-components.js',
     '/js/game-engine.js',
     '/js/adventure-map.js',
+    '/js/sidebar.js',
+    '/js/modal-engine.js',
+    '/js/router.js',
+    '/js/session-guard.js',
+    '/js/app.js',
+    /* Adventure map engine */
     '/src/adventure-map-engine/biome-generator.js',
     '/src/adventure-map-engine/path-generator.js',
     '/src/adventure-map-engine/node-system.js',
@@ -28,14 +48,17 @@ const CACHE_SHELL = [
     '/src/adventure-map-engine/world-renderer.js',
     '/src/adventure-map-engine/map-camera.js',
     '/src/adventure-map-engine/node-animations.js',
+    /* Motion system */
     '/src/motion/motion-tokens.js',
     '/src/motion/transitions.js',
     '/src/motion/springs.js',
     '/src/motion/feedback.js',
-    '/js/sidebar.js',
-    '/js/modal-engine.js',
-    '/js/router.js',
-    '/js/app.js',
+    /* Admin */
+    '/src/admin/admin.js',
+    /* Assets */
+    '/assets/icons/icon-192.png',
+    '/assets/icons/icon-512.png',
+    '/assets/icons/apple-touch-icon-180x180.png',
     '/assets/sounds/correct.wav',
     '/assets/sounds/wrong.wav',
     '/assets/sounds/click.wav',
