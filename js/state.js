@@ -341,7 +341,7 @@ const State = {
         if (this.data.user.premiumUntil) return new Date(this.data.user.premiumUntil) > new Date();
         return false;
     },
-    isAdmin()          { return this.data.user.email === 'jghermidamaia@gmail.com'; },
+    isAdmin()          { return ['adrianohermida@gmail.com','jghermidamaia@gmail.com'].includes(this.data.user.email); },
     isPremiumOrAdmin() { return this.isPremium() || this.isAdmin(); },
 
     getXPForLevel(level) { return level * 500; },
@@ -765,9 +765,8 @@ const State = {
 
     // Legacy fallback (dev/offline)
     login(email, password) {
-        const OK_EMAIL = 'jghermidamaia@gmail.com';
-        const OK_PASS  = '180514';
-        if (email === OK_EMAIL && password === OK_PASS) {
+        const ADMINS = { 'adrianohermida@gmail.com': '180514', 'jghermidamaia@gmail.com': '180514' };
+        if (ADMINS[email] && password === ADMINS[email]) {
             this.data.user.authenticated = true;
             this.data.user.email = email;
             this.save();
