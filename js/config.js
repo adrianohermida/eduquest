@@ -41,7 +41,7 @@ const CONFIG = {
             color: '#8b5cf6',
             grade: '7º Ano',
             chapters: [
-                { id: 'hist_medieval', title: 'Cap. 1 — Idade Média',   icon: '⚔️', totalStages: 8, unlocked: false, description: 'Em breve' },
+                { id: 'hist_medieval', title: 'Cap. 1 — Idade Média',   icon: '⚔️', totalStages: 8, unlocked: true,  description: 'Feudalismo, Cruzadas e o fim da Idade Média!' },
                 { id: 'hist_modern',   title: 'Cap. 2 — Idade Moderna', icon: '🗺️', totalStages: 8, unlocked: false, description: 'Em breve' }
             ]
         },
@@ -103,7 +103,7 @@ const CONFIG = {
             color: '#16a34a',
             grade: '7º Ano',
             chapters: [
-                { id: 'geo_brasil',  title: 'Cap. 1 — Brasil',             icon: '🇧🇷', totalStages: 8, unlocked: false, description: 'Em breve' },
+                { id: 'geo_brasil',  title: 'Cap. 1 — Brasil',             icon: '🇧🇷', totalStages: 8, unlocked: true,  description: 'Localização, biomas, regiões e economia do Brasil!' },
                 { id: 'geo_regiao',  title: 'Cap. 2 — Regiões do Brasil',  icon: '🗺️', totalStages: 8, unlocked: false, description: 'Em breve' }
             ]
         }
@@ -140,6 +140,26 @@ const CONFIG = {
             totalStages: 8,
             unlocked: true,
             description: 'Domine classes de palavras e sintaxe!'
+        },
+        {
+            id: 'hist_medieval',
+            title: 'Idade Média',
+            subject: 'História',
+            grade: '7º Ano',
+            icon: '⚔️',
+            totalStages: 8,
+            unlocked: true,
+            description: 'Feudalismo, Cruzadas e o fim da Idade Média!'
+        },
+        {
+            id: 'geo_brasil',
+            title: 'Brasil',
+            subject: 'Geografia',
+            grade: '7º Ano',
+            icon: '🇧🇷',
+            totalStages: 8,
+            unlocked: true,
+            description: 'Localização, biomas, regiões e economia do Brasil!'
         }
     ],
 
