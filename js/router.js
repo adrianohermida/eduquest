@@ -74,6 +74,7 @@ const Router = {
             case 'stage':      this.renderStagePrep(container, parts[1], parts[2]);      break;
             case 'profile':    this.renderProfile(container);   break;
             case 'shop':       this.renderShop(container);      break;
+            case 'subjects':   this.renderSubjects(container);           break;
             case 'missions':   this.renderMissions(container);           break;
             case 'adventure':  AdventureMap.start(parts[1]);            break;
             case 'ranking':       this.renderRanking(container);           break;
@@ -2508,42 +2509,135 @@ const Router = {
     },
 
     // ── MISSIONS ──────────────────────────────────────────
-    renderMissions(container) {
-        const chapters = CONFIG.chapters || [];
+    // ── SUBJECT HUB ──────────────────────────────────────────
+    renderSubjects(container) {
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const subjects = CONFIG.subjects || [];
 
-        const chaptersHTML = chapters.map(ch => {
-            const prog      = State.getChapterProgress(ch.id);
-            const percent   = prog.percent;
-            const completed = percent >= 100;
+        const subjectCards = subjects.map(subj => {
+            const unlockedChapters = subj.chapters.filter(ch => ch.unlocked);
+            const lockedChapters   = subj.chapters.filter(ch => !ch.unlocked);
+
+            // Aggregate progress across all unlocked chapters
+            let totalStages = 0, completedStages = 0;
+            unlockedChapters.forEach(ch => {
+                const prog = State.getChapterProgress(ch.id);
+                totalStages    += ch.totalStages;
+                completedStages += prog.completed || 0;
+            });
+            const pct = totalStages > 0 ? Math.round((completedStages / totalStages) * 100) : 0;
+
+            const chapterList = subj.chapters.map(ch => {
+                if (!ch.unlocked) {
+                    return `<div class="subj-chapter-row locked">
+                        ${_ic('lock',{size:'xs',color:'locked'})}
+                        <span class="subj-ch-title">${ch.title}</span>
+                        <span class="subj-ch-badge" style="color:var(--text-muted)">Em Breve</span>
+                    </div>`;
+                }
+                const prog = State.getChapterProgress(ch.id);
+                const done = prog.percent >= 100;
+                return `<div class="subj-chapter-row" onclick="Router.navigate('#chapter/${ch.id}')">
+                    <span style="font-size:1rem">${ch.icon}</span>
+                    <span class="subj-ch-title">${ch.title}</span>
+                    <span class="subj-ch-badge" style="color:${done ? 'var(--color-success)' : subj.color}">${done ? '✓ Completo' : prog.percent + '%'}</span>
+                </div>`;
+            }).join('');
+
             return `
-            <div class="chapter-card${completed ? ' ch-completed' : ''}" onclick="Router.navigate('#chapter/${ch.id}')">
-                <div class="chapter-icon-wrap">${ch.icon}</div>
-                <div class="chapter-body">
-                    <div class="chapter-subject">${ch.subject} · ${ch.grade}</div>
-                    <div class="chapter-title">${ch.title}</div>
-                    <div class="chapter-progress-row">
-                        <div class="chapter-progress-track">
-                            <div class="chapter-progress-fill" style="width:${percent}%"></div>
-                        </div>
-                        <span class="chapter-percent">${percent}%</span>
+            <div class="subj-card" style="border-color:${subj.color}33">
+                <div class="subj-card-header" style="background:${subj.color}18">
+                    <div class="subj-icon">${subj.icon}</div>
+                    <div class="subj-info">
+                        <div class="subj-name" style="color:${subj.color}">${subj.name}</div>
+                        <div class="subj-grade">${subj.grade}</div>
+                    </div>
+                    <div class="subj-progress-ring">
+                        <svg width="48" height="48" viewBox="0 0 48 48">
+                            <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="4"/>
+                            <circle cx="24" cy="24" r="20" fill="none" stroke="${subj.color}" stroke-width="4"
+                                stroke-dasharray="${2 * Math.PI * 20}"
+                                stroke-dashoffset="${2 * Math.PI * 20 * (1 - pct / 100)}"
+                                stroke-linecap="round" transform="rotate(-90 24 24)"/>
+                        </svg>
+                        <span class="subj-ring-pct" style="color:${subj.color}">${pct}%</span>
                     </div>
                 </div>
-                <div class="chapter-arrow">${completed ? _ic('check',{size:'sm',color:'success'}) : '›'}</div>
+                <div class="subj-chapters-list">
+                    ${chapterList}
+                </div>
+                ${unlockedChapters.length > 0 ? `
+                <div class="subj-card-footer">
+                    <button class="subj-start-btn" style="background:${subj.color}"
+                        onclick="Router.navigate('#chapter/${unlockedChapters[0].id}')">
+                        ${_ic('flag',{size:'xs'})} ${pct > 0 ? 'Continuar' : 'Começar'}
+                    </button>
+                </div>` : `
+                <div class="subj-card-footer">
+                    <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600">Conteúdo em desenvolvimento</span>
+                </div>`}
             </div>`;
         }).join('');
 
-        const comingSoonHTML = ['Matemática 7º Ano', 'Português 7º Ano', 'História 7º Ano'].map(name => `
-            <div class="chapter-card locked">
-                <div class="chapter-icon-wrap" style="background:var(--surface-3)">${_ic('scroll',{size:'md',color:'locked'})}</div>
-                <div class="chapter-body">
-                    <div class="chapter-subject" style="color:var(--text-muted)">Em Breve</div>
-                    <div class="chapter-title">${name}</div>
-                    <div style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-top:4px">Aguarde novos conteúdos!</div>
-                </div>
-                <div class="chapter-arrow">${_ic('lock',{size:'sm',color:'locked'})}</div>
-            </div>`
-        ).join('');
+        container.innerHTML = `
+        <div class="screen">
+            <div class="missions-banner">
+                <h2>${_ic('scroll',{size:'sm'})} Grade Curricular</h2>
+                <p>Explore todas as matérias do 7º Ano</p>
+            </div>
+            <div class="subjects-grid">
+                ${subjectCards}
+            </div>
+        </div>`;
+    },
+
+    // ── MISSIONS ──────────────────────────────────────────
+    renderMissions(container) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const subjects = CONFIG.subjects || [];
+
+        // Build chapter cards grouped by subject
+        const subjectsHTML = subjects.map(subj => {
+            const chapCards = subj.chapters.map(ch => {
+                if (!ch.unlocked) {
+                    return `
+                    <div class="chapter-card locked">
+                        <div class="chapter-icon-wrap" style="background:var(--surface-3)">${_ic('lock',{size:'md',color:'locked'})}</div>
+                        <div class="chapter-body">
+                            <div class="chapter-subject" style="color:var(--text-muted)">${subj.name} · ${subj.grade}</div>
+                            <div class="chapter-title">${ch.title}</div>
+                            <div style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-top:4px">${ch.description}</div>
+                        </div>
+                        <div class="chapter-arrow">${_ic('lock',{size:'sm',color:'locked'})}</div>
+                    </div>`;
+                }
+                const prog      = State.getChapterProgress(ch.id);
+                const percent   = prog.percent;
+                const completed = percent >= 100;
+                return `
+                <div class="chapter-card${completed ? ' ch-completed' : ''}" onclick="Router.navigate('#chapter/${ch.id}')">
+                    <div class="chapter-icon-wrap" style="background:${subj.color}22">${ch.icon}</div>
+                    <div class="chapter-body">
+                        <div class="chapter-subject" style="color:${subj.color}">${subj.name} · ${subj.grade}</div>
+                        <div class="chapter-title">${ch.title}</div>
+                        <div class="chapter-progress-row">
+                            <div class="chapter-progress-track">
+                                <div class="chapter-progress-fill" style="width:${percent}%;background:${subj.color}"></div>
+                            </div>
+                            <span class="chapter-percent">${percent}%</span>
+                        </div>
+                    </div>
+                    <div class="chapter-arrow">${completed ? _ic('check',{size:'sm',color:'success'}) : '›'}</div>
+                </div>`;
+            }).join('');
+
+            const hasUnlocked = subj.chapters.some(ch => ch.unlocked);
+            return `
+            <div class="section-header${hasUnlocked ? '' : ' mt-2'}">
+                <span class="section-title" style="color:${subj.color}">${subj.icon} ${subj.name}</span>
+            </div>
+            ${chapCards}`;
+        }).join('');
 
         container.innerHTML = `
         <div class="screen">
@@ -2551,16 +2645,7 @@ const Router = {
                 <h2>${_ic('sword',{size:'sm'})} Todas as Missões</h2>
                 <p>Escolha sua próxima batalha, herói!</p>
             </div>
-
-            <div class="section-header">
-                <span class="section-title">${_ic('map',{size:'sm'})} Disponíveis</span>
-            </div>
-            ${chaptersHTML}
-
-            <div class="section-header mt-4">
-                <span class="section-title">${_ic('lock',{size:'sm',color:'locked'})} Em Breve</span>
-            </div>
-            ${comingSoonHTML}
+            ${subjectsHTML}
         </div>`;
     },
 

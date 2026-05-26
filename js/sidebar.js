@@ -9,6 +9,7 @@ const Sidebar = {
 
     NAV_ITEMS: [
         { icon: 'map',         label: 'Aventura',    route: 'home',        hash: '#home'        },
+        { icon: 'scroll',      label: 'Matérias',    route: 'subjects',    hash: '#subjects'    },
         { icon: 'missions',    label: 'Missões',     route: 'missions',    hash: '#missions'    },
         { icon: 'star',        label: 'Flashcards',  route: 'flashcards',  hash: '#flashcards'  },
         { icon: 'scroll',      label: 'Memória',     route: 'memory',      hash: '#memory'      },
@@ -162,6 +163,12 @@ const Sidebar = {
                         </div>
                     </div>
                 </div>
+                ${(typeof State !== 'undefined' && State.isAdmin()) ? `
+                <a class="sidebar-item" href="#admin/overview" style="margin-top:6px;opacity:0.75;font-size:0.78rem" aria-label="Painel Admin">
+                    <span class="sidebar-item-icon" aria-hidden="true">⚙️</span>
+                    <span class="sidebar-item-label">Admin</span>
+                    <span class="sidebar-badge-chip" aria-hidden="true">Dev</span>
+                </a>` : ''}
             </div>
 
         </div>`;
