@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v10';
+const CACHE_NAME  = 'eduquest-v11';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -39,6 +39,20 @@ const CACHE_SHELL = [
     '/js/router.js',
     '/js/session-guard.js',
     '/js/app.js',
+    /* Feature engines — Sprints 3-6C */
+    '/js/social-engine.js',
+    '/js/events-engine.js',
+    '/js/ai-studio.js',
+    '/js/builder.js',
+    '/js/flashcard-engine.js',
+    '/js/memory-engine.js',
+    '/js/focus-engine.js',
+    '/js/icon-system.js',
+    /* Mini-games */
+    '/js/mini-games/speed-drill.js',
+    '/js/mini-games/memory-game.js',
+    '/js/mini-games/forca.js',
+    '/js/mini-games/word-search.js',
     /* Adventure map engine */
     '/src/adventure-map-engine/biome-generator.js',
     '/src/adventure-map-engine/path-generator.js',
@@ -53,6 +67,8 @@ const CACHE_SHELL = [
     '/src/motion/transitions.js',
     '/src/motion/springs.js',
     '/src/motion/feedback.js',
+    '/src/motion/tactile-engine.js',
+    '/src/motion/ui-animations.js',
     /* Admin */
     '/src/admin/admin.js',
     /* Assets */

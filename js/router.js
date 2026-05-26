@@ -44,12 +44,6 @@ const Router = {
             if (!State.isOnboarded())     { this.navigate('#onboarding/1'); return; }
         }
 
-        // Action-only routes — toggle overlay without clearing the screen
-        if (route === 'deep-focus') {
-            if (typeof DeepFocus !== 'undefined') DeepFocus.toggle();
-            return;
-        }
-
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
@@ -98,6 +92,7 @@ const Router = {
             case 'speed-drill':   if (typeof SpeedDrill !== 'undefined') SpeedDrill.start(); else container.innerHTML = '<div class="screen"><p style="padding:32px">Speed Drill não carregado.</p></div>'; break;
             case 'flashcards':    this._renderFlashcardsRoute(container); break;
             case 'reading':       if (typeof ReadingFocus !== 'undefined') ReadingFocus.start(parts[1], parts[2]); else container.innerHTML = '<div class="screen"><p style="padding:32px">Reading Focus não carregado.</p></div>'; break;
+            case 'deep-focus':    if (typeof DeepFocus !== 'undefined') DeepFocus.renderScreen(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Focus Engine não carregado.</p></div>'; break;
             case 'builder':       if (typeof Builder !== 'undefined') Builder.start(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Builder não carregado.</p></div>'; break;
             case 'admin':
                 if (typeof EduAdmin !== 'undefined' && State.isAdmin()) {

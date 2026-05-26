@@ -24,7 +24,7 @@ const Sidebar = {
         { icon: 'crown',       label: 'Battle Pass', route: 'battle-pass', hash: '#battle-pass' },
         { icon: 'ai-tutor',    label: 'AI Studio',   route: 'ai-studio',   hash: '#ai-studio'   },
         { icon: 'sword',       label: 'PvP',         route: 'pvp',         hash: '#pvp'         },
-        { icon: 'compass',     label: 'Modo Foco',   action: 'DeepFocus.toggle()', route: 'deep-focus' },
+        { icon: 'compass',     label: 'Modo Foco',   route: 'deep-focus',  hash: '#deep-focus'  },
         { icon: 'backpack',    label: 'Builder',     route: 'builder',     hash: '#builder'     },
         { icon: 'avatar',      label: 'Perfil',      route: 'profile',     hash: '#profile'     },
     ],

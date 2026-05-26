@@ -1348,6 +1348,359 @@
     margin-left: 4px;
 }
 
+/* ── DEEP FOCUS CONFIG SCREEN (P03) ─────────────────────────── */
+
+.df-screen {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 16px 16px 80px;
+}
+
+.df-screen-hero {
+    text-align: center;
+    padding: 24px 16px 16px;
+}
+
+.df-screen-icon { font-size: 3.5rem; margin-bottom: 10px; }
+
+.df-screen-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 0 0 6px;
+}
+
+.df-screen-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.df-config-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.df-section-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.df-duration-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.df-dur-btn {
+    padding: 10px 6px;
+    border-radius: var(--r-md);
+    border: 2px solid var(--border);
+    background: var(--surface-2);
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 150ms;
+}
+
+.df-dur-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+.df-dur-active {
+    border-color: var(--brand) !important;
+    background: var(--brand-light) !important;
+    color: var(--brand) !important;
+}
+
+.df-source-opts { display: flex; flex-direction: column; gap: 8px; }
+
+.df-source-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--r-md);
+    border: 2px solid var(--border);
+    background: var(--surface-2);
+    cursor: pointer;
+    transition: border-color 150ms;
+}
+
+.df-source-opt input[type="radio"] { display: none; }
+
+.df-src-selected {
+    border-color: var(--brand);
+    background: var(--brand-light);
+}
+
+.df-src-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.df-src-icon { font-size: 1.25rem; }
+
+.df-src-label { font-size: 0.88rem; font-weight: 800; }
+
+.df-src-badge {
+    min-width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--brand);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+}
+
+.df-src-empty { background: var(--border); color: var(--text-muted); }
+
+.df-stage-sel {
+    width: 100%;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: var(--font);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.df-start-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1rem;
+    font-weight: 900;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--brand), #ff9a44);
+    box-shadow: 0 4px 16px rgba(255,107,26,0.32);
+}
+
+.df-tips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 4px;
+}
+
+.df-tip {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── DEEP FOCUS DRILL SCREEN ─────────────────────────────────── */
+
+.df-drill-screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg);
+    padding: 0;
+    max-width: 100%;
+}
+
+.df-drill-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 10px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.df-drill-exit {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--r-sm);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.df-drill-prog-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.df-drill-prog-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.df-drill-prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), #ff9a44);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.df-drill-prog-lbl {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.df-drill-score-badge {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: var(--brand);
+    background: var(--brand-light);
+    padding: 4px 10px;
+    border-radius: var(--r-full);
+    flex-shrink: 0;
+}
+
+.df-combo-banner {
+    text-align: center;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, rgba(255,107,26,0.12), rgba(255,107,26,0.06));
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--brand);
+    border-bottom: 1px solid rgba(255,107,26,0.15);
+}
+
+.df-drill-q-card {
+    margin: 20px 16px 16px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 24px 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.df-drill-q-num {
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--brand);
+    margin-bottom: 10px;
+}
+
+.df-drill-q-text {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+.df-drill-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 16px 32px;
+}
+
+.df-drill-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--r-lg);
+    border: 2px solid var(--border);
+    background: var(--surface);
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 150ms, background 150ms, transform 120ms;
+    box-shadow: var(--shadow-xs);
+}
+
+.df-drill-opt:hover:not(:disabled) {
+    border-color: var(--brand);
+    background: var(--brand-light);
+    transform: translateY(-1px);
+}
+
+.df-opt-key {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 900;
+    flex-shrink: 0;
+    color: var(--text-muted);
+}
+
+.df-drill-opt.df-opt-correct {
+    border-color: var(--success) !important;
+    background: var(--success-light) !important;
+    color: var(--success) !important;
+}
+
+.df-drill-opt.df-opt-wrong {
+    border-color: var(--danger) !important;
+    background: var(--danger-light) !important;
+    color: var(--danger) !important;
+}
+
+.df-drill-opt:disabled { cursor: default; }
+
+/* ── DRILL DONE ──────────────────────────────────────────────── */
+
+.df-drill-done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 32px 20px;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.df-done-icon  { margin-bottom: 16px; }
+.df-done-title { font-size: 1.6rem; font-weight: 900; margin: 0 0 8px; }
+.df-done-score { font-size: 3rem; font-weight: 900; color: var(--brand); line-height: 1; }
+.df-done-sub   { font-size: 0.88rem; color: var(--text-muted); font-weight: 700; margin: 6px 0 24px; }
+.df-done-btn   { width: 100%; max-width: 320px; margin-bottom: 10px; }
+
+/* Dark mode */
+[data-theme="dark"] .df-config-card,
+[data-theme="dark"] .df-drill-q-card { background: var(--surface-2); }
+[data-theme="dark"] .df-source-opt   { background: var(--surface-3); }
+[data-theme="dark"] .df-drill-opt    { background: var(--surface-2); }
+
 /* ── READING FOCUS SCREEN (P05) ─────────────────────────────── */
 
 .rf-screen {
