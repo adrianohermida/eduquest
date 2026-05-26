@@ -132,6 +132,8 @@ const State = {
                     await this._loadFromCloud(session.user.id);
                     this.save();
                     this.updateHUD();
+                    // Start inactivity guard after successful login
+                    if (typeof SessionGuard !== 'undefined') SessionGuard.start();
                     // Navigate away from auth/landing pages
                     const r = window.location.hash.replace('#', '').split('/')[0];
                     const authPages = ['landing','login','register','','reset-password'];

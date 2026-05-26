@@ -17,6 +17,7 @@ window.SessionGuard = (() => {
     let _warnTimer   = null;
     let _checkTimer  = null;
     let _sleeping    = false;
+    let _started     = false;
     let _resumeRoute = '#home';
 
     /* ── CSS (injected once) ─────────────────────────────── */
@@ -341,6 +342,8 @@ window.SessionGuard = (() => {
     /* ── Guard: only run for authenticated users ─────────── */
     function start() {
         if (typeof State === 'undefined' || !State.isAuthenticated()) return;
+        if (_started) { _resetTimers(); return; } // already listening — just reset
+        _started = true;
         init();
     }
 
