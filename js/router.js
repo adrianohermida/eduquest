@@ -879,9 +879,10 @@ const Router = {
             </div>`).join('');
 
         const chaptersHTML = chapters.map(ch => {
-            const prog    = State.getChapterProgress(ch.id);
+            const prog      = State.getChapterProgress(ch.id);
+            const completed = prog.percent >= 100;
             return `
-            <div class="chapter-card ${ch.unlocked ? '' : 'locked'}"
+            <div class="chapter-card ${ch.unlocked ? '' : 'locked'}${completed ? ' ch-completed' : ''}"
                  onclick="${ch.unlocked ? `Router.navigate('#chapter/${ch.id}')` : ''}">
                 <div class="chapter-icon-wrap">${ch.icon}</div>
                 <div class="chapter-body">
@@ -894,7 +895,7 @@ const Router = {
                         <span class="chapter-percent">${prog.percent}%</span>
                     </div>
                 </div>
-                <div class="chapter-arrow">${ch.unlocked ? '›' : _ic('lock',{size:'sm',color:'locked'})}</div>
+                <div class="chapter-arrow">${completed ? _ic('check',{size:'sm',color:'success'}) : ch.unlocked ? '›' : _ic('lock',{size:'sm',color:'locked'})}</div>
             </div>`;
         }).join('');
 
@@ -2407,7 +2408,7 @@ const Router = {
         const itemsHTML = items.map(item => {
             const owned = inventory[item.action] || 0;
             return `
-            <div class="shop-item-card">
+            <div class="shop-item-card${owned > 0 ? ' si-owned' : ''}">
                 <span class="shop-item-icon">${_ic(item.iconId,{size:'xl',color:item.color})}</span>
                 <div class="shop-item-name">${item.name}</div>
                 <div class="shop-item-desc">${item.desc}</div>
@@ -2472,10 +2473,11 @@ const Router = {
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
 
         const chaptersHTML = chapters.map(ch => {
-            const prog    = State.getChapterProgress(ch.id);
-            const percent = prog.percent;
+            const prog      = State.getChapterProgress(ch.id);
+            const percent   = prog.percent;
+            const completed = percent >= 100;
             return `
-            <div class="chapter-card" onclick="Router.navigate('#chapter/${ch.id}')">
+            <div class="chapter-card${completed ? ' ch-completed' : ''}" onclick="Router.navigate('#chapter/${ch.id}')">
                 <div class="chapter-icon-wrap">${ch.icon}</div>
                 <div class="chapter-body">
                     <div class="chapter-subject">${ch.subject} · ${ch.grade}</div>
@@ -2487,7 +2489,7 @@ const Router = {
                         <span class="chapter-percent">${percent}%</span>
                     </div>
                 </div>
-                <div class="chapter-arrow">›</div>
+                <div class="chapter-arrow">${completed ? _ic('check',{size:'sm',color:'success'}) : '›'}</div>
             </div>`;
         }).join('');
 

@@ -1,0 +1,483 @@
+/* ════════════════════════════════════════════════════════════
+   EDUQUEST CARD INTERACTION SYSTEM v1.0
+   Phase 4 — Hover · Press · Glow · Completion · Active · Pulse
+   Load order: after depth.css — final word on card interactions.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── GLOW TOKENS ──────────────────────────────────────────── */
+:root {
+    --glow-brand:     0 0 0 3px rgba(249,115,22,0.18), 0 8px 24px rgba(249,115,22,0.14);
+    --glow-success:   0 0 0 3px rgba(34,197,94,0.22),  0 8px 20px rgba(34,197,94,0.12);
+    --glow-boss:      0 0 0 3px rgba(234,88,12,0.28),  0 8px 28px rgba(234,88,12,0.18);
+    --glow-legendary: 0 0 0 3px rgba(245,158,11,0.28), 0 8px 24px rgba(245,158,11,0.18);
+    --glow-epic:      0 0 0 3px rgba(139,92,246,0.24), 0 8px 22px rgba(139,92,246,0.15);
+    --glow-rare:      0 0 0 3px rgba(59,130,246,0.22), 0 6px 18px rgba(59,130,246,0.12);
+    --glow-claimable: 0 0 0 3px rgba(249,115,22,0.24), 0 8px 22px rgba(249,115,22,0.18);
+
+    --card-press:     scale(0.97) translateY(1px);
+    --card-transition:
+        transform   180ms cubic-bezier(0.34,1.56,0.64,1),
+        box-shadow  200ms cubic-bezier(0.22,1,0.36,1),
+        border-color 140ms ease,
+        background  140ms ease;
+}
+
+/* ── KEYFRAMES ────────────────────────────────────────────── */
+
+/* Breathing glow — active / selected cards */
+@keyframes cq-pulse-brand {
+    0%, 100% { box-shadow: var(--glow-brand); }
+    50%       { box-shadow: 0 0 0 6px rgba(249,115,22,0.09), 0 12px 32px rgba(249,115,22,0.22); }
+}
+
+/* Boss aura — fiercer, red-orange */
+@keyframes cq-pulse-boss {
+    0%, 100% { box-shadow: var(--glow-boss); }
+    50%       { box-shadow: 0 0 0 6px rgba(234,88,12,0.11), 0 14px 36px rgba(234,88,12,0.26); }
+}
+
+/* Player row in ranking */
+@keyframes cq-pulse-me {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(249,115,22,0.22), 0 4px 16px rgba(249,115,22,0.10); }
+    50%       { box-shadow: 0 0 0 4px rgba(249,115,22,0.10), 0 8px 24px rgba(249,115,22,0.18); }
+}
+
+/* Claimable item — pulsing call-to-action */
+@keyframes cq-pulse-claimable {
+    0%, 100% { box-shadow: var(--glow-claimable); }
+    50%       { box-shadow: 0 0 0 7px rgba(249,115,22,0.07), 0 12px 28px rgba(249,115,22,0.24); }
+}
+
+/* Today's streak dot — gentle heartbeat */
+@keyframes cq-streak-today {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 10px rgba(249,115,22,0.40); }
+    50%       { transform: scale(1.10); box-shadow: 0 0 18px rgba(249,115,22,0.65); }
+}
+
+/* Reward pop — card completing (applied one-shot via JS) */
+@keyframes cq-reward-pop {
+    0%   { transform: scale(1);    box-shadow: var(--glow-success); }
+    45%  { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(34,197,94,0.14), 0 16px 36px rgba(34,197,94,0.20); }
+    100% { transform: scale(1);    box-shadow: var(--glow-success); }
+}
+
+/* Achievement unlock — bounce-in entrance */
+@keyframes cq-ach-unlock {
+    0%   { transform: scale(0.75); opacity: 0;   }
+    60%  { transform: scale(1.14); opacity: 1;   }
+    80%  { transform: scale(0.96);               }
+    100% { transform: scale(1);                  }
+}
+
+/* Progress bar slide-in (transform-based, doesn't interfere with inline width) */
+@keyframes cq-progress-grow {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+
+/* ── PROGRESS BARS — animated mount ─────────────────────── */
+/* transform-origin must be element-level, not keyframe */
+
+.chapter-progress-fill,
+.continue-fill,
+.event-mission-pf,
+.home-xp-fill {
+    transform-origin: left center;
+    animation: cq-progress-grow 0.85s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+.event-mission-pf { animation-delay: 0.12s; }
+.continue-fill    { animation-delay: 0.08s; }
+.home-xp-fill     { animation-delay: 0.20s; }
+
+/* ── MISSION CARDS (chapter map) ─────────────────────────── */
+
+.mission-card {
+    transition: var(--card-transition);
+}
+
+.mission-card:not(.mc-locked):hover {
+    transform: translateY(-3px);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+    border-color: var(--brand);
+}
+
+.mission-card:not(.mc-locked):active {
+    transform: var(--card-press);
+    box-shadow: var(--shadow-depth-1);
+}
+
+/* Current mission — brand breathing pulse */
+.mission-card.mc-active {
+    border-color: var(--brand);
+    animation: cq-pulse-brand 2.6s ease-in-out infinite;
+}
+.mission-card.mc-active:hover {
+    animation: none;
+    transform: translateY(-3px);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+
+/* Completed mission — success glow, full opacity */
+.mission-card.mc-completed {
+    border-color: rgba(34,197,94,0.30);
+    box-shadow: var(--glow-success);
+    opacity: 1;
+}
+.mission-card.mc-completed:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-success), var(--shadow-depth-2);
+    border-color: rgba(34,197,94,0.55);
+}
+
+/* Boss mission — red-orange aura when active */
+.mission-card.mc-boss.mc-active {
+    animation: cq-pulse-boss 2.2s ease-in-out infinite;
+    border-color: var(--brand-dark);
+}
+.mission-card.mc-boss.mc-active:hover {
+    animation: none;
+    transform: translateY(-3px);
+    box-shadow: var(--glow-boss), var(--shadow-depth-2);
+}
+
+/* Locked */
+.mission-card.mc-locked {
+    opacity: 0.48;
+    cursor: not-allowed;
+    filter: grayscale(0.45);
+}
+
+/* ── DAILY MISSIONS ───────────────────────────────────────── */
+
+.daily-mission {
+    transition: var(--card-transition);
+    cursor: pointer;
+}
+
+.daily-mission:not(.done):hover {
+    transform: translateX(4px) translateY(-1px);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+    border-color: var(--brand);
+}
+
+.daily-mission:not(.done):active {
+    transform: scale(0.99);
+    box-shadow: var(--shadow-depth-1);
+}
+
+/* Done — muted success */
+.daily-mission.done {
+    opacity: 0.60;
+    border-color: rgba(34,197,94,0.22);
+    box-shadow: var(--glow-success);
+    filter: grayscale(0.18);
+}
+
+/* ── CHAPTER CARDS (matérias) ─────────────────────────────── */
+
+.chapter-card {
+    transition: var(--card-transition);
+}
+
+.chapter-card:not(.locked):hover {
+    transform: translateY(-4px);
+    border-color: var(--brand);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+
+.chapter-card:not(.locked):active {
+    transform: var(--card-press);
+    box-shadow: var(--shadow-depth-1);
+    border-color: var(--brand);
+}
+
+/* Completed chapter — success halo */
+.chapter-card.ch-completed {
+    border-color: rgba(34,197,94,0.35);
+    box-shadow: var(--glow-success);
+}
+.chapter-card.ch-completed:hover {
+    border-color: rgba(34,197,94,0.60);
+    box-shadow: var(--glow-success), var(--shadow-depth-2);
+    transform: translateY(-4px);
+}
+
+/* ── CONTINUE CARD (home hero) ────────────────────────────── */
+
+.continue-card {
+    transition: var(--card-transition);
+}
+
+.continue-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.16), var(--shadow-brand-lift);
+}
+
+.continue-card:active {
+    transform: var(--card-press);
+    box-shadow: var(--shadow-depth-1);
+}
+
+/* ── STREAK CALENDAR DAYS ─────────────────────────────────── */
+
+.streak-day {
+    transition: transform 150ms ease;
+    cursor: default;
+}
+
+.streak-day:hover .streak-day-dot {
+    transform: scale(1.12);
+}
+
+/* Today's flame — heartbeat */
+.streak-day.today .streak-day-dot {
+    animation: cq-streak-today 2.6s ease-in-out infinite;
+}
+
+/* ── SHOP CARDS (loja) ────────────────────────────────────── */
+
+.shop-item-card {
+    transition: var(--card-transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.shop-item-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--brand);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+
+.shop-item-card:active {
+    transform: var(--card-press);
+    box-shadow: var(--shadow-depth-1);
+}
+
+/* Owned state — success tint */
+.shop-item-card.si-owned {
+    border-color: rgba(34,197,94,0.32);
+}
+.shop-item-card.si-owned::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(34,197,94,0.04);
+    pointer-events: none;
+}
+.shop-item-card.si-owned:hover {
+    border-color: rgba(34,197,94,0.58);
+    box-shadow: var(--glow-success), var(--shadow-depth-2);
+}
+
+/* ── RANKING ──────────────────────────────────────────────── */
+
+.ranking-row {
+    transition: var(--card-transition);
+    cursor: default;
+}
+
+.ranking-row:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-depth-2);
+}
+
+/* Player's own row — brand pulse */
+.ranking-row.is-me {
+    animation: cq-pulse-me 3s ease-in-out infinite;
+}
+.ranking-row.is-me:hover {
+    animation: none;
+    transform: translateX(4px);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+
+/* Podium items */
+.podium-item {
+    transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1);
+    cursor: default;
+}
+.podium-item:hover           { transform: translateY(-5px) scale(1.04); }
+.podium-item.first:hover     { transform: translateY(-7px) scale(1.07); }
+
+/* ── ACHIEVEMENT CARDS ────────────────────────────────────── */
+
+.ach-item {
+    transition: var(--card-transition);
+    cursor: default;
+}
+
+.ach-item:not(.ach-locked):hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+.ach-item:not(.ach-locked):active {
+    transform: scale(0.97);
+}
+
+/* Locked — more subdued */
+.ach-item.ach-locked {
+    opacity: 0.42;
+    filter: grayscale(0.65);
+    cursor: not-allowed;
+}
+
+/* Newly unlocked — bounce entrance (add/remove via JS) */
+.ach-item.ach-just-unlocked {
+    animation: cq-ach-unlock 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* Rarity glows on unlocked badges */
+.ach-item:not(.ach-locked) .ach-badge.ach-rare {
+    box-shadow: 0 0 14px rgba(59,130,246,0.30), 0 3px 10px rgba(59,130,246,0.20);
+}
+.ach-item:not(.ach-locked) .ach-badge.ach-epic {
+    box-shadow: 0 0 16px rgba(139,92,246,0.34), 0 3px 12px rgba(139,92,246,0.22);
+    animation: cq-pulse-brand 3.2s ease-in-out infinite;
+    animation-name: cq-ach-epic-pulse;
+}
+.ach-item:not(.ach-locked) .ach-badge.ach-legendary {
+    box-shadow: 0 0 20px rgba(245,158,11,0.45), 0 3px 14px rgba(245,158,11,0.28);
+    animation: cq-ach-legendary-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes cq-ach-epic-pulse {
+    0%, 100% { box-shadow: 0 0 16px rgba(139,92,246,0.34), 0 3px 12px rgba(139,92,246,0.22); }
+    50%       { box-shadow: 0 0 26px rgba(139,92,246,0.52), 0 4px 18px rgba(139,92,246,0.32); }
+}
+@keyframes cq-ach-legendary-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(245,158,11,0.45), 0 3px 14px rgba(245,158,11,0.28); }
+    50%       { box-shadow: 0 0 32px rgba(245,158,11,0.65), 0 4px 20px rgba(245,158,11,0.40); }
+}
+
+/* ── EVENT MISSION CARDS ──────────────────────────────────── */
+
+.event-mission-card {
+    transition: var(--card-transition);
+    cursor: default;
+}
+
+.event-mission-card:not(.done):hover {
+    transform: translateY(-2px) translateX(2px);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+    border-color: var(--brand);
+}
+.event-mission-card:not(.done):active {
+    transform: scale(0.99);
+    box-shadow: var(--shadow-depth-1);
+}
+
+/* Claimable — pulsing call-to-action */
+.event-mission-card.claimable {
+    border-color: var(--brand);
+    animation: cq-pulse-claimable 2.0s ease-in-out infinite;
+}
+.event-mission-card.claimable:hover {
+    animation: none;
+    transform: translateY(-3px);
+    box-shadow: var(--glow-claimable), var(--shadow-depth-2);
+}
+
+/* Done — muted success */
+.event-mission-card.done {
+    opacity: 0.62;
+    border-color: rgba(34,197,94,0.28);
+    box-shadow: var(--glow-success);
+    filter: grayscale(0.15);
+}
+
+/* ── AVATAR CLASS CARDS (profile) ─────────────────────────── */
+
+.avatar-class-card {
+    transition: var(--card-transition);
+}
+
+.avatar-class-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--brand);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+.avatar-class-card:active {
+    transform: var(--card-press);
+}
+
+/* Selected — sustained brand pulse */
+.avatar-class-card.acc-selected {
+    border-color: var(--brand);
+    box-shadow: var(--glow-brand);
+    animation: cq-pulse-brand 3s ease-in-out infinite;
+}
+.avatar-class-card.acc-selected:hover {
+    animation: none;
+    transform: translateY(-3px);
+    box-shadow: var(--glow-brand), var(--shadow-depth-2);
+}
+
+/* ── REWARD PULSE UTILITY ─────────────────────────────────── */
+/* Add via JS (e.g. EduTactile / GameEngine), auto-removes with event listener */
+
+.eq-card-reward {
+    animation: cq-reward-pop 0.65s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* ── DARK MODE ────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+    --glow-brand:     0 0 0 3px rgba(249,115,22,0.24), 0 8px 24px rgba(249,115,22,0.20);
+    --glow-success:   0 0 0 3px rgba(34,197,94,0.26),  0 8px 20px rgba(34,197,94,0.16);
+    --glow-boss:      0 0 0 3px rgba(234,88,12,0.34),  0 8px 28px rgba(234,88,12,0.24);
+    --glow-claimable: 0 0 0 3px rgba(249,115,22,0.30), 0 8px 22px rgba(249,115,22,0.24);
+}
+
+[data-theme="dark"] .chapter-card.ch-completed,
+[data-theme="dark"] .mission-card.mc-completed {
+    background: rgba(34,197,94,0.05);
+}
+
+[data-theme="dark"] .daily-mission.done,
+[data-theme="dark"] .event-mission-card.done {
+    background: rgba(34,197,94,0.04);
+}
+
+[data-theme="dark"] .shop-item-card.si-owned::after {
+    background: rgba(34,197,94,0.06);
+}
+
+[data-theme="dark"] .ach-item.ach-locked {
+    opacity: 0.32;
+}
+
+/* ── PREFERS REDUCED MOTION ───────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .mission-card.mc-active,
+    .mission-card.mc-boss.mc-active,
+    .ranking-row.is-me,
+    .avatar-class-card.acc-selected,
+    .event-mission-card.claimable,
+    .streak-day.today .streak-day-dot,
+    .ach-item:not(.ach-locked) .ach-badge.ach-epic,
+    .ach-item:not(.ach-locked) .ach-badge.ach-legendary {
+        animation: none;
+    }
+
+    .chapter-progress-fill,
+    .continue-fill,
+    .event-mission-pf,
+    .home-xp-fill {
+        animation: none;
+    }
+
+    .mission-card,
+    .daily-mission,
+    .chapter-card,
+    .shop-item-card,
+    .avatar-class-card,
+    .event-mission-card,
+    .ach-item,
+    .ranking-row {
+        transition: box-shadow 0ms, background 0ms;
+    }
+}
