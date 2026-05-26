@@ -203,6 +203,11 @@ const SpeedDrill = {
             this.state.wrong++;
             this._clearCombo();
             if (typeof SoundManager !== 'undefined') SoundManager.play('wrong');
+            // Feed MemoryEngine (negative — drops card back to box 1)
+            if (q._leitnerKey && typeof MemoryEngine !== 'undefined' && typeof State !== 'undefined') {
+                const card = (State.data.leitnerBoxes || {})[q._leitnerKey];
+                if (card) MemoryEngine.processAnswer(card.chapterId, card.stageId, card.qIdx, false, elapsed, card.question, card.answer, card.topic);
+            }
         }
 
         this._updateScoreHUD();

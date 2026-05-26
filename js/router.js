@@ -47,7 +47,7 @@ const Router = {
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        const isFullscreen = isGame || isAuth;  // adventure keeps app layout (HUD/sidebar visible)
+        const isFullscreen = isGame || isAuth || route === 'speed-drill';  // adventure keeps app layout (HUD/sidebar visible)
 
         // Layout mode: full-screen (auth/game) vs app (normal)
         document.body.dataset.layout = isFullscreen ? 'full' : 'app';
