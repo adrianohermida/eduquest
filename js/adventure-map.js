@@ -109,11 +109,11 @@ const AdventureMap = {
 
         // Show discipline + mapa in header context nav
         if (meta && typeof HUD !== 'undefined') {
-            const subNames = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', geografia: 'Geografia' };
+            const subNames   = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', geografia: 'Geografia' };
             const gradeNames = { '7ano': '7º Ano', '8ano': '8º Ano', '9ano': '9º Ano' };
-            const sub   = subNames[meta.subject]  || 'Ciências';
-            const grade = gradeNames[meta.grade]  || '7º Ano';
-            HUD.setContext({ icon: meta.icon || '📚', subject: `${sub} • ${grade}`, stage: 'Mapa Aventura', href: `#chapter/${meta.id || ''}` });
+            const sub   = subNames[meta.subject] || meta.subject || 'Ciências';
+            const grade = gradeNames[meta.grade] || meta.grade   || '7º Ano';
+            HUD.setContext({ icon: meta.icon || '📚', subject: sub, grade, stage: 'Mapa Aventura', href: `#chapter/${meta.id || ''}` });
         }
 
         this._bindEvents();
