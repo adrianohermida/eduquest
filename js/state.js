@@ -525,20 +525,64 @@ const State = {
 
     // ── COMPANION ────────────────────────────────────────────
     getCompanionMessage() {
-        const u      = this.data.user;
-        const streak = u.streak || 1;
-        const hour   = new Date().getHours();
+        const u        = this.data.user;
+        const streak   = u.streak || 1;
+        const hour     = new Date().getHours();
         const missions = this.getMissions();
-        const done   = missions.filter(m => m.completed).length;
-        const cls    = this.getAvatarClass();
+        const done     = missions.filter(m => m.completed).length;
+        const cls      = this.getAvatarClass();
 
-        if (streak >= 7) return { mood: 'fire',      cls, msg: `${streak} dias! Você é imparável!`        };
-        if (streak >= 3) return { mood: 'cool',       cls, msg: `${streak} dias seguidos, continue assim!` };
-        if (done === 3)  return { mood: 'celebrate',  cls, msg: 'Todas as missões concluídas! Incrível!'   };
-        if (done >= 1)   return { mood: 'encourage',  cls, msg: `${done} missão feita! Falta pouco.`       };
-        if (hour < 12)   return { mood: 'morning',    cls, msg: 'Bom dia! Hora de treinar a mente.'        };
-        if (hour < 18)   return { mood: 'afternoon',  cls, msg: 'Uma missão rápida e você ganha XP!'       };
-        return                  { mood: 'night',      cls, msg: 'Ainda dá tempo de manter o streak!'       };
+        // ── Behavior-aware layer (Sprint 5: AI Companion Full) ──
+
+        // 1. Re-engagement: days since last play
+        if (u.lastPlayed) {
+            const daysSince = Math.floor((Date.now() - new Date(u.lastPlayed).getTime()) / 86400000);
+            if (daysSince >= 3) return { mood: 'worried',   cls, msg: `${daysSince} dias sem estudar! Volte antes de perder o streak!` };
+            if (daysSince >= 2) return { mood: 'encourage', cls, msg: 'Saudades! Vamos retomar onde paramos?' };
+        }
+
+        // 2. Weak topic detected
+        const weak = this.getWeakTopics(1);
+        if (weak.length && (u.totalCorrect || 0) > 10) {
+            return { mood: 'coach', cls, msg: `Você erra bastante em "${weak[0].topic}". Que tal revisar agora?` };
+        }
+
+        // 3. XP milestone proximity
+        const rank = this.getRank();
+        if (rank.next !== Infinity) {
+            const toNext = rank.next - (u.xp || 0);
+            if (toNext <= 150 && toNext > 0) return { mood: 'excited', cls, msg: `Só ${toNext} XP para subir de liga! Vamos!` };
+        }
+
+        // 4. High XP today (detected via battle pass progress)
+        const bpXP = u.battlePassXP || 0;
+        if (bpXP > 0 && (bpXP % 150) < 30) return { mood: 'celebrate', cls, msg: 'Você está em chamas hoje! Continue!' };
+
+        // 5. Streak milestones
+        if (streak >= 30) return { mood: 'legendary', cls, msg: `${streak} dias! Você é uma lenda do conhecimento!` };
+        if (streak >= 14) return { mood: 'fire',       cls, msg: `${streak} dias! Dedicação total, mestre!`           };
+        if (streak >= 7)  return { mood: 'fire',       cls, msg: `${streak} dias! Você é imparável!`                 };
+        if (streak >= 3)  return { mood: 'cool',       cls, msg: `${streak} dias seguidos, continue assim!`          };
+
+        // 6. Daily mission progress
+        if (done === 3)   return { mood: 'celebrate', cls, msg: 'Todas as missões do dia! Você arrasouu!' };
+        if (done >= 1)    return { mood: 'encourage', cls, msg: `${done} missão feita! Falta pouco.`     };
+
+        // 7. Class-specific messages
+        const classMessages = {
+            guerreiro:  ['Guerreiros não recuam! Vamos batalhar?',  'Força e honra! Uma missão te espera.'],
+            mago:       ['A sabedoria aumenta com cada questão!',   'Invoque seu poder intelectual!'],
+            arqueiro:   ['Foco no alvo! Acerte todas as questões.', 'Precisão é tudo. Vamos treinar?'],
+            cientista:  ['A ciência aguarda sua exploração!',       'Cada questão é um experimento!'],
+            explorador: ['Aventura e aprendizado te esperam!',      'Novos horizontes te chamam!'],
+        };
+        const msgs = classMessages[cls] || classMessages.guerreiro;
+        const classMsg = msgs[Math.floor(Date.now() / 3600000) % msgs.length];
+
+        // 8. Time of day fallback
+        if (hour < 12) return { mood: 'morning',   cls, msg: 'Bom dia! Hora de treinar a mente.'  };
+        if (hour < 18) return { mood: 'afternoon', cls, msg: classMsg                             };
+        return               { mood: 'night',      cls, msg: 'Ainda dá tempo de manter o streak!' };
     },
 
     showXPFloat(amount) {
