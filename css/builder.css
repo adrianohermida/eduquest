@@ -6,7 +6,7 @@
 .builder-screen { padding: var(--sp-4, 20px); max-width: 640px; margin: 0 auto; }
 
 .bldr-header    { margin-bottom: var(--sp-4, 20px); }
-.bldr-title     { font-size: 1.25rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+.bldr-title     { font-size: 1.25rem; font-weight: 900; color: var(--text); display: flex; align-items: center; gap: 8px; }
 .bldr-subtitle  { font-size: .78rem; color: var(--text-muted); margin-top: 3px; font-weight: 600; }
 
 .bldr-admin-badge {
@@ -39,7 +39,7 @@
 .bldr-chapter-card:hover { border-color: var(--brand); }
 .bldr-ch-icon   { font-size: 2rem; width: 44px; text-align: center; flex-shrink: 0; }
 .bldr-ch-body   { flex: 1; min-width: 0; }
-.bldr-ch-title  { font-size: .95rem; font-weight: 800; color: var(--text-main); }
+.bldr-ch-title  { font-size: .95rem; font-weight: 800; color: var(--text); }
 .bldr-ch-meta   { font-size: .72rem; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
 .bldr-ch-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
@@ -53,7 +53,7 @@
 .bldr-stage-card:hover { border-color: var(--brand); }
 .bldr-st-icon  { width: 36px; text-align: center; flex-shrink: 0; }
 .bldr-st-body  { flex: 1; min-width: 0; }
-.bldr-st-title { font-size: .9rem; font-weight: 800; color: var(--text-main); }
+.bldr-st-title { font-size: .9rem; font-weight: 800; color: var(--text); }
 .bldr-st-meta  { font-size: .7rem; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
 .bldr-st-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
@@ -68,7 +68,7 @@
 .bldr-btn-primary:hover { filter: brightness(1.1); }
 .bldr-btn-play { background: var(--success, #22c55e); color: #fff; border-color: var(--success, #22c55e); }
 .bldr-btn-play:hover { filter: brightness(1.1); }
-.bldr-btn-edit { background: var(--surface); color: var(--text-main); border-color: var(--border); }
+.bldr-btn-edit { background: var(--surface); color: var(--text); border-color: var(--border); }
 .bldr-btn-edit:hover { background: var(--border); }
 .bldr-btn-delete { background: rgba(239,68,68,.1); color: var(--error, #ef4444); border-color: var(--error, #ef4444); }
 .bldr-btn-delete:hover { background: var(--error, #ef4444); color: #fff; }
@@ -83,14 +83,14 @@
     font-size: .85rem; font-weight: 800; cursor: pointer; padding: 4px 0;
 }
 .bldr-back-link:hover { text-decoration: underline; }
-.bldr-stages-title { font-size: .95rem; font-weight: 900; color: var(--text-main); }
+.bldr-stages-title { font-size: .95rem; font-weight: 900; color: var(--text); }
 .bldr-stages-sub   { font-size: .7rem; color: var(--text-muted); font-weight: 600; }
 .bldr-add-btn { padding: 7px 14px !important; font-size: .8rem !important; }
 
 /* ── FORMS ───────────────────────────────────────────────── */
 .bldr-form        { padding: 0 var(--sp-2, 8px); }
 .bldr-stage-form  { padding-bottom: 40px; }
-.bldr-form-title  { font-size: 1rem; font-weight: 900; color: var(--text-main); margin-bottom: var(--sp-3, 16px); }
+.bldr-form-title  { font-size: 1rem; font-weight: 900; color: var(--text); margin-bottom: var(--sp-3, 16px); }
 
 .bldr-field       { margin-bottom: var(--sp-3, 16px); }
 .bldr-field-row   { display: flex; gap: 10px; margin-bottom: var(--sp-3, 16px); }
@@ -106,7 +106,7 @@
     width: 100%; padding: 9px 12px;
     border: 1.5px solid var(--border); border-radius: var(--r-md, 10px);
     font-size: .88rem; font-weight: 700;
-    background: var(--bg); color: var(--text-main);
+    background: var(--bg); color: var(--text);
     font-family: inherit; box-sizing: border-box;
     transition: border-color .15s;
     appearance: auto;
@@ -118,7 +118,7 @@
     width: 100%; padding: 9px 12px;
     border: 1.5px solid var(--border); border-radius: var(--r-md, 10px);
     font-size: .85rem; font-weight: 700;
-    background: var(--bg); color: var(--text-main);
+    background: var(--bg); color: var(--text);
     font-family: inherit; box-sizing: border-box;
     resize: vertical; min-height: 72px;
     transition: border-color .15s;
@@ -130,7 +130,7 @@
 /* ── QUESTIONS SECTION ───────────────────────────────────── */
 .bldr-questions-section { margin-top: var(--sp-4, 20px); }
 .bldr-qs-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.bldr-qs-title  { font-size: .88rem; font-weight: 900; color: var(--text-main); }
+.bldr-qs-title  { font-size: .88rem; font-weight: 900; color: var(--text); }
 .bldr-qs-count  {
     background: var(--brand); color: #fff;
     border-radius: var(--r-full, 999px);
@@ -160,7 +160,7 @@
     width: 100%; padding: 8px 10px;
     border: 1.5px solid var(--border); border-radius: 8px;
     font-size: .85rem; font-weight: 700;
-    background: var(--bg); color: var(--text-main);
+    background: var(--bg); color: var(--text);
     font-family: inherit; box-sizing: border-box;
     resize: vertical; margin-bottom: 10px;
 }
@@ -184,7 +184,7 @@
 /* ── PREMIUM GATE ────────────────────────────────────────── */
 .bldr-gate        { text-align: center; padding: 60px 24px; }
 .bldr-gate-icon   { display: flex; justify-content: center; margin-bottom: 16px; }
-.bldr-gate h2     { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; color: var(--text-main); }
+.bldr-gate h2     { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; color: var(--text); }
 .bldr-gate p      { color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
 
 /* ── EMPTY STATE ─────────────────────────────────────────── */
@@ -202,7 +202,7 @@
     background: rgba(249,115,22,.08); border: 1.5px solid var(--brand);
     border-radius: var(--r-lg, 14px); padding: 14px; margin-bottom: 16px;
 }
-.bldr-admin-info strong { font-size: .88rem; color: var(--text-main); }
+.bldr-admin-info strong { font-size: .88rem; color: var(--text); }
 .bldr-platform-stats    { display: flex; gap: 10px; margin-bottom: 16px; }
 .bldr-pstat {
     background: var(--surface); border: 1.5px solid var(--border);

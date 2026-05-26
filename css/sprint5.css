@@ -77,7 +77,7 @@
 .event-missions-title {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--text-main);
+    color: var(--text);
     margin: 0 0 12px;
     display: flex;
     align-items: center;
@@ -116,7 +116,7 @@
 .event-mission-desc {
     font-size: .9rem;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--text);
     margin-bottom: 4px;
 }
 .event-mission-progress {
@@ -204,7 +204,7 @@
 .bp-tier-label {
     font-size: 1rem;
     font-weight: 900;
-    color: var(--text-main);
+    color: var(--text);
 }
 .bp-xp-label {
     font-size: .8rem;
@@ -309,7 +309,7 @@
     50%      { box-shadow: 0 0 0 6px rgba(249,115,22,0); }
 }
 .bp-reward-icon  { flex-shrink: 0; }
-.bp-reward-text  { font-size: .75rem; font-weight: 700; color: var(--text-main); flex: 1; }
+.bp-reward-text  { font-size: .75rem; font-weight: 700; color: var(--text); flex: 1; }
 .bp-reward-check { font-size: .8rem; color: var(--success, #22c55e); margin-left: auto; }
 .bp-premium-lock {
     display: flex;
@@ -351,7 +351,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: linear-gradient(90deg, var(--brand), var(--brand-dark, #ea580c));
     border-radius: 20px;
     padding: 4px 12px;
     font-size: .75rem;
@@ -399,14 +399,15 @@
     padding: 12px;
     font-family: inherit;
     font-size: .9rem;
-    color: var(--text-main);
+    color: var(--text);
     resize: vertical;
     transition: border-color .2s;
     box-sizing: border-box;
 }
 .ai-textarea:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(249,115,22,.1);
 }
 .ai-textarea::placeholder { color: var(--text-muted); }
 .ai-char-count {
@@ -417,7 +418,7 @@
 }
 .ai-analyze-btn {
     width: 100%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--brand), var(--brand-dark, #ea580c));
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -451,7 +452,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: #6366f1;
+    background: var(--brand);
     animation: aiDotBounce 1.2s ease-in-out infinite;
 }
 .ai-processing-dot:nth-child(2) { animation-delay: .2s; }
@@ -474,7 +475,7 @@
 /* Results */
 .ai-results-card {
     background: var(--surface);
-    border: 1.5px solid #6366f1;
+    border: 1.5px solid var(--brand);
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 16px;
@@ -490,13 +491,13 @@
 .ai-results-title {
     font-size: 1rem;
     font-weight: 900;
-    color: var(--text-main);
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 .ai-questions-count {
-    background: #6366f1;
+    background: var(--brand);
     color: #fff;
     border-radius: 20px;
     padding: 3px 10px;
@@ -508,12 +509,12 @@
     border-radius: 12px;
     padding: 12px;
     margin-bottom: 10px;
-    border-left: 3px solid #6366f1;
+    border-left: 3px solid var(--brand);
 }
 .ai-question-text {
     font-size: .88rem;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--text);
     margin-bottom: 8px;
 }
 .ai-question-opts {
@@ -564,11 +565,11 @@
     padding: 10px 12px;
     font-family: inherit;
     font-size: .9rem;
-    color: var(--text-main);
+    color: var(--text);
 }
-.ai-name-input:focus { outline: none; border-color: #6366f1; }
+.ai-name-input:focus { outline: none; border-color: var(--brand); }
 .ai-save-btn {
-    background: #6366f1;
+    background: var(--brand);
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -603,11 +604,11 @@
     transition: border-color .2s;
     text-decoration: none;
 }
-.ai-set-card:hover { border-color: #6366f1; }
+.ai-set-card:hover { border-color: var(--brand); }
 .ai-set-icon {
     width: 40px;
     height: 40px;
-    background: color-mix(in srgb, #6366f1 12%, var(--bg));
+    background: rgba(249,115,22,.12);
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -618,7 +619,7 @@
 .ai-set-name {
     font-size: .9rem;
     font-weight: 800;
-    color: var(--text-main);
+    color: var(--text);
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -714,7 +715,7 @@
 .pvp-section-title {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--text-main);
+    color: var(--text);
     margin: 0 0 12px;
     display: flex;
     align-items: center;
@@ -753,7 +754,7 @@
 .pvp-challenge-name {
     font-size: .9rem;
     font-weight: 800;
-    color: var(--text-main);
+    color: var(--text);
     margin-bottom: 2px;
 }
 .pvp-challenge-meta {
@@ -835,7 +836,7 @@
 .pvp-friend-name {
     font-size: .82rem;
     font-weight: 800;
-    color: var(--text-main);
+    color: var(--text);
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -892,7 +893,7 @@
     padding: 8px 14px;
     font-size: .88rem;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--text);
     cursor: pointer;
     text-decoration: none;
     transition: border-color .2s;
@@ -908,7 +909,7 @@
 .s5-empty-title {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--text-main);
+    color: var(--text);
     margin-bottom: 6px;
 }
 .s5-empty-desc { font-size: .85rem; }
@@ -929,7 +930,7 @@
     display: flex; align-items: center; gap: 10px;
     background: rgba(249,115,22,.08); border: 1.5px solid var(--brand);
     border-radius: var(--r-lg, 14px); padding: 10px 14px; margin-bottom: 16px;
-    font-size: .82rem; font-weight: 700; color: var(--text-main);
+    font-size: .82rem; font-weight: 700; color: var(--text);
 }
 .ai-admin-banner strong { color: var(--brand); }
 
@@ -959,6 +960,14 @@
 .ai-pdf-drop p { font-size: .85rem; color: var(--text-muted); font-weight: 700; margin: 0; }
 .ai-pdf-drop span { font-size: .72rem; color: var(--text-muted); font-weight: 600; }
 
+/* PDF clear button */
+.ai-pdf-clear {
+    background: none; border: 1.5px solid var(--border); color: var(--text-muted);
+    border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: .75rem;
+    transition: all .14s; flex-shrink: 0;
+}
+.ai-pdf-clear:hover { border-color: var(--error, #ef4444); color: var(--error, #ef4444); }
+
 /* PDF loaded / done state */
 .ai-pdf-done {
     display: flex; align-items: center; gap: 12px;
@@ -966,7 +975,7 @@
     border-radius: var(--r-md, 10px); padding: 12px 14px;
 }
 .ai-pdf-done-info { flex: 1; min-width: 0; }
-.ai-pdf-done-name { font-size: .88rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ai-pdf-done-name { font-size: .88rem; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ai-pdf-done-meta { font-size: .72rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
 /* PDF premium gate */
@@ -975,7 +984,7 @@
     background: var(--surface); border-radius: var(--r-lg, 14px);
     border: 1.5px solid var(--border);
 }
-.ai-pdf-gate h3 { font-size: 1rem; font-weight: 900; color: var(--text-main); margin-bottom: 8px; }
+.ai-pdf-gate h3 { font-size: 1rem; font-weight: 900; color: var(--text); margin-bottom: 8px; }
 .ai-pdf-gate p  { font-size: .82rem; color: var(--text-muted); margin-bottom: 16px; }
 
 /* PDF progress */
@@ -1001,7 +1010,7 @@
 .ai-set-action-btn {
     padding: 5px 10px; border-radius: 7px; font-size: .72rem; font-weight: 800;
     cursor: pointer; border: 1.5px solid var(--border);
-    background: var(--surface); color: var(--text-main);
+    background: var(--surface); color: var(--text);
     transition: all .14s;
 }
 .ai-set-action-btn:hover { background: var(--border); }
@@ -1026,11 +1035,11 @@
     font-size: 1.1rem; cursor: pointer; padding: 4px 8px;
     border-radius: 8px; transition: all .14s; flex-shrink: 0;
 }
-.aip-exit-btn:hover { background: var(--surface); color: var(--text-main); }
-.aip-title { font-size: .88rem; font-weight: 900; color: var(--text-main); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aip-exit-btn:hover { background: var(--surface); color: var(--text); }
+.aip-title { font-size: .88rem; font-weight: 900; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Progress bar */
-.aip-prog-wrap  { padding: 0 16px 8px; }
+.aip-prog-wrap  { flex: 1; min-width: 0; }
 .aip-prog-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
 .aip-prog-fill  { height: 100%; background: var(--brand); border-radius: 3px; transition: width .3s ease; }
 .aip-prog-label { font-size: .68rem; font-weight: 800; color: var(--text-muted); text-align: right; }
@@ -1067,7 +1076,7 @@
     border-radius: var(--r-full, 999px); margin-bottom: 10px;
 }
 .aip-q-text {
-    font-size: .95rem; font-weight: 800; color: var(--text-main);
+    font-size: .95rem; font-weight: 800; color: var(--text);
     line-height: 1.5;
 }
 
@@ -1078,7 +1087,7 @@
     background: var(--surface); border: 1.5px solid var(--border);
     border-radius: var(--r-md, 10px); padding: 12px 14px;
     cursor: pointer; transition: all .15s; font-size: .88rem; font-weight: 700;
-    color: var(--text-main); text-align: left; width: 100%;
+    color: var(--text); text-align: left; width: 100%;
 }
 .aip-option:hover:not(:disabled) { border-color: var(--brand); background: rgba(249,115,22,.05); }
 .aip-option:disabled { cursor: default; }

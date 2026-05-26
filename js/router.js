@@ -2775,12 +2775,12 @@ const Router = {
                     ${isPrem ? `
                     <div class="ai-pdf-drop" id="ai-pdf-drop"
                         onclick="document.getElementById('ai-pdf-input').click()"
-                        ondragover="event.preventDefault();this.classList.add('dragover')"
-                        ondragleave="this.classList.remove('dragover')"
-                        ondrop="event.preventDefault();this.classList.remove('dragover');Router._handlePDFDrop(event)">
-                        <div class="ai-pdf-icon">📄</div>
-                        <div class="ai-pdf-label">Clique ou arraste um PDF aqui</div>
-                        <div class="ai-pdf-sub">Máximo 30 páginas · OCR automático</div>
+                        ondragover="event.preventDefault();this.classList.add('drag-over')"
+                        ondragleave="this.classList.remove('drag-over')"
+                        ondrop="event.preventDefault();this.classList.remove('drag-over');Router._handlePDFDrop(event)">
+                        <div class="ai-pdf-drop-icon">📄</div>
+                        <p>Clique ou arraste um PDF aqui</p>
+                        <span>Máximo 30 páginas · OCR automático</span>
                         <input type="file" id="ai-pdf-input" accept=".pdf" style="display:none"
                             onchange="Router._handlePDFFile(this)">
                     </div>
@@ -2846,7 +2846,14 @@ const Router = {
         try {
             const text = await AIStudio.extractFromPDF(file);
             window._aiCurrentPDFText = text;
-            if (status) status.innerHTML = `<div class="ai-pdf-done">✅ ${file.name} · ${text.split(/\s+/).length.toLocaleString()} palavras extraídas<button class="ai-pdf-clear" onclick="Router._clearPDF()">✕</button></div>`;
+            if (status) status.innerHTML = `
+                <div class="ai-pdf-done">
+                    <div class="ai-pdf-done-info">
+                        <div class="ai-pdf-done-name">✅ ${file.name}</div>
+                        <div class="ai-pdf-done-meta">${text.split(/\s+/).length.toLocaleString()} palavras extraídas</div>
+                    </div>
+                    <button class="ai-pdf-clear" onclick="Router._clearPDF()">✕ Remover</button>
+                </div>`;
         } catch (err) {
             if (status) status.innerHTML = `<span style="color:var(--error)">❌ Erro ao ler PDF: ${err.message}</span>`;
             if (drop) drop.style.display = '';
@@ -3018,7 +3025,7 @@ const Router = {
         container.innerHTML = `
         <div class="ai-studio-screen">
             <div class="aip-topbar">
-                <button class="aip-exit" onclick="Router.navigate('#ai-studio')">✕</button>
+                <button class="aip-exit-btn" onclick="Router.navigate('#ai-studio')">✕</button>
                 <div class="aip-prog-wrap">
                     <div class="aip-prog-track"><div class="aip-prog-fill" style="width:${Math.round((idx/set.questions.length)*100)}%"></div></div>
                     <span class="aip-prog-label">${idx+1}/${set.questions.length}</span>
