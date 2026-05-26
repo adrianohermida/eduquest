@@ -89,6 +89,7 @@ const Router = {
             case 'pvp':           this.renderPvP(container);                            break;
             case 'memory':        if (typeof MemoryEngine !== 'undefined') MemoryEngine.renderMemoryScreen(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Memory Engine não carregado.</p></div>'; break;
             case 'speed-drill':   if (typeof SpeedDrill !== 'undefined') SpeedDrill.start(); else container.innerHTML = '<div class="screen"><p style="padding:32px">Speed Drill não carregado.</p></div>'; break;
+            case 'flashcards':    this._renderFlashcardsRoute(container); break;
             default:              this.renderHome(container);
         }
 
@@ -3036,6 +3037,28 @@ const Router = {
         if (typeof SocialEngine === 'undefined') return;
         SocialEngine.resolveChallenge(challengeId);
         this.renderPvP(document.getElementById('app-container'));
+    },
+
+    // ── FLASHCARDS ROUTE ───────────────────────────────────────
+    _renderFlashcardsRoute(container) {
+        if (typeof FlashcardEngine === 'undefined') {
+            container.innerHTML = '<div class="screen"><p style="padding:32px">Flashcard Engine não carregado.</p></div>';
+            return;
+        }
+        const cards = FlashcardEngine.buildCardsFromMemory(40);
+        // Also merge AI study set cards
+        if (typeof State !== 'undefined') {
+            const sets = State.data.aiStudySets || [];
+            sets.forEach((set, idx) => {
+                const fc = FlashcardEngine.buildCardsFromStudySet(idx);
+                fc.forEach(c => cards.push(c));
+            });
+        }
+        FlashcardEngine.start({
+            cards,
+            source: 'memory',
+            title:  'Flashcards',
+        });
     },
 };
 

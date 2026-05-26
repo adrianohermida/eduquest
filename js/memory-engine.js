@@ -253,57 +253,64 @@ const MemoryEngine = {
         </div>`;
     },
 
-    // ── REVIEW SESSION (inline flashcard-style) ──────────────────
+    // ── REVIEW SESSION — delegates to FlashcardEngine (Sprint 6B) ──
 
     _startReviewSession() {
         const due = this.getDueCards().slice(0, 20);
         if (due.length === 0) return;
 
-        this._reviewQueue  = [...due];
-        this._reviewIdx    = 0;
-        this._reviewScore  = { correct: 0, wrong: 0 };
-        this._renderReviewCard();
+        if (typeof FlashcardEngine !== 'undefined') {
+            FlashcardEngine.start({
+                cards:  due,
+                source: 'memory',
+                title:  `Revisão (${due.length} card${due.length > 1 ? 's' : ''})`,
+            });
+        } else {
+            // Fallback: plain text review (FlashcardEngine not loaded)
+            this._reviewQueue = [...due];
+            this._reviewIdx   = 0;
+            this._reviewScore = { correct: 0, wrong: 0 };
+            this._renderReviewCardFallback();
+        }
     },
 
-    _renderReviewCard() {
+    _renderReviewCardFallback() {
         const container = document.getElementById('app-container');
         if (!container) return;
-
         if (this._reviewIdx >= this._reviewQueue.length) {
-            this._renderReviewResults(container);
+            const s   = this._reviewScore;
+            const xp  = s.correct * 5;
+            if (xp > 0 && typeof State !== 'undefined') State.addXP(xp);
+            container.innerHTML = `<div class="screen"><div style="padding:32px;text-align:center">
+                <h2>Revisão concluída!</h2>
+                <p>${s.correct} corretas · +${xp} XP</p>
+                <button class="btn-primary" onclick="Router.navigate('#memory')">Ver Memória</button>
+            </div></div>`;
             return;
         }
-
-        const card  = this._reviewQueue[this._reviewIdx];
-        const total = this._reviewQueue.length;
-        const idx   = this._reviewIdx;
-        const _ic   = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
-
+        const card = this._reviewQueue[this._reviewIdx];
         container.innerHTML = `
         <div class="screen review-session-screen">
             <div class="rev-topbar">
                 <button class="btn-exit" onclick="Router.navigate('#memory')">✕</button>
                 <div class="rev-progress-track">
-                    <div class="rev-progress-fill" style="width:${(idx/total)*100}%"></div>
+                    <div class="rev-progress-fill" style="width:${(this._reviewIdx/this._reviewQueue.length)*100}%"></div>
                 </div>
-                <div class="rev-counter">${idx+1}/${total}</div>
+                <div class="rev-counter">${this._reviewIdx+1}/${this._reviewQueue.length}</div>
             </div>
             <div class="rev-card-wrap">
                 <div class="rev-card" id="rev-card">
                     <div class="rev-topic-badge">${card.topic}</div>
-                    <div class="rev-question">${card.question || 'Questão sem texto'}</div>
-                    <div class="rev-flip-hint">Toque para revelar a resposta</div>
+                    <div class="rev-question">${card.question || 'Questão'}</div>
+                    <div class="rev-flip-hint">Toque para revelar</div>
                     <div class="rev-answer hidden" id="rev-answer">${card.answer || 'Resposta'}</div>
                     <div class="rev-actions hidden" id="rev-actions">
-                        <button class="btn-danger rev-btn-wrong"
-                            onclick="MemoryEngine._reviewAnswer(false)">${_ic('warning',{size:'sm'})} Errei</button>
-                        <button class="btn-success rev-btn-correct"
-                            onclick="MemoryEngine._reviewAnswer(true)">${_ic('check',{size:'sm'})} Acertei</button>
+                        <button class="rev-btn-wrong" onclick="MemoryEngine._reviewAnswerFallback(false)">Errei</button>
+                        <button class="rev-btn-correct" onclick="MemoryEngine._reviewAnswerFallback(true)">Acertei</button>
                     </div>
                 </div>
             </div>
         </div>`;
-
         document.getElementById('rev-card')?.addEventListener('click', () => {
             document.getElementById('rev-answer')?.classList.remove('hidden');
             document.getElementById('rev-actions')?.classList.remove('hidden');
@@ -311,43 +318,13 @@ const MemoryEngine = {
         });
     },
 
-    _reviewAnswer(correct) {
+    _reviewAnswerFallback(correct) {
         const card = this._reviewQueue[this._reviewIdx];
         this.processAnswer(card.chapterId, card.stageId, card.qIdx, correct, 0, card.question, card.answer, card.topic);
         if (correct) this._reviewScore.correct++;
         else          this._reviewScore.wrong++;
         this._reviewIdx++;
-        this._renderReviewCard();
-    },
-
-    _renderReviewResults(container) {
-        const s   = this._reviewScore;
-        const tot = s.correct + s.wrong;
-        const pct = tot > 0 ? Math.round((s.correct / tot) * 100) : 0;
-        const xp  = s.correct * 5;
-        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
-
-        if (xp > 0 && typeof State !== 'undefined') State.addXP(xp);
-        if (typeof EventsEngine !== 'undefined' && xp > 0) EventsEngine.onXPGained(xp);
-
-        container.innerHTML = `
-        <div class="screen review-results-screen">
-            <div class="rr-hero">
-                ${_ic('star',{size:'4xl',color:'brand'})}
-                <h2>Revisão concluída!</h2>
-                <div class="rr-pct">${pct}%</div>
-                <div class="rr-pct-lbl">de acerto</div>
-            </div>
-            <div class="rr-stats">
-                <div class="rr-stat rr-correct">${_ic('check',{size:'sm',color:'success'})} ${s.correct} corretas</div>
-                <div class="rr-stat rr-wrong">${_ic('warning',{size:'sm',color:'danger'})} ${s.wrong} erradas</div>
-                <div class="rr-stat rr-xp">${_ic('xp',{size:'sm',color:'xp'})} +${xp} XP</div>
-            </div>
-            <div class="rr-actions">
-                <button class="btn-primary" onclick="Router.navigate('#memory')">Ver Mapa de Memória</button>
-                <button class="btn-secondary" onclick="Router.navigate('#home')">Voltar ao Início</button>
-            </div>
-        </div>`;
+        this._renderReviewCardFallback();
     },
 
     // ── QUESTION POOL FOR SPEED DRILL ────────────────────────────
