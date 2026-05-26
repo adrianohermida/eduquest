@@ -2508,6 +2508,538 @@ const Router = {
             container.innerHTML = `<div class="screen"><p style="padding:40px;text-align:center;color:var(--text-muted)">Caça-palavras não disponível.</p></div>`;
         }
     },
+
+    // ── EVENTS ────────────────────────────────────────────────
+    renderEvents(container) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        if (typeof EventsEngine === 'undefined') {
+            container.innerHTML = `<div class="screen"><p style="padding:40px;text-align:center;color:var(--text-muted)">Eventos não disponíveis.</p></div>`;
+            return;
+        }
+        const event    = EventsEngine.getCurrentEvent();
+        const secs     = EventsEngine.getEventTimeRemaining();
+        const timeLeft = EventsEngine.formatTimeRemaining(secs);
+
+        const missionsHTML = event.missions.map(m => {
+            const progress  = EventsEngine.getEventMissionProgress(m.id);
+            const claimed   = EventsEngine.isEventMissionClaimed(m.id);
+            const claimable = !claimed && progress >= m.goal;
+            const pct       = Math.min(100, Math.round((progress / m.goal) * 100));
+            return `
+            <div class="event-mission-card${claimed ? ' done' : claimable ? ' claimable' : ''}">
+                <div class="event-mission-icon">${_ic(m.type === 'streak' ? 'streak' : m.type === 'combo' ? 'crown' : m.type === 'gems' ? 'gem' : 'star', {size:'sm', color: claimed ? 'locked' : 'xp'})}</div>
+                <div class="event-mission-body">
+                    <div class="event-mission-desc">${m.desc}</div>
+                    <div class="event-mission-progress"><div class="event-mission-pf" style="width:${pct}%"></div></div>
+                    <div class="event-mission-meta">
+                        <span>${progress}/${m.goal}</span>
+                        <span>${_ic('xp',{size:'xs',color:'xp'})} +${m.xp} XP</span>
+                        <span>${_ic('gem',{size:'xs',color:'gem'})} +${m.gems}</span>
+                    </div>
+                </div>
+                ${claimed
+                    ? `<div class="event-mission-done-badge">${_ic('check',{size:'xs',color:'success'})} Resgatado</div>`
+                    : `<button class="event-mission-btn" ${claimable ? '' : 'disabled'} onclick="Router._claimEventMission('${m.id}')">${claimable ? 'Resgatar' : 'Pendente'}</button>`
+                }
+            </div>`;
+        }).join('');
+
+        container.innerHTML = `
+        <div class="events-screen">
+            <div class="event-hero">
+                <div class="event-hero-badge">${_ic(event.icon, {size:'xs'})} Evento Ativo</div>
+                <div class="event-hero-title">${event.name}</div>
+                <div class="event-hero-desc">${event.desc}</div>
+                <div class="event-timer">${_ic('streak',{size:'xs'})} Termina em ${timeLeft}</div>
+                ${event.bonusXPMult > 1 ? `<div class="event-bonus-tag">${_ic('xp',{size:'xs'})} XP x${event.bonusXPMult} ativo neste evento!</div>` : ''}
+            </div>
+
+            <div class="event-missions-title">${_ic('scroll',{size:'sm',color:'science'})} Missoes do Evento</div>
+            ${missionsHTML}
+
+            <div style="margin-top:20px;padding:16px;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;text-align:center;">
+                <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Passe de Batalha da Temporada</div>
+                <a href="#battle-pass" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:12px;text-decoration:none;font-weight:800;font-size:.9rem;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff">
+                    ${_ic('crown',{size:'sm',color:'final'})} Ver Battle Pass
+                </a>
+            </div>
+        </div>`;
+    },
+
+    _claimEventMission(id) {
+        if (typeof EventsEngine === 'undefined') return;
+        const result = EventsEngine.claimEventMission(id);
+        if (result && typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('reward', {
+                title: 'Missao Concluida!',
+                desc:  result.desc,
+                xp:    result.xp,
+                gems:  result.gems,
+            });
+        }
+        this.renderEvents(document.getElementById('app-container'));
+    },
+
+    // ── BATTLE PASS ───────────────────────────────────────────
+    renderBattlePass(container) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        if (typeof EventsEngine === 'undefined') {
+            container.innerHTML = `<div class="screen"><p style="padding:40px;text-align:center;color:var(--text-muted)">Battle Pass nao disponivel.</p></div>`;
+            return;
+        }
+        const prog     = EventsEngine.getBattlePassProgress();
+        const isPrem   = typeof State !== 'undefined' && State.data.user.isPremium;
+        const season   = typeof State !== 'undefined' ? (State.data.user.battlePassSeason || 1) : 1;
+        const totalXP  = typeof State !== 'undefined' ? (State.data.user.battlePassXP || 0) : 0;
+
+        const rewardLabel = r => {
+            if (r.type === 'xp')   return `+${r.amount} XP`;
+            if (r.type === 'gems') return `+${r.amount} Gemas`;
+            if (r.type === 'item') return `${EventsEngine.ITEM_LABELS[r.id] || r.id} x${r.qty}`;
+            return '';
+        };
+        const rewardIcon = r => {
+            if (r.type === 'xp')   return _ic('xp',    {size:'sm', color:'xp'});
+            if (r.type === 'gems') return _ic('gem',   {size:'sm', color:'gem'});
+            if (r.type === 'item') return _ic(EventsEngine.ITEM_ICONS[r.id] || 'star', {size:'sm', color:'rpg'});
+            return '';
+        };
+
+        const tiersHTML = Array.from({length: EventsEngine.TIERS_COUNT}, (_, i) => {
+            const tier      = i + 1;
+            const unlocked  = prog.tier >= tier;
+            const isCur     = prog.tier + 1 === tier;
+            const rewardDef = EventsEngine.BATTLE_PASS_REWARDS.find(r => r.tier === tier);
+            if (!rewardDef) return '';
+
+            const freeClm  = EventsEngine.isRewardClaimed(tier, 'free');
+            const premClm  = EventsEngine.isRewardClaimed(tier, 'premium');
+            const freeCan  = unlocked && !freeClm;
+            const premCan  = unlocked && isPrem && !premClm;
+
+            return `
+            <div class="bp-tier-row${unlocked ? ' unlocked' : ''}${isCur ? ' current' : ''}">
+                <div class="bp-tier-num">${tier}</div>
+                <div class="bp-reward-cell${freeCan ? ' claimable' : freeClm ? ' claimed' : !unlocked ? ' locked' : ''}"
+                     onclick="Router._claimBPReward(${tier},'free')">
+                    ${rewardIcon(rewardDef.free)}
+                    <span class="bp-reward-text">${rewardLabel(rewardDef.free)}</span>
+                    ${freeClm ? `<span class="bp-reward-check">${_ic('check',{size:'xs',color:'success'})}</span>` : ''}
+                </div>
+                <div class="bp-reward-cell premium${premCan ? ' claimable' : premClm ? ' claimed' : !unlocked || !isPrem ? ' locked' : ''}"
+                     onclick="Router._claimBPReward(${tier},'premium')">
+                    ${rewardIcon(rewardDef.premium)}
+                    <span class="bp-reward-text">${rewardLabel(rewardDef.premium)}</span>
+                    ${premClm
+                        ? `<span class="bp-reward-check">${_ic('check',{size:'xs',color:'success'})}</span>`
+                        : !isPrem
+                            ? `<span class="bp-premium-lock">${_ic('crown',{size:'xs'})} PREMIUM</span>`
+                            : ''
+                    }
+                </div>
+            </div>`;
+        }).join('');
+
+        container.innerHTML = `
+        <div class="bp-screen">
+            <div class="s5-screen-header">
+                <div style="font-size:1.2rem;font-weight:900;color:var(--text-main)">${_ic('crown',{size:'sm',color:'final'})} Battle Pass</div>
+                <div class="bp-season-badge">${_ic('star',{size:'xs'})} Temporada ${season}</div>
+            </div>
+
+            <div class="bp-progress-card">
+                <div class="bp-progress-label">
+                    <span class="bp-tier-label">Tier ${prog.tier} / ${EventsEngine.TIERS_COUNT}</span>
+                    <span class="bp-xp-label">${totalXP.toLocaleString('pt-BR')} XP total</span>
+                </div>
+                <div class="bp-progress-bar"><div class="bp-progress-fill" style="width:${prog.pct}%"></div></div>
+                <div class="bp-progress-sub">${prog.xpInTier} / ${EventsEngine.XP_PER_TIER} XP para proximo tier</div>
+            </div>
+
+            ${!isPrem ? `
+            <div style="background:linear-gradient(135deg,#7c3aed22,#a855f722);border:1.5px solid #a855f7;border-radius:16px;padding:16px;text-align:center;margin-bottom:20px;">
+                <div style="font-size:.95rem;font-weight:800;color:var(--text-main);margin-bottom:6px">${_ic('crown',{size:'sm',color:'final'})} Desbloqueie o Premium Pass</div>
+                <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:12px">Acesse recompensas exclusivas, XP extra e itens raros em cada tier.</div>
+                <button class="btn-primary" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;padding:10px 24px;border-radius:12px;font-weight:800;color:#fff;cursor:pointer;font-size:.88rem" onclick="Router._showPremiumModal()">
+                    ${_ic('crown',{size:'xs'})} Assinar Premium
+                </button>
+            </div>` : ''}
+
+            <div class="bp-track-header">
+                <span></span>
+                <span class="th-free">Gratis</span>
+                <span class="th-prem">${_ic('crown',{size:'xs'})} Premium</span>
+            </div>
+            ${tiersHTML}
+        </div>`;
+    },
+
+    _claimBPReward(tier, track) {
+        if (typeof EventsEngine === 'undefined') return;
+        const r = EventsEngine.claimReward(tier, track);
+        if (!r) return;
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('reward', {
+                title: `Tier ${tier} Resgatado!`,
+                desc:  EventsEngine.BATTLE_PASS_REWARDS.find(x => x.tier === tier)
+                    ? (track === 'free' ? 'Recompensa gratis' : 'Recompensa premium') : '',
+                xp:    r.type === 'xp'   ? r.amount : 0,
+                gems:  r.type === 'gems' ? r.amount : 0,
+            });
+        }
+        this.renderBattlePass(document.getElementById('app-container'));
+    },
+
+    // ── AI STUDIO ────────────────────────────────────────────
+    renderAIStudio(container) {
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const sets = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
+
+        const setsHTML = sets.length
+            ? sets.map(s => `
+                <div class="ai-set-card" onclick="Router._playAISet('${s.id}')">
+                    <div class="ai-set-icon">${_ic('scroll', {size:'sm', color:'science'})}</div>
+                    <div class="ai-set-body">
+                        <div class="ai-set-name">${s.name}</div>
+                        <div class="ai-set-meta">${s.questions.length} questoes &middot; ${new Date(s.createdAt).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                    <button class="ai-set-delete" onclick="event.stopPropagation();Router._deleteAISet('${s.id}')" title="Excluir">x</button>
+                </div>`).join('')
+            : `<div class="ai-no-sets">${_ic('scroll',{size:'lg',color:'locked'})} <br>Nenhum estudo criado ainda.<br>Cole um texto acima e clique em Analisar!</div>`;
+
+        container.innerHTML = `
+        <div class="ai-studio-screen">
+            <div class="ai-studio-hero">
+                <div class="ai-studio-hero-badge">${_ic('ai-tutor',{size:'xs'})} IA Generativa</div>
+                <div class="ai-studio-hero-title">AI Studio</div>
+                <div class="ai-studio-hero-desc">Cole qualquer texto de estudo e eu gero questoes automaticamente para voce praticar.</div>
+            </div>
+
+            <div class="ai-input-card">
+                <div class="ai-input-label">${_ic('scroll',{size:'xs',color:'science'})} Cole seu texto aqui</div>
+                <textarea class="ai-textarea" id="ai-text-input" placeholder="Cole aqui um trecho do seu material de estudo: apostila, livro, artigo, resumo..." maxlength="5000" oninput="document.getElementById('ai-char-count').textContent=this.value.length+'/5000'"></textarea>
+                <div class="ai-char-count" id="ai-char-count">0/5000</div>
+                <button class="ai-analyze-btn" id="ai-analyze-btn" onclick="Router._analyzeAIText()">
+                    ${_ic('ai-tutor',{size:'sm'})} Analisar com IA
+                </button>
+            </div>
+
+            <div id="ai-results-area"></div>
+
+            <div class="ai-saved-section">
+                <div class="ai-saved-title">${_ic('backpack',{size:'xs',color:'science'})} Meus Estudos Salvos</div>
+                ${setsHTML}
+            </div>
+        </div>`;
+    },
+
+    _analyzeAIText() {
+        const textarea = document.getElementById('ai-text-input');
+        const btn      = document.getElementById('ai-analyze-btn');
+        const area     = document.getElementById('ai-results-area');
+        const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        if (!textarea || !area) return;
+        const text = textarea.value.trim();
+        if (text.length < 100) {
+            if (typeof ModalEngine !== 'undefined') ModalEngine.enqueue('info', { title: 'Texto muito curto', desc: 'Cole pelo menos 100 caracteres para gerar questoes.' });
+            return;
+        }
+        if (typeof AIStudio === 'undefined') return;
+
+        btn.disabled = true;
+        const steps  = ['Lendo o texto...', 'Identificando conceitos-chave...', 'Gerando questoes...', 'Validando alternativas...'];
+        let stepIdx  = 0;
+        area.innerHTML = `
+        <div class="ai-processing">
+            <div class="ai-processing-dots">
+                <div class="ai-processing-dot"></div>
+                <div class="ai-processing-dot"></div>
+                <div class="ai-processing-dot"></div>
+            </div>
+            <div class="ai-processing-text">Analisando com IA...</div>
+            <div class="ai-processing-steps" id="ai-step-text">${steps[0]}</div>
+        </div>`;
+
+        const stepTimer = setInterval(() => {
+            stepIdx = (stepIdx + 1) % steps.length;
+            const el = document.getElementById('ai-step-text');
+            if (el) el.textContent = steps[stepIdx];
+        }, 500);
+
+        AIStudio.analyze(text, questions => {
+            clearInterval(stepTimer);
+            btn.disabled = false;
+            if (!questions.length) {
+                area.innerHTML = `<div class="ai-processing"><div class="ai-processing-text" style="color:#ef4444">Nao consegui gerar questoes com este texto.<br>Tente um texto mais longo com definicoes claras.</div></div>`;
+                return;
+            }
+            window._aiCurrentQuestions = questions;
+            window._aiCurrentText      = text;
+            const letters = ['A', 'B', 'C', 'D'];
+            const qHTML   = questions.map((q, qi) => `
+                <div class="ai-question-item">
+                    <div class="ai-question-text">${qi+1}. ${q.text}</div>
+                    <div class="ai-question-opts">
+                        ${q.options.map((opt, oi) => `
+                        <div class="ai-question-opt${oi === q.correctIndex ? ' correct' : ''}">
+                            <span class="ai-opt-letter">${letters[oi]||oi+1}</span>
+                            ${opt}
+                        </div>`).join('')}
+                    </div>
+                </div>`).join('');
+            area.innerHTML = `
+            <div class="ai-results-card">
+                <div class="ai-results-header">
+                    <div class="ai-results-title">${_ic('star',{size:'sm',color:'xp'})} Questoes Geradas <span class="ai-questions-count">${questions.length}</span></div>
+                </div>
+                ${qHTML}
+                <div class="ai-save-row">
+                    <input class="ai-name-input" id="ai-set-name" type="text" placeholder="Nome do estudo..." maxlength="60">
+                    <button class="ai-save-btn" onclick="Router._saveAISet()">Salvar</button>
+                </div>
+            </div>`;
+        });
+    },
+
+    _saveAISet() {
+        if (typeof AIStudio === 'undefined') return;
+        const nameEl    = document.getElementById('ai-set-name');
+        const name      = nameEl ? nameEl.value.trim() : '';
+        const questions = window._aiCurrentQuestions || [];
+        const text      = window._aiCurrentText || '';
+        if (!questions.length) return;
+        AIStudio.saveStudySet(name || 'Estudo Personalizado', text, questions);
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('reward', { title: 'Estudo Salvo!', desc: `"${name || 'Estudo Personalizado'}" adicionado aos seus estudos.`, xp: 0, gems: 0 });
+        }
+        this.renderAIStudio(document.getElementById('app-container'));
+    },
+
+    _deleteAISet(id) {
+        if (typeof AIStudio === 'undefined') return;
+        AIStudio.deleteStudySet(id);
+        this.renderAIStudio(document.getElementById('app-container'));
+    },
+
+    _playAISet(id) {
+        const sets = typeof AIStudio !== 'undefined' ? AIStudio.getStudySets() : [];
+        const set  = sets.find(s => s.id === id);
+        if (!set || !set.questions.length) return;
+        window._aiPlaySet   = set;
+        window._aiPlayIdx   = 0;
+        window._aiPlayScore = 0;
+        this._renderAIPlay(document.getElementById('app-container'));
+    },
+
+    _renderAIPlay(container) {
+        const _ic  = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const set  = window._aiPlaySet;
+        const idx  = window._aiPlayIdx || 0;
+        if (!set || idx >= set.questions.length) {
+            const total = set ? set.questions.length : 0;
+            const score = window._aiPlayScore || 0;
+            container.innerHTML = `
+            <div class="ai-studio-screen">
+                <div style="text-align:center;padding:40px 20px;">
+                    <div style="font-size:2.5rem;margin-bottom:16px">${_ic('trophy',{size:'xl',color:'final'})}</div>
+                    <div style="font-size:1.4rem;font-weight:900;color:var(--text-main);margin-bottom:8px">Estudo Concluido!</div>
+                    <div style="font-size:1rem;color:var(--text-muted);margin-bottom:20px">${score} / ${total} questoes corretas</div>
+                    <a href="#ai-studio" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:800">
+                        ${_ic('scroll',{size:'sm'})} Voltar ao AI Studio
+                    </a>
+                </div>
+            </div>`;
+            if (typeof EventsEngine !== 'undefined') {
+                EventsEngine.trackMissionComplete();
+            }
+            return;
+        }
+        const q       = set.questions[idx];
+        const letters = ['A','B','C','D'];
+        container.innerHTML = `
+        <div class="ai-studio-screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <a href="#ai-studio" style="text-decoration:none;color:var(--text-muted);font-size:.85rem;font-weight:700">Sair</a>
+                <span style="font-size:.85rem;color:var(--text-muted);font-weight:700">${idx+1} / ${set.questions.length}</span>
+            </div>
+            <div class="review-question-card" style="margin-bottom:16px">
+                <div style="font-size:.75rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${_ic('ai-tutor',{size:'xs',color:'science'})} ${set.name}</div>
+                <div style="font-size:1rem;font-weight:700;color:var(--text-main)">${q.text}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+                ${q.options.map((opt, oi) => `
+                <button class="review-option" onclick="Router._answerAIPlay(${oi})" style="text-align:left;display:flex;align-items:center;gap:10px">
+                    <span style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0">${letters[oi]||oi+1}</span>
+                    ${opt}
+                </button>`).join('')}
+            </div>
+        </div>`;
+    },
+
+    _answerAIPlay(selectedIdx) {
+        const set = window._aiPlaySet;
+        const idx = window._aiPlayIdx || 0;
+        const q   = set.questions[idx];
+        const ok  = selectedIdx === q.correctIndex;
+        if (ok) {
+            window._aiPlayScore = (window._aiPlayScore || 0) + 1;
+            if (typeof State !== 'undefined') State.addXP(15);
+            if (typeof EventsEngine !== 'undefined') EventsEngine.trackCorrectAnswer();
+        }
+
+        const buttons = document.querySelectorAll('.review-option');
+        buttons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.correctIndex) btn.style.background = 'rgba(34,197,94,.25)';
+            else if (i === selectedIdx && !ok) btn.style.background = 'rgba(239,68,68,.25)';
+        });
+        setTimeout(() => {
+            window._aiPlayIdx = idx + 1;
+            this._renderAIPlay(document.getElementById('app-container'));
+        }, 900);
+    },
+
+    // ── PVP ────────────────────────────────────────────────────
+    renderPvP(container) {
+        const _ic       = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const SE        = typeof SocialEngine !== 'undefined' ? SocialEngine : null;
+        const user      = typeof State !== 'undefined' ? State.data.user : {};
+        const wins      = user.pvpWins   || 0;
+        const losses    = user.pvpLosses || 0;
+        const elo       = user.pvpElo    ?? 1000;
+        const winRate   = wins + losses > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
+
+        const challenges    = SE ? SE.getChallenges() : [];
+        const incoming      = challenges.filter(c => c.to === 'player' && !c.resolved);
+        const outgoing      = challenges.filter(c => c.from === 'player' && !c.resolved);
+        const resolved      = challenges.filter(c => c.resolved).slice(0, 5);
+        const friendPlayers = SE ? SE.getFriendPlayers() : [];
+
+        const challengeCard = (c, type) => {
+            const ghost  = SE ? SE.GHOST_PLAYERS.find(g => g.name === c.name) : null;
+            const ago    = Math.floor((Date.now() - (c.sentAt || Date.now())) / 60000);
+            const agoTxt = ago < 60 ? `${ago}m atras` : `${Math.floor(ago/60)}h atras`;
+            return `
+            <div class="pvp-challenge-card ${type}${c.resolved ? ' resolved' : ''}">
+                <div class="pvp-challenge-avatar">${ghost?.avatar || '?'}</div>
+                <div class="pvp-challenge-body">
+                    <div class="pvp-challenge-name">${c.name}</div>
+                    <div class="pvp-challenge-meta">
+                        <span class="pvp-challenge-badge ${type === 'incoming' ? 'incoming' : c.result || 'pending'}">${type === 'incoming' ? 'Desafio!' : c.resolved ? (c.result || 'enviado') : 'Aguardando'}</span>
+                        <span>${agoTxt}</span>
+                        ${ghost ? `<span>Nivel ${ghost.level}</span>` : ''}
+                    </div>
+                </div>
+                ${type === 'incoming' && !c.resolved ? `
+                <div class="pvp-challenge-actions">
+                    <button class="pvp-accept-btn" onclick="Router._acceptPvP('${c.id}')">Aceitar</button>
+                    <button class="pvp-decline-btn" onclick="Router._declinePvP('${c.id}')">Recusar</button>
+                </div>` : ''}
+            </div>`;
+        };
+
+        const friendsGrid = friendPlayers.length
+            ? `<div class="pvp-friends-grid">
+                ${friendPlayers.map(fp => `
+                <div class="pvp-friend-card">
+                    <div class="pvp-friend-avatar">${fp.avatar}</div>
+                    <div class="pvp-friend-name">${fp.name}</div>
+                    <div class="pvp-friend-level">Nivel ${fp.level} &middot; ${fp.xp.toLocaleString('pt-BR')} XP</div>
+                    <button class="pvp-friend-challenge-btn" onclick="Router._sendPvPChallenge('${fp.name}')">
+                        ${_ic('sword',{size:'xs',color:'rpg'})} Desafiar
+                    </button>
+                </div>`).join('')}
+               </div>`
+            : `<div class="pvp-empty">Adicione amigos para desafia-los! Va em <a href="#friends" style="color:var(--brand)">Amigos</a> para comecar.</div>`;
+
+        container.innerHTML = `
+        <div class="pvp-screen">
+            <div class="pvp-hero">
+                <div class="pvp-hero-title">${_ic('sword',{size:'md',color:'rpg'})} Batalhas PvP</div>
+                <div class="pvp-hero-desc">Desafie amigos em duelos assincronos. Venca e suba no ranking!</div>
+                <div class="pvp-stats-row">
+                    <div class="pvp-stat">
+                        <div class="pvp-stat-val" style="color:#22c55e">${wins}</div>
+                        <div class="pvp-stat-lbl">Vitorias</div>
+                    </div>
+                    <div class="pvp-stat">
+                        <div class="pvp-stat-val" style="color:#ef4444">${losses}</div>
+                        <div class="pvp-stat-lbl">Derrotas</div>
+                    </div>
+                    <div class="pvp-stat">
+                        <div class="pvp-stat-val">${winRate}%</div>
+                        <div class="pvp-stat-lbl">Win Rate</div>
+                    </div>
+                    <div class="pvp-stat">
+                        <div class="pvp-stat-val pvp-stat-elo">${elo}</div>
+                        <div class="pvp-stat-lbl">ELO</div>
+                    </div>
+                </div>
+            </div>
+
+            ${incoming.length ? `
+            <div class="pvp-section-title">${_ic('boss',{size:'sm',color:'rpg'})} Desafios Recebidos (${incoming.length})</div>
+            ${incoming.map(c => challengeCard(c, 'incoming')).join('')}` : ''}
+
+            ${outgoing.length ? `
+            <div class="pvp-section-title" style="margin-top:${incoming.length?16:0}px">${_ic('flag',{size:'sm',color:'science'})} Desafios Enviados</div>
+            ${outgoing.map(c => challengeCard(c, 'outgoing')).join('')}` : ''}
+
+            ${resolved.length ? `
+            <div class="pvp-section-title" style="margin-top:16px">${_ic('scroll',{size:'sm',color:'locked'})} Historico</div>
+            ${resolved.map(c => challengeCard(c, c.result || 'resolved')).join('')}` : ''}
+
+            ${!incoming.length && !outgoing.length && !resolved.length ? `
+            <div class="s5-empty-state">
+                <div class="s5-empty-icon">${_ic('sword',{size:'xl',color:'locked'})}</div>
+                <div class="s5-empty-title">Nenhuma batalha ainda</div>
+                <div class="s5-empty-desc">Desafie um amigo abaixo para comecar!</div>
+            </div>` : ''}
+
+            <div class="pvp-send-section">
+                <div class="pvp-section-title" style="margin-top:8px">${_ic('friends',{size:'sm',color:'science'})} Desafiar um Amigo</div>
+                ${friendsGrid}
+            </div>
+        </div>`;
+    },
+
+    _sendPvPChallenge(ghostName) {
+        if (typeof SocialEngine === 'undefined') return;
+        const ghost = SocialEngine.GHOST_PLAYERS.find(g => g.name === ghostName);
+        if (!ghost) return;
+        SocialEngine.sendChallenge(ghost);
+        if (typeof ModalEngine !== 'undefined') {
+            ModalEngine.enqueue('info', { title: 'Desafio Enviado!', desc: `${ghostName} foi desafiado. Aguarde a resposta!` });
+        }
+        this.renderPvP(document.getElementById('app-container'));
+    },
+
+    _acceptPvP(challengeId) {
+        if (typeof SocialEngine === 'undefined') return;
+        SocialEngine.resolveChallenge(challengeId);
+        if (typeof State !== 'undefined') {
+            const won = (challengeId.charCodeAt(0) % 2 === 0);
+            if (won) {
+                State.data.user.pvpWins  = (State.data.user.pvpWins  || 0) + 1;
+                State.data.user.pvpElo   = (State.data.user.pvpElo   ?? 1000) + 18;
+                State.addXP(50);
+                State.addGems(5);
+                if (typeof ModalEngine !== 'undefined') ModalEngine.enqueue('reward', { title: 'Vitoria!', desc: 'Voce venceu o duelo!', xp: 50, gems: 5 });
+            } else {
+                State.data.user.pvpLosses = (State.data.user.pvpLosses || 0) + 1;
+                State.data.user.pvpElo    = Math.max(800, (State.data.user.pvpElo ?? 1000) - 12);
+                if (typeof ModalEngine !== 'undefined') ModalEngine.enqueue('info', { title: 'Derrota', desc: 'Estude mais para vencer da proxima vez!' });
+            }
+            State.save();
+        }
+        this.renderPvP(document.getElementById('app-container'));
+    },
+
+    _declinePvP(challengeId) {
+        if (typeof SocialEngine === 'undefined') return;
+        SocialEngine.resolveChallenge(challengeId);
+        this.renderPvP(document.getElementById('app-container'));
+    },
 };
 
 window.Router = Router;
