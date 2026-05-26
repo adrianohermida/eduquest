@@ -685,59 +685,6 @@ window.EduAdmin = (() => {
         ${body}`;
     }
 
-    function _renderContentChapters(data) {
-        const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow' };
-        return `
-        <div class="admin-wide-table-wrap">
-            <table class="admin-table">
-                <thead><tr><th>Capítulo</th><th>Matéria</th><th>Ano</th><th>Estágios</th><th>Questões</th><th>Flashcards</th><th>Status</th><th>Ações</th></tr></thead>
-                <tbody>${data.map(c => `
-                <tr>
-                    <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">${c.icon}</span><strong>${c.title}</strong></div></td>
-                    <td>${badge(c.subjectLabel, sc[c.subject] || 'grey')}</td>
-                    <td>${c.grade}</td>
-                    <td>${c.stagesLoaded}/${c.totalStages}</td>
-                    <td>${c.questionCount}</td>
-                    <td>${c.flashcardCount}</td>
-                    <td>${badge('Publicado','green')}</td>
-                    <td><button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('stages','${c.id}')" style="padding:4px 10px;font-size:0.7rem">Ver Estágios →</button></td>
-                </tr>`).join('')}
-                </tbody>
-            </table>
-        </div>`;
-    }
-
-    function _renderContentStages(chapterId, data) {
-        const chapter = (data || _loadContentData()).find(c => c.id === chapterId);
-        if (!chapter) return `<div style="padding:40px;text-align:center;color:#94a3b8">Capítulo não encontrado.</div>`;
-        const dc = { easy:'green', medium:'blue', hard:'orange', boss:'red' };
-        return `
-        <div class="admin-wide-table-wrap">
-            <table class="admin-table">
-                <thead><tr><th>Estágio</th><th>Dificuldade</th><th>Tempo</th><th>Total Questões</th><th>Flashcards</th><th>Ações</th></tr></thead>
-                <tbody>${chapter.stages.map(s => {
-                    const sd = window[s.varName];
-                    if (!sd) return `<tr><td colspan="6" style="color:#94a3b8;font-style:italic;padding:12px">${s.id} — não carregado</td></tr>`;
-                    const total = (sd.warmup?.length||0) + (sd.guidedPractice?.length||0) + (sd.questions?.length||0) + (sd.adaptiveReview?.length||0);
-                    const fc    = sd.summary?.flashcards?.length || 0;
-                    const diff  = sd.difficulty || (s.isBoss ? 'boss' : 'medium');
-                    return `<tr>
-                        <td><span style="font-size:1.1rem">${sd.icon||'📖'}</span> <strong>${sd.title}</strong>${s.isBoss ? ' <span style="color:#ef4444">💀</span>' : ''}${s.isFinal ? ' <span style="color:#f59e0b">🏆</span>' : ''}</td>
-                        <td>${badge(diff, dc[diff]||'grey')}</td>
-                        <td>${sd.estimatedTime||'—'}min</td>
-                        <td>${total}</td>
-                        <td>${fc}</td>
-                        <td style="display:flex;gap:4px">
-                            <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('questions','${chapterId}','${s.varName}')" style="padding:4px 10px;font-size:0.7rem">Ver</button>
-                            <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._openStageEditor('${s.varName}')" style="padding:4px 10px;font-size:0.7rem">✏️ Editar</button>
-                        </td>
-                    </tr>`;
-                }).join('')}
-                </tbody>
-            </table>
-        </div>`;
-    }
-
     function _renderContentQuestions(stageVar) {
         const sd = window[stageVar];
         if (!sd) return `<div style="padding:40px;text-align:center;color:#94a3b8">Stage não encontrado.</div>`;
@@ -777,131 +724,13 @@ window.EduAdmin = (() => {
     function _openStageEditor(varName) {
         _editVarName = varName;
         const sd = window[varName];
-        if (!sd) { alert(`Stage ${varName} não encontrado.`); return; }
+        if (!sd) { _editorToast(`⚠️ Stage "${varName}" não encontrado.`); return; }
         _editBuffer = JSON.parse(JSON.stringify(sd));
         const modal = document.createElement('div');
         modal.id = 'stage-editor-overlay';
         modal.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,23,0.97);z-index:2000;display:flex;flex-direction:column;font-family:inherit';
         modal.innerHTML = _buildStageEditorHTML();
         document.body.appendChild(modal);
-    }
-
-    function _buildStageEditorHTML() {
-        if (!_editBuffer) return '';
-        const sd = _editBuffer;
-        const varName = _editVarName;
-        const qSections = [
-            { key:'warmup',         label:'🔥 Aquecimento' },
-            { key:'guidedPractice', label:'🔍 Prática Guiada' },
-            { key:'questions',      label:'⚔️ Questões Principais' },
-            { key:'adaptiveReview', label:'🧠 Revisão Adaptativa' },
-        ];
-        const metaHTML = `
-        <div style="display:grid;grid-template-columns:1fr 90px 160px 110px;gap:12px;margin-bottom:14px">
-            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Título</label>
-                <input type="text" value="${_esc(sd.title||'')}" oninput="EduAdmin._bufSet('title',this.value)"
-                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px 10px;border-radius:6px;font-size:0.9rem;box-sizing:border-box"></div>
-            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Ícone</label>
-                <input type="text" value="${_esc(sd.icon||'')}" oninput="EduAdmin._bufSet('icon',this.value)"
-                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:1.3rem;text-align:center;box-sizing:border-box"></div>
-            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Dificuldade</label>
-                <select onchange="EduAdmin._bufSet('difficulty',this.value)"
-                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;box-sizing:border-box">
-                    ${['easy','medium','hard','boss'].map(d => `<option value="${d}" ${sd.difficulty===d?'selected':''}>${d}</option>`).join('')}
-                </select></div>
-            <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Tempo (min)</label>
-                <input type="number" value="${sd.estimatedTime||10}" oninput="EduAdmin._bufSet('estimatedTime',parseInt(this.value)||0)"
-                style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;box-sizing:border-box"></div>
-        </div>
-        <div><label style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:4px">Objetivos de Aprendizagem (um por linha)</label>
-            <textarea rows="4" oninput="EduAdmin._bufSetObjectives(this.value)"
-            style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;resize:vertical;box-sizing:border-box">${_esc((sd.learningObjectives||[]).join('\n'))}</textarea>
-        </div>`;
-
-        const questionsHTML = qSections.map(sec => {
-            const qs = sd[sec.key] || [];
-            return `
-            <div style="margin-bottom:20px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                    <h4 style="margin:0;color:#f97316;font-size:0.9rem">${sec.label} <span style="color:#64748b;font-weight:400">(${qs.length})</span></h4>
-                    <button onclick="EduAdmin._editorAddQuestion('${sec.key}')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:4px 10px;font-size:0.75rem">+ Questão</button>
-                </div>
-                <div id="ed-${sec.key}-list">${qs.map((q,i) => _buildQuestionEditor(sec.key, i, q)).join('')}</div>
-            </div>`;
-        }).join('');
-
-        const flashcardsHTML = `
-        <div style="margin-bottom:20px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <h4 style="margin:0;color:#f97316;font-size:0.9rem">🃏 Flashcards <span style="color:#64748b;font-weight:400">(${(sd.summary?.flashcards||[]).length})</span></h4>
-                <button onclick="EduAdmin._editorAddFlashcard()" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:4px 10px;font-size:0.75rem">+ Flashcard</button>
-            </div>
-            <div id="ed-flashcard-list">${(sd.summary?.flashcards||[]).map((fc,i) => _buildFlashcardEditor(i, fc)).join('')}</div>
-        </div>`;
-
-        return `
-        <div style="background:#1e293b;border-bottom:1px solid #334155;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px">
-            <div style="min-width:0">
-                <div style="font-size:1.05rem;font-weight:700;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">✏️ ${_esc(sd.title||varName)}</div>
-                <div style="font-size:0.72rem;color:#64748b;margin-top:2px">${varName} · alterações em memória até exportar</div>
-            </div>
-            <div style="display:flex;gap:8px;flex-shrink:0">
-                <button onclick="EduAdmin._exportStageJS()" class="admin-topbar-btn admin-topbar-btn-ghost">⬇ Exportar .js</button>
-                <button onclick="EduAdmin._applyStageEdit()" class="admin-topbar-btn admin-topbar-btn-primary" style="background:linear-gradient(135deg,#22c55e,#16a34a)">✅ Aplicar na Sessão</button>
-                <button onclick="EduAdmin._closeStageEditor()" class="admin-topbar-btn admin-topbar-btn-ghost" style="color:#ef4444;border-color:#ef4444">✕</button>
-            </div>
-        </div>
-        <div style="flex:1;overflow-y:auto;padding:24px">
-            <div style="max-width:1080px;margin:0 auto">
-                <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:20px">
-                    <h3 style="margin:0 0 14px;color:#f97316;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em">📋 Metadados</h3>
-                    ${metaHTML}
-                </div>
-                <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:20px">
-                    <h3 style="margin:0 0 14px;color:#f97316;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em">❓ Questões</h3>
-                    ${questionsHTML}
-                </div>
-                <div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:20px">
-                    <h3 style="margin:0 0 14px;color:#f97316;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em">🃏 Flashcards</h3>
-                    ${flashcardsHTML}
-                </div>
-                <div style="padding:32px 0;text-align:center;display:flex;gap:12px;justify-content:center">
-                    <button onclick="EduAdmin._exportStageJS()" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:10px 28px">⬇ Exportar .js</button>
-                    <button onclick="EduAdmin._applyStageEdit()" class="admin-topbar-btn admin-topbar-btn-primary" style="padding:10px 28px;background:linear-gradient(135deg,#22c55e,#16a34a)">✅ Aplicar na Sessão</button>
-                </div>
-            </div>
-        </div>`;
-    }
-
-    function _buildQuestionEditor(section, idx, q) {
-        const opts = q.options || [
-            {text:'',correct:true},{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}
-        ];
-        return `
-        <div id="qed-${section}-${idx}" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <span style="font-size:0.72rem;color:#64748b;font-weight:700;letter-spacing:0.05em">QUESTÃO ${idx+1}</span>
-                <button onclick="EduAdmin._editorRemoveQuestion('${section}',${idx})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:4px" title="Remover">✕</button>
-            </div>
-            <div style="margin-bottom:10px">
-                <label style="font-size:0.7rem;color:#94a3b8;display:block;margin-bottom:3px">Enunciado</label>
-                <textarea rows="2" oninput="EduAdmin._bufQ('${section}',${idx},'prompt',this.value)"
-                style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;resize:vertical;box-sizing:border-box">${_esc(q.prompt||'')}</textarea>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-                ${opts.map((o, oi) => `
-                <div style="display:flex;align-items:center;gap:6px">
-                    <input type="radio" name="correct-${section}-${idx}" value="${oi}" ${o.correct?'checked':''} onchange="EduAdmin._bufQCorrect('${section}',${idx},${oi})" style="accent-color:#f97316;flex-shrink:0" title="Marcar como correta">
-                    <input type="text" value="${_esc(o.text||'')}" oninput="EduAdmin._bufQ('${section}',${idx},'options.${oi}.text',this.value)" placeholder="Opção ${String.fromCharCode(65+oi)}"
-                    style="flex:1;background:#1e293b;border:1px solid ${o.correct?'#22c55e':'#334155'};color:#f1f5f9;padding:6px 8px;border-radius:6px;font-size:0.8rem;min-width:0;box-sizing:border-box">
-                </div>`).join('')}
-            </div>
-            <div>
-                <label style="font-size:0.7rem;color:#94a3b8;display:block;margin-bottom:3px">Explicação (feedback após resposta)</label>
-                <textarea rows="2" oninput="EduAdmin._bufQ('${section}',${idx},'explanation',this.value)"
-                style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;resize:vertical;box-sizing:border-box">${_esc(q.explanation||'')}</textarea>
-            </div>
-        </div>`;
     }
 
     function _buildFlashcardEditor(idx, fc) {
@@ -1028,9 +857,28 @@ window.EduAdmin = (() => {
         if (main) main.innerHTML = _renderContent();
     }
 
-    /* ── CRUD: Create Chapter ─────────────────────────────────── */
+    /* ── CRUD Helpers ────────────────────────────────────────── */
 
-    let _crudBuffer = null;
+    function _confirmModal(title, msg, onConfirm) {
+        document.getElementById('admin-confirm-modal')?.remove();
+        const m = document.createElement('div');
+        m.id = 'admin-confirm-modal';
+        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:4000;display:flex;align-items:center;justify-content:center';
+        m.innerHTML = `
+        <div style="background:#1e293b;border:1px solid #ef4444;border-radius:12px;padding:24px;width:420px;max-width:95vw">
+            <div style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-bottom:8px">${title}</div>
+            <div style="font-size:0.84rem;color:#94a3b8;margin-bottom:20px;line-height:1.55">${msg}</div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button onclick="document.getElementById('admin-confirm-modal').remove()" class="admin-topbar-btn admin-topbar-btn-ghost">Cancelar</button>
+                <button id="admin-confirm-yes" class="admin-topbar-btn admin-topbar-btn-primary" style="background:#ef4444;border-color:#ef4444">Excluir</button>
+            </div>
+        </div>`;
+        document.body.appendChild(m);
+        document.getElementById('admin-confirm-yes').onclick = () => { m.remove(); onConfirm(); };
+        m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+    }
+
+    /* ── CRUD: Create Chapter ─────────────────────────────────── */
 
     function _openCreateChapter() {
         document.getElementById('crud-modal')?.remove();
@@ -1099,11 +947,16 @@ window.EduAdmin = (() => {
     function _confirmDeleteChapter(chapterId) {
         const chapter = (window.CHAPTERS_REGISTRY || {})[chapterId];
         if (!chapter) return;
-        if (!confirm(`Excluir o capítulo "${chapter.title}" e todos os seus ${chapter.stages?.length || 0} estágios?\n\nEsta ação não pode ser desfeita.`)) return;
-        (chapter.stages || []).forEach(s => { delete window[s.varName]; });
-        delete window.CHAPTERS_REGISTRY[chapterId];
-        _editorToast(`🗑 Capítulo "${chapter.title}" excluído.`);
-        _contentNav('chapters');
+        _confirmModal(
+            '🗑 Excluir Capítulo',
+            `Excluir <strong style="color:#f1f5f9">${_esc(chapter.title)}</strong> e todos os seus ${chapter.stages?.length || 0} estágios?<br><br>Esta ação não pode ser desfeita.`,
+            () => {
+                (chapter.stages || []).forEach(s => { delete window[s.varName]; });
+                delete window.CHAPTERS_REGISTRY[chapterId];
+                _editorToast(`🗑 Capítulo "${chapter.title}" excluído.`);
+                _contentNav('chapters');
+            }
+        );
     }
 
     /* ── CRUD: Create Stage ───────────────────────────────────── */
@@ -1192,20 +1045,24 @@ window.EduAdmin = (() => {
     function _confirmDeleteStage(chapterId, varName) {
         const sd = window[varName];
         const title = sd?.title || varName;
-        if (!confirm(`Excluir o estágio "${title}"?\n\nEsta ação não pode ser desfeita.`)) return;
-        delete window[varName];
-        const chapter = (window.CHAPTERS_REGISTRY || {})[chapterId];
-        if (chapter?.stages) {
-            chapter.stages = chapter.stages.filter(s => s.varName !== varName);
-            chapter.totalStages = chapter.stages.length;
-        }
-        _editorToast(`🗑 Estágio "${title}" excluído.`);
-        _contentNav('stages', chapterId);
+        _confirmModal(
+            '🗑 Excluir Estágio',
+            `Excluir o estágio <strong style="color:#f1f5f9">${_esc(title)}</strong>?<br><br>Esta ação não pode ser desfeita.`,
+            () => {
+                delete window[varName];
+                const chapter = (window.CHAPTERS_REGISTRY || {})[chapterId];
+                if (chapter?.stages) {
+                    chapter.stages = chapter.stages.filter(s => s.varName !== varName);
+                    chapter.totalStages = chapter.stages.length;
+                }
+                _editorToast(`🗑 Estágio "${title}" excluído.`);
+                _contentNav('stages', chapterId);
+            }
+        );
     }
 
-    /* ── Override content renders to add CRUD buttons ────────── */
+    /* ── Content renders with full CRUD ──────────────────────── */
 
-    const _origRenderContentChapters = _renderContentChapters;
     function _renderContentChapters(data) {
         const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow' };
         return `
@@ -1234,7 +1091,6 @@ window.EduAdmin = (() => {
         </div>`;
     }
 
-    const _origRenderContentStages = _renderContentStages;
     function _renderContentStages(chapterId, data) {
         const chapter = (data || _loadContentData()).find(c => c.id === chapterId);
         if (!chapter) return `<div style="padding:40px;text-align:center;color:#94a3b8">Capítulo não encontrado.</div>`;
@@ -2253,6 +2109,7 @@ window.EduAdmin = (() => {
         _contentNav, _openStageEditor, _closeStageEditor, _applyStageEdit, _exportStageJS,
         _bufSet, _bufSetObjectives, _bufQ, _bufQCorrect, _bufFC,
         _editorAddQuestion, _editorRemoveQuestion, _editorAddFlashcard, _editorRemoveFlashcard,
+        _confirmModal,
         _openCreateChapter, _saveNewChapter, _confirmDeleteChapter,
         _openCreateStage, _saveNewStage, _confirmDeleteStage,
         _bufMedia, _bufSCard, _addSummaryCard, _removeSummaryCard, _previewImage,
