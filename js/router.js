@@ -118,8 +118,19 @@ const Router = {
         if (typeof HUD !== 'undefined') {
             setTimeout(() => {
                 HUD.refreshNotifBadge();
-                if (isFullscreen || route === 'home' || route === '') {
+                if (isFullscreen) {
                     HUD.clearContext();
+                } else if (route === 'home' || route === '') {
+                    const chapters     = (typeof CONFIG !== 'undefined' && CONFIG.chapters) || [];
+                    const activeChapter = chapters.find(ch => {
+                        if (!ch.unlocked) return false;
+                        return typeof State !== 'undefined' && !State.getChapterProgress(ch.id).completed;
+                    }) || chapters[0];
+                    if (activeChapter) {
+                        HUD.setContext({ icon: activeChapter.icon, subject: activeChapter.subject, stage: 'Mapa', href: `#chapter/${activeChapter.id}` });
+                    } else {
+                        HUD.clearContext();
+                    }
                 } else if (route === 'chapter' && parts[1]) {
                     const meta = window.CHAPTER_METADATA;
                     if (meta) HUD.setContext({ icon: meta.icon || '📚', subject: meta.title, stage: 'Mapa', href: `#chapter/${parts[1]}` });

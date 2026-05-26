@@ -107,16 +107,13 @@ const AdventureMap = {
 
         this._renderWorld();
 
-        // Show discipline selector in header
-        const discWrap = document.getElementById('hud-disc-wrap');
-        const discText = document.getElementById('hud-disc-text');
-        if (discWrap) discWrap.style.removeProperty('display');
-        if (discText && meta) {
+        // Show discipline + mapa in header context nav
+        if (meta && typeof HUD !== 'undefined') {
             const subNames = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', geografia: 'Geografia' };
             const gradeNames = { '7ano': '7º Ano', '8ano': '8º Ano', '9ano': '9º Ano' };
-            const sub = subNames[meta.subject] || 'Ciências';
-            const grade = gradeNames[meta.grade] || '';
-            discText.textContent = grade ? `${sub} • ${grade}` : sub;
+            const sub   = subNames[meta.subject]  || 'Ciências';
+            const grade = gradeNames[meta.grade]  || '7º Ano';
+            HUD.setContext({ icon: meta.icon || '📚', subject: `${sub} • ${grade}`, stage: 'Mapa Aventura', href: `#chapter/${meta.id || ''}` });
         }
 
         this._bindEvents();
@@ -649,8 +646,7 @@ const AdventureMap = {
             container.style.removeProperty('--wm-mode-label');
         }
         document.getElementById('bottom-nav')?.classList.remove('hidden');
-        const discWrap = document.getElementById('hud-disc-wrap');
-        if (discWrap) discWrap.style.display = 'none';
+        if (typeof HUD !== 'undefined') HUD.clearContext();
         // Restore global right panel
         const globalRP = document.getElementById('right-panel');
         if (globalRP) globalRP.style.removeProperty('display');

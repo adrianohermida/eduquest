@@ -958,32 +958,18 @@ const HUD = {
 
     // ── CONTEXT BAR ───────────────────────────────────────
     setContext(data) {
-        const el   = document.getElementById('hud-context');
-        const disc = document.getElementById('hud-disc-wrap');
-        if (!el) return;
-        if (!data) { el.innerHTML = ''; return; }
-
-        el.innerHTML = `
-        <a class="hud-ctx-pill" href="${data.href || '#home'}" aria-label="${data.subject} — ${data.stage}">
-            <span class="hud-ctx-icon" aria-hidden="true">${data.icon || '📚'}</span>
-            <span class="hud-ctx-subject">${data.subject}</span>
-            <span class="hud-ctx-sep" aria-hidden="true">•</span>
-            <span class="hud-ctx-stage">${data.stage}</span>
-        </a>`;
-
-        // Show discipline chip with current subject/grade
-        if (disc) {
-            disc.style.display = '';
-            const txt = document.getElementById('hud-disc-text');
-            if (txt) txt.textContent = `${data.subject} • 7º Ano`;
-        }
+        if (!data) { this.clearContext(); return; }
+        const nav  = document.getElementById('hud-ctx-nav');
+        const txt  = document.getElementById('hud-disc-text');
+        const mapa = document.getElementById('hud-mapa-btn');
+        if (nav)  nav.style.removeProperty('display');
+        if (txt)  txt.textContent = `${data.subject} • 7º Ano`;
+        if (mapa) mapa.href = data.href || '#home';
     },
 
     clearContext() {
-        const el   = document.getElementById('hud-context');
-        const disc = document.getElementById('hud-disc-wrap');
-        if (el) el.innerHTML = '';
-        if (disc) disc.style.display = 'none';
+        const nav = document.getElementById('hud-ctx-nav');
+        if (nav) nav.style.display = 'none';
     },
 
     // ── POST-RENDER EFFECTS ───────────────────────────────
@@ -1106,11 +1092,12 @@ const HUD = {
         if (typeof State === 'undefined') return;
         const u  = State.data.user;
         const $  = id => document.getElementById(id);
-        if ($('hud-xp'))     $('hud-xp').textContent     = (u.xp || 0).toLocaleString('pt-BR');
-        if ($('hud-gems'))   $('hud-gems').textContent   = u.gems  || 0;
-        if ($('hud-streak')) $('hud-streak').textContent = u.streak || 1;
-        if ($('hud-hearts')) $('hud-hearts').textContent = u.hearts ?? 5;
-        if ($('hud-level'))  $('hud-level').textContent  = `Nv.${u.level || 1}`;
+        if ($('hud-xp'))      $('hud-xp').textContent     = (u.xp || 0).toLocaleString('pt-BR');
+        if ($('hud-gems'))    $('hud-gems').textContent   = u.gems  || 0;
+        if ($('hud-streak'))  $('hud-streak').textContent = u.streak || 1;
+        if ($('hud-hearts'))  $('hud-hearts').textContent = u.hearts ?? 5;
+        if ($('hud-av-icon')) $('hud-av-icon').textContent = u.avatar || '🦸';
+        if ($('hud-av-level'))$('hud-av-level').textContent = `Nível ${u.level || 1}`;
         this.refreshNotifBadge();
     },
 
