@@ -21,6 +21,7 @@ const Sidebar = {
         { icon: 'scroll',   label: 'Memória',     route: 'memory',      hash: '#memory'      },
         { icon: 'star',     label: 'Flashcards',  route: 'flashcards',  hash: '#flashcards'  },
         { icon: 'xp',       label: 'Speed Drill', route: 'speed-drill', hash: '#speed-drill' },
+        { icon: 'compass',  label: 'Modo Foco',  action: 'DeepFocus.toggle()', route: 'deep-focus' },
         { icon: 'avatar',   label: 'Perfil',    route: 'profile',    hash: '#profile'    },
     ],
 
@@ -104,19 +105,16 @@ const Sidebar = {
         const el = document.getElementById('sidebar');
         if (!el) return;
 
-        const itemsHTML = this.NAV_ITEMS.map(item => `
-            <a class="sidebar-item${item.soon ? ' soon' : ''}"
-               href="${item.hash}"
-               data-route="${item.route}"
-               data-tooltip="${item.label}"
-               aria-label="${item.label}${item.soon ? ' — em breve' : ''}"
-               role="menuitem"
-               ${item.soon ? 'aria-disabled="true" tabindex="-1"' : ''}
-            >
-                <span class="sidebar-item-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(item.icon,{size:'md'}) : item.icon}</span>
-                <span class="sidebar-item-label">${item.label}</span>
-                ${item.soon ? '<span class="sidebar-soon-chip" aria-hidden="true">breve</span>' : ''}
-            </a>`).join('');
+        const itemsHTML = this.NAV_ITEMS.map(item => {
+            const iconHTML = `<span class="sidebar-item-icon" aria-hidden="true">${typeof IconSystem !== 'undefined' ? IconSystem.html(item.icon,{size:'md'}) : item.icon}</span>`;
+            const lblHTML  = `<span class="sidebar-item-label">${item.label}</span>`;
+            const soonHTML = item.soon ? '<span class="sidebar-soon-chip" aria-hidden="true">breve</span>' : '';
+            const cls      = `sidebar-item${item.soon ? ' soon' : ''}`;
+            if (item.action) {
+                return `<button class="${cls}" onclick="${item.action};Sidebar.close()" data-route="${item.route||''}" data-tooltip="${item.label}" aria-label="${item.label}" role="menuitem">${iconHTML}${lblHTML}${soonHTML}</button>`;
+            }
+            return `<a class="${cls}" href="${item.hash}" data-route="${item.route}" data-tooltip="${item.label}" aria-label="${item.label}${item.soon ? ' — em breve' : ''}" role="menuitem" ${item.soon ? 'aria-disabled="true" tabindex="-1"' : ''}>${iconHTML}${lblHTML}${soonHTML}</a>`;
+        }).join('');
 
         const u = (typeof State !== 'undefined') ? State.data.user : { name: 'Herói', level: 1, avatar: '🦸' };
 

@@ -44,10 +44,16 @@ const Router = {
             if (!State.isOnboarded())     { this.navigate('#onboarding/1'); return; }
         }
 
+        // Action-only routes — toggle overlay without clearing the screen
+        if (route === 'deep-focus') {
+            if (typeof DeepFocus !== 'undefined') DeepFocus.toggle();
+            return;
+        }
+
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        const isFullscreen = isGame || isAuth || route === 'speed-drill';  // adventure keeps app layout (HUD/sidebar visible)
+        const isFullscreen = isGame || isAuth || route === 'speed-drill' || route === 'reading';
 
         // Layout mode: full-screen (auth/game) vs app (normal)
         document.body.dataset.layout = isFullscreen ? 'full' : 'app';
@@ -90,6 +96,7 @@ const Router = {
             case 'memory':        if (typeof MemoryEngine !== 'undefined') MemoryEngine.renderMemoryScreen(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Memory Engine não carregado.</p></div>'; break;
             case 'speed-drill':   if (typeof SpeedDrill !== 'undefined') SpeedDrill.start(); else container.innerHTML = '<div class="screen"><p style="padding:32px">Speed Drill não carregado.</p></div>'; break;
             case 'flashcards':    this._renderFlashcardsRoute(container); break;
+            case 'reading':       if (typeof ReadingFocus !== 'undefined') ReadingFocus.start(parts[1], parts[2]); else container.innerHTML = '<div class="screen"><p style="padding:32px">Reading Focus não carregado.</p></div>'; break;
             default:              this.renderHome(container);
         }
 
@@ -1143,8 +1150,10 @@ const Router = {
         const gemReward    = Math.floor(xpReward / 10);
         const flashcards   = stageData.summary?.flashcards || [];
         const mnemonics    = stageData.summary?.mnemonics  || [];
+        const passages     = stageData.summary?.content    || [];
         const hasFlashcards = flashcards.length > 0;
         const hasMnemonics  = mnemonics.length  > 0;
+        const hasPassages   = passages.length   > 0;
 
         container.innerHTML = `
         <div class="prep-screen">
@@ -1216,6 +1225,15 @@ const Router = {
                         <span class="mg-desc">Encontre os termos do capítulo no grid</span>
                     </div>
                 </button>
+                ${hasPassages ? `
+                <button class="minigame-btn"
+                        onclick="Router.navigate('#reading/${chapterId}/${stageId}')">
+                    <span class="mg-icon">${_ic('scroll',{size:'md'})}</span>
+                    <div class="mg-info">
+                        <span class="mg-name">Leitura Focada</span>
+                        <span class="mg-desc">Leia com destaque de palavras · ${passages.length} passagem${passages.length > 1 ? 's' : ''}</span>
+                    </div>
+                </button>` : ''}
             </div>
         </div>`;
     },
