@@ -692,60 +692,93 @@ const HUD = {
     },
 
     _ddHearts(u) {
-        const hearts    = u.hearts ?? 5;
-        const maxHearts = 5;
-        const regen     = 3600; // 1h per heart in seconds
-        const full      = hearts >= maxHearts;
-
+        const hearts     = u.hearts ?? 5;
+        const maxHearts  = 5;
+        const full       = hearts >= maxHearts;
+        const missing    = maxHearts - hearts;
+        const refillCost = missing * 2;
+        const canRefill  = !full && (u.gems || 0) >= refillCost;
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
+
         const heartsHTML = Array.from({ length: maxHearts }, (_, i) =>
             `<span class="hdd-heart${i >= hearts ? ' hh-empty' : ''}" aria-hidden="true">${i < hearts ? _ic('heart',{size:'md',color:'heart'}) : _ic('heart',{size:'md',color:'locked'})}</span>`
         ).join('');
 
         return `
         <div class="hdd-head">
-            <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('heart',{size:'lg',color:'heart'}) : '❤️'}</span>
+            <span class="hdd-head-icon">${_ic('heart',{size:'lg',color:'heart'})}</span>
             <div class="hdd-head-info">
                 <div class="hdd-head-title">${hearts} / ${maxHearts} Vidas</div>
-                <div class="hdd-head-sub">${full ? 'Cheio! Vá batalhar!' : `Recuperação: 1h por vida`}</div>
+                <div class="hdd-head-sub">${full ? 'Cheio! Vá estudar!' : 'Recuperação: 1 vida / hora'}</div>
             </div>
         </div>
         <div class="hdd-body">
             <div class="hdd-hearts-row">${heartsHTML}</div>
-            ${!full ? `
-            <div class="hdd-recovery">
-                Próxima vida em <strong>~${regen / 60}min</strong>
-            </div>` : `
-            <div class="hdd-hearts-max">Todas as vidas disponíveis ✓</div>`}
+            ${full
+                ? `<div class="hdd-hearts-max">Todas as vidas disponíveis! Aproveite.</div>`
+                : `<div class="hdd-hearts-timer">
+                       <span class="hdd-timer-icon">⏱</span>
+                       <div style="flex:1">
+                           <div style="font-size:.68rem;font-weight:700;color:var(--text-muted)">Próxima vida em</div>
+                           <div class="hdd-timer-val" id="hdd-hearts-countdown">calculando...</div>
+                       </div>
+                       <div style="font-size:.66rem;font-weight:700;color:var(--text-muted);text-align:right">
+                           <span style="display:block">${missing} vida${missing !== 1 ? 's' : ''}</span>
+                           <span>faltando</span>
+                       </div>
+                   </div>
+                   <button class="hdd-heart-action${canRefill ? '' : ' ha-disabled'}"
+                       onclick="${canRefill ? 'HUD._refillHearts()' : ''}"
+                       ${canRefill ? '' : 'disabled'}>
+                       ${_ic('gem',{size:'xs',color:'gem'})} Recuperar tudo · ${refillCost} gemas
+                   </button>`
+            }
             <div class="hdd-milestone">
-                <span class="hdd-milestone-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('shield',{size:'sm',color:'success'}) : '🛡️'}</span>
-                <span style="flex:1;font-size:0.74rem;font-weight:700">Escudo protege contra perda de vidas</span>
+                <span class="hdd-milestone-icon">${_ic('shield',{size:'sm',color:'success'})}</span>
+                <span style="flex:1;font-size:.74rem;font-weight:700">Escudo protege contra perda de vidas</span>
+                <a href="#shop" class="hdd-shield-link" onclick="HUD._closeAll()">Comprar</a>
             </div>
         </div>
         <div class="hdd-footer">
-            <a href="#shop" class="hdd-action" onclick="HUD._closeAll()">🛒 Comprar Vidas</a>
+            <a href="#shop" class="hdd-action" onclick="HUD._closeAll()">Comprar Vidas na Loja</a>
         </div>`;
     },
 
     _ddNotifications(u) {
         const notifs = this._getNotifications(u);
-        if (!notifs.length) {
-            return `
-            <div class="hdd-head">
-                <span class="hdd-head-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('bell',{size:'lg'}) : '🔔'}</span>
-                <div class="hdd-head-info">
-                    <div class="hdd-head-title">Notificações</div>
-                    <div class="hdd-head-sub">Tudo em dia!</div>
-                </div>
+        const _ic    = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
+        const unread = notifs.filter(n => n.unread).length;
+        const muted  = (typeof SoundManager !== 'undefined') && SoundManager.muted;
+
+        const headHTML = `
+        <div class="hdd-head">
+            <span class="hdd-head-icon">🔔</span>
+            <div class="hdd-head-info">
+                <div class="hdd-head-title">Notificações</div>
+                <div class="hdd-head-sub">${unread > 0 ? `${unread} ${unread === 1 ? 'nova' : 'novas'}` : 'Tudo em dia!'}</div>
             </div>
+            ${unread > 0 ? `<button class="hdd-mark-read" onclick="HUD._markAllRead()" title="Marcar como lidas">✓</button>` : ''}
+        </div>`;
+
+        const footHTML = `
+        <div class="hdd-footer hdd-notif-footer">
+            <button class="hdd-mute-toggle" onclick="SoundManager.toggle();HUD.toggleDropdown('notifications')">
+                <span>${muted ? '🔇' : '🔊'}</span>
+                <span>${muted ? 'Som desativado' : 'Som ativado'}</span>
+                <span class="hdd-mute-badge${muted ? ' muted' : ''}">${muted ? 'OFF' : 'ON'}</span>
+            </button>
+        </div>`;
+
+        if (!notifs.length) {
+            return headHTML + `
             <div class="hdd-notif-empty">
-                <span class="hdd-notif-empty-icon">${typeof IconSystem !== 'undefined' ? IconSystem.html('achievement',{size:'lg',color:'xp'}) : '🎉'}</span>
+                <span class="hdd-notif-empty-icon">${_ic('achievement',{size:'lg',color:'xp'})}</span>
                 Sem notificações pendentes
-            </div>`;
+            </div>` + footHTML;
         }
 
         const listHTML = notifs.map(n => `
-            <a class="hdd-notif-item${n.unread ? ' hni-unread' : ''}"
+            <a class="hdd-notif-item${n.unread ? ' hni-unread' : ''}${n.urgent ? ' hni-urgent' : ''}"
                href="${n.href || '#home'}"
                onclick="HUD._closeAll()">
                 <span class="hdd-notif-icon">${n.icon}</span>
@@ -753,27 +786,13 @@ const HUD = {
                     <div class="hdd-notif-text">${n.text}</div>
                     <div class="hdd-notif-time">${n.time}</div>
                 </div>
+                ${n.action ? `<span class="hdd-notif-cta">${n.action}</span>` : ''}
             </a>`).join('');
 
-        const muted = (typeof SoundManager !== 'undefined') && SoundManager.muted;
-        return `
-        <div class="hdd-head">
-            <span class="hdd-head-icon">🔔</span>
-            <div class="hdd-head-info">
-                <div class="hdd-head-title">Notificações</div>
-                <div class="hdd-head-sub">${notifs.filter(n=>n.unread).length} novas</div>
-            </div>
-        </div>
+        return headHTML + `
         <div class="hdd-body" style="padding-bottom:4px">
             <div class="hdd-notif-list">${listHTML}</div>
-        </div>
-        <div class="hdd-footer hdd-notif-footer">
-            <button class="hdd-mute-toggle" onclick="SoundManager.toggle();HUD.toggleDropdown('notifications')" aria-label="Alternar som">
-                <span>${muted ? '🔇' : '🔊'}</span>
-                <span>${muted ? 'Som desativado' : 'Som ativado'}</span>
-                <span class="hdd-mute-badge ${muted ? 'muted' : ''}">${muted ? 'OFF' : 'ON'}</span>
-            </button>
-        </div>`;
+        </div>` + footHTML;
     },
 
     _ddDiscipline() {
@@ -812,34 +831,58 @@ const HUD = {
     },
 
     _getNotifications(u) {
-        const notifs = [];
-        const streak = u.streak || 1;
-        const hearts = u.hearts ?? 5;
-        const missions = (typeof State !== 'undefined') ? State.getMissions() : [];
-        const pendingMissions = missions.filter(m => !m.completed);
-
+        const notifs  = [];
+        const streak  = u.streak || 1;
+        const hearts  = u.hearts ?? 5;
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : id;
-        if (streak >= 3) {
-            notifs.push({ icon: _ic('streak',{size:'sm',color:'streak'}), text: `Sequência de ${streak} dias! Continue assim!`, time: 'Hoje', unread: false, href: '#home' });
-        }
-        if (hearts <= 1) {
-            notifs.push({ icon: _ic('heart',{size:'sm',color:'heart'}), text: `Atenção: você está com apenas ${hearts} vida(s)!`, time: 'Agora', unread: true, href: '#shop' });
-        }
-        if (pendingMissions.length) {
-            notifs.push({ icon: _ic('xp',{size:'sm',color:'xp'}), text: `${pendingMissions.length} missão(ões) diária(s) disponível(is)!`, time: 'Hoje', unread: true, href: '#missions' });
-        }
-        notifs.push({ icon: _ic('boss',{size:'sm',color:'rpg'}), text: 'Boss da semana chegando em breve!', time: 'Esta semana', unread: false, href: '#home' });
 
-        // Social notifications from SocialEngine
+        // Streak risk check — find today's entry in the calendar
+        const calendar  = (typeof State !== 'undefined') ? State.getStreakCalendar(7) : [];
+        const todayDone = calendar.find?.(d => d.isToday)?.active;
+        if (streak > 0 && !todayDone) {
+            notifs.push({
+                icon: _ic('streak',{size:'sm',color:'streak'}),
+                text: `Sequência de ${streak} dias em risco! Jogue agora.`,
+                time: 'Urgente', unread: true, urgent: true, href: '#home', action: 'Jogar',
+            });
+        } else if (streak >= 3) {
+            notifs.push({
+                icon: _ic('streak',{size:'sm',color:'streak'}),
+                text: `Sequência de ${streak} dias — continue assim!`,
+                time: 'Hoje', unread: false, href: '#home',
+            });
+        }
+
+        if (hearts <= 1) {
+            notifs.push({
+                icon: _ic('heart',{size:'sm',color:'heart'}),
+                text: `Apenas ${hearts} vida${hearts !== 1 ? 's' : ''}! Recarregue.`,
+                time: 'Agora', unread: true, urgent: true, href: '#shop',
+            });
+        }
+
+        const missions = (typeof State !== 'undefined') ? State.getMissions() : [];
+        const pending  = missions.filter(m => !m.completed);
+        if (pending.length) {
+            notifs.push({
+                icon: _ic('xp',{size:'sm',color:'xp'}),
+                text: `${pending.length} missão${pending.length !== 1 ? 'ões' : ''} ${pending.length !== 1 ? 'disponíveis' : 'disponível'}!`,
+                time: 'Hoje', unread: true, href: '#missions',
+            });
+        }
+
+        notifs.push({
+            icon: _ic('boss',{size:'sm',color:'rpg'}),
+            text: 'Boss da semana se aproxima! Prepare-se.',
+            time: 'Esta semana', unread: false, href: '#home',
+        });
+
         if (typeof SocialEngine !== 'undefined') {
             const socialNotifs = SocialEngine.getSocialNotifications();
             for (const sn of socialNotifs) {
                 notifs.push({
-                    icon:   _ic(sn.icon, {size:'sm', color: sn.color}),
-                    text:   sn.text,
-                    time:   sn.time,
-                    unread: sn.unread,
-                    href:   sn.href,
+                    icon: _ic(sn.icon, {size:'sm', color: sn.color}),
+                    text: sn.text, time: sn.time, unread: sn.unread, href: sn.href,
                 });
             }
         }
@@ -949,6 +992,134 @@ const HUD = {
         const disc = document.getElementById('hud-disc-wrap');
         if (el) el.innerHTML = '';
         if (disc) disc.style.display = 'none';
+    },
+
+    // ── POST-RENDER EFFECTS ───────────────────────────────
+    _afterRender(type, el) {
+        if (type === 'xp') {
+            const fill = el.querySelector('.hdd-bar-animated');
+            if (fill) {
+                const pct = parseFloat(fill.dataset.pct) || 0;
+                setTimeout(() => {
+                    if (typeof EduAnimations !== 'undefined') {
+                        EduAnimations.progressBar(fill, pct, 720);
+                    } else {
+                        fill.style.transition = 'width 720ms';
+                        fill.style.width = pct + '%';
+                    }
+                }, 80);
+            }
+        }
+        if (type === 'hearts') this._startHeartsTimer();
+        if (type === 'gems') {
+            const gemEl = el.querySelector('#hdd-gems-display');
+            if (gemEl && typeof EduAnimations !== 'undefined') {
+                const val = parseInt(gemEl.textContent) || 0;
+                EduAnimations.counter(gemEl, 0, val, 600);
+            }
+        }
+    },
+
+    // ── HEARTS LIVE COUNTDOWN ─────────────────────────────
+    _heartsTimerId: null,
+
+    _startHeartsTimer() {
+        this._stopHeartsTimer();
+        const tick = () => {
+            const el = document.getElementById('hdd-hearts-countdown');
+            if (!el) { this._stopHeartsTimer(); return; }
+            if (typeof State === 'undefined') return;
+            const u = State.data.user;
+            if ((u.hearts ?? 5) >= 5) { el.textContent = 'Cheio!'; return; }
+            const stored = u.nextHeartAt || u.heartRegenAt;
+            if (!stored) { el.textContent = '~1h 00m'; return; }
+            const diff = stored - Date.now();
+            if (diff <= 0) { el.textContent = 'Disponível!'; return; }
+            const m = Math.floor(diff / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            el.textContent = `${m}m ${String(s).padStart(2, '0')}s`;
+        };
+        tick();
+        this._heartsTimerId = setInterval(tick, 1000);
+    },
+
+    _stopHeartsTimer() {
+        if (this._heartsTimerId) { clearInterval(this._heartsTimerId); this._heartsTimerId = null; }
+    },
+
+    // ── XP HISTORY BUILDER ────────────────────────────────
+    _buildXPHistory(u) {
+        const items = [];
+        if (typeof State !== 'undefined') {
+            State.getMissions().filter(m => m.completed).slice(0, 2).forEach(m => {
+                items.push({ icon: '⚔️', text: m.name || 'Missão concluída', xp: m.xpReward || 15 });
+            });
+        }
+        if ((u.xp || 0) > 0 && items.length < 3) {
+            items.push({ icon: '⚡', text: 'XP de fases concluídas', xp: Math.min(u.xp || 0, 80) });
+        }
+        return items.slice(0, 3);
+    },
+
+    // ── QUICK ACTIONS ─────────────────────────────────────
+    _useFreeze() {
+        if (typeof State === 'undefined') return;
+        const u = State.data.user;
+        const cnt = u.inventory?.['streak-freeze'] || 0;
+        if (!cnt) return;
+        if (!u.inventory) u.inventory = {};
+        u.inventory['streak-freeze'] = cnt - 1;
+        State.save();
+        if (typeof EduTactile !== 'undefined') EduTactile.rewardBurst(document.getElementById('hud-streak-btn'));
+        this.toggleDropdown('streak');
+    },
+
+    _claimDaily() {
+        if (typeof State === 'undefined') return;
+        const u = State.data.user;
+        const today = new Date().toDateString();
+        if (u.lastDailyReward === today) return;
+        u.lastDailyReward = today;
+        u.gems = (u.gems || 0) + 5;
+        State.save();
+        this.update();
+        const btn = document.getElementById('hud-gems-btn');
+        if (typeof EduTactile !== 'undefined') EduTactile.xpBurst(btn, 5);
+        this.toggleDropdown('gems');
+    },
+
+    _refillHearts() {
+        if (typeof State === 'undefined') return;
+        const u = State.data.user;
+        const missing = 5 - (u.hearts || 0);
+        const cost    = missing * 2;
+        if ((u.gems || 0) < cost) return;
+        u.gems   -= cost;
+        u.hearts  = 5;
+        State.save();
+        this.update();
+        if (typeof EduTactile !== 'undefined') EduTactile.rewardBurst(document.getElementById('hud-hearts-btn'));
+        this.toggleDropdown('hearts');
+    },
+
+    _markAllRead() {
+        const dd = document.getElementById('hud-dd-notifications');
+        if (dd) dd.querySelectorAll('.hni-unread').forEach(el => el.classList.remove('hni-unread'));
+        const badge = document.getElementById('hud-notif-badge');
+        if (badge) badge.style.display = 'none';
+    },
+
+    // ── HUD REFRESH ───────────────────────────────────────
+    update() {
+        if (typeof State === 'undefined') return;
+        const u  = State.data.user;
+        const $  = id => document.getElementById(id);
+        if ($('hud-xp'))     $('hud-xp').textContent     = (u.xp || 0).toLocaleString('pt-BR');
+        if ($('hud-gems'))   $('hud-gems').textContent   = u.gems  || 0;
+        if ($('hud-streak')) $('hud-streak').textContent = u.streak || 1;
+        if ($('hud-hearts')) $('hud-hearts').textContent = u.hearts ?? 5;
+        if ($('hud-level'))  $('hud-level').textContent  = `Nv.${u.level || 1}`;
+        this.refreshNotifBadge();
     },
 
     // ── INIT ──────────────────────────────────────────────
