@@ -23,6 +23,7 @@ const EduFeedback = {
             '.hud-chip',
             '.hud-notif-btn',
             '.hud-avatar-btn',
+            '.sidebar-item',
             '.mission-card',
             '.daily-mission',
             '.chapter-card',
@@ -30,6 +31,13 @@ const EduFeedback = {
             '.avatar-class-card',
             '.wm-node',
             '.wm-label-enter-btn',
+            '.bldr-chapter-card',
+            '.bldr-stage-card',
+            '.bldr-tab',
+            '.bldr-btn-sm',
+            '.ai-set-card',
+            '.aip-option',
+            '.rp-mission',
         ].join(',');
     },
 
@@ -46,8 +54,11 @@ const EduFeedback = {
     _onClick(event) {
         const target = event.target.closest(this.interactiveSelector());
         if (!target || target.closest('[aria-disabled="true"], :disabled')) return;
-        if (target.matches('.nav-tab, .hud-chip, .mission-play-btn, .wm-node, .daily-mission')) {
+        if (target.matches('.nav-tab, .hud-chip, .mission-play-btn, .wm-node, .daily-mission, .bldr-tab, .ai-set-card')) {
             EduSprings.pop(target, target.matches('.wm-node') ? 1.2 : 0.75);
+        }
+        if (target.matches('.aip-option')) {
+            EduSprings.soft(target);
         }
         if (typeof SoundManager !== 'undefined') {
             try { SoundManager.play('click'); } catch (_) {}
@@ -61,11 +72,15 @@ const EduFeedback = {
         }
     },
 
-    reward(selector = '.hud-xp-wrap, .hud-gems-wrap') {
+    reward(selector, burstEl) {
+        selector = selector || '.hud-xp-wrap, .hud-gems-wrap';
         document.querySelectorAll(selector).forEach(el => {
             EduSprings.reward(el);
             EduTransitions.shimmer(el);
         });
+        if (burstEl && typeof EduTactile !== 'undefined') {
+            EduTactile.rewardBurst(burstEl);
+        }
         if (navigator.vibrate && !EduTransitions.reducedMotion()) {
             navigator.vibrate(EduMotionTokens.haptics.reward);
         }
