@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v11';
+const CACHE_NAME  = 'eduquest-v12';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -71,6 +71,40 @@ const CACHE_SHELL = [
     '/src/motion/ui-animations.js',
     /* Admin */
     '/src/admin/admin.js',
+    /* Ciências 7º Ano — Capítulo 7 Doenças */
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/metadata.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_01.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_02.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_03.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_04.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_05.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_06.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_07.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_08.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_09.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_10.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_boss.js',
+    '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_final.js',
+    /* Matemática 7º Ano — Números Racionais */
+    '/js/data/matematica/7ano/chapters/mat_racionais/metadata.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_s01.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_s02.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_s03.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_s04.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_s05.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_s06.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_sboss.js',
+    '/js/data/matematica/7ano/chapters/mat_racionais/stages/mat_sfinal.js',
+    /* Português 7º Ano — Gramática */
+    '/js/data/portugues/7ano/chapters/port_gram/metadata.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_s01.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_s02.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_s03.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_s04.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_s05.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_s06.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_sboss.js',
+    '/js/data/portugues/7ano/chapters/port_gram/stages/pt_sfinal.js',
     /* Assets */
     '/assets/icons/icon-192.png',
     '/assets/icons/icon-512.png',
