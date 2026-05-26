@@ -598,8 +598,8 @@
         padding-bottom: 0;
     }
 
-    /* HUD offset from sidebar */
-    .top-hud { left: var(--sidebar-w-compact); }
+    /* HUD: full width on tablet — sidebar sits below it */
+    .top-hud { left: 0; }
 
     /* Sidebar: compact always-visible, starts below HUD */
     .sidebar {
