@@ -120,6 +120,7 @@ const Sidebar = {
         }).join('');
 
         const u = (typeof State !== 'undefined') ? State.data.user : { name: 'Herói', level: 1, avatar: '🦸' };
+        const xpProg = (typeof State !== 'undefined') ? State.getXPProgress() : { current: 0, needed: 500, percent: 0 };
 
         el.innerHTML = `
         <div class="sidebar-inner">
@@ -143,6 +144,12 @@ const Sidebar = {
                         <span class="sidebar-user-level" id="sb-user-level">Nível ${u.level || 1}</span>
                     </div>
                 </a>
+                <div class="sidebar-user-xp-row">
+                    <span class="sidebar-user-xp-text">${xpProg.current} / ${xpProg.needed} XP</span>
+                    <div class="sidebar-user-xp-bar">
+                        <div class="sidebar-user-xp-fill" id="sb-xp-fill" style="width:${xpProg.percent}%"></div>
+                    </div>
+                </div>
             </div>
 
         </div>`;

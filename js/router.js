@@ -907,14 +907,17 @@ const Router = {
             <div class="home-greeting">
                 <div class="home-greeting-text">
                     <div class="home-greeting-hi">Olá, ${user.name}! 👋</div>
-                    <div class="home-greeting-sub">Nível ${user.level} · ${xpProg.current}/${xpProg.needed} XP</div>
+                    <div class="home-greeting-sub">Continue aprendendo e salvando o mundo!</div>
                 </div>
                 <div class="home-greeting-avatar home-greeting-avatar--${avatarCls}" onclick="Router.navigate('#profile')">${_ic('avatar',{size:'lg',color:avatarColor})}</div>
             </div>
 
             <!-- XP bar -->
-            <div class="home-xp-bar">
-                <div class="home-xp-fill" style="width:${xpProg.percent}%"></div>
+            <div class="home-xp-wrap">
+                <div class="home-xp-bar">
+                    <div class="home-xp-fill" style="width:${xpProg.percent}%"></div>
+                </div>
+                <span class="home-xp-label">${xpProg.current} / ${xpProg.needed} XP</span>
             </div>
 
             <!-- Companion Widget -->

@@ -3334,11 +3334,17 @@ img { max-width: 100%; }
 }
 .home-greeting-avatar:active { transform: scale(0.92); }
 
+.home-xp-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--sp-4);
+}
 .home-xp-bar {
+    flex: 1;
     height: 5px;
     background: var(--surface-3);
     border-radius: var(--r-full);
-    margin-bottom: var(--sp-4);
     overflow: hidden;
 }
 .home-xp-fill {
@@ -3346,6 +3352,13 @@ img { max-width: 100%; }
     background: linear-gradient(90deg, var(--brand), #fb923c);
     border-radius: var(--r-full);
     transition: width 0.6s var(--ease-smooth);
+}
+.home-xp-label {
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: var(--brand);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Continue Journey card */

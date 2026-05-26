@@ -297,6 +297,11 @@
 .sidebar-user-name  { font-size: 0.82rem; font-weight: 900; color: var(--text); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sidebar-user-level { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; display: block; }
 
+.sidebar-user-xp-row  { padding: 0 var(--space-4) var(--space-3); display: flex; flex-direction: column; gap: 4px; }
+.sidebar-user-xp-text { font-size: 0.6rem; font-weight: 700; color: var(--brand); text-align: right; }
+.sidebar-user-xp-bar  { height: 5px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
+.sidebar-user-xp-fill { height: 100%; border-radius: var(--r-full); background: linear-gradient(90deg, var(--brand), #ea580c); transition: width 0.6s ease; }
+
 /* ── Tooltip for compact mode ── */
 @media (min-width: 768px) and (max-width: 1279px) {
     .sidebar-item { position: relative; }

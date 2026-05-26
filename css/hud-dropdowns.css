@@ -100,22 +100,32 @@
 /* Make chips into proper interactive buttons */
 .hud-chip {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 3px;
+    justify-content: center;
+    gap: 1px;
     font-size: 0.78rem;
     font-weight: 900;
-    padding: 5px 9px;
-    border-radius: var(--r-full);
+    padding: 6px 14px;
+    border-radius: 10px;
     background: var(--surface-2);
     color: var(--text);
-    border: 1.5px solid transparent;
+    border: 1.5px solid var(--border);
     cursor: pointer;
     font-family: var(--font);
-    min-height: 32px;
+    min-height: 44px;
+    min-width: 52px;
     white-space: nowrap;
     transition: background var(--dur-fast), border-color var(--dur-fast), transform 0.12s;
     -webkit-tap-highlight-color: transparent;
     outline: none;
+}
+.hud-chip-lbl {
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: capitalize;
+    letter-spacing: 0.01em;
 }
 .hud-chip:hover  { background: var(--surface-3); border-color: var(--border); }
 .hud-chip:active { transform: scale(0.91); }

@@ -138,8 +138,8 @@
     margin-bottom: var(--space-2);
 }
 
-/* XP bar row — small compact separator */
-.home-xp-bar {
+/* XP bar row — small compact separator (margin lives on the wrapper now) */
+.home-xp-wrap {
     margin-bottom: var(--space-5);   /* 20px breathing after XP */
 }
 
