@@ -47,6 +47,8 @@ body {
 .hud-avatar-btn,
 .hud-menu-btn,
 .hud-disc-chip {
+    position: relative;
+    overflow: visible;
     box-shadow: var(--shadow-depth-1);
     transition:
         transform 150ms var(--motion-spring),
@@ -246,6 +248,12 @@ body {
 .daily-mission:not(.done):first-child,
 .rp-mission-cur-section {
     box-shadow: 0 0 0 1px rgba(249,115,22,0.12), var(--shadow-depth-2);
+}
+
+.mission-card,
+.daily-mission {
+    position: relative;
+    overflow: hidden;
 }
 
 .mission-card.mc-active::after,
