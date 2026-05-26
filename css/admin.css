@@ -921,15 +921,236 @@
 [data-theme="dark"] .admin-cmd-box  { background: #1e293b; border-color: #334155; }
 [data-theme="dark"] .admin-cmd-input { color: #f1f5f9; }
 
-/* ── RESPONSIVE (tablet) ──────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile-first
+   Base = mobile. Scale up: tablet (768px), desktop (1024px)
+   ══════════════════════════════════════════════════════════ */
 
-@media (max-width: 1280px) {
-    .admin-kpi-grid    { grid-template-columns: repeat(2, 1fr); }
-    .admin-charts-row  { grid-template-columns: 1fr; }
-    .admin-content-grid { grid-template-columns: 1fr; }
+/* ── MOBILE SIDEBAR DRAWER ────────────────────────────────── */
+
+/* Hamburger button — shown only on mobile */
+.admin-mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #475569;
+    flex-shrink: 0;
+    transition: background 120ms;
+}
+.admin-mobile-menu-btn:hover { background: #e2e8f0; }
+
+/* Overlay backdrop for mobile sidebar */
+.admin-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 9010;
+}
+.admin-sidebar-backdrop.open { display: block; }
+
+/* ── BASE (Mobile < 768px) ────────────────────────────────── */
+
+/* Admin layout: stack vertically on mobile */
+.admin-layout {
+    flex-direction: column;
+}
+
+/* Sidebar: off-canvas drawer on mobile */
+.admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    height: 100%;
+    z-index: 9020;
+    transform: translateX(-100%);
+    transition: transform 0.26s ease;
+    box-shadow: none;
+}
+.admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+}
+
+/* Admin body: full width on mobile */
+.admin-body {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Topbar: compact on mobile */
+.admin-topbar {
+    height: 52px;
+    padding: 0 12px;
+    gap: 8px;
+}
+
+/* Hide search bar and right actions on mobile — just show breadcrumb + hamburger */
+.admin-topbar-search { display: none; }
+.admin-topbar-status { display: none; }
+.admin-topbar-btn    { display: none; }
+
+/* Mobile back button in topbar */
+.admin-topbar-back-mobile {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    font-family: var(--font);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.admin-topbar-back-mobile:hover { background: #e2e8f0; }
+
+/* KPI grid: 1 column on very small screens */
+.admin-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+/* Main: reduced padding on mobile */
+.admin-main {
+    padding: 14px 12px;
+}
+
+/* Charts: stack on mobile */
+.admin-charts-row     { grid-template-columns: 1fr; gap: 12px; }
+.admin-content-grid   { grid-template-columns: 1fr; gap: 12px; }
+.admin-health-grid    { grid-template-columns: 1fr; gap: 10px; }
+.admin-plans-grid     { grid-template-columns: 1fr; gap: 12px; }
+.admin-ai-grid        { grid-template-columns: 1fr; gap: 12px; }
+
+/* Tables: horizontal scroll on mobile */
+.admin-table-card,
+.admin-wide-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.admin-table {
+    min-width: 520px;
+}
+
+/* Page header: stack on mobile */
+.admin-page-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+}
+.admin-page-title { font-size: 1.1rem; }
+
+/* Section card: reduced padding on mobile */
+.admin-section-card { padding: 14px; }
+.admin-chart-card   { padding: 14px; }
+.admin-kpi-card     { padding: 14px 16px; }
+
+/* ── TABLET (768px+) ──────────────────────────────────────── */
+
+@media (min-width: 768px) {
+    /* Admin layout: row (sidebar + body) */
+    .admin-layout { flex-direction: row; }
+
+    /* Sidebar: always visible, static (not off-canvas) */
+    .admin-sidebar {
+        position: relative;
+        transform: none !important;
+        box-shadow: none !important;
+        width: 200px;
+        height: 100vh;
+        flex-shrink: 0;
+    }
+
+    /* Hide hamburger on tablet+ */
+    .admin-mobile-menu-btn { display: none; }
+    .admin-topbar-back-mobile { display: none; }
+
+    /* Show search and some topbar elements */
+    .admin-topbar-search {
+        display: flex;
+        min-width: 160px;
+        flex: 1;
+        max-width: 280px;
+    }
+    .admin-topbar-status { display: flex; }
+
+    /* Topbar full height */
+    .admin-topbar {
+        height: 56px;
+        padding: 0 20px;
+        gap: 12px;
+    }
+
+    /* KPI: 2 columns */
+    .admin-kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+    /* Main: normal padding */
+    .admin-main { padding: 20px; }
+
+    /* Section cards: normal */
+    .admin-section-card { padding: 18px; }
+    .admin-chart-card   { padding: 18px; }
+    .admin-kpi-card     { padding: 16px 18px; }
+
+    /* Page header: row */
+    .admin-page-header { flex-direction: row; align-items: flex-start; }
+    .admin-page-title  { font-size: 1.3rem; }
+}
+
+/* ── DESKTOP (1024px+) ────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+    /* Sidebar: full width */
+    .admin-sidebar { width: 220px; }
+
+    /* Show all topbar actions */
+    .admin-topbar-btn { display: inline-flex; }
+    .admin-topbar-search {
+        min-width: 200px;
+        max-width: 320px;
+    }
+    .admin-topbar { padding: 0 24px; gap: 16px; }
+
+    /* KPI: 4 columns */
+    .admin-kpi-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    /* Charts side by side */
+    .admin-charts-row { grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Content grid */
+    .admin-content-grid { grid-template-columns: 2fr 1fr; gap: 16px; }
+
+    /* Health: 4 columns */
     .admin-health-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* Main: full padding */
+    .admin-main { padding: 24px; }
+
+    /* Tables: no forced scroll */
+    .admin-table { min-width: auto; }
 }
-@media (max-width: 768px) {
-    .admin-sidebar { display: none; }
-    .admin-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+
+@media (min-width: 1280px) {
+    .admin-health-grid { grid-template-columns: repeat(4, 1fr); }
+    .admin-kpi-grid    { gap: 18px; }
 }
+
+/* ── DARK MODE (responsive additions) ─────────────────────── */
+
+[data-theme="dark"] .admin-mobile-menu-btn  { background: #1e293b; color: #94a3b8; }
+[data-theme="dark"] .admin-topbar-back-mobile { background: #1e293b; color: #94a3b8; }
+[data-theme="dark"] .admin-sidebar-backdrop  { background: rgba(0,0,0,0.7); }

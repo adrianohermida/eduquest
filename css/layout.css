@@ -705,6 +705,21 @@
 }
 
 /* ═══════════════════════════════════════════════════════
+   ADMIN LAYOUT MODE — admin dashboard owns its own shell
+   Hides student sidebar/HUD/right-panel; resets body offsets
+   ═══════════════════════════════════════════════════════ */
+body[data-layout="admin"] .sidebar,
+body[data-layout="admin"] .right-panel,
+body[data-layout="admin"] .top-hud,
+body[data-layout="admin"] .bottom-nav,
+body[data-layout="admin"] .sidebar-overlay { display: none !important; }
+
+body[data-layout="admin"] {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════
    FULL-SCREEN LAYOUT — auth / game / adventure
    Resets offsets so auth screens cover full viewport
    ═══════════════════════════════════════════════════════ */

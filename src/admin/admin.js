@@ -181,8 +181,9 @@ window.EduAdmin = (() => {
         const sectionLabel = NAV.find(n => n.id === _section)?.label || 'Dashboard';
 
         return `
+        <div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop" onclick="EduAdmin._closeMobileSidebar()"></div>
         <div class="admin-layout" id="admin-layout">
-            <aside class="admin-sidebar">
+            <aside class="admin-sidebar" id="admin-sidebar">
                 <div class="admin-sidebar-logo" onclick="EduAdmin._navigate('overview')">
                     <div class="admin-sidebar-logo-icon">⚡</div>
                     <div class="admin-sidebar-logo-text">EduQuest</div>
@@ -206,6 +207,7 @@ window.EduAdmin = (() => {
             </aside>
             <div class="admin-body">
                 <div class="admin-topbar">
+                    <button class="admin-mobile-menu-btn" onclick="EduAdmin._openMobileSidebar()" aria-label="Menu">☰</button>
                     <div class="admin-topbar-breadcrumb">
                         <span>EduQuest</span>
                         <span class="admin-topbar-breadcrumb-sep">›</span>
@@ -222,8 +224,9 @@ window.EduAdmin = (() => {
                             Sistemas normais
                         </div>
                         <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._refresh()">↺ Refresh</button>
-                        <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._navigate('ai')">+ Novo Conteúdo</button>
+                        <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._navigate('ai')">+ Novo</button>
                     </div>
+                    <button class="admin-topbar-back-mobile" onclick="EduAdmin._exit()">← App</button>
                 </div>
                 <div class="admin-main" id="admin-main">
                     ${_renderSection()}
@@ -1196,6 +1199,7 @@ window.EduAdmin = (() => {
     function _navigate(section) {
         _section = section;
         _closeCmd();
+        _closeMobileSidebar();
         if (!_container) return;
         _container.innerHTML = _buildLayout();
         _container.querySelector('.admin-main')?.scrollTo(0, 0);
@@ -1203,8 +1207,23 @@ window.EduAdmin = (() => {
     }
 
     function _exit() {
+        _closeMobileSidebar();
         if (_container) _container.innerHTML = '';
         window.location.hash = '#home';
+    }
+
+    function _openMobileSidebar() {
+        const sidebar   = document.getElementById('admin-sidebar');
+        const backdrop  = document.getElementById('admin-sidebar-backdrop');
+        if (sidebar)  sidebar.classList.add('open');
+        if (backdrop) backdrop.classList.add('open');
+    }
+
+    function _closeMobileSidebar() {
+        const sidebar   = document.getElementById('admin-sidebar');
+        const backdrop  = document.getElementById('admin-sidebar-backdrop');
+        if (sidebar)  sidebar.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('open');
     }
 
     function _refresh() {
@@ -1263,5 +1282,5 @@ window.EduAdmin = (() => {
         CMD_ITEMS[idx]?.action?.();
     }
 
-    return { init, render, _navigate, _exit, _openCmd, _closeCmd, _cmdSearch, _cmdKey, _execCmd, _refresh };
+    return { init, render, _navigate, _exit, _openCmd, _closeCmd, _cmdSearch, _cmdKey, _execCmd, _refresh, _openMobileSidebar, _closeMobileSidebar };
 })();

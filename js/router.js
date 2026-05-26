@@ -47,20 +47,20 @@ const Router = {
         const isGame      = route === 'stage';
         const isAdventure = route === 'adventure';
         const isAuth      = publicRoutes.includes(route);
-        // admin, ai-studio, etc. are normal app pages — keep HUD/sidebar visible
+        const isAdmin     = route === 'admin';
         const isFullscreen = isGame || isAuth || route === 'speed-drill' || route === 'reading';
 
-        // Layout mode: full-screen (auth/game) vs app (normal)
-        document.body.dataset.layout = isFullscreen ? 'full' : 'app';
+        // Layout mode: full-screen (auth/game) | admin (own shell) | app (normal)
+        document.body.dataset.layout = isFullscreen ? 'full' : (isAdmin ? 'admin' : 'app');
 
-        if (hudEl) hudEl.classList.toggle('hidden', isFullscreen);
-        if (navEl) navEl.classList.toggle('hidden', isFullscreen || isAdventure);
+        if (hudEl) hudEl.classList.toggle('hidden', isFullscreen || isAdmin);
+        if (navEl) navEl.classList.toggle('hidden', isFullscreen || isAdventure || isAdmin);
 
         // Close mobile drawer when navigating
         if (typeof Sidebar !== 'undefined' && window.innerWidth < 768) Sidebar.close();
 
         container.innerHTML = '';
-        if (!isFullscreen) this._updateNavActive(route);
+        if (!isFullscreen && !isAdmin) this._updateNavActive(route);
 
         switch (route) {
             case 'landing':         this.renderLanding(container);                        break;
@@ -105,8 +105,8 @@ const Router = {
             default:              this.renderHome(container);
         }
 
-        // Refresh right panel content after each app-route render
-        if (!isFullscreen && typeof Sidebar !== 'undefined') {
+        // Refresh right panel content after each app-route render (not in admin or fullscreen)
+        if (!isFullscreen && !isAdmin && typeof Sidebar !== 'undefined') {
             setTimeout(() => Sidebar.refreshRightPanel(), 0);
         }
 
