@@ -19,10 +19,10 @@
     /* Z-index scale */
     --z-base:    1;
     --z-sticky:  100;
-    --z-hud:     300;
     --z-nav:     400;
     --z-overlay: 440;
     --z-sidebar: 450;
+    --z-hud:     460;   /* HUD above sidebar so it spans the full top */
     --z-modal:   600;
     --z-toast:   800;
     --z-supreme: 9999;

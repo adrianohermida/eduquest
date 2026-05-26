@@ -68,7 +68,7 @@
     --shadow-glow:  0 0 24px rgba(255,107,26,0.28);
 
     /* Layout */
-    --hud-h: 56px;
+    --hud-h: 68px;
     --nav-h: 68px;
     --max-w: 700px;
 
@@ -168,18 +168,21 @@ img { max-width: 100%; }
 /* ── TOP HUD ─────────────────────────────────────── */
 .top-hud {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0 !important;   /* always full-width — overrides any cached media-query rule */
+    right: 0 !important;
+    width: 100%;
     height: calc(var(--hud-h) + var(--safe-top));
     background: var(--surface);
-    border-bottom: 1.5px solid var(--border);
+    border-bottom: 2px solid var(--border);
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
-    padding: 0 var(--sp-4) 0;
+    padding: 0;
     padding-top: var(--safe-top);
-    padding-left: calc(var(--sp-4) + var(--safe-left));
-    padding-right: calc(var(--sp-4) + var(--safe-right));
-    z-index: 300;
+    padding-left: calc(var(--sp-5) + var(--safe-left));
+    padding-right: calc(var(--sp-5) + var(--safe-right));
+    z-index: 500;
     box-shadow: 0 1px 0 var(--border);
 }
 /* inner flex items align to center when no safe area */
