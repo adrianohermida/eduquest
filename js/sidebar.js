@@ -8,13 +8,17 @@ const Sidebar = {
     _isOpen: false,
 
     NAV_ITEMS: [
-        { icon: 'map',      label: 'Início',  route: 'home',     hash: '#home'     },
-        { icon: 'missions', label: 'Missões', route: 'missions', hash: '#missions'  },
-        { icon: 'sword',    label: 'Arena',   route: 'arena',    hash: '#arena',    soon: true },
-        { icon: 'trophy',   label: 'Ranking', route: 'ranking',  hash: '#ranking'   },
-        { icon: 'shop',     label: 'Loja',    route: 'shop',     hash: '#shop'      },
-        { icon: 'guild',    label: 'Guild',   route: 'guild',    hash: '#guild'     },
-        { icon: 'avatar',   label: 'Perfil',  route: 'profile',  hash: '#profile'   },
+        { icon: 'map',      label: 'Início',    route: 'home',       hash: '#home'       },
+        { icon: 'missions', label: 'Missões',   route: 'missions',   hash: '#missions'   },
+        { icon: 'trophy',   label: 'Ranking',   route: 'ranking',    hash: '#ranking'    },
+        { icon: 'shop',     label: 'Loja',      route: 'shop',       hash: '#shop'       },
+        { icon: 'guild',    label: 'Guild',     route: 'guild',      hash: '#guild'      },
+        { icon: 'friends',  label: 'Amigos',    route: 'friends',    hash: '#friends'    },
+        { icon: 'xp',       label: 'Eventos',   route: 'events',     hash: '#events'     },
+        { icon: 'crown',    label: 'Battle Pass',route: 'battle-pass',hash: '#battle-pass'},
+        { icon: 'ai-tutor', label: 'AI Studio', route: 'ai-studio',  hash: '#ai-studio'  },
+        { icon: 'sword',    label: 'PvP',       route: 'pvp',        hash: '#pvp'        },
+        { icon: 'avatar',   label: 'Perfil',    route: 'profile',    hash: '#profile'    },
     ],
 
     // ── LIFECYCLE ─────────────────────────────────────────

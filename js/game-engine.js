@@ -720,6 +720,10 @@ const GameEngine = {
             }
 
             if (typeof SoundManager !== 'undefined') SoundManager.play('correct');
+            if (typeof EventsEngine !== 'undefined') {
+                EventsEngine.trackCorrectAnswer();
+                EventsEngine.trackCombo(this.state.combo);
+            }
             this._showBattleEffect(true);
             this._updateCombo();
             this._showFeedback(true, q.explanation, points, typedValue);
@@ -857,6 +861,13 @@ const GameEngine = {
             State.completeMission('complete_stage');
             State.completeMission('streak_day');
             if (stars === 3) State.completeMission('perfect_score');
+            // Events + Battle Pass hooks
+            if (typeof EventsEngine !== 'undefined') {
+                EventsEngine.trackMissionComplete();
+                EventsEngine.onXPGained(xpGain);
+                if (stars === 3) EventsEngine.trackPerfect();
+                if (gemGain > 0) EventsEngine.trackGemsGained(gemGain);
+            }
         }
 
         State.recordGameEnd({

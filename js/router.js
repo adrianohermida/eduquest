@@ -2910,31 +2910,30 @@ const Router = {
         const winRate   = wins + losses > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
 
         const challenges    = SE ? SE.getChallenges() : [];
-        const incoming      = challenges.filter(c => c.to === 'player' && !c.resolved);
-        const outgoing      = challenges.filter(c => c.from === 'player' && !c.resolved);
-        const resolved      = challenges.filter(c => c.resolved).slice(0, 5);
+        const pending       = challenges.filter(c => c.status === 'pending');
+        const resolved      = challenges.filter(c => c.status !== 'pending').slice(0, 5);
         const friendPlayers = SE ? SE.getFriendPlayers() : [];
 
-        const challengeCard = (c, type) => {
-            const ghost  = SE ? SE.GHOST_PLAYERS.find(g => g.name === c.name) : null;
-            const ago    = Math.floor((Date.now() - (c.sentAt || Date.now())) / 60000);
-            const agoTxt = ago < 60 ? `${ago}m atras` : `${Math.floor(ago/60)}h atras`;
+        const challengeCard = c => {
+            const name    = c.ghostName || c.name || '?';
+            const avatar  = c.ghostAvatar || '?';
+            const level   = c.ghostLevel || '?';
+            const isResolved = c.status !== 'pending';
+            const statusBadge = isResolved ? c.status : 'outgoing';
+            const sentMs  = c.sentAt ? new Date(c.sentAt).getTime() : Date.now();
+            const ago     = Math.floor((Date.now() - sentMs) / 60000);
+            const agoTxt  = ago < 60 ? `${ago}m atras` : `${Math.floor(ago/60)}h atras`;
             return `
-            <div class="pvp-challenge-card ${type}${c.resolved ? ' resolved' : ''}">
-                <div class="pvp-challenge-avatar">${ghost?.avatar || '?'}</div>
+            <div class="pvp-challenge-card outgoing${isResolved ? ' resolved' : ''}">
+                <div class="pvp-challenge-avatar">${avatar}</div>
                 <div class="pvp-challenge-body">
-                    <div class="pvp-challenge-name">${c.name}</div>
+                    <div class="pvp-challenge-name">${name}</div>
                     <div class="pvp-challenge-meta">
-                        <span class="pvp-challenge-badge ${type === 'incoming' ? 'incoming' : c.result || 'pending'}">${type === 'incoming' ? 'Desafio!' : c.resolved ? (c.result || 'enviado') : 'Aguardando'}</span>
+                        <span class="pvp-challenge-badge ${statusBadge}">${isResolved ? (c.status === 'won' ? 'Vitoria' : 'Derrota') : 'Aguardando'}</span>
                         <span>${agoTxt}</span>
-                        ${ghost ? `<span>Nivel ${ghost.level}</span>` : ''}
+                        <span>Nivel ${level}</span>
                     </div>
                 </div>
-                ${type === 'incoming' && !c.resolved ? `
-                <div class="pvp-challenge-actions">
-                    <button class="pvp-accept-btn" onclick="Router._acceptPvP('${c.id}')">Aceitar</button>
-                    <button class="pvp-decline-btn" onclick="Router._declinePvP('${c.id}')">Recusar</button>
-                </div>` : ''}
             </div>`;
         };
 
@@ -2977,19 +2976,15 @@ const Router = {
                 </div>
             </div>
 
-            ${incoming.length ? `
-            <div class="pvp-section-title">${_ic('boss',{size:'sm',color:'rpg'})} Desafios Recebidos (${incoming.length})</div>
-            ${incoming.map(c => challengeCard(c, 'incoming')).join('')}` : ''}
-
-            ${outgoing.length ? `
-            <div class="pvp-section-title" style="margin-top:${incoming.length?16:0}px">${_ic('flag',{size:'sm',color:'science'})} Desafios Enviados</div>
-            ${outgoing.map(c => challengeCard(c, 'outgoing')).join('')}` : ''}
+            ${pending.length ? `
+            <div class="pvp-section-title">${_ic('flag',{size:'sm',color:'science'})} Desafios Enviados (${pending.length})</div>
+            ${pending.map(c => challengeCard(c)).join('')}` : ''}
 
             ${resolved.length ? `
-            <div class="pvp-section-title" style="margin-top:16px">${_ic('scroll',{size:'sm',color:'locked'})} Historico</div>
-            ${resolved.map(c => challengeCard(c, c.result || 'resolved')).join('')}` : ''}
+            <div class="pvp-section-title" style="margin-top:${pending.length?16:0}px">${_ic('scroll',{size:'sm',color:'locked'})} Historico</div>
+            ${resolved.map(c => challengeCard(c)).join('')}` : ''}
 
-            ${!incoming.length && !outgoing.length && !resolved.length ? `
+            ${!pending.length && !resolved.length ? `
             <div class="s5-empty-state">
                 <div class="s5-empty-icon">${_ic('sword',{size:'xl',color:'locked'})}</div>
                 <div class="s5-empty-title">Nenhuma batalha ainda</div>
@@ -3005,9 +3000,9 @@ const Router = {
 
     _sendPvPChallenge(ghostName) {
         if (typeof SocialEngine === 'undefined') return;
-        const ghost = SocialEngine.GHOST_PLAYERS.find(g => g.name === ghostName);
-        if (!ghost) return;
-        SocialEngine.sendChallenge(ghost);
+        const idx = SocialEngine.GHOST_PLAYERS.findIndex(g => g.name === ghostName);
+        if (idx === -1) return;
+        SocialEngine.sendChallenge(`ghost_${idx}`);
         if (typeof ModalEngine !== 'undefined') {
             ModalEngine.enqueue('info', { title: 'Desafio Enviado!', desc: `${ghostName} foi desafiado. Aguarde a resposta!` });
         }
