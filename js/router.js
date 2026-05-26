@@ -985,11 +985,13 @@ const Router = {
             </div>
 
             <!-- Daily Missions -->
-            <div class="section-header">
-                <span class="section-title">${_ic('missions',{size:'sm'})} Missões do dia</span>
-                <span class="section-done-text">${missions.filter(m=>m.completed).length}/${missions.length} concluídas</span>
+            <div class="daily-missions-card">
+                <div class="daily-missions-card-header">
+                    <div class="daily-missions-card-title">${_ic('missions',{size:'sm'})} Missões do dia</div>
+                    <span class="section-done-text">${missions.filter(m=>m.completed).length}/${missions.length} concluídas</span>
+                </div>
+                <div class="daily-missions-list">${missionsHTML}</div>
             </div>
-            <div class="daily-missions-list">${missionsHTML}</div>
 
             <!-- Live Presence -->
             ${liveCount ? `
@@ -1002,7 +1004,7 @@ const Router = {
             </div>` : ''}
 
             <!-- Chapters -->
-            <div class="section-header mt-4">
+            <div class="section-header" style="margin-top:var(--sp-6)">
                 <span class="section-title">${_ic('scroll',{size:'sm'})} Matérias</span>
                 <span class="section-link" onclick="Router.navigate('#missions')" style="cursor:pointer">Ver todas ›</span>
             </div>

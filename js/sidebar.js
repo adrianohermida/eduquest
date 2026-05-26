@@ -183,7 +183,7 @@ const Sidebar = {
             <div class="rp-cal-day${d.active ? ' active' : ''}${d.isToday ? ' today' : ''}"
                  role="listitem"
                  aria-label="${d.label}${d.active ? ', streak ativo' : ''}">
-                <span class="rp-cal-dot" aria-hidden="true"></span>
+                <span class="rp-cal-dot" aria-hidden="true">${(d.active || d.isToday) ? '🔥' : ''}</span>
                 <span class="rp-cal-label">${d.label}</span>
             </div>`).join('');
 
@@ -246,22 +246,23 @@ const Sidebar = {
                 return `
                 <section class="rp-section rp-mission-cur-section" aria-labelledby="rp-cur-lbl">
                     <div class="rp-mission-cur-header">
-                        <h2 class="rp-section-title" id="rp-cur-lbl">${_icR('flag',{size:'xs',color:'xp'})} Missão Atual</h2>
+                        <div class="rp-section-title" id="rp-cur-lbl">${_icR('flag',{size:'xs',color:'xp'})} Missão Atual</div>
                         <span class="rp-principal-chip">Principal</span>
                     </div>
                     <div class="rp-mission-cur-card">
+                        <div class="rp-mission-cur-icon" aria-hidden="true">🎯</div>
                         <div class="rp-mission-cur-body">
                             <div class="rp-mission-cur-meta">FASE ${activeStage.index}</div>
-                            <div class="rp-mission-cur-title">${stageData.title || `Missão ${activeStage.index}`}</div>
+                            <div class="rp-mission-cur-title">${stageData.title || `Complete a fase ${activeStage.index}`}</div>
                             <div class="rp-mission-cur-desc">${stageDesc}</div>
-                            <div class="rp-mission-cur-rewards">
-                                <span class="rp-reward-chip rp-reward-xp">${_icR('xp',{size:'xs',color:'xp'})} +${stageXP} XP</span>
-                                <span class="rp-reward-chip rp-reward-gem">${_icR('gem',{size:'xs',color:'gem'})} +${stageGems}</span>
-                            </div>
                         </div>
                     </div>
+                    <div class="rp-mission-cur-rewards">
+                        <span class="rp-reward-chip rp-reward-xp">⭐ +${stageXP} XP</span>
+                        <span class="rp-reward-chip rp-reward-gem">💎 +${stageGems}</span>
+                    </div>
                     <a href="#stage/${chId}/${activeStage.id}" class="rp-jogar-btn" aria-label="Jogar missão ${stageData.title || activeStage.id}">
-                        Jogar agora <span aria-hidden="true">→</span>
+                        Jogar agora →
                     </a>
                 </section>`;
               })()

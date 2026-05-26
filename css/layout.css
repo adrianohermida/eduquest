@@ -427,29 +427,40 @@
 /* Streak calendar */
 .rp-calendar {
     display: flex;
+    align-items: center;
+    gap: 4px;
     justify-content: space-between;
-    gap: 3px;
 }
 .rp-cal-day {
     flex: 1;
     display: flex; flex-direction: column; align-items: center;
-    gap: 3px;
+    gap: 6px;
 }
 .rp-cal-dot {
-    width: 28px; height: 28px;
+    width: 36px; height: 36px;
     border-radius: 50%;
-    background: var(--surface-3);
+    border: 2px solid var(--border);
+    background: var(--surface);
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.72rem;
-    transition: background var(--dur-fast);
+    font-size: 0.9rem;
+    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
+    color: var(--border);
 }
-.rp-cal-day.active .rp-cal-dot { background: #fef3c7; }
-.rp-cal-day.today  .rp-cal-dot { background: var(--brand); box-shadow: 0 0 8px rgba(249,115,22,0.38); }
-.rp-cal-label { font-size: 0.54rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+.rp-cal-day.active .rp-cal-dot {
+    background: var(--surface);
+    border-color: var(--brand);
+    color: var(--brand);
+}
+.rp-cal-day.today .rp-cal-dot {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(255,107,26,0.38);
+}
+.rp-cal-dot:hover { transform: scale(1.1); }
+.rp-cal-label { font-size: 0.56rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
 .rp-cal-day.active .rp-cal-label { color: var(--brand); }
-.rp-cal-num { font-size: 0.5rem; color: var(--text-muted); font-weight: 700; line-height: 1; }
-.rp-cal-day.active .rp-cal-num { color: var(--brand); }
-.rp-cal-day.today  .rp-cal-num { color: #fff; }
+.rp-cal-day.today  .rp-cal-label { color: var(--brand); }
 
 /* Daily quests */
 .rp-mission {
@@ -478,16 +489,24 @@
 .rp-rank-xp   { font-size: 0.68rem; color: var(--brand); font-weight: 800; }
 .rp-rank-btn  { font-size: 0.72rem; font-weight: 900; color: var(--brand); text-decoration: none; white-space: nowrap; flex-shrink: 0; }
 
-/* League card — simplified clickable card */
+/* League card — inner card inside rp-section */
 .rp-league-card {
     display: flex; align-items: center; gap: var(--sp-3);
     padding: var(--sp-3);
-    background: var(--surface); border: 2px solid var(--border); border-radius: var(--r-xl);
+    background: var(--surface-2); border-radius: 14px;
     text-decoration: none;
-    transition: background var(--dur-fast), border-color var(--dur-fast);
+    transition: background var(--dur-fast);
 }
-.rp-league-card:hover { background: var(--surface-2); border-color: var(--brand); }
-.rp-league-icon   { flex-shrink: 0; }
+.rp-league-card:hover { background: var(--bg); }
+.rp-league-icon {
+    width: 44px; height: 44px;
+    border-radius: var(--r-md);
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+.rp-league-icon-wrap { flex-shrink: 0; }
 .rp-league-info   { flex: 1; min-width: 0; }
 .rp-league-name   { font-size: 0.82rem; font-weight: 900; color: var(--text); }
 .rp-league-sub    { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; }
@@ -503,6 +522,72 @@
 .rp-boss-icon { font-size: 2rem; }
 .rp-boss-name { font-size: 0.78rem; font-weight: 900; color: var(--text); }
 .rp-boss-desc { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; }
+
+/* ── "Jogar agora" CTA button ──────────────────────── */
+.rp-jogar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, #ff6b1a, #ff9a44);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: var(--font);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform var(--dur-fast), box-shadow var(--dur-fast);
+    margin-top: var(--sp-3);
+    box-shadow: 0 4px 14px rgba(255,107,26,0.28);
+}
+.rp-jogar-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,26,0.38); }
+.rp-jogar-btn:active { transform: scale(0.97); }
+
+/* ── Mission current card ──────────────────────────── */
+.rp-mission-cur-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-3);
+}
+.rp-principal-chip {
+    background: var(--brand-light);
+    color: var(--brand);
+    font-size: 0.69rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+.rp-mission-cur-card {
+    display: flex;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-3);
+}
+.rp-mission-cur-icon {
+    width: 48px; height: 48px;
+    border-radius: var(--r-md);
+    background: #e8f5e9;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+}
+.rp-mission-cur-body { flex: 1; min-width: 0; }
+.rp-mission-cur-meta  { font-size: 0.62rem; font-weight: 900; color: var(--brand); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.rp-mission-cur-title { font-size: 0.875rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.rp-mission-cur-desc  { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; line-height: 1.4; }
+.rp-mission-cur-rewards { display: flex; gap: 8px; margin-top: var(--sp-2); }
+.rp-reward-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.81rem;
+    font-weight: 800;
+}
+.rp-reward-xp  { background: var(--brand-light); color: var(--brand); }
+.rp-reward-gem { background: #e8f5e9; color: #4caf50; }
 
 /* ═══════════════════════════════════════════════════════
    BODY LAYOUT ADJUSTMENTS — TABLET (768px+)
