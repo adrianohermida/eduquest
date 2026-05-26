@@ -855,29 +855,7 @@
 }
 
 /* ── DISCIPLINE SELECTOR CHIP ──────────────────────────────── */
-/* Visibility controlled by parent #hud-ctx-nav — no need for display:none here */
-
-.hud-disc-chip {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    background: var(--brand-light);
-    color: var(--brand);
-    border: 1.5px solid rgba(249, 115, 22, 0.22);
-    border-radius: var(--r-full);
-    font-size: 0.76rem;
-    font-weight: 800;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background var(--dur-fast), border-color var(--dur-fast);
-    height: 32px;
-    font-family: var(--font);
-    outline: none;
-}
-.hud-disc-chip:hover  { background: rgba(249,115,22,0.18); border-color: rgba(249,115,22,0.4); }
-.hud-disc-chip:active { transform: scale(0.96); }
-.hud-disc-chip:focus-visible { outline: 2.5px solid var(--brand); outline-offset: 2px; }
+/* Styles defined in the "CENTER NAV" section above */
 
 /* Discipline dropdown — anchored left-aligned (not right) */
 #hud-dd-discipline {
