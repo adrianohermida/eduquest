@@ -1,6 +1,6 @@
 /**
  * EDUQUEST BATTLE MODE ENGINE v1.0
- * N1 (Fixação Kumon) → N2 (Aplicação Escolar) → N3 (Calibragem Vestibular)
+ * N1 (Fixação Progressiva) → N2 (Aplicação Escolar) → N3 (Calibragem Vestibular)
  * Sprint 9 — 2026-05-26
  */
 
