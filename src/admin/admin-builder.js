@@ -132,18 +132,77 @@ window.EduBuilder = (() => {
 
     /* ── Prompt Builder ─────────────────────────────────────── */
     function _buildPrompt(type, text, opts) {
-        const ctx = `Analise o conteúdo educativo abaixo e gere material estruturado para uma plataforma gamificada.\n\nCONTEÚDO DE REFERÊNCIA:\n---\n${text.substring(0,6000)}\n---\n\nContexto: Matéria "${opts.subject||'Geral'}" | Ano: ${opts.grade||'7º Ano'} | Dificuldade: ${opts.difficulty||'medium'} | Língua: Português (Brasil)\n\n`;
-        const schemas = {
-            questions:   `Gere ${opts.count||8} questões variadas (inclua múltipla escolha, V/F e lacuna quando possível). JSON:\n{"questions":[{"prompt":"","type":"multiple_choice|true_false|fill_blank|short_answer","options":[{"text":"","correct":true|false}],"answer":"(para fill_blank/short_answer)","explanation":""}]}`,
-            full_stage:  `Gere um estágio completo de aprendizagem. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":""}],"flashcards":[{"q":"","a":""}]},"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":""}]}`,
-            flashcards:  `Gere ${opts.count||10} flashcards. JSON:\n{"flashcards":[{"q":"","a":""}]}`,
-            summary:     `Gere ${opts.count||5} cards de resumo com macetes. JSON:\n{"content":[{"icon":"emoji","title":"","text":"texto longo com exemplos e macetes"}]}`,
-            objectives:  `Gere ${opts.count||5} objetivos de aprendizagem (verbos de Bloom). JSON:\n{"objectives":[""]}`,
-            true_false:  `Gere ${opts.count||8} afirmações V/F. JSON:\n{"questions":[{"prompt":"","type":"true_false","correct":true,"explanation":""}]}`,
-            fill_blank:  `Gere ${opts.count||6} questões de lacuna. Use ___ na frase. JSON:\n{"questions":[{"prompt":"frase com ___","type":"fill_blank","answer":"","options":[{"text":"","correct":false}],"explanation":""}]}`,
-            matching:    `Gere ${opts.count||5} pares. JSON:\n{"pairs":[{"left":"conceito","right":"definição"}]}`,
+        // Language context
+        const lang = opts.language||'pt';
+        const langLabel = lang==='es' ? 'Espanhol (produção em espanhol correto)' : lang==='en' ? 'Inglês (produção em inglês correto)' : 'Português (Brasil)';
+        const langInstr = lang==='es'
+            ? '\n\nINSTRUÇÃO DE IDIOMA: O CONTEÚDO GERADO deve ser majoritariamente em ESPANHOL. Perguntas, opções, explicações e flashcards em espanhol. Títulos de cards em português é OK para contexto pedagógico. Use espanhol da Espanha (vosotros, etc) ou neutro conforme o material.'
+            : lang==='en'
+            ? '\n\nLANGUAGE INSTRUCTION: Generated content must be in ENGLISH. Questions, options, explanations and flashcards in English.'
+            : '';
+
+        // Grammar focus context (for LE)
+        const gFocus = opts.grammarFocus||'';
+        const grammarMap = {
+            muy_mucho:    'FOCO GRAMATICAL: MUY vs MUCHO — inclua questões sobre: MUY+adjetivo/advérbio (invariável), MUCHO+substantivo (concorda gênero/número), PAMM (mejor/peor/mayor/menor/más/menos/antes/después → sempre MUCHO). Inclua pegadinhas com "muy mejor/peor" (errado).',
+            verbos_2conj: 'FOCO GRAMATICAL: Verbos irregulares 2ª conjugação (-ER) — querer→quiero, poder→puedo, tener→TENGO (irregular), volver→vuelvo, entender→entiendo. Padrões e→ie e o→ue. REGRA: nosotros/vosotros NUNCA mudam o radical.',
+            verbos_3conj: 'FOCO GRAMATICAL: Verbos irregulares 3ª conjugação (-IR) — sentir→siento(e→ie), pedir→pido(e→i, EXCLUSIVO de -IR), dormir→duerme(o→ue), seguir→sigo, servir→sirvo, morir→muere. REGRA: nosotros/vosotros SEMPRE regulares.',
+            ortografia_mn:'FOCO GRAMATICAL: Ortografia M/N — REGRA: M antes de P e B (campo, también, siempre, hombre). N antes das demais consoantes. N antes de V (invierno). Latinismos -m final (álbum, réquiem). Inclua pares como sienpre/siempre, tanbién/también.',
+            ortografia_rr:'FOCO GRAMATICAL: Ortografia R/RR — RR entre vogais (perro, carro, carretera). R inicial sempre forte (ratón, río). R após N/L/S forte sem RR (honra, alrededor, Israel). Pares mínimos: pero/perro, caro/carro, cero/cerro. Apócope completo: buen/gran/primer/tercer/cualquier/san.',
+            numerales:    'FOCO GRAMATICAL: Numerales — Ordinais 1º-10º (primer/tercer apócope masc.sing.). Fracionários: medio/mitad, tercio, cuarto. Multiplicativos: doble/triple/cuádruple. Coletivos: docena=12, decena≈10, lustro=5a, siglo=100a. CUALQUIER = apócope universal singular.',
+            apocope:      'FOCO GRAMATICAL: Apócope — BUENO→BUEN (masc.sing.), MALO→MAL (masc.sing.), GRANDE→GRAN (qualquer sing.), PRIMERO→PRIMER (masc.sing.), TERCERO→TERCER (masc.sing.), CUALQUIERA→CUALQUIER (qualquer sing.), SANTO→SAN (exceto Tomás/Domingo).',
+            comidas:      'FOCO VOCABULAR: Comidas del Día — desayuno(7-9h), almuerzo(13-15h), merienda(15-17h), cena(20-22h). Utensilios: sartén, olla, rallador, batidora. Pesos: gramo, kilo, cucharada, pizca. Objetos de mesa: mantel, servilleta, vaso, copa.',
+            deportes:     'FOCO VOCABULAR: Deportes Olímpicos — balonmano=handebol, natación, voleibol, baloncesto, ciclismo, mountain bike, atletismo. Posições: portero, delantero, defensa, lateral. Locais: estadio, piscina, velódromo, cancha. Equipamento: casco, raqueta, maillot.',
         };
-        return ctx + (schemas[type]||schemas.questions) + '\n\nRetorne APENAS o JSON válido.';
+        const grammarInstr = gFocus && grammarMap[gFocus] ? `\n\n${grammarMap[gFocus]}` : '';
+
+        // Stage type context
+        const stageType = opts.stageType||'normal';
+        const stageInstr = stageType==='boss'
+            ? '\n\nTIPO DE ESTÁGIO: BOSS — questões que INTEGRAM múltiplos tópicos da unidade. Mais difíceis. 10-12 questões. Inclua pegadinhas e questões de análise crítica.'
+            : stageType==='final'
+            ? '\n\nTIPO DE ESTÁGIO: EXAME FINAL — questões de ALTA complexidade, integrando TODA a unidade. 10-12 questões. Inclua análise de texto, questões compostas e integrações inter-tópicos.'
+            : stageType==='n3_bonus'
+            ? '\n\nTIPO DE ESTÁGIO: N3 BÔNUS VESTIBULAR — gere 15 questões de nível ENEM/FUVEST/UNICAMP adaptadas. Contexto: universitário, crítico, interdisciplinar. Inclua tópicos avançados, dados estatísticos, citações de fontes. JSON: window.VARNAME_N3_BONUS = { questions: [...] }'
+            : '';
+
+        // Adaptive thresholds context
+        const thresholdNote = `\n\nLIMIARES ADAPTATIVOS (para referência): N1=${opts.adaptiveN1||85}% | N2=${opts.adaptiveN2||80}% | N3=${opts.adaptiveN3||70}%. Calibre a dificuldade das questões proporcionalmente.`;
+
+        const ctx = `Analise o conteúdo educativo abaixo e gere material estruturado para uma plataforma gamificada.\n\nCONTEÚDO DE REFERÊNCIA:\n---\n${text.substring(0,6000)}\n---\n\nContexto: Matéria "${opts.subject||'Geral'}" | Ano: ${opts.grade||'7º Ano'} | Dificuldade: ${opts.difficulty||'medium'} | Língua de saída: ${langLabel}${langInstr}${grammarInstr}${stageInstr}${thresholdNote}\n\n`;
+
+        const schemas = {
+            questions:     `Gere ${opts.count||8} questões variadas (inclua múltipla escolha, V/F e lacuna quando possível). JSON:\n{"questions":[{"prompt":"","type":"multiple_choice|true_false|fill_blank|short_answer","options":[{"text":"","correct":true|false}],"answer":"(para fill_blank/short_answer)","explanation":"","topic":""}]}`,
+            full_stage:    `Gere um estágio completo de aprendizagem. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":""}],"flashcards":[{"q":"","a":""}],"mnemonics":[{"trigger":"","memory":""}]},"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":"","topic":""}]}`,
+            full_stage_es: `Gere um estágio completo de ESPANHOL. Questões em espanhol. Flashcards: frente em espanhol, verso em português. Mnemonics: macetes para regras gramaticais. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":"texto pedagógico misturando PT e ES"}],"flashcards":[{"q":"(ES)","a":"(PT)"}],"mnemonics":[{"trigger":"regra/palavra-chave","memory":"frase mnemônica pedagógica"}]},"questions":[{"prompt":"(ES)","type":"multiple_choice","options":[{"text":"(ES)","correct":false}],"explanation":"(PT pedagógico)","topic":""}]}`,
+            flashcards:    `Gere ${opts.count||10} flashcards. JSON:\n{"flashcards":[{"q":"","a":""}]}`,
+            mnemonics:     `Gere ${opts.count||6} mnemônicos pedagógicos para memorização das regras/conceitos. Cada mnemônico tem: "trigger" (a regra ou palavra-chave que ativa) e "memory" (a frase/técnica de memorização). JSON:\n{"mnemonics":[{"trigger":"palavra-chave ou regra","memory":"frase mnemônica criativa e pedagógica"}]}`,
+            summary:       `Gere ${opts.count||5} cards de resumo com macetes. JSON:\n{"content":[{"icon":"emoji","title":"","text":"texto longo com exemplos e macetes"}]}`,
+            objectives:    `Gere ${opts.count||5} objetivos de aprendizagem (verbos de Bloom). JSON:\n{"objectives":[""]}`,
+            true_false:    `Gere ${opts.count||8} afirmações V/F. JSON:\n{"questions":[{"prompt":"","type":"true_false","correct":true,"explanation":""}]}`,
+            fill_blank:    `Gere ${opts.count||6} questões de lacuna. Use ___ na frase. JSON:\n{"questions":[{"prompt":"frase com ___","type":"fill_blank","answer":"","options":[{"text":"","correct":false}],"explanation":""}]}`,
+            matching:      `Gere ${opts.count||5} pares. JSON:\n{"pairs":[{"left":"conceito","right":"definição"}]}`,
+            n3_bonus:      `Gere 15 questões de nível VESTIBULAR (ENEM/FUVEST/UNICAMP adaptadas) sobre o conteúdo. Questões devem ser críticas, interdisciplinares e contextualizadas. Inclua dados, citações e análises. JSON:\n{"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":"pedagógica e aprofundada","topic":""}]}`,
+            verbos_conj:   `Gere ${opts.count||5} tabelas de conjugação verbal + frases de exemplo para prática. Inclua: verbo no infinitivo, padrão de mudança (se irregular), tabela de conjugação no presente, e 2 frases de exemplo por verbo. JSON:\n{"verbs":[{"infinitive":"","pattern":"e→ie|e→i|o→ue|irregular|regular","conjugation":{"yo":"","tu":"","el":"","nosotros":"","vosotros":"","ellos":""},"examples":["",""]}]}`,
+        };
+        return ctx + (schemas[type]||schemas.questions) + '\n\nRetorne APENAS o JSON válido, sem markdown.';
+    }
+
+    /* ── Apply Subject Preset ────────────────────────────────── */
+    function _applyPreset(key) {
+        const p = SUBJECT_PRESETS[key];
+        if (!p) return;
+        _bState.subjectPreset = key;
+        _bState.language = p.language;
+        _bState.adaptiveN1 = p.adaptiveN1;
+        _bState.adaptiveN2 = p.adaptiveN2;
+        _bState.adaptiveN3 = p.adaptiveN3;
+        if (key==='espanhol') { _bState.subject = 'Espanhol'; }
+        else if (key==='ingles') { _bState.subject = 'Inglês'; }
+        // Re-render source tab to show updated settings
+        const body = document.getElementById('bld-body');
+        if (body && _tab==='source') body.innerHTML = _htmlSource();
+        _toast(`✅ Preset "${p.label}" aplicado — limiares ${p.adaptiveN1}/${p.adaptiveN2}/${p.adaptiveN3}%`);
     }
 
     /* ── PDF / File Reading ─────────────────────────────────── */
