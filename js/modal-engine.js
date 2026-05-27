@@ -185,19 +185,47 @@ const ModalEngine = {
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">${this._ic('xp',{size:'xs',color:'xp'})} Receber!</button>`;
     },
 
-    _streakRiskHTML({ streak }) {
+    _streakRiskHTML({ streak, content, _modalId = 'streak_risk' }) {
+        // Usa conteúdo rotacionado se fornecido (via ModalPreferences.getContent),
+        // senão mantém texto padrão para não quebrar chamadas legadas sem content.
+        const title   = content?.title    || 'Sequência em Risco!';
+        const message = (content?.message || 'Você tem <strong>{streak} dia{s}</strong> de sequência. Complete pelo menos 1 missão hoje!')
+            .replace('{streak}', streak)
+            .replace('{s}', streak !== 1 ? 's' : '');
+        const ctaText = content?.cta      || 'Fazer Missão Agora';
+        const secText = content?.secondary || 'Deixar para depois';
+
         return `
             <div class="modal-streak-risk-wrap">
                 <div class="modal-streak-risk-fire">${this._ic('streak',{size:'xl',color:'streak'})}</div>
                 <div class="modal-streak-risk-warn">${this._ic('warning',{size:'lg',color:'warning'})}</div>
             </div>
-            <h2 class="modal-title modal-title-warn" id="modal-title-el">Sequência em Risco!</h2>
-            <p class="modal-subtitle">Você tem <strong>${streak} dia${streak !== 1 ? 's' : ''}</strong> de sequência.</p>
-            <p class="modal-text">Complete pelo menos 1 missão hoje para não perder!</p>
-            <button class="btn-primary modal-cta" onclick="Router.navigate('#missions'); ModalEngine.dismiss()">
-                ${this._ic('sword',{size:'xs'})} Fazer Missão Agora
+            <h2 class="modal-title modal-title-warn" id="modal-title-el">${title}</h2>
+            <p class="modal-subtitle">${message}</p>
+            <button class="btn-primary modal-cta"
+                onclick="ModalPreferences.recordInteraction('${_modalId}','cta_click'); Router.navigate('#missions'); ModalEngine.dismiss()">
+                ${this._ic('sword',{size:'xs'})} ${ctaText}
             </button>
-            <button class="modal-dismiss-link" onclick="ModalEngine.dismiss()">Deixar para depois</button>`;
+            <button class="modal-dismiss-link"
+                onclick="ModalEngine.dismissIncentive('${_modalId}')">
+                ${secText}
+            </button>
+            <div class="modal-prefs-footer">
+                <label class="modal-pref-check">
+                    <input type="checkbox" id="modal-pref-dont-show"
+                        onchange="ModalEngine._onDontShowChange(this)">
+                    Não mostrar este aviso novamente
+                </label>
+                <div class="modal-pref-snooze" id="modal-pref-snooze">
+                    <span>Silenciar por:</span>
+                    <select id="modal-pref-snooze-select">
+                        <option value="1">1 dia</option>
+                        <option value="3" selected>3 dias</option>
+                        <option value="7">1 semana</option>
+                        <option value="30">1 mês</option>
+                    </select>
+                </div>
+            </div>`;
     },
 
     _questCompleteHTML({ icon, title, xp, gems }) {
@@ -403,6 +431,43 @@ const ModalEngine = {
             <h2 class="modal-title" id="modal-title-el">${title}</h2>
             ${message ? `<p class="modal-subtitle">${message}</p>` : ''}
             <button class="btn-primary modal-cta" onclick="ModalEngine.dismiss()">Entendido</button>`;
+    },
+
+    // ── INCENTIVE DISMISS — com frequency-cap ───────────────────
+
+    /**
+     * Fecha um modal de incentivo lendo as preferências do formulário embutido.
+     * Persiste snooze ou dismiss permanente via ModalPreferences.
+     *
+     * @param {string} modalId  ex: 'streak_risk'
+     */
+    dismissIncentive(modalId) {
+        const dontShow  = document.getElementById('modal-pref-dont-show')?.checked ?? false;
+        const snoozeDays = parseInt(
+            document.getElementById('modal-pref-snooze-select')?.value ?? '3', 10
+        );
+
+        // Registra interação de dismiss
+        if (typeof ModalPreferences !== 'undefined') {
+            ModalPreferences.recordInteraction(modalId, 'dismiss', { dontShowAgain: dontShow, snoozeDays });
+            ModalPreferences.setDismissed(modalId, dontShow, dontShow ? 0 : snoozeDays);
+        }
+
+        this.dismiss(false);
+    },
+
+    /**
+     * Toggle do checkbox "Não mostrar novamente":
+     * oculta o seletor de snooze quando marcado.
+     *
+     * @param {HTMLInputElement} checkbox
+     */
+    _onDontShowChange(checkbox) {
+        if (typeof ModalPreferences !== 'undefined') {
+            ModalPreferences.recordInteraction('streak_risk', 'checkbox_toggle', { checked: checkbox.checked });
+        }
+        const snoozeEl = document.getElementById('modal-pref-snooze');
+        if (snoozeEl) snoozeEl.style.display = checkbox.checked ? 'none' : 'flex';
     },
 };
 

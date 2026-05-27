@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v29';
+const CACHE_NAME  = 'eduquest-v30';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -37,6 +37,7 @@ const CACHE_SHELL = [
     '/js/adventure-map.js',
     '/js/sidebar.js',
     '/js/modal-engine.js',
+    '/js/modal-preferences.js',
     '/js/router.js',
     '/js/session-guard.js',
     '/js/app.js',

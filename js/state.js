@@ -461,11 +461,22 @@ const State = {
 
         ModalEngine.enqueue('dailyReward', { streak, xp, gems });
 
-        // Queue streak risk if no missions done yet today
-        const missions  = this.getMissions();
-        const anyDone   = missions.some(m => m.completed);
+        // Queue streak risk if no missions done yet today —
+        // respeitando frequency cap via ModalPreferences
+        const missions = this.getMissions();
+        const anyDone  = missions.some(m => m.completed);
         if (!anyDone && streak > 1) {
-            ModalEngine.enqueue('streakRisk', { streak });
+            if (typeof ModalPreferences !== 'undefined') {
+                ModalPreferences.shouldShow('streak_risk', 'app_open').then(check => {
+                    if (!check.shouldShow) return;
+                    const content = ModalPreferences.getContent('streak_risk', streak);
+                    ModalEngine.enqueue('streakRisk', { streak, content, _modalId: 'streak_risk' });
+                    ModalPreferences.recordImpression('streak_risk', 'app_open');
+                });
+            } else {
+                // ModalPreferences ainda não carregado — fallback seguro
+                ModalEngine.enqueue('streakRisk', { streak });
+            }
         }
     },
 
