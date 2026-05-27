@@ -1,1 +1,204 @@
-espanhol_7A_topico_1.txt
+# 📘 TÓPICO 7: Numerales (Ordinales, Fraccionarios, Multiplicativos) y Medidas Temporales
+*(Alinhado à Unidad 3 | pp. 53-60 | Slide de Revisão | Método Kumon → Vestibular | BNCC: EF07LE01, EF07LE04, EF07LE12)*
+
+---
+
+### 🔹 NÍVEL 1 - Fixação Kumon (15 questões)
+```
+1. [MC] ¿Qué ordinal se usa antes de "lugar" (sustantivo masculino singular)?
+a) Primero b) Primer c) Primeros d) Primera
+✅ Gab: B | 📝 Just: Primero pierde la "o" (apócope) antes de sustantivo masculino singular.
+💡 DICA SLIDE: ✂️ *PRIMERO → PIERDE LA O ANTES DE SMS (Sustantivo Masculino Singular). "Primer lugar".* 🎵 *Som de corte limpo + "¡Primer gol!"*
+
+2. [V/F] "Un tercio" corresponde a la fracción 1/3. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Fraccionario estándar en español para dividir en tres partes iguales.
+💡 DICA SLIDE: 📐 *1/3 = UN TERCIO. Visualiza un círculo dividido en 3.* 🧠 *Fracción = parte del todo.*
+
+3. [MC] ¿Qué multiplicativo significa "2 veces"?
+a) Triple b) Doble c) Cuádruple d) Múltiple
+✅ Gab: B | 📝 Just: Doble = 2x. Triple = 3x. Cuádruple = 4x.
+💡 DICA SLIDE: ✖️ *2X = DOBLE. Visualiza dos filas idénticas.* ❤️ *Duplicar = reforzar.*
+
+4. [MC] "100 años" equivale a:
+a) Una década b) Un siglo c) Una docena d) Un lustro
+✅ Gab: B | 📝 Just: Siglo = 100 años. Década = 10 años.
+💡 DICA SLIDE: 📅 *100 AÑOS = UN SIGLO. Línea del tiempo clara.* 🕰️ *Cien vueltas al sol.*
+
+5. [V/F] "Década" y "docena" significan lo mismo (12 unidades). ( ) V ( ) F
+✅ Gab: F | 📝 Just: Década = 10 años. Docena = 12 unidades. Son conceptos distintos.
+💡 DICA SLIDE: 🔢 *10 = DÉCADA | 12 = DOCENA | 10 = DECENA. No confundir.*
+
+6. [MC] Completa: "Es el ______ (tercero/tercer) piso del edificio."
+a) tercero b) tercer c) terceros d) tercera
+✅ Gab: B | 📝 Just: Tercero pierde la "o" antes de "piso" (masc. sing.).
+💡 DICA SLIDE: 🏢 *TERCERO → TERCER. Apócope obligatoria.* 🎵 *Som ascendente + "¡Tercer piso!"*
+
+7. [V/F] "La mitad" y "medio" son sinónimos cuando se refiere a 1/2. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Ambos expresan la fracción 1/2 en contextos cotidianos y matemáticos.
+💡 DICA SLIDE: 🍰 *½ = LA MITAD / MEDIO. Partir por el centro.* ❤️ *Equilibrio perfecto.*
+
+8. [MC] ¿Qué ordinal corresponde al número 10?
+a) Noveno b) Décimo c) Undécimo d) Duodécimo
+✅ Gab: B | 📝 Just: Décimo es la forma normativa para 10º.
+💡 DICA SLIDE: 🔟 *10º = DÉCIMO. Línea de meta clara.* 🧠 *Memoria secuencial.*
+
+9. [V/F] A partir del número 11, los ordinales se sustituyen por cardinales en el español moderno (ej: siglo XXI, no vigesimoprimero). ( ) V ( ) F
+✅ Gab: V | 📝 Just: Norma culta actual prefiere cardinales para números mayores a 10.
+💡 DICA SLIDE: 📜 *SIGLO XXI = "VEINTIUNO". Economía lingüística.*
+
+10. [MC] "Una decena" equivale a:
+a) 10 unidades b) 12 unidades c) 20 unidades d) 50 unidades
+✅ Gab: A | 📝 Just: Decena = grupo de 10. Docena = 12.
+💡 DICA SLIDE: 🔢 *10 = DECENA. Conteo base decimal.* 🎵 *Som de conteo 1-10.*
+
+11. [V/F] "Cualquier" es la forma apocopada de "cualquiera" y se usa ante cualquier sustantivo singular. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Apócope invariable ante singular, sin importar género.
+💡 DICA SLIDE: ✂️ *CUALQUIERA → CUALQUIER. Invariable ante singular.* ❤️ *Puerta abierta a todos.*
+
+12. [MC] Si un atleta corre "el doble" de distancia que otro, y el segundo corrió 5 km, ¿cuánto corrió el primero?
+a) 2.5 km b) 5 km c) 10 km d) 15 km
+✅ Gab: C | 📝 Just: Doble = 2x. 5 km × 2 = 10 km.
+💡 DICA SLIDE: ✖️ *Doble = multiplicar por 2. Lógica aplicada.*
+
+13. [V/F] "Gran" solo se apocopa ante sustantivos masculinos singulares. ( ) V ( ) F
+✅ Gab: F | 📝 Just: "Gran" se apocopa ante CUALQUIER sustantivo singular (masculino o femenino).
+💡 DICA SLIDE: 📏 *GRAN = apócope universal singular. "Gran mujer", "gran partido".*
+
+14. [MC] ¿Qué fracción corresponde a "un cuarto"?
+a) 1/2 b) 1/3 c) 1/4 d) 1/5
+✅ Gab: C | 📝 Just: Cuarto = 1/4. En medidas: 1/4 de kilo = 250g.
+💡 DICA SLIDE: 📐 *1/4 = UN CUARTO. Cortar en 4 partes iguales.*
+
+15. [V/F] "Un siglo" y "una década" son medidas temporales que ayudan a organizar la historia del deporte. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Estructuran cronología: Juegos Antiguos → Modernos (1896) → Actualidad.
+💡 DICA SLIDE: 📚 *Siglo + década = mapa temporal.* 🧠 *Contexto histórico = comprensión profunda.*
+```
+
+---
+
+### 🔹 NÍVEL 2 - Aplicación Escolar (20 questões)
+```
+16. [Interpretação] En la crónica deportiva: "Es el ______ partido de la temporada". ¿Qué forma es correcta? → ✅ primer. 📝 Just: Apócope antes de "partido" (masc. sing.). 💡 DICA SLIDE: ✂️ *Primer + masc. sing. = regla fija.*
+17. [MC] Completa: "La ______ (mitad/tercio) de los espectadores gritó gol." → ✅ Gab: mitad. 📝 Just: Concordancia con "mitad" (sustantivo femenino). 💡 DICA SLIDE: 🏟️ *Mitad = parte del todo. Concordancia flexible.*
+18. [V/F] "Un cuarto de litro" equivale a 250 ml. ( ) V ( ) F → ✅ V. 📝 Just: 1L = 1000ml → 1/4 = 250ml. 💡 DICA SLIDE: 🥛 *1/4 = cuarto. Cálculo cotidiano en cocina/deporte.*
+19. [MC] ¿Qué medida temporal se usa para agrupar 10 años de historia olímpica? → ✅ Gab: década. 📝 Just: Década = período de 10 años. 💡 DICA SLIDE: 📅 *10 años = década. Ciclos deportivos claros.*
+20. [V/F] "Siglo XXI" se lee como "siglo veintiuno", siguiendo la norma de sustituir ordinales por cardinales. ( ) V ( ) F → ✅ V. 📝 Just: Norma RAE vigente. 💡 DICA SLIDE: 📜 *Cardinal > Ordinal post-10. Modernidad lingüística.*
+21. [MC] "El ______ (noveno/décimo) mes del año es septiembre." → ✅ Gab: noveno. 📝 Just: Secuencia ordinal estándar. 💡 DICA SLIDE: 🗓️ *Noveno = 9º. Memoria calendario.*
+22. [V/F] "Doble" y "triple" son multiplicativos que nunca cambian de forma (son invariables). ( ) V ( ) F → ✅ V. 📝 Just: No concuerdan en género/número. 💡 DICA SLIDE: 🔒 *Doble/Triple = invariables. "Doble victoria", "doble récord".*
+23. [MC] Completa: "Es una ______ (década/docena) de años de entrenamiento." → ✅ Gab: década. 📝 Just: Década = tiempo (10 años). Docena = cantidad (12). 💡 DICA SLIDE: ⏳ *Tiempo ≠ cantidad. Precisión léxica.*
+24. [V/F] "Tercer" y "primer" mantienen la "o" cuando van antes de sustantivo femenino. ( ) V ( ) F → ✅ F. 📝 Just: Nunca van con femenino. Se usa "tercera/primera". 💡 DICA SLIDE: ♀️ *Femenino = tercera/primera. Masculino singular = tercer/primer.*
+25. [MC] "Un ______ (quinto/sexto) de la medalla de oro." → ✅ Gab: quinto. 📝 Just: Fraccionario 1/5. 💡 DICA SLIDE: 🥇 *1/5 = quinto. División equitativa.*
+26. [Interpretação] En receta de cebiche: "exprimir hasta la mitad del limón". ¿Qué fracción se usa? → ✅ 1/2 (medio). 💡 DICA SLIDE: 🍋 *Mitad = equilibrio ácido-amargo. Técnica culinaria precisa.*
+27. [V/F] "Cualquier deportista" usa apócope correctamente ante sustantivo masculino. ( ) V ( ) F → ✅ V. 📝 Just: Cualquier + singular = norma. 💡 DICA SLIDE: ✨ *Inclusión lingüística = acceso universal.*
+28. [MC] "El equipo ganó por ______ (doble/múltiple) diferencia de goles." → ✅ Gab: doble. 📝 Just: Doble = ventaja clara (2x). Múltiple = indefinido. 💡 DICA SLIDE: 📊 *Doble = dato concreto. Precisión estadística.*
+29. [V/F] "Una docena de medallas" equivale a 12. ( ) V ( ) F → ✅ V. 📝 Just: Docena = 12 unidades exactas. 💡 DICA SLIDE: 🔢 *12 = docena. Conteo olímpico.*
+30. [MC] "Es el ______ (cuarto/quinto) partido consecutivo." → ✅ Gab: cuarto. 📝 Just: Secuencia ordinal lógica. 💡 DICA SLIDE: 📈 *Cuarto = 4º. Racha deportiva.*
+31. [V/F] "Gran" se apocopa igual que "bueno" (solo ante masculino singular). ( ) V ( ) F → ✅ F. 📝 Just: Gran = cualquier singular. Bueno = buen (solo masc. sing.). 💡 DICA SLIDE: ⚖️ *Gran ≠ Bueno. Apócope diferente por origen.*
+32. [MC] "La ______ (mitad/tercera) parte del estadio estaba llena." → ✅ Gab: mitad. 📝 Just: Mitad = 1/2. Tercera parte = 1/3. 💡 DICA SLIDE: 🏟️ *Fracción + contexto = imagen clara.*
+33. [V/F] "Década" proviene de "diez" y "siglo" de "cien". ( ) V ( ) F → ✅ V. 📝 Just: Etimología latina: decas/cien. 💡 DICA SLIDE: 📚 *Raíces latinas = clave del vocabulario.*
+34. [MC] "Un ______ (tercio/cuarto) de la carrera." → ✅ Gab: tercio. 📝 Just: 1/3 del recorrido. 💡 DICA SLIDE: 🏃 *Progresión fraccionaria. Meta cerca.*
+35. [V/F] "El primer día" y "un día primero" son intercambiables en español normativo. ( ) V ( ) F → ✅ F. 📝 Just: "Primero" solo se usa aislado o postpuesto en contextos arcaicos/poéticos. 💡 DICA SLIDE: 📜 *Norma actual = primer + sustantivo. Elegancia sintáctica.*
+```
+
+---
+
+### 🔹 NÍVEL 3 - Vestibular (10 questões)
+36. [MC] La norma de sustituir ordinales por cardinales a partir del XI ("siglo XXI", no "vigésimo primero") se fundamenta en:
+a) Influencia del inglés en el español moderno
+b) Economía lingüística y simplificación fonética en el habla culta contemporánea
+c) Error histórico de imprenta
+d) Prohibición académica de ordinales largos
+✅ Gab: B | 📝 Just: La RAE promueve cardinales por fluidez y uso generalizado en medios académicos.
+💡 DICA SLIDE: 🗣️ *Economía del lenguaje = evolución natural. Norma viva, no rígida.*
+
+37. [Eliminatória] Analise as afirmativas sobre numerales y apócope:
+I. "Primer" y "tercer" pierden la "o" solo ante sustantivo masculino singular.
+II. "Gran" y "buen" se apocopan ante cualquier sustantivo singular, sin importar género.
+III. A partir del siglo XI, los ordinales se sustituyen por cardinales en el lenguaje culto.
+IV. "Cualquiera" nunca se apocopa ante sustantivo femenino.
+Están correctas: a) I y II b) I, II y III c) II, III y IV d) I, III y IV
+✅ Gab: B | 📝 Just: IV es falsa. "Cualquier" se usa ante cualquier singular: cualquier mujer, cualquier idea.
+💡 DICA SLIDE: 🔍 *Eliminar absolutos ("nunca"). Apócope = regla de economía lingüística.*
+
+38. [MC] En la crónica deportiva, el uso de "doble récord mundial" cumple la función de:
+a) Sustituir datos estadísticos por ficción
+b) Humanizar el evento, conectar emocionalmente con el lector y trascender el mero resultado numérico
+c) Exagerar hechos para vender entradas
+d) Confundir al lector con lenguaje poético innecesario
+✅ Gab: B | 📝 Just: El multiplicativo transforma un dato frío en logro histórico accesible.
+💡 DICA SLIDE: 📖 *Dato + emoción = crónica viva. Lenguaje que impacta.* ❤️ *Palabras que laten.*
+
+39. [V/F] "La mitad de los atletas son mujeres." El término "mitad" funciona como fracción o como sustantivo partitivo en esta estructura. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Funciona como sustantivo partitivo que exige concordancia con el complemento.
+💡 DICA SLIDE: 📊 *Mitad = parte del todo. Concordancia flexible según contexto.*
+
+40. [MC] ¿Qué política educativa se alinea con los valores olímpicos (excelencia, amistad, respeto) y su integración curricular mediante alfabetización numérica?
+a) Competencia individualista y eliminación de perdedores
+b) Educación física inclusiva, trabajo en equipo, fair play y análisis crítico de datos deportivos
+c) Prohibición de deportes adaptados por "falta de rigor"
+d) Enfoque exclusivo en resultados y medallas
+✅ Gab: B | 📝 Just: El deporte escolar debe formar ciudadanos críticos, no solo atletas.
+💡 DICA SLIDE: 🤝 *Deporte + números = escuela de vida. Valores > medallas.* 🧠 *Neuroeducación en movimiento.*
+
+41. [V/F] "Un cuarto de kilo" y "250 gramos" son expresiones numéricamente equivalentes pero funcionalmente distintas (cocina vs. laboratorio). ( ) V ( ) F
+✅ Gab: V | 📝 Just: Ambas miden lo mismo, pero el registro y contexto varían según la práctica social.
+💡 DICA SLIDE: ⚖️ *Equivalencia ≠ sinonimia. Contexto define el uso.*
+
+42. [MC] Si una crónica dice: "El estadio era un volcán de voces y el doble de entradas vendidas", ¿qué recurso estilístico predomina y qué efecto busca?
+a) Hipérbole + comicidad b) Metáfora + inmersión sensorial y énfasis cuantitativo c) Símil + distanciamiento crítico d) Ironía + desprecio al espectáculo
+✅ Gab: B | 📝 Just: La metáfora transforma datos en experiencia vivida; el multiplicativo refuerza magnitud.
+💡 DICA SLIDE: 🌋 *Volcán + doble = pasión desbordante. Lenguaje que quema.* ❤️ *Fútbol = emoción pura.*
+
+43. [Eliminatória] Sobre reglas de apócope y numerales:
+I. "Cerro" y "cero" difieren por RR vs R simple (ortografía, no numeral).
+II. "Gran" y "buen" se apocopan ante cualquier sustantivo singular, sin importar género.
+III. "Primer" y "tercer" pierden "o" solo antes de sustantivo masculino singular.
+IV. La "rr" siempre tiene sonido fuerte entre vocales.
+Están correctas: a) I, III y IV b) II y III c) I, II y IV d) Todas
+✅ Gab: A | 📝 Just: II es falsa ("buen" solo ante masc. sing.). I, III, IV son correctas según norma.
+💡 DICA SLIDE: 🔍 *Eliminar absolutos. Apócope = regla de economía lingüística.*
+
+44. [MC] ¿Por qué la ceremonia olímpica mantiene el orden de entrada (Grecia primero, anfitrión último) a pesar de los cambios geopolíticos y numéricos de participantes?
+a) Por inercia burocrática sin significado actual
+b) Para honrar el origen histórico y celebrar la hospitalidad contemporánea, reforzando continuidad y respeto simbólico
+c) Para evitar conflictos diplomáticos por orden alfabético
+d) Para reducir el tiempo de transmisión televisiva
+✅ Gab: B | 📝 Just: Simboliza diálogo entre tradición y modernidad, base del espíritu olímpico.
+💡 DICA SLIDE: 🏛️🤝 *Pasado + presente = futuro. Ceremonia = diplomacia simbólica.*
+
+45. [MC] En "El ______ (décimo/décima) aniversario se celebró con un ______ (doble/triple) récord mundial.", ¿cuál opción es gramatical y semánticamente coherente?
+a) décima / triple b) décimo / doble c) décimo / triple d) décima / doble
+✅ Gab: B | 📝 Just: "Décimo" concuerda con "aniversario" (masc.). "Doble récord" es expresión consolidada.
+💡 DICA SLIDE: 📈 *Décimo + doble = precisión numérica y concordancia.* 🧠 *Matemática + lengua = rigor.*
+
+---
+
+### 🔹 DISSERTATIVAS (3 questões)
+46. Explica, en español o portugués, por qué la apócope de "primero/tercero" solo ocurre ante sustantivo masculino singular, mientras que "bueno/grande/cualquiera" se apocopan ante cualquier singular. Justifica con reglas normativas y ejemplos.
+✅ **Gab Esperado:** "Primer/tercer" son ordinales que históricamente perdieron la vocal final solo ante masculino singular por evolución fonética y normativa culta. "Bueno/grande/cualquiera" son adjetivos/cuantificadores cuya apócope ("buen/gran/cualquier") se aplica ante CUALQUIER sustantivo singular, sin importar género, porque buscan economía expresiva y fluidez sintáctica. Ej: primer día, tercera vez, buen partido, gran mujer, cualquier idea.
+💡 DICA SLIDE: ✂️ *Apócope = economía lingüística. Historia + uso = regla.*
+
+47. Compara el uso de fraccionarios (medio, tercio, cuarto) y multiplicativos (doble, triple) en la crónica deportiva y la enciclopedia digital. ¿Qué función cumple cada tipo de numeral y cómo se complementan?
+✅ **Gab Esperado:** Los fraccionarios dividen y contextualizan (mitad del estadio, cuarto de final), generando perspectiva y equilibrio. Los multiplicativos enfatizan logros y magnitud (doble récord, triple salto), creando impacto y memoria histórica. En la crónica, humanizan datos; en la enciclopedia, sistematizan información. Juntos, construyen narrativa y precisión técnica.
+💡 DICA SLIDE: 📊📖 *Fracción = perspectiva | Multiplicativo = impacto. Juntos = conocimiento completo.*
+
+48. Corrige el siguiente texto y justifica cada cambio numérico/apocopado: "Es el primero partido de la temporada. Hay una gran equipo. La mitad de los jugador es bueno. Ganaron por doble de goles. Es el tercer vez que pasa."
+✅ **Gab Esperado:** "Es el primer partido (✗ primero→primer, apócope) de la temporada. Hay un gran equipo (✓). La mitad de los jugadores son buenos (✗ jugador→jugadores, concordancia; bueno→buenos). Ganaron por doble diferencia de goles (✓, pero se añade 'diferencia' para naturalidad). Es la tercera vez que pasa (✗ tercer→tercera, concordancia con 'vez' fem.)." Justificación: apócope normativa, concordancia de género/número, precisión léxica.
+💡 DICA SLIDE: 🔍 *Corrección = diagnóstico gramatical + aplicación sistemática. Precisión = respeto al idioma.*
+
+---
+
+### 🔹 ELIMINATÓRIAS/Vestibular (2 questões)
+49. [Gráfico Conceitual] Un país gana 2 medallas de oro, 3 de plata y 1 de bronce en una edición. ¿Qué fracción del total corresponde a oro y qué multiplicativo expresa el total si se duplica en la siguiente edición?
+✅ **Gab:** Fracción oro = 2/6 = 1/3. Multiplicativo total duplicado = doble (12 medallas). 📝 Just: Total = 6. Oro = 2. 2/6 = 1/3. Doble = 2x. 💡 DICA SLIDE: 🥇📊 *Fracción + multiplicativo = lectura crítica de datos. Precisión numérica.*
+
+50. [Análise Crítica] "Los números en el deporte son solo datos fríos, sin impacto cultural o educativo." Esta afirmación es válida? Justifique con base en crónica deportiva, enciclopedia, y rol pedagógico de la alfabetización numérica en escuelas.
+✅ **Gab Esperado:** No es válida. Los números en el deporte estructuran memoria histórica (décadas, siglos), miden superación (récords, fracciones de esfuerzo) y enseñan ciudadanía (estadísticas de inclusión, fair play). La crónica los humaniza; la enciclopedia los sistematiza. En escuelas, analizar datos deportivos desarrolla pensamiento crítico, equidad y respeto por la diversidad. Los números son puentes, no muros.
+💡 DICA SLIDE: 🏫📊 *Deporte + números = aula sin paredes. Datos = historias vivas.* 🧠 *Alfabetización numérica = poder ciudadano.*
+
+---
+
+✅ **Tópico 7 concluído com 50 questões completas.**
+*(Pronto para importação CMS: tags BNCC, níveis N1-N3, dissertativas, eliminatórias, dicas do slide integradas e gatilhos neurocognitivos em todas as questões.)*
+
+Deseja que eu prossiga imediatamente com o **Tópico 8: Ortografía II (R/RR) y Apócope Avanzada** mantendo o mesmo rigor pedagógico, calibragem vestibular e integração do slide de revisão? 🎯

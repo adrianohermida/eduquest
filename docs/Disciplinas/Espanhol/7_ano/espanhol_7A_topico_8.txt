@@ -1,1 +1,180 @@
-espanhol_7A_topico_1.txt
+# 📘 TÓPICO 8: Ortografía II (R/RR) y Apócope Avanzada
+*(Alinhado à Unidad 3 | pp. 53-60 | Slide de Revisão | Método Kumon → Vestibular | BNCC: EF07LE01, EF07LE04, EF07LP07)*
+
+---
+
+### 🔹 NÍVEL 1 - Fixação Kumon (15 questões)
+```
+1. [MC] ¿Cómo se escribe correctamente la palabra que significa "vehículo de cuatro ruedas"?
+a) caro b) carro c) carrro d) caaro
+✅ Gab: B | 📝 Just: RR entre vocales = sonido fuerte vibrante múltiple.
+💡 DICA SLIDE: 🔊 *RR entre vocales = FUERTE (perro, carro).* 🎵 *Som de motor acelerando + "¡rrr!"*
+
+2. [V/F] La "r" al inicio de palabra siempre tiene sonido suave. ( ) V ( ) F
+✅ Gab: F | 📝 Just: R inicial = sonido fuerte (ratón, rato).
+💡 DICA SLIDE: 🐀 *R inicial = FUERTE. No lleva RR.* 🧠 *Memória visual: R no começo = voz alta.*
+
+3. [MC] Completa: "El atleta corrió por la ca___era."
+a) rr b) r c) rn d) rt
+✅ Gab: A | 📝 Just: RR entre vocales para som forte.
+💡 DICA SLIDE: 🛣️ *Carretera = RR. Vibração intensa entre vogais.*
+
+4. [V/F] "Primer" es la forma apocopada de "primero" y se usa antes de sustantivo masculino singular. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Regra de apócope normativa.
+💡 DICA SLIDE: ✂️ *PRIMERO → PRIMER (antes de SMS = Sustantivo Masculino Singular).*
+
+5. [MC] ¿Cuál es la forma correcta antes de "niño"?
+a) primero b) primer c) primeros d) primera
+✅ Gab: B | 📝 Just: Apócope obrigatória antes de sust. masc. sing.
+💡 DICA SLIDE: 🧒 *Primer niño. Regra fixa.* ❤️ *Constância gramatical.*
+
+6. [V/F] "Gran" solo se apocopa ante sustantivos masculinos. ( ) V ( ) F
+✅ Gab: F | 📝 Just: "Gran" se apocopa ante CUALQUIER sustantivo singular (masculino o femenino).
+💡 DICA SLIDE: 🌟 *GRAN = qualquer singular. "Gran mujer", "gran partido".*
+
+7. [MC] Completa: "Es un _____ día para entrenar."
+a) bueno b) buen c) buenos d) buena
+✅ Gab: B | 📝 Just: Apócope antes de sust. masc. sing.
+💡 DICA SLIDE: ☀️ *Bueno → buen (antes de masc. sing.).*
+
+8. [V/F] "Honra" se escribe con H y R simple porque la R va después de consonante (n) y suena fuerte. ( ) V ( ) F
+✅ Gab: V | 📝 Just: R fuerte después de n, l, s.
+💡 DICA SLIDE: 🏆 *Honra, Enrique, Israel = R forte após consoante.* 🎵 *Som firme + consoante.*
+
+9. [MC] ¿Qué par de palabras cambia de significado por R/RR?
+a) caro/carro b) pero/perro c) cero/cerro d) Todas son correctas
+✅ Gab: D | 📝 Just: Ortografia define significado semântico.
+💡 DICA SLIDE: 🔤 *Una letra cambia todo el mensaje.* 🧠 *Ortografia = precisão.*
+
+10. [V/F] "Cualquiera" se apocopa a "cualquier" solo ante sustantivos femeninos. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Invariable ante cualquier sustantivo singular.
+💡 DICA SLIDE: ✂️ *Cualquier persona/cosa. Regra universal.*
+
+11. [MC] Completa: "_____ persona puede ser campeón."
+a) Cualquiera b) Cualquier c) Cualquié d) Cualquie
+✅ Gab: B | 📝 Just: Apócope ante singular invariável.
+💡 DICA SLIDE: ✨ *Cualquier + singular.* ❤️ *Inclusão linguística.*
+
+12. [V/F] "Santo" se apocopa a "San" ante todos los nombres de santos. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Exceções históricas: Santo Domingo, Santo Tomás, Santo Toribio.
+💡 DICA SLIDE: 📿 *San Juan/Pedro, mas Santo Domingo/Tomás.*
+
+13. [MC] ¿Cómo se escribe la palabra que significa "elevación de tierra"?
+a) cero b) cerro c) ceero d) cerroo
+✅ Gab: B | 📝 Just: R simples inicial = forte. Não leva RR.
+💡 DICA SLIDE: ⛰️ *Cerro = montanha. Cero = número.*
+
+14. [V/F] La "rr" nunca aparece al inicio de una palabra en español. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Norma ortográfica absoluta do espanhol.
+💡 DICA SLIDE: 🚫 *RR nunca inicia palavra. Fonotáctica válida.*
+
+15. [MC] Completa: "Fue el _____ partido de la temporada."
+a) tercero b) tercer c) terceros d) tercera
+✅ Gab: B | 📝 Just: Apócope de "tercero" antes de masc. sing.
+💡 DICA SLIDE: 🥉 *Tercer partido. Regra fixa.*
+```
+
+---
+
+### 🔹 NÍVEL 2 - Aplicação Escolar (20 questões)
+16. [Interpretação] Na crônica: "El estadio era un volcán de voces". Se "carretera" aparecesse com R simples, qual erro fonético ocorreria? → ✅ Som suave em vez de forte, alterando pronúncia e ritmo. 💡 DICA SLIDE: 🛣️ *RR = vibração intensa entre vogais.*
+17. [MC] Completa: "Es una _____ oportunidad para ganar." a) buena b) buen c) buenas d) bueno → ✅ Gab: A. 📝 Just: Oportunidad (fem.) → buena. Apócope só ante masc. sing. 💡 DICA SLIDE: ⚖️ *Bueno → buen (só masc. sing.). Feminino = buena.*
+18. [V/F] "Gran" se usa ante "mujer" e "hombre" indistintamente. ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: 🌟 *Gran mujer / Gran hombre. Singular universal.*
+19. [MC] Qual opção corrige o erro? "El perro corrió por la carretera pero el auto no lo vio." → ✅ Gab: Já está correta. Diferencia pero (conj.) / perro (animal). 💡 DICA SLIDE: 🔍 *Mas não confunda: conjunção ≠ animal.*
+20. [V/F] "Tercer" perde o "o" antes de "lugar". ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: 🥉 *Tercer lugar. Apócope normativa.*
+21. [MC] Completa: "Hay _____ buenos jugadores en el equipo." a) buen b) buenos c) buena d) buenísimos → ✅ Gab: B. 📝 Just: Plural → forma completa. 💡 DICA SLIDE: 📏 *Apócope só no singular.*
+22. [V/F] "Santo Tomás" se apocopa a "San Tomás". ( ) V ( ) F → ✅ F. 📝 Just: Exceção histórica. 💡 DICA SLIDE: 📿 *Santo Tomás (não San).*
+23. [MC] "El atleta recibió _____ premio." a) un b) uno c) una d) unos → ✅ Gab: A. 📝 Just: Apócope de "uno" antes de masc. sing. 💡 DICA SLIDE: 🔢 *Uno → un (antes de masc. sing.).*
+24. [V/F] "Cualquier" é invariável em gênero. ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: ✂️ *Cualquier idea / cualquier libro.*
+25. [MC] Completa com R ou RR: "Is___el" → ✅ Gab: R. 📝 Just: R forte depois de consoante (s). 💡 DICA SLIDE: 🇮🇱 *Israel = R após S.*
+26. [Interpretação] No texto olímpico: "El _____ atleta cruzó la meta." Qual forma é normativa? → ✅ tercer. 💡 DICA SLIDE: 🥉 *Tercer atleta.*
+27. [V/F] "Ratón" leva R simples porque está no início e soa forte. ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: 🐀 *R inicial = forte sem RR.*
+28. [MC] Completa: "Es _____ hombre muy trabajador." a) un b) uno c) una d) unos → ✅ Gab: A. 💡 DICA SLIDE: 👨 *Un hombre.*
+29. [V/F] "Buenos días" usa a forma completa porque é plural. ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: ☀️ *Plural = sem apócope.*
+30. [MC] Qual par segue a regra de R/RR? a) caro/carro b) cero/cerro c) pero/perro d) Todas → ✅ Gab: D. 💡 DICA SLIDE: 🔤 *Ortografia semântica.*
+31. [V/F] "Gran partido" e "buen partido" são apócopes válidas. ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: ⚽ *Gran/buen + masc. sing.*
+32. [MC] Completa: "La _____ mujer ganó la medalla." a) gran b) grande c) granas d) grandes → ✅ Gab: A. 📝 Just: Gran ante singular feminino. 💡 DICA SLIDE: 🏅 *Gran mulher.*
+33. [V/F] "Enrique" leva R simples depois de consoante (n). ( ) V ( ) F → ✅ V. 💡 DICA SLIDE: 👤 *Enrique = R forte após N.*
+34. [MC] Completa: "_____ cosa es posible en los Juegos." a) Cualquier b) Cualquiera c) Cualquiér d) Cualquiere → ✅ Gab: A. 💡 DICA SLIDE: ✨ *Cualquier cosa.*
+35. [V/F] "Primer" e "tercer" se usam ante substantivos femininos. ( ) V ( ) F → ✅ F. 📝 Just: Primera/Tercera para feminino. 💡 DICA SLIDE: ♀️ *Feminino = forma completa.*
+
+---
+
+### 🔹 NÍVEL 3 - Vestibular (10 questões)
+36. [MC] La norma que prohíbe "rr" al inicio de palabra se basa en:
+a) Estética b) Fonotáctica del español (ninguna palabra comienza con vibrante múltiple) c) Influencia del inglés d) Error histórico
+✅ Gab: B | 📝 Just: Restrição fonológica do espanhol: vibrante múltiple não inicia sílaba tônica.
+💡 DICA SLIDE: 🗣️ *Fonotáctica = regras de som válidas.*
+
+37. [Eliminatória] I. "RR" siempre suena fuerte entre vocales. II. "Gran" se apocopa ante cualquier singular. III. "Santo" se apocopa ante todos los santos. IV. "Primer" solo va ante masculino singular. Están correctas: a) I, II, IV b) II, III c) I, III, IV d) Todas
+✅ Gab: A | 📝 Just: III é falsa (exceções históricas).
+💡 DICA SLIDE: 🔍 *Eliminar absolutos. Apócope = regra histórica.*
+
+38. [MC] En la crónica deportiva, el uso de "gran victoria" cumple función de:
+a) Exagerar b) Intensificar y condensar el significado en ritmo periodístico c) Confundir d) Redundar
+✅ Gab: B | 📝 Just: Apócope gera economia silábica e ritmo ágil típico do jornalismo esportivo.
+💡 DICA SLIDE: 📰 *Apócope = economia expressiva + ritmo.*
+
+39. [V/F] La apócope de "uno" a "un" sigue el mismo principio fonético que "primero" a "primer". ( ) V ( ) F
+✅ Gab: V | 📝 Just: Economia silábica ante sust. masc. sing. por conveniência articulatória.
+💡 DICA SLIDE: 🔗 *Mesmo padrão histórico.*
+
+40. [MC] ¿Qué política lingüística promueve el uso correcto de R/RR en escuelas?
+a) Memorización sin contexto b) Conciencia fonológica, práctica contextualizada y corrección formativa c) Prohibición de diccionarios d) Enfoque exclusivo en exámenes
+✅ Gab: B | 📝 Just: Fonologia + uso contextualizado = retenção neurolinguística duradoura.
+💡 DICA SLIDE: 🎓 *Fonología + uso = retención.*
+
+41. [V/F] "Cualquier" es invariable porque proviene de "cual" + "quiera", y la apócope busca fluidez sintáctica. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Evolução histórica busca economia e fluidez diante de qualquer singular.
+💡 DICA SLIDE: 📜 *Etimología + economía = regla.*
+
+42. [MC] Si un texto dice "San Juan y Santo Domingo", ¿qué explica la diferencia?
+a) Error b) Excepción histórica y normativa (Santo antes de D/T) c) Regionalismo d) Modernización
+✅ Gab: B | 📝 Just: Norma da RAE conserva "Santo" ante nomes começados com D ou T.
+💡 DICA SLIDE: 📿 *Santo Domingo/Tomás/Toribio = exceções.*
+
+43. [Eliminatória] I. "Pero" y "perro" difieren por R simple vs RR. II. "Gran" va ante femenino singular. III. "Buen" va ante femenino singular. IV. "RR" nunca inicia palabra. Correctas: a) I, II, IV b) I, III c) II, III, IV d) Todas
+✅ Gab: A | 📝 Just: III é falsa (buen só ante masc. sing.).
+💡 DICA SLIDE: 🔍 *Precisão normativa.*
+
+44. [MC] En "El _____ día de competencia", ¿qué opción es correcta?
+a) primero b) primer c) primeros d) primera
+✅ Gab: B | 📝 Just: Apócope ante masc. sing.
+💡 DICA SLIDE: 📅 *Primer día.*
+
+45. [MC] "La _____ atleta ganó el _____ premio."
+a) gran / primer b) grande / primero c) gran / primero d) grande / primer
+✅ Gab: A | 📝 Just: Gran (qualquier sing.) + primer (masc. sing.).
+💡 DICA SLIDE: 🏅 *Gran + primer.*
+
+---
+
+### 🔹 DISSERTATIVAS (3 questões)
+46. Explica la regla fonética que justifica el uso de R/RR en español. ¿Por qué "carro" lleva RR y "caro" lleva R simple?
+✅ **Gab Esperado:** Em espanhol, R simples entre vogais tem som suave (vibrante simples). Para marcar o som forte (vibrante múltiple) entre vogais, usa-se RR. "Carro" (veículo) exige vibração forte para diferenciar de "caro" (preço), que usa R suave. É uma distinção fonêmica obrigatória na norma culta.
+💡 DICA SLIDE: 🔊 *Fonética distintiva. RR = força. R = leveza.*
+
+47. Compara la apócope de "primero/tercero" con la de "bueno/grande/cualquiera". ¿Por qué sus reglas difieren?
+✅ **Gab Esperado:** "Primero/tercero" → só perdem o "o" ante substantivo masculino singular por evolução fonética histórica. "Grande/cualquiera" → apocopam-se ante QUALQUER singular (masculino ou feminino) por economia sintática universal. "Bueno" → "buen" só ante masculino singular. Ex: primer lugar, gran mujer, cualquier idea, buen día. A diferença reflete origens etimológicas e padrões de fluidez articulatória.
+💡 DICA SLIDE: ✂️ *História + uso = reglas distintas.*
+
+48. Corrige el siguiente texto y justifica cada cambio ortográfico/apocopado: "Es el primero partido. Hay un gran equipo. La mitad de los jugador es bueno. Ganaron por doble de goles. Es el tercer vez que pasa."
+✅ **Gab Esperado:** "Es el primer partido (✗ primero→primer, apócope) de la temporada. Hay un gran equipo (✓). La mitad de los jugadores son buenos (✗ jugador→jugadores, concordância; bueno→buenos). Ganaron por doble diferencia de goles (✓, mas adiciona-se 'diferencia' para naturalidade). Es la tercera vez que pasa (✗ tercer→tercera, concordância com 'vez' fem.)." Justificação: apócope normativa, concordância de gênero/número, precisão léxica.
+💡 DICA SLIDE: 🔍 *Correção = diagnóstico gramatical + aplicação sistemática.*
+
+---
+
+### 🔹 ELIMINATÓRIAS/Vestibular (2 questões)
+49. [Gráfico Conceitual] Um país ganha 2 ouros, 3 pratas e 1 bronze em uma edição. Qual fração do total corresponde ao ouro e qual multiplicativo expressa o total se duplicar na próxima edição?
+✅ **Gab:** Fração ouro = 2/6 = 1/3. Multiplicativo total duplicado = doble (12 medalhas). 📝 Just: Total = 6. Ouro = 2. 2/6 = 1/3. Doble = 2x. 💡 DICA SLIDE: 🥇📊 *Fracción + multiplicativo = leitura crítica de dados.*
+
+50. [Análise Crítica] "La ortografía es solo una convención social sin base científica". Esta afirmación é válida? Justifique com base em fonética, neurociência da linguagem e normas acadêmicas.
+✅ **Gab Esperado:** Não é válida. R/RR baseia-se em fonética distintiva (diferença de significado por vibração). Apócope reflete economia articulatória histórica. Neurociência mostra que ortografia consistente reduz carga cognitiva e facilita leitura fluente. A RAE sistematiza esses padrões, não os inventa. É convenção, sim, mas fundamentada em ciência linguística e função social.
+💡 DICA SLIDE: 🌐 *Ortografía = ciência + história + função social.*
+
+---
+
+✅ **Tópico 8 concluído com 50 questões completas.**
+*(Pronto para importação CMS: tags BNCC, níveis N1-N3, dissertativas, eliminatórias, dicas do slide integradas e gatilhos neurocognitivos em todas as questões.)*
+
+Deseja que eu prossiga imediatamente com o **Tópico 9: Verbos Irregulares 3ª Conjugación (e→ie / e→i / o→ue) y Producción Textual** mantendo o mesmo rigor pedagógico, calibragem vestibular e integração do slide de revisão? 🎯
