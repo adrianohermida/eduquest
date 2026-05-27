@@ -238,6 +238,139 @@ const SupaDB = {
             reviewed_at:    new Date().toISOString(),
             review_count:   0
         });
+    },
+
+    // ── CONTENT SEEDER ───────────────────────────────────────
+    /**
+     * Seeds all content from window.CHAPTERS_REGISTRY into Supabase.
+     * Idempotent: upserts chapters/stages, replaces questions/flashcards/summary_cards per stage.
+     *
+     * @param {function} onProgress  Called with ({ done, total, label, error? })
+     * @returns {{ chaptersOk, stagesOk, questionsOk, flashcardsOk, cardsOk, errors[] }}
+     */
+    async seedContent(onProgress) {
+        const c = getClient();
+        if (!c) return { error: 'Supabase client not available' };
+
+        const registry  = window.CHAPTERS_REGISTRY || {};
+        const chapters  = Object.values(registry);
+        const report    = { chaptersOk: 0, stagesOk: 0, questionsOk: 0, flashcardsOk: 0, cardsOk: 0, errors: [] };
+        const total     = chapters.reduce((s, ch) => s + (ch.stages?.length || 0), chapters.length);
+        let done        = 0;
+
+        const progress = (label, error) => {
+            done++;
+            if (typeof onProgress === 'function') onProgress({ done, total, label, error });
+        };
+
+        for (const meta of chapters) {
+            // ── 1. Upsert chapter ─────────────────────────────────
+            const chRow = {
+                id: meta.id, subject: meta.subject, grade: meta.grade,
+                title: meta.title, icon: meta.icon || '📚', color: meta.color || '#64748b',
+                total_stages: meta.totalStages || meta.stages?.length || 0,
+                description: meta.description || '', published: meta.published !== false
+            };
+            const { error: chErr } = await c.from('chapters')
+                .upsert(chRow, { onConflict: 'id' });
+            if (chErr) {
+                report.errors.push(`chapter ${meta.id}: ${chErr.message}`);
+                progress(`⚠️ chapter/${meta.id}`, chErr.message);
+                continue;
+            }
+            report.chaptersOk++;
+            progress(`📚 ${meta.title}`);
+
+            for (const s of (meta.stages || [])) {
+                const sd = window[s.varName];
+                if (!sd) {
+                    report.errors.push(`stage ${s.id}: window.${s.varName} not loaded`);
+                    progress(`⚠️ ${s.id} (not loaded)`);
+                    continue;
+                }
+
+                // ── 2. Upsert stage ───────────────────────────────
+                const stRow = {
+                    id: s.id, chapter_id: meta.id,
+                    stage_index: s.index || 1, var_name: s.varName,
+                    title: sd.title || s.id, icon: sd.icon || '⚔️',
+                    difficulty: sd.difficulty || (s.isBoss ? 'boss' : 'medium'),
+                    estimated_time: sd.estimatedTime || 10,
+                    is_boss: !!s.isBoss, is_final: !!s.isFinal,
+                    learning_objectives: sd.learningObjectives || [],
+                    completion_message: sd.completionMessage || '',
+                    rewards: sd.rewards || {}, published: true
+                };
+                const { error: stErr } = await c.from('stages')
+                    .upsert(stRow, { onConflict: 'id' });
+                if (stErr) {
+                    report.errors.push(`stage ${s.id}: ${stErr.message}`);
+                    progress(`⚠️ stage/${s.id}`, stErr.message);
+                    continue;
+                }
+                report.stagesOk++;
+
+                // ── 3. Replace questions (delete + insert) ────────
+                await c.from('questions').delete().eq('stage_id', s.id);
+                const sections = [
+                    { key: 'warmup',         data: sd.warmup         || [] },
+                    { key: 'guidedPractice', data: sd.guidedPractice || [] },
+                    { key: 'questions',      data: sd.questions      || [] },
+                    { key: 'adaptiveReview', data: sd.adaptiveReview || [] },
+                ];
+                const qRows = [];
+                for (const sec of sections) {
+                    sec.data.forEach((q, i) => {
+                        qRows.push({
+                            stage_id: s.id, section: sec.key, seq_index: i,
+                            prompt: (q.prompt || '').slice(0, 2000),
+                            options: q.options || [],
+                            explanation: (q.explanation || '').slice(0, 2000),
+                            difficulty: q.difficulty || null,
+                            topic: q.topic || null,
+                            type: q.type || 'multiple_choice'
+                        });
+                    });
+                }
+                if (qRows.length) {
+                    const { error: qErr } = await c.from('questions').insert(qRows);
+                    if (qErr) report.errors.push(`questions ${s.id}: ${qErr.message}`);
+                    else report.questionsOk += qRows.length;
+                }
+
+                // ── 4. Replace flashcards ─────────────────────────
+                await c.from('flashcards').delete().eq('stage_id', s.id);
+                const fcs = sd.summary?.flashcards || [];
+                if (fcs.length) {
+                    const fcRows = fcs.map((fc, i) => ({
+                        stage_id: s.id, seq_index: i,
+                        question: (fc.q || '').slice(0, 500),
+                        answer:   (fc.a || '').slice(0, 1000)
+                    }));
+                    const { error: fcErr } = await c.from('flashcards').insert(fcRows);
+                    if (fcErr) report.errors.push(`flashcards ${s.id}: ${fcErr.message}`);
+                    else report.flashcardsOk += fcRows.length;
+                }
+
+                // ── 5. Replace summary cards ──────────────────────
+                await c.from('summary_cards').delete().eq('stage_id', s.id);
+                const cards = sd.summary?.content || [];
+                if (cards.length) {
+                    const cardRows = cards.map((card, i) => ({
+                        stage_id: s.id, seq_index: i,
+                        icon:  card.icon  || '📌',
+                        title: (card.title || '').slice(0, 200),
+                        text:  (card.text  || '').slice(0, 3000)
+                    }));
+                    const { error: cardErr } = await c.from('summary_cards').insert(cardRows);
+                    if (cardErr) report.errors.push(`summary_cards ${s.id}: ${cardErr.message}`);
+                    else report.cardsOk += cardRows.length;
+                }
+
+                progress(`✅ ${sd.title}`);
+            }
+        }
+        return report;
     }
 };
 

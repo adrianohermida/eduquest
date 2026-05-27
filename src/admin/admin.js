@@ -682,6 +682,7 @@ window.EduAdmin = (() => {
                 <div class="admin-page-sub" style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${crumbs}</div>
             </div>
             <div class="admin-page-actions">
+                <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._openSeedModal()" title="Sincronizar todo o conteúdo dos JS globals → Supabase">☁️ Seed Supabase</button>
                 <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._navigate('ai')">🤖 Gerar com IA</button>
             </div>
         </div>
@@ -2283,6 +2284,110 @@ window.EduAdmin = (() => {
         CMD_ITEMS[idx]?.action?.();
     }
 
+    /* ── Supabase Content Seeder ─────────────────────────────────── */
+
+    function _openSeedModal() {
+        document.getElementById('seed-modal')?.remove();
+        const data = _loadContentData();
+        const totalStages    = data.reduce((s, c) => s + c.stagesLoaded, 0);
+        const totalQuestions = data.reduce((s, c) => s + c.questionCount, 0);
+        const totalFC        = data.reduce((s, c) => s + c.flashcardCount, 0);
+        const m = document.createElement('div');
+        m.id = 'seed-modal';
+        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:4000;display:flex;align-items:center;justify-content:center';
+        m.innerHTML = `
+        <div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px;width:520px;max-width:95vw">
+            <div style="font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:6px">☁️ Seed Supabase — Conteúdo</div>
+            <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:20px;line-height:1.5">
+                Sincroniza todos os JS globals carregados → tabelas <code style="background:#0f172a;padding:1px 5px;border-radius:3px">chapters / stages / questions / flashcards / summary_cards</code>.<br>
+                <strong style="color:#f97316">Idempotente:</strong> pode rodar múltiplas vezes sem duplicar dados.
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:20px">
+                ${[['📚',data.length,'Capítulos'],['🗺️',totalStages,'Estágios'],['❓',totalQuestions,'Questões'],['🃏',totalFC,'Flashcards']].map(([i,v,l]) => `
+                <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px;text-align:center">
+                    <div style="font-size:1.3rem">${i}</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#f1f5f9">${v}</div>
+                    <div style="font-size:0.7rem;color:#64748b">${l}</div>
+                </div>`).join('')}
+            </div>
+            <div id="seed-log" style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;min-height:80px;max-height:180px;overflow-y:auto;font-family:monospace;font-size:0.75rem;color:#94a3b8;margin-bottom:16px">
+                Aguardando início…
+            </div>
+            <div id="seed-bar-wrap" style="display:none;margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#64748b;margin-bottom:4px">
+                    <span id="seed-bar-label">Processando…</span>
+                    <span id="seed-bar-pct">0%</span>
+                </div>
+                <div style="background:#1e293b;border:1px solid #334155;border-radius:4px;height:8px;overflow:hidden">
+                    <div id="seed-bar-fill" style="height:100%;background:linear-gradient(90deg,#f97316,#fb923c);width:0%;transition:width 0.2s"></div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button id="seed-cancel-btn" onclick="document.getElementById('seed-modal').remove()" class="admin-topbar-btn admin-topbar-btn-ghost">Cancelar</button>
+                <button id="seed-run-btn" onclick="EduAdmin._runSeed()" class="admin-topbar-btn admin-topbar-btn-primary">🚀 Iniciar Seed</button>
+            </div>
+        </div>`;
+        document.body.appendChild(m);
+        m.addEventListener('click', e => { if (e.target === m && !document.getElementById('seed-run-btn')?.disabled) m.remove(); });
+    }
+
+    async function _runSeed() {
+        if (typeof SupaDB === 'undefined') { _editorToast('⚠️ SupaDB não disponível'); return; }
+        const runBtn    = document.getElementById('seed-run-btn');
+        const cancelBtn = document.getElementById('seed-cancel-btn');
+        const log       = document.getElementById('seed-log');
+        const barWrap   = document.getElementById('seed-bar-wrap');
+        const barFill   = document.getElementById('seed-bar-fill');
+        const barPct    = document.getElementById('seed-bar-pct');
+        const barLabel  = document.getElementById('seed-bar-label');
+
+        if (!log) return;
+        runBtn.disabled = true;
+        runBtn.textContent = '⏳ Seeding…';
+        if (cancelBtn) cancelBtn.disabled = true;
+        if (barWrap) barWrap.style.display = 'block';
+        log.textContent = '';
+
+        const addLog = (msg, isError) => {
+            const line = document.createElement('div');
+            line.style.cssText = `color:${isError ? '#ef4444' : '#94a3b8'};padding:1px 0;`;
+            line.textContent = msg;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        };
+
+        addLog('🔐 Verificando sessão…');
+        const session = await SupaAuth?.getSession?.();
+        if (!session?.user?.id) {
+            addLog('⚠️ Faça login no app antes de rodar o seed.', true);
+            runBtn.disabled = false;
+            runBtn.textContent = '🚀 Iniciar Seed';
+            if (cancelBtn) cancelBtn.disabled = false;
+            return;
+        }
+        addLog(`✅ Autenticado como ${session.user.email}`);
+
+        const result = await SupaDB.seedContent(({ done, total, label, error }) => {
+            const pct = Math.round((done / total) * 100);
+            if (barFill) barFill.style.width = `${pct}%`;
+            if (barPct)  barPct.textContent  = `${pct}%`;
+            if (barLabel) barLabel.textContent = label;
+            addLog(label, !!error);
+        });
+
+        // Summary
+        if (result.errors?.length > 0) {
+            addLog('─────────────── ERROS ───────────────', true);
+            result.errors.forEach(e => addLog(e, true));
+        }
+        const summary = `✅ Concluído — ${result.chaptersOk} capítulos · ${result.stagesOk} estágios · ${result.questionsOk} questões · ${result.flashcardsOk} flashcards · ${result.cardsOk} cards${result.errors?.length ? ` · ⚠️ ${result.errors.length} erros` : ''}`;
+        addLog(summary);
+        runBtn.textContent = '✅ Seed concluído!';
+        runBtn.style.background = result.errors?.length ? '#f59e0b' : '#22c55e';
+        if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.textContent = 'Fechar'; }
+        _editorToast(summary);
+    }
+
     return {
         init, render, _navigate, _exit, _openCmd, _closeCmd, _cmdSearch, _cmdKey, _execCmd, _refresh,
         _openMobileSidebar, _closeMobileSidebar,
@@ -2298,5 +2403,6 @@ window.EduAdmin = (() => {
         _changeQType, _bufQTrueFalse, _bufQItem, _addQItem, _removeQItem,
         _bufQPair, _addQPair,
         _setApprovalStatus,
+        _openSeedModal, _runSeed,
     };
 })();
