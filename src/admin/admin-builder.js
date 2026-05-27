@@ -16,18 +16,74 @@ window.EduBuilder = (() => {
     let _bState = {
         subject: '', grade: '7º Ano', difficulty: 'medium',
         targetType: 'questions', targetChapter: '', count: 8,
+        /* ── Extended parameters (Sprint 9 / Spanish / LE) ── */
+        language: 'pt',           // 'pt' = Portuguese output | 'es' = Spanish output
+        stageType: 'normal',      // 'normal' | 'boss' | 'final' | 'n3_bonus'
+        grammarFocus: '',         // '' | 'muy_mucho' | 'verbos_2conj' | 'verbos_3conj' | 'ortografia_mn' | 'ortografia_rr' | 'numerales' | 'apocope'
+        adaptiveN1: 85,           // N1 unlock threshold (%) — default 85, LE=80
+        adaptiveN2: 80,           // N2 unlock threshold (%) — default 80, LE=75
+        adaptiveN3: 70,           // N3 target (%) — no gate, but sets star threshold
+        sensoryTrigger: '',       // icon/color hint for topic UX (e.g. '🍳 amber' for cooking)
+        subjectPreset: '',        // preset key that auto-fills language + thresholds
     };
+
+    /* ── Subject Presets ────────────────────────────────────── */
+    const SUBJECT_PRESETS = {
+        espanhol: {
+            label: '🇪🇸 Espanhol/LE', language:'es',
+            adaptiveN1:80, adaptiveN2:75, adaptiveN3:70,
+            note:'Língua Estrangeira: limites mais baixos (80/75/70%) pois LE exige mais repetição.'
+        },
+        ingles: {
+            label: '🇬🇧 Inglês/LE', language:'en',
+            adaptiveN1:80, adaptiveN2:75, adaptiveN3:70,
+            note:'Língua Estrangeira: mesmos limiares de LE.'
+        },
+        ciencias: {
+            label: '🔬 Ciências', language:'pt',
+            adaptiveN1:85, adaptiveN2:80, adaptiveN3:70,
+            note:'Padrão STEM: 85/80/70%.'
+        },
+        matematica: {
+            label: '📐 Matemática', language:'pt',
+            adaptiveN1:85, adaptiveN2:80, adaptiveN3:70,
+            note:'Padrão STEM: 85/80/70%.'
+        },
+        default: {
+            label: '📚 Padrão', language:'pt',
+            adaptiveN1:85, adaptiveN2:80, adaptiveN3:70,
+            note:'Limiares padrão: 85/80/70%.'
+        },
+    };
+
+    /* ── Grammar Focus Options (for LE) ────────────────────── */
+    const GRAMMAR_FOCUS = [
+        { id:'',              label:'— Nenhum foco específico —' },
+        { id:'muy_mucho',     label:'MUY vs MUCHO (regra PAMM)' },
+        { id:'verbos_2conj',  label:'Verbos -ER irregulares (e→ie, o→ue, TENGO)' },
+        { id:'verbos_3conj',  label:'Verbos -IR irregulares (e→ie, e→i, o→ue)' },
+        { id:'ortografia_mn', label:'Ortografia M/N (M antes de P/B)' },
+        { id:'ortografia_rr', label:'Ortografia R/RR (pares mínimos, apócope)' },
+        { id:'numerales',     label:'Numerales (ordinais, fracionários, coletivos)' },
+        { id:'apocope',       label:'Apócope (buen/gran/primer/tercer/cualquier/san)' },
+        { id:'comidas',       label:'Vocabulário: Comidas del Día' },
+        { id:'deportes',      label:'Vocabulário: Deportes Olímpicos' },
+    ];
 
     /* ── Content Type Catalogue ─────────────────────────────── */
     const CONTENT_TYPES = [
         { id:'full_stage',   icon:'🎮', label:'Estágio Completo',    desc:'Questões + flashcards + resumo + objetivos em uma geração' },
+        { id:'full_stage_es',icon:'🇪🇸', label:'Estágio Completo ES', desc:'Estágio completo em Espanhol — inclui mnemonics + flashcards em ES' },
         { id:'questions',    icon:'❓', label:'Questões',             desc:'Múltipla escolha, V/F, lacuna e resposta curta' },
         { id:'flashcards',   icon:'🃏', label:'Flashcards',           desc:'Pares pergunta/resposta para memorização' },
+        { id:'mnemonics',    icon:'🧠', label:'Mnemônicos',           desc:'Regras de memória: trigger + frase mnemônica pedagógica' },
         { id:'summary',      icon:'📋', label:'Cards de Resumo',      desc:'Blocos explicativos com ícone, título e texto' },
         { id:'objectives',   icon:'🎯', label:'Objetivos',            desc:'Objetivos de aprendizagem mensuráveis (BNCC-aligned)' },
         { id:'true_false',   icon:'✅', label:'Verdadeiro/Falso',     desc:'Afirmações para classificar como V ou F' },
         { id:'fill_blank',   icon:'✍️', label:'Complete a Lacuna',    desc:'Frases com ___ para preencher (com distractores)' },
         { id:'matching',     icon:'🔗', label:'Correspondência',      desc:'Coluna A → Coluna B: conectar conceitos e definições' },
+        { id:'n3_bonus',     icon:'🏆', label:'N3 Bônus Vestibular',  desc:'15 questões de alto nível (ENEM/FUVEST) para o modo N3 de batalha' },
+        { id:'verbos_conj',  icon:'🔄', label:'Conjugação Verbal',    desc:'Tabelas de conjugação + frases de exemplo (ideal para LE)' },
     ];
 
     /* ── Approval Helpers ───────────────────────────────────── */
