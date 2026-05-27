@@ -73,7 +73,8 @@ const CONFIG = {
             color: '#d97706',
             grade: '7º Ano',
             chapters: [
-                { id: 'esp_presente', title: 'Lección 1 — Presente', icon: '💬', totalStages: 6, unlocked: false, description: 'Em breve' }
+                { id: 'esp_gastronomia', title: 'Unidad 2 — Gastronomía y Alimentación', icon: '🍽️', totalStages: 6, unlocked: true,  description: 'Comidas del día, vocabulario, ortografía y verbos irregulares!' },
+                { id: 'esp_deportes',    title: 'Unidad 3 — Deportes y Juegos Olímpicos', icon: '🏅', totalStages: 7, unlocked: true,  description: 'Olimpíadas, vocabulario deportivo, numerales y verbos -IR!' }
             ]
         },
         {
@@ -141,7 +142,9 @@ const CONFIG = {
         { id: 'geo_cap6_populacao', title: 'Cap. 6 — População Brasileira',      subject: 'Geografia',   grade: '7º Ano', icon: '👥', totalStages: 6,  unlocked: true, description: 'Distribuição, crescimento e migrações do povo brasileiro!' },
         { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização',             subject: 'Geografia',   grade: '7º Ano', icon: '🏙️',totalStages: 7,  unlocked: true, description: 'Cidades, êxodo rural e projeções populacionais!' },
         { id: 'cap8_corpo',         title: 'Cap. 8 — Corpo Humano',              subject: 'Ciências',    grade: '8º Ano', icon: '🫀', totalStages: 8,  unlocked: true, description: 'Sistemas do corpo humano!' },
-        { id: 'mat8_equacoes',      title: 'Potências, Raízes e Equações',       subject: 'Matemática',  grade: '8º Ano', icon: '⚡', totalStages: 8,  unlocked: true, description: 'Potenciação, radiciação e equações!' }
+        { id: 'mat8_equacoes',      title: 'Potências, Raízes e Equações',       subject: 'Matemática',  grade: '8º Ano', icon: '⚡', totalStages: 8,  unlocked: true, description: 'Potenciação, radiciação e equações!' },
+        { id: 'esp_gastronomia',    title: 'Espanhol — Gastronomía',             subject: 'Espanhol',    grade: '7º Ano', icon: '🍽️', totalStages: 6, unlocked: true, description: 'Comidas del día, MUY/MUCHO, ortografia e verbos 2ª conj.!' },
+        { id: 'esp_deportes',       title: 'Espanhol — Deportes Olímpicos',      subject: 'Espanhol',    grade: '7º Ano', icon: '🏅', totalStages: 7, unlocked: true, description: 'Olimpíadas, R/RR, numerales e verbos 3ª conj.!' }
     ],
 
     // ── GAMIFICATION ─────────────────────────────────────
