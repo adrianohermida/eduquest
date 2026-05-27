@@ -108,6 +108,26 @@ const GameEngine = {
         } else {
             mc = (window.QUESTIONS_BANK || []).map(q => this._normalizeQuestion(q));
         }
+
+        // N3 mode: inject vestibular bonus questions if available
+        if (this.state?.battleLevel === 'n3') {
+            const bonusVarName = `${this.state.stageData?.id || this.state.stageId || ''}_n3_bonus`.toUpperCase().replace(/-/g, '_');
+            // Also try chapter-level bonus: e.g. GEO_CAP7_N3_BONUS
+            const chapterBonus = window[bonusVarName];
+            if (!chapterBonus) {
+                // Try pattern: e.g. stageId = 'geo_cap7_s01' → look for GEO_CAP7_N3_BONUS
+                const chapterPrefix = (this.state.stageId || '').replace(/_s\d+|_sboss|_sfinal/, '').toUpperCase();
+                const altBonus = window[`${chapterPrefix}_N3_BONUS`];
+                if (altBonus?.questions?.length > 0) {
+                    const bonusMC = this._fisherYates(altBonus.questions.map(q => this._normalizeQuestion(q)));
+                    mc = [...mc, ...bonusMC.slice(0, 5)]; // add up to 5 vestibular bonus questions
+                }
+            } else if (chapterBonus?.questions?.length > 0) {
+                const bonusMC = this._fisherYates(chapterBonus.questions.map(q => this._normalizeQuestion(q)));
+                mc = [...mc, ...bonusMC.slice(0, 5)];
+            }
+        }
+
         mc = this._fisherYates(mc).slice(0, CONFIG.stages.questionsPerGame || 10);
 
         const tf = this._generateTFQuestions(stageData);
