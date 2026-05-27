@@ -36,7 +36,7 @@ const GameEngine = {
 
     // ── ENTRY POINT ─────────────────────────────────────────────
 
-    start(chapterId, stageId, stageIndex) {
+    start(chapterId, stageId, stageIndex, level) {
         const stageVarName = stageId.toUpperCase();
         const stageData    = window[stageVarName];
         if (!stageData) {
@@ -44,6 +44,9 @@ const GameEngine = {
             Router.navigate(`#chapter/${chapterId}`);
             return;
         }
+
+        const battleLevel = (level && typeof BattleMode !== 'undefined' && BattleMode.LEVELS[level])
+            ? level : 'n1';
 
         Object.assign(this.state, {
             chapterId, stageId,
@@ -69,6 +72,9 @@ const GameEngine = {
             hasStarGuarantee: false,
             correctCount:     0,
             peakCombo:        0,
+            battleLevel,
+            _fastestAnswerMs: 0,
+            _questionStartMs: 0,
         });
 
         // Apply purchased inventory items
@@ -287,6 +293,10 @@ const GameEngine = {
         const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const heartsHTML = Array.from({length: maxLives}, () => _ic('heart',{size:'xs',color:'heart'})).join('');
 
+        const lvBadge = (typeof BattleMode !== 'undefined' && this.state.battleLevel && this.state.battleLevel !== 'n1')
+            ? `<span class="bm-arena-badge bm-lvl-${this.state.battleLevel}">${BattleMode.LEVELS[this.state.battleLevel]?.label || ''}</span>`
+            : '';
+
         app.innerHTML = `
             <div class="game-arena battle-arena battle-duo ${theme.bgClass}" id="game-arena">
                 <div class="duo-topbar">
@@ -296,7 +306,7 @@ const GameEngine = {
                             <div class="duo-progress-fill" id="game-progress" style="width:0%"></div>
                         </div>
                     </div>
-                    <div class="duo-lives" id="game-lives">${heartsHTML}</div>
+                    <div class="duo-lives" id="game-lives">${heartsHTML}${lvBadge}</div>
                 </div>
                 <div class="duo-enemy-bar">
                     <span class="duo-enemy-icon" id="enemy-sprite">${theme.enemy}</span>
@@ -385,7 +395,12 @@ const GameEngine = {
         const container = document.getElementById('question-container');
         const letters   = ['A', 'B', 'C', 'D'];
 
-        this.state.timer = CONFIG.stages.timePerQuestion || 15;
+        // Level-aware timer: BattleMode overrides CONFIG default
+        const levelTimer = (typeof BattleMode !== 'undefined' && this.state.battleLevel)
+            ? BattleMode.getTimerForLevel(this.state.battleLevel)
+            : (CONFIG.stages.timePerQuestion || 15);
+        this.state.timer            = levelTimer + (this.state.extraTime || 0);
+        this.state._questionStartMs = Date.now();
         this._updateTimerUI();
         this._startTimer();
 
@@ -617,7 +632,7 @@ const GameEngine = {
 
     _startTimer() {
         clearInterval(this.state.timerInterval);
-        this.state.timer = (CONFIG.stages.timePerQuestion || 15) + (this.state.extraTime || 0);
+        // Timer is already set in _loadQuestion — keep it
         this._updateTimerUI();
         this.state.timerInterval = setInterval(() => {
             if (this.state.pendingFeedback) return;
@@ -678,11 +693,23 @@ const GameEngine = {
             this.state.correctCount = (this.state.correctCount || 0) + 1;
             if (this.state.combo > (this.state.peakCombo || 0)) this.state.peakCombo = this.state.combo;
             if (this.state.combo >= 5) State.completeMission('combo_5');
-            const timeLimit = CONFIG.stages.timePerQuestion || 15;
-            if (this.state.timer > timeLimit - 5) State.completeMission('fast_answer');
-            const comboBonus = (CONFIG.xp.comboBonus || 0) * this.state.combo;
-            const timeBonus  = Math.floor((this.state.timer / 15) * (CONFIG.xp.timeBonusMax || 75));
-            const points     = Math.round(((CONFIG.xp.correct || 10) + comboBonus + timeBonus) * (this.state.xpMultiplier || 1));
+            const levelTimer = (typeof BattleMode !== 'undefined' && this.state.battleLevel)
+                ? BattleMode.getTimerForLevel(this.state.battleLevel)
+                : (CONFIG.stages.timePerQuestion || 15);
+            if (this.state.timer > levelTimer - 5) State.completeMission('fast_answer');
+            const comboBonus    = (CONFIG.xp.comboBonus || 0) * this.state.combo;
+            const timeBonus     = Math.floor((this.state.timer / levelTimer) * (CONFIG.xp.timeBonusMax || 75));
+            const levelMult     = (typeof BattleMode !== 'undefined' && this.state.battleLevel)
+                ? BattleMode.getMultiplier(this.state.battleLevel) : 1.0;
+            const streakMult    = (typeof BattleMode !== 'undefined')
+                ? BattleMode.getStreakMultiplier(this.state.combo) : 1.0;
+            const points        = Math.round(((CONFIG.xp.correct || 10) + comboBonus + timeBonus)
+                * (this.state.xpMultiplier || 1) * levelMult * streakMult);
+            // Track fastest answer for speed badge
+            const elapsed = this.state._questionStartMs ? Date.now() - this.state._questionStartMs : 0;
+            if (elapsed > 0 && (this.state._fastestAnswerMs === 0 || elapsed < this.state._fastestAnswerMs)) {
+                this.state._fastestAnswerMs = elapsed;
+            }
             this.state.score += points;
 
             this.state.enemyHP = Math.max(0, this.state.enemyHP - 100 / this.state.questions.length);
@@ -943,6 +970,29 @@ const GameEngine = {
 
         // Persist session to Supabase (fire-and-forget)
         this._persistGameSession(victory, stars, xpGain, gemGain);
+
+        // BattleMode: record result + badge / level-up celebrations
+        if (typeof BattleMode !== 'undefined' && this.state.battleLevel) {
+            const bmResult = BattleMode.recordResult(
+                this.state.chapterId,
+                this.state.stageId,
+                this.state.battleLevel,
+                this.state.correctCount     || 0,
+                this.state.questions.length,
+                this.state.peakCombo        || 0,
+                this.state._fastestAnswerMs || 0
+            );
+            if (bmResult.earnedBadges?.length > 0) {
+                setTimeout(() => {
+                    bmResult.earnedBadges
+                        .filter(b => !bmResult.leveledUp || b.id !== `${bmResult.newLevel}_unlock`)
+                        .forEach((b, i) => setTimeout(() => BattleMode.showBadgeToast(b), i * 450));
+                }, 1200);
+            }
+            if (bmResult.leveledUp) {
+                setTimeout(() => BattleMode.showLevelUpModal(bmResult.newLevel, []), 2800);
+            }
+        }
     },
 
     // ── SUPABASE PERSISTENCE ──────────────────────────────────────

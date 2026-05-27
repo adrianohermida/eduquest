@@ -142,6 +142,24 @@ const Router = {
         }
     },
 
+    // ── BATTLE MODE level selection (used from renderStagePrep) ──
+    _selectedLevel: 'n1',
+
+    _selectLevel(level) {
+        Router._selectedLevel = level;
+        // Update visual selection on buttons
+        document.querySelectorAll('.bm-lv-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.level === level);
+        });
+        // Update start button label
+        const btn = document.getElementById('bm-start-btn');
+        if (btn && typeof BattleMode !== 'undefined') {
+            const lv = BattleMode.LEVELS[level];
+            if (lv) btn.innerHTML = `⚡ Iniciar ${lv.label} — ${lv.fullLabel}!`;
+        }
+        if (typeof SoundManager !== 'undefined') SoundManager.play('click');
+    },
+
     _updateNavActive(route) {
         // Update both bottom nav tabs AND sidebar items
         document.querySelectorAll('.nav-tab, .sidebar-item').forEach(tab => {
@@ -1234,11 +1252,20 @@ const Router = {
                 Dificuldade: ${diffData.label}
             </div>
 
+            ${(!isBoss && !isFinal && typeof BattleMode !== 'undefined') ? `
+            <div class="bm-selector-wrap" id="bm-selector-wrap">
+                <div class="bm-selector-header">⚔️ Modo de Batalha</div>
+                ${BattleMode.renderLevelSelector(chapterId, stageId, 'Router._selectLevel')}
+            </div>
+            <button class="btn-primary" id="bm-start-btn"
+                    onclick="GameEngine.start('${chapterId}', '${stageId}', ${stageIndex}, Router._selectedLevel || 'n1')">
+                ${_ic('xp',{size:'sm'})} Iniciar N1 — Fixação!
+            </button>` : `
             <button class="btn-primary"
                 style="${(isBoss || isFinal) ? 'background:var(--gold);box-shadow:0 5px 0 #92400e' : ''}"
                 onclick="GameEngine.start('${chapterId}', '${stageId}', ${stageIndex})">
                 ${isFinal ? `${_ic('achievement',{size:'sm'})} Iniciar Exame Final!` : isBoss ? `${_ic('sword',{size:'sm'})} Enfrentar o Chefe!` : `${_ic('xp',{size:'sm'})} Iniciar Missão!`}
-            </button>
+            </button>`}
 
             <div class="minigame-select">
                 <div class="minigame-select-title">ou pratique com</div>
@@ -1403,6 +1430,16 @@ const Router = {
                 <!-- Mastery -->
                 <div class="section-header mt-3" style="margin-bottom:var(--sp-3)"><span class="section-title">${_ic('dna',{size:'sm'})} Domínio</span></div>
                 ${masteryHTML}
+
+                <!-- Battle Mode Calibration -->
+                ${typeof BattleMode !== 'undefined' ? `
+                <div class="section-header mt-3" style="margin-bottom:var(--sp-3)">
+                    <span class="section-title">⚔️ Calibragem Vestibular</span>
+                </div>
+                <div class="bm-heatmap-section">
+                    <div class="bm-heatmap-title">🔥 Conceitos com mais erros</div>
+                    ${BattleMode.renderHeatmap()}
+                </div>` : ''}
 
                 <!-- Achievements -->
                 <div class="section-header mt-3" style="margin-bottom:var(--sp-3)">

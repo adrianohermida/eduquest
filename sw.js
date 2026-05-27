@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v20';
+const CACHE_NAME  = 'eduquest-v21';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -72,6 +72,9 @@ const CACHE_SHELL = [
     '/src/motion/ui-animations.js',
     /* Admin */
     '/src/admin/admin.js',
+    /* Battle Mode — Sprint 9 */
+    '/js/battle-mode.js',
+    '/css/battle-mode.css',
     /* Ciências 7º Ano — Capítulo 7 Doenças */
     '/js/data/ciencias/7ano/chapters/cap7_doencas/metadata.js',
     '/js/data/ciencias/7ano/chapters/cap7_doencas/stages/stage_01.js',
@@ -134,6 +137,7 @@ const CACHE_SHELL = [
     '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_s04.js',
     '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_sboss.js',
     '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_sfinal.js',
+    '/js/data/geografia/7ano/chapters/geo_cap6_populacao/stages/geo_cap6_n3_bonus.js',
     /* Geografia 7º Ano — Cap. 7: Urbanização e Dinâmicas Migratórias */
     '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/metadata.js',
     '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_s01.js',
@@ -142,6 +146,7 @@ const CACHE_SHELL = [
     '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_s04.js',
     '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_sboss.js',
     '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_sfinal.js',
+    '/js/data/geografia/7ano/chapters/geo_cap7_urbanizacao/stages/geo_cap7_n3_bonus.js',
     /* Ciências 8º Ano — Corpo Humano */
     '/js/data/ciencias/8ano/chapters/cap8_corpo/metadata.js',
     '/js/data/ciencias/8ano/chapters/cap8_corpo/stages/cap8_s01.js',

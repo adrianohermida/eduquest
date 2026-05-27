@@ -908,6 +908,16 @@ const State = {
         return Object.keys(this.data.wrongAnswers || {}).length;
     },
 
+    getWrongAnswersMap() {
+        const wa  = this.data.wrongAnswers || {};
+        const map = {};
+        for (const item of Object.values(wa)) {
+            const t = item.topic || 'Geral';
+            map[t] = (map[t] || 0) + (item.count || 1);
+        }
+        return map;
+    },
+
     getReviewQuestions(n = 5) {
         const wa = Object.values(this.data.wrongAnswers || {})
             .sort((a, b) => b.count - a.count)
