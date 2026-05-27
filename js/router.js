@@ -94,7 +94,8 @@ const Router = {
             case 'flashcards':    this._renderFlashcardsRoute(container); break;
             case 'reading':       if (typeof ReadingFocus !== 'undefined') ReadingFocus.start(parts[1], parts[2]); else container.innerHTML = '<div class="screen"><p style="padding:32px">Reading Focus não carregado.</p></div>'; break;
             case 'deep-focus':    if (typeof DeepFocus !== 'undefined') DeepFocus.renderScreen(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Focus Engine não carregado.</p></div>'; break;
-            case 'builder':       if (typeof Builder !== 'undefined') Builder.start(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Builder não carregado.</p></div>'; break;
+            case 'builder':          if (typeof Builder !== 'undefined') Builder.start(container); else container.innerHTML = '<div class="screen"><p style="padding:32px">Builder não carregado.</p></div>'; break;
+            case 'battle-dashboard': this.renderBattleDashboard(container); break;
             case 'admin':
                 if (typeof EduAdmin !== 'undefined' && State.isAdmin()) {
                     EduAdmin.render(container, parts[1] || 'overview');
@@ -1437,6 +1438,7 @@ const Router = {
                 ${typeof BattleMode !== 'undefined' ? `
                 <div class="section-header mt-3" style="margin-bottom:var(--sp-3)">
                     <span class="section-title">⚔️ Calibragem Vestibular</span>
+                    <span class="section-link" onclick="Router.navigate('#battle-dashboard')" style="cursor:pointer">Dashboard completo ›</span>
                 </div>
                 <div class="bm-heatmap-section">
                     <div class="bm-heatmap-title">🔥 Conceitos com mais erros</div>
@@ -2022,6 +2024,168 @@ const Router = {
                 this.navigate('#guild');
             },
         });
+    },
+
+    // ── BATTLE DASHBOARD (Sprint A8) ─────────────────────
+    async renderBattleDashboard(container) {
+        const _ic  = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const lvCfg = typeof BattleMode !== 'undefined' ? BattleMode.LEVELS : {};
+        const userId = typeof State !== 'undefined' ? State.data?.user?.id : null;
+
+        // Local heatmap data (instant — from localStorage wrong answers)
+        const localHeatmap = typeof BattleMode !== 'undefined' ? BattleMode.getHeatmapData() : [];
+
+        // ── Helper: render a level stat card ──────────────
+        const _lvCard = (key, data, unlocked) => {
+            const lv  = lvCfg[key] || { label: key.toUpperCase(), color: '#64748b', icon: '⚔️', fullLabel: key, desc: '' };
+            const acc = data.total > 0 ? Math.round((data.correct / data.total) * 100) : null;
+            const accBar = acc !== null
+                ? `<div style="background:#334155;border-radius:4px;height:6px;margin-top:6px;overflow:hidden">
+                     <div style="height:100%;width:${acc}%;background:${lv.color};border-radius:4px;transition:width .5s"></div>
+                   </div>
+                   <div style="font-size:0.7rem;color:${lv.color};margin-top:3px;font-weight:700">${acc}% precisão</div>`
+                : `<div style="font-size:0.7rem;color:#475569;margin-top:6px">${unlocked ? 'Sem sessões ainda' : 'Bloqueado'}</div>`;
+            return `
+            <div style="background:#1e293b;border:1.5px solid ${unlocked ? lv.color + '66' : '#334155'};border-radius:12px;padding:14px;opacity:${unlocked ? 1 : 0.55}">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                    <span style="font-size:1.4rem">${lv.icon}</span>
+                    <div>
+                        <div style="font-size:0.68rem;background:${lv.color};color:#fff;font-weight:800;padding:1px 6px;border-radius:6px;display:inline-block">${lv.label}</div>
+                        <div style="font-size:0.78rem;font-weight:700;color:#f1f5f9;margin-top:1px">${lv.fullLabel}</div>
+                    </div>
+                    ${!unlocked ? `<span style="margin-left:auto;font-size:1rem">🔒</span>` : ''}
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:0.72rem;text-align:center">
+                    <div style="background:#0f172a;border-radius:6px;padding:6px">
+                        <div style="color:#f1f5f9;font-weight:800;font-size:1rem">${data.sessions}</div>
+                        <div style="color:#64748b">sessões</div>
+                    </div>
+                    <div style="background:#0f172a;border-radius:6px;padding:6px">
+                        <div style="color:#f1f5f9;font-weight:800;font-size:1rem">${data.victories}</div>
+                        <div style="color:#64748b">vitórias</div>
+                    </div>
+                    <div style="background:#0f172a;border-radius:6px;padding:6px">
+                        <div style="color:#fbbf24;font-weight:800;font-size:1rem">${data.sessions > 0 ? (data.stars / data.sessions).toFixed(1) : '—'}</div>
+                        <div style="color:#64748b">★ média</div>
+                    </div>
+                </div>
+                ${accBar}
+                <div style="font-size:0.65rem;color:#475569;margin-top:5px">${lv.desc}</div>
+            </div>`;
+        };
+
+        // ── Heatmap HTML ──────────────────────────────────
+        const _heatmapHtml = (data) => {
+            if (!data.length) return `<div style="color:#475569;font-style:italic;padding:12px 0;font-size:0.82rem">Nenhum erro registrado ainda. Continue praticando!</div>`;
+            const max = data[0]?.count || 1;
+            return data.map(({ topic, count }) => {
+                const pct  = Math.round((count / max) * 100);
+                const heat = pct >= 80 ? '#ef4444' : pct >= 60 ? '#f97316' : pct >= 40 ? '#f59e0b' : pct >= 20 ? '#22c55e' : '#3b82f6';
+                return `<div style="display:grid;grid-template-columns:1fr 3fr auto;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1e293b">
+                    <span style="font-size:0.75rem;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${topic}</span>
+                    <div style="background:#1e293b;border-radius:4px;height:8px;overflow:hidden">
+                        <div style="height:100%;width:${Math.max(pct,5)}%;background:${heat};border-radius:4px"></div>
+                    </div>
+                    <span style="font-size:0.7rem;color:${heat};font-weight:700;min-width:28px;text-align:right">${count}×</span>
+                </div>`;
+            }).join('');
+        };
+
+        // ── Initial skeleton render ───────────────────────
+        const localLevelMap = {
+            n1: { sessions: 0, correct: 0, total: 0, victories: 0, stars: 0 },
+            n2: { sessions: 0, correct: 0, total: 0, victories: 0, stars: 0 },
+            n3: { sessions: 0, correct: 0, total: 0, victories: 0, stars: 0 },
+        };
+        const unlocked = typeof BattleMode !== 'undefined' && userId
+            ? BattleMode.getUnlockedLevels('geo_brasil', 'geo_brasil_s01')  // generic check
+            : { n1: true, n2: false, n3: false };
+
+        container.innerHTML = `
+        <div class="screen" style="padding:var(--sp-4)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+                <button onclick="history.back()" style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:0">‹</button>
+                <div>
+                    <h2 style="margin:0;font-size:1.1rem;font-weight:900;color:var(--text)">⚔️ Battle Dashboard</h2>
+                    <div style="font-size:0.72rem;color:var(--text-muted)">Análise de desempenho por nível · sincronizando…</div>
+                </div>
+            </div>
+
+            <!-- Level cards -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0" id="bmd-level-cards">
+                ${_lvCard('n1', localLevelMap.n1, true)}
+                ${_lvCard('n2', localLevelMap.n2, unlocked.n2||false)}
+                ${_lvCard('n3', localLevelMap.n3, unlocked.n3||false)}
+            </div>
+
+            <!-- Concept heatmap -->
+            <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                    <div style="font-size:0.88rem;font-weight:800;color:#f1f5f9">🔥 Conceitos com mais erros</div>
+                    <div id="bmd-sync-badge" style="font-size:0.65rem;background:#334155;color:#94a3b8;padding:2px 8px;border-radius:8px">⏳ sincronizando</div>
+                </div>
+                <div id="bmd-heatmap">${_heatmapHtml(localHeatmap)}</div>
+            </div>
+
+            <!-- CTA row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+                <button onclick="Router.navigate('#mastery')"
+                    style="background:#1e293b;border:1.5px solid #334155;color:#f1f5f9;border-radius:10px;padding:12px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+                    ${_ic('microscope',{size:'sm',color:'science'})} Mapa de Domínio
+                </button>
+                <button onclick="Router.navigate('#review')"
+                    style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;border-radius:10px;padding:12px;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+                    ${_ic('compass',{size:'sm',color:'final'})} Revisão Inteligente
+                </button>
+            </div>
+        </div>`;
+
+        // ── Async Supabase enrichment ─────────────────────
+        if (typeof SupaDB === 'undefined' || !userId) {
+            const badge = document.getElementById('bmd-sync-badge');
+            if (badge) { badge.textContent = '📴 offline'; badge.style.background = '#1e293b'; }
+            return;
+        }
+
+        try {
+            const stats = await SupaDB.getUserBattleStats(userId);
+            if (!stats) throw new Error('no data');
+
+            // Patch level cards
+            const cardEl = document.getElementById('bmd-level-cards');
+            if (cardEl) {
+                const lvUnlocked = {
+                    n1: true,
+                    n2: stats.levelMap.n2.sessions > 0 || unlocked.n2,
+                    n3: stats.levelMap.n3.sessions > 0 || unlocked.n3,
+                };
+                cardEl.innerHTML =
+                    _lvCard('n1', stats.levelMap.n1, lvUnlocked.n1) +
+                    _lvCard('n2', stats.levelMap.n2, lvUnlocked.n2) +
+                    _lvCard('n3', stats.levelMap.n3, lvUnlocked.n3);
+            }
+
+            // Patch heatmap
+            const hmEl = document.getElementById('bmd-heatmap');
+            if (hmEl && stats.heatmap.length) hmEl.innerHTML = _heatmapHtml(stats.heatmap);
+
+            // Update sync badge
+            const badge = document.getElementById('bmd-sync-badge');
+            if (badge) {
+                badge.style.background = '#0f172a';
+                badge.style.borderColor = '#22c55e';
+                badge.style.color = '#22c55e';
+                badge.textContent = `✅ ${stats.totalSessions} sessões · ${stats.totalWrong} erros`;
+            }
+
+            // Update subtitle
+            const sub = container.querySelector('div[style*="sincronizando"]');
+            if (sub) sub.textContent = `Análise de desempenho · ${stats.totalSessions} sessões registradas`;
+
+        } catch(e) {
+            const badge = document.getElementById('bmd-sync-badge');
+            if (badge) { badge.textContent = '⚠️ dados locais'; badge.style.color = '#f59e0b'; }
+        }
     },
 
     // ── MASTERY SCREEN ───────────────────────────────────

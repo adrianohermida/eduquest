@@ -556,7 +556,81 @@ const SupaDB = {
             const synced = JSON.parse(localStorage.getItem('eq_synced_stages') || '{}');
             return synced[stageId] ? new Date(synced[stageId]).toLocaleDateString('pt-BR') : null;
         } catch(e) { return null; }
-    }
+    },
+
+    // ── BATTLE DASHBOARD (Sprint A8) ───────────────────────
+    /**
+     * Fetch per-user battle stats: concept heatmap + level breakdown.
+     * Reads from wrong_answers and game_sessions (RLS: own rows only).
+     * @param {string} userId
+     * @returns {Promise<{heatmap, levelMap, totalWrong, totalSessions}|null>}
+     */
+    async getUserBattleStats(userId) {
+        const c = getClient();
+        if (!c || !userId) return null;
+        try {
+            const [wrongRes, sessionRes] = await Promise.all([
+                c.from('wrong_answers')
+                    .select('topic, chapter_id, stage_id, review_count')
+                    .eq('user_id', userId)
+                    .order('review_count', { ascending: false })
+                    .limit(200),
+                c.from('game_sessions')
+                    .select('battle_level, correct_count, total_questions, stars, victory, played_at, chapter_id')
+                    .eq('user_id', userId)
+                    .not('battle_level', 'is', null)
+                    .order('played_at', { ascending: false })
+                    .limit(100),
+            ]);
+
+            const wrongAnswers = wrongRes.data  || [];
+            const sessions     = sessionRes.data || [];
+
+            // Aggregate wrong answers by topic
+            const topicMap = {};
+            wrongAnswers.forEach(w => {
+                const key = (w.topic || 'Geral').trim();
+                topicMap[key] = (topicMap[key] || 0) + 1 + (w.review_count || 0);
+            });
+            const heatmap = Object.entries(topicMap)
+                .map(([topic, count]) => ({ topic, count }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 15);
+
+            // Chapter breakdown for wrong answers
+            const chapterErrMap = {};
+            wrongAnswers.forEach(w => {
+                const ch = w.chapter_id || 'outros';
+                chapterErrMap[ch] = (chapterErrMap[ch] || 0) + 1;
+            });
+            const chapterErrors = Object.entries(chapterErrMap)
+                .map(([chapter_id, errors]) => ({ chapter_id, errors }))
+                .sort((a, b) => b.errors - a.errors)
+                .slice(0, 8);
+
+            // Aggregate by battle level
+            const levelMap = {
+                n1: { sessions: 0, correct: 0, total: 0, victories: 0, stars: 0 },
+                n2: { sessions: 0, correct: 0, total: 0, victories: 0, stars: 0 },
+                n3: { sessions: 0, correct: 0, total: 0, victories: 0, stars: 0 },
+            };
+            sessions.forEach(s => {
+                const lv = s.battle_level;
+                if (levelMap[lv]) {
+                    levelMap[lv].sessions++;
+                    levelMap[lv].correct   += (s.correct_count   || 0);
+                    levelMap[lv].total     += (s.total_questions  || 0);
+                    levelMap[lv].stars     += (s.stars            || 0);
+                    if (s.victory) levelMap[lv].victories++;
+                }
+            });
+
+            return { heatmap, levelMap, chapterErrors, totalWrong: wrongAnswers.length, totalSessions: sessions.length };
+        } catch(e) {
+            console.error('SupaDB.getUserBattleStats:', e);
+            return null;
+        }
+    },
 };
 
 window.SupaClient = { getClient };
