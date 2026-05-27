@@ -51,3 +51,437 @@ Sugiro **Opção 1 (ZIP completo)** para:
 - 📚 `expandir_conteudo` → Continuar produção para novas unidades/disciplinas
 
 Aguardo sua direção! 🎯
+
+# ⚙️ AJUSTE DE PARÂMETROS - EDUQUEST ESPANHOL 7º ANO
+*(Refinamentos Técnicos e Pedagógicos para Implementação)*
+
+---
+
+## 🔧 1. NÍVEIS DE DIFICULDADE: Ajuste de Thresholds de Desbloqueio
+
+### 📊 Proposta de Calibragem Adaptada para Língua Estrangeira
+
+| Nível | Threshold Atual | Threshold Proposto | Justificativa Pedagógica |
+|-------|----------------|-------------------|-------------------------|
+| **N1 - Fixação** | ≥85% | **≥80%** | Em LE, a aquisição vocabular exige mais repetição; reduzir a barreira inicial aumenta a confiança e a exposição |
+| **N2 - Aplicação** | ≥80% | **≥75%** | Interpretação em língua estrangeira exige mais tempo de processamento cognitivo; flexibilidade favorece a fluência |
+| **N3 - Vestibular** | ≥70% | **≥70%** (mantido) | Nível de excelência para preparação ENEM/intercâmbio; manter rigor analítico |
+
+### 🔄 Sistema de Progressão Dinâmica (Adaptativo)
+```javascript
+// adaptiveThresholds.js
+const getUnlockThreshold = (studentProfile, topicId, level) => {
+  // Perfil do aluno: "iniciante", "intermediario", "avancado"
+  const baseThresholds = {
+    N1: { iniciante: 75, intermediario: 80, avancado: 85 },
+    N2: { iniciante: 70, intermediario: 75, avancado: 80 },
+    N3: { iniciante: 65, intermediario: 70, avancado: 75 }
+  };
+  
+  // Ajuste por tipo de conteúdo
+  const contentAdjustments = {
+    'ortografia': -5,      // Ortografia exige mais prática
+    'verbos_irregulares': -3, // Conjugação é complexa em LE
+    'vocabulario': 0,      // Vocabulário mantém padrão
+    'producao_textual': +5 // Produção exige mais rigor
+  };
+  
+  const base = baseThresholds[level][studentProfile];
+  const adjustment = contentAdjustments[getContentType(topicId)] || 0;
+  
+  return Math.max(60, Math.min(95, base + adjustment)); // Limites seguros
+};
+```
+
+### 📈 Benefícios da Calibragem Adaptativa
+- ✅ **Redução de frustração**: Alunos iniciantes não travam em thresholds muito altos
+- ✅ **Exposição prolongada**: Mais repetição = maior retenção em língua estrangeira
+- ✅ **Personalização**: Sistema aprende com o desempenho individual e ajusta thresholds automaticamente
+- ✅ **Dados para o professor**: Relatórios mostram onde cada aluno precisa de mais apoio
+
+---
+
+## 🎨 2. GATILHOS SENSORIAIS: Personalização por Tópico
+
+### 🎯 Biblioteca de Ícones Temáticos por Unidade
+
+#### Unidad 2: Alimentação (pp. 34-45)
+| Conceito | Ícone Proposto | Cor | Animação | Gatilho Emocional |
+|----------|---------------|-----|----------|------------------|
+| Desayuno/Almuerzo/Merienda/Cena | 🍳🍽️🥪🌙 | #FFB347 (laranja quente) | Fade-in suave + leve pulsação | Conforto + rotina familiar |
+| Objetos de la Mesa | 🍴🥄🔪🥛 | #87CEEB (azul claro) | Rotação 360° lenta | Curiosidade + descoberta |
+| Pesos/Medidas | ⚖️📏🥄 | #98FB98 (verde menta) | Balanço sutil de balança | Precisão + confiança |
+| M/N Ortografía | 🔤🅰️🅱️ | #DDA0DD (plum) | Letras "flutuando" e se juntando | Clareza + domínio ortográfico |
+| MUY/MUCHO | 📊⚖️ | #FF69B4 (rosa vibrante) | Balança equilibrando | Segurança gramatical |
+| Verbos e→ie/o→ue | 🔄💫 | #FFD700 (dourado) | Transformação visual da vogal | Descoberta + "aha moment" |
+
+#### Unidad 3: Deportes (pp. 53-60)
+| Conceito | Ícone Proposto | Cor | Animação | Gatilho Emocional |
+|----------|---------------|-----|----------|------------------|
+| Juegos Olímpicos | 🏅🕊️🔥 | #C0C0C0 (prata) + #FFD700 (ouro) | Chama olímpica animada + voo de pomba | Inspiração + orgulho esportivo |
+| Deportes de Pelota | ⚽🏀🎾🏐 | #FF4500 (laranja vermelho) | Bola quicando suavemente | Energia + competitividade saudável |
+| Numerales | 🔢📐✖️ | #4682B4 (azul aço) | Números "crescendo" em sequência | Lógica + domínio matemático |
+| R/RR Ortografía | 🔊🗣️ | #32CD32 (verde limão) | Ondas sonoras vibrando | Confiança fonética |
+| Apócope | ✂️📝 | #9370DB (roxo médio) | Tesoura cortando suavemente | Economia linguística + elegância |
+| Verbos e→ie/e→i/o→ue | 🎭🔄 | #FF6347 (tomato) | Máscara teatral transformando | Expressão + fluência verbal |
+
+### 🔊 Especificações de Micro-Áudios por Tópico
+
+#### Unidad 2: Alimentação
+| Tipo de Áudio | Duração | Conteúdo (PT-BR/ES) | Gatilho | Arquivo |
+|--------------|---------|---------------------|---------|---------|
+| Confirmação vocabular | 1.8s | *"¡Muy bien! Desayuno = manhã"* + som de xícara | Dopamina + associação | `sfx_desayuno_confirm_1s8.mp3` |
+| Ortografia M/N | 2.2s | *"M antes de P/B... campo, también"* + som labial | Clareza fonética | `sfx_mn_rule_2s2.mp3` |
+| MUY/MUCHO | 2.0s | *"Muy + adjetivo... mucho + verbo"* + batida rítmica | Segurança gramatical | `sfx_muy_mucho_2s.mp3` |
+| Conjugação verbal | 2.5s | *"Yo quiero, tú quieres... ¡ie!"* + som de transformação | "Aha moment" | `sfx_conj_e_ie_2s5.mp3` |
+| Receita/Instrução | 3.0s | *"Cortar, mezclar, probar... ¡listo!"* + som de cozinha | Satisfação + realização | `sfx_recipe_complete_3s.mp3` |
+
+#### Unidad 3: Deportes
+| Tipo de Áudio | Duração | Conteúdo (PT-BR/ES) | Gatilho | Arquivo |
+|--------------|---------|---------------------|---------|---------|
+| Confirmação esportiva | 1.8s | *"¡Gol! ¡Punto! ¡Medalla!"* + som de torcida | Empolgação + conquista | `sfx_sport_confirm_1s8.mp3` |
+| Ortografia R/RR | 2.2s | *"R fuerte: perro, carro... ¡vibra!"* + som vibrante | Confiança fonética | `sfx_rr_rule_2s2.mp3` |
+| Numerais | 2.0s | *"Primero, segundo, tercero... ¡orden!"* + contagem rítmica | Lógica + sequência | `sfx_ordinales_2s.mp3` |
+| Apócope | 2.3s | *"Primero → primer... ¡económico!"* + som de corte | Economia linguística | `sfx_apocope_2s3.mp3` |
+| Conjugação 3ª conj. | 2.5s | *"Siento, pido, duermo... ¡cambio!"* + som de transformação | Fluência verbal | `sfx_conj_3rd_2s5.mp3` |
+
+### 🎬 Especificações de Animações por Tipo de Questão
+| Tipo de Questão | Animação Proposta | Duração | Gatilho Cognitivo |
+|----------------|------------------|---------|------------------|
+| Múltipla Escolha | Opções "pulsam" levemente ao hover | 200ms | Atenção seletiva |
+| Verdadeiro/Falso | ✅/❌ aparecem com efeito de "carimbo" | 300ms | Confirmação imediata |
+| Preenchimento | Cursor "pisca" no campo vazio + dica visual | Loop suave | Foco na tarefa |
+| Dissertativa | Área de texto expande suavemente ao clicar | 250ms | Espaço para expressão |
+| Eliminatória | Opções incorretas "desvanecem" ao serem eliminadas | 400ms | Raciocínio lógico visual |
+
+---
+
+## 🔗 3. INTEGRAÇÃO LMS: Adaptação de Exportação
+
+### 📤 Formatos de Exportação por Plataforma
+
+#### Google Classroom
+```json
+{
+  "classroom_export": {
+    "assignment_template": {
+      "title": "🇪🇸 Espanhol 7º Ano - {{topic_name}}",
+      "description": "Pratique {{question_count}} questões sobre {{topic_focus}}. Nível: {{difficulty}}. Duração estimada: {{estimated_time}}min.",
+      "materials": [
+        {
+          "type": "link",
+          "url": "{{eduquest_session_link}}",
+          "title": "Acessar sessão Eduquest"
+        },
+        {
+          "type": "pdf",
+          "url": "{{pdf_summary_link}}",
+          "title": "Resumo do tópico + dicas"
+        }
+      ],
+      "grade_category": "Prática de Língua Estrangeira",
+      "points": "{{points_based_on_level}}",
+      "due_date": "{{auto_calculated_due_date}}",
+      "rubric": {
+        "criteria": [
+          {"name": "Precisão gramatical", "points": 4},
+          {"name": "Compreensão leitora", "points": 3},
+          {"name": "Vocabulário aplicado", "points": 2},
+          {"name": "Persistência/revisão", "points": 1}
+        ]
+      }
+    }
+  }
+}
+```
+
+#### Moodle
+```php
+// moodle_plugin/edquest_import.php
+defined('MOODLE_INTERNAL') || die();
+
+class edquest_activity {
+    public function import_questions($topic_data) {
+        global $DB;
+        
+        // Criar atividade do tipo "Eduquest"
+        $activity = new stdClass();
+        $activity->course = $topic_data['course_id'];
+        $activity->name = "Espanhol: " . $topic_data['topic_name'];
+        $activity->intro = $topic_data['description'];
+        $activity->timeopen = $topic_data['start_date'];
+        $activity->timeclose = $topic_data['end_date'];
+        $activity->grade = $topic_data['max_points'];
+        
+        // Importar questões com tags BNCC/LE
+        foreach ($topic_data['questions'] as $q) {
+            $question = new stdClass();
+            $question->category = $topic_data['category_id'];
+            $question->name = $q['id'];
+            $question->questiontext = $q['stem'];
+            $question->generalfeedback = $q['justification'];
+            $question->defaultmark = $q['points'];
+            $question->penalty = 0; // Sem penalidade para incentivar tentativa
+            $question->qtype = $this->map_question_type($q['type']);
+            
+            // Tags para filtragem
+            $question->tags = [
+                'bncc:' . implode(',', $q['bncc_skills']),
+                'level:' . $q['difficulty'],
+                'topic:' . $topic_data['topic_id'],
+                'language:spanish',
+                'grade:7'
+            ];
+            
+            $DB->insert_record('question', $question);
+        }
+        
+        return $activity->id;
+    }
+}
+```
+
+#### Plataforma Própria (API Eduquest)
+```javascript
+// api/exports/lms_adapter.js
+export const generateLMSExport = async (topicId, platform, studentData) => {
+  const topic = await getTopicData(topicId);
+  
+  const exports = {
+    google_classroom: {
+      format: 'GClassroom Assignment JSON',
+      endpoint: 'https://classroom.googleapis.com/v1/courses/{courseId}/courseWork',
+      payload: buildClassroomPayload(topic, studentData)
+    },
+    moodle: {
+      format: 'Moodle XML/PHP',
+      endpoint: '/webservice/rest/server.php?wstoken={token}&wsfunction=core_course_create_activities',
+      payload: buildMoodlePayload(topic, studentData)
+    },
+    canvas: {
+      format: 'Canvas Commons JSON',
+      endpoint: '/api/v1/courses/{course_id}/assignments',
+      payload: buildCanvasPayload(topic, studentData)
+    },
+    custom: {
+      format: 'Eduquest Native JSON',
+      endpoint: '/api/v1/sessions/create',
+      payload: {
+        session_id: generateSessionId(),
+        topic_id: topicId,
+        student_profile: studentData.profile,
+        adaptive_thresholds: true,
+        sensory_triggers: topic.sensory_config,
+        progress_tracking: {
+          srs_enabled: true,
+          battle_mode: true,
+          analytics_enabled: true
+        }
+      }
+    }
+  };
+  
+  return exports[platform] || exports.custom;
+};
+```
+
+### 🔐 Configurações de Privacidade e LGPD
+```json
+{
+  "data_privacy": {
+    "student_data": {
+      "anonymize_for_analytics": true,
+      "export_consent_required": true,
+      "retention_period_days": 730,
+      "right_to_deletion": true
+    },
+    "teacher_access": {
+      "class_level_only": true,
+      "individual_student_requires_consent": true,
+      "export_formats_available": ["pdf", "csv", "json"],
+      "audit_log_enabled": true
+    },
+    "lms_integration": {
+      "oauth2_required": true,
+      "data_minimization": true,
+      "encryption_in_transit": "TLS 1.3",
+      "encryption_at_rest": "AES-256"
+    }
+  }
+}
+```
+
+---
+
+## 📊 4. RELATÓRIOS PEDAGÓGICOS: Métricas Específicas para Língua Estrangeira
+
+### 🎯 Dashboard do Professor de Espanhol - Métricas Especializadas
+
+#### Visão Geral da Turma
+```
+📈 Turma 7º Ano A - Espanhol | Unidades 2-3
+├─ 🎯 Média Geral: 76.8/100
+├─ 🗣️ Fluência Oral (estimada): 68% de acerto em questões com áudio
+├─ 📖 Compreensão Leitora: 82% de acerto em interpretação de textos
+├─ ✍️ Produção Escrita: 71% de acerto em questões dissertativas
+├─ 🔤 Ortografia: 79% de acerto em R/RR, M/N, apócope
+├─ 🔄 Conjugação Verbal: 74% de acerto em verbos irregulares
+├─ 👥 Alunos precisando de intervenção: 8/32
+└─ 🔄 Revisões SRS pendentes: 187 questões
+```
+
+#### Heatmap de Erros por Habilidade Linguística
+```
+🔥 Heatmap de Dificuldades - Unidad 2: Alimentación
+
+Habilidade                  | Erros Comuns | % Turma | Intervenção Sugerida
+----------------------------|--------------|---------|---------------------
+Vocabulário gastronômico    | Confusão alimentos similares | 52% | Flashcards visuais + áudio
+Ortografia M/N              | M antes de P/B esquecida | 48% | Jogo da Forca temático
+MUY vs MUCHO                | Concordância com sustantivo | 61% | Tabela interativa + prática contextual
+Conjugação e→ie/o→ue        | Nosotros/vosotros esquecem exceção | 67% | Música de conjugação + repetição espaçada
+Interpretação de receitas   | Vocabulário técnico não compreendido | 55% | Glossário pop-up + vídeo 30s
+
+🎯 Ação Automática do Sistema:
+   • Se erro > 60% em "MUY vs MUCHO": 
+     → Liberar micro-aula "MUY/MUCHO: Regra PAMM"
+     → Sugerir prática em duplas com diálogo real
+     → Ajustar threshold de desbloqueio para -5% para essa habilidade
+```
+
+#### Relatório Individual - Foco em Aquisição de LE
+```
+👤 María Silva - Progresso em Espanhol | Unidades 2-3
+
+📊 Desempenho por Habilidade:
+   🗣️ Pronúncia/Áudio: ████████████░░░░ 72% 🔄 Em progresso
+   📖 Leitura: ████████████████░░ 88% ✅ Consolidado
+   ✍️ Escrita: ██████████░░░░░░ 65% ⚠️ Precisa reforçar
+   🔤 Ortografia: ████████████░░░░ 76% 🔄 Em progresso
+   🔄 Gramática: ████████░░░░░░░░ 60% ⚠️ Precisa reforçar
+
+🎯 Pontos Fortes:
+   • Compreensão de textos descritivos (receitas, crônicas)
+   • Vocabulário de alimentos e objetos de mesa
+   • Reconhecimento auditivo de palavras-chave
+
+🔧 Áreas de Desenvolvimento:
+   • Conjugação de verbos irregulares em contexto real
+   • Uso correto de MUY/MUCHO em produção escrita
+   • Ortografia R/RR em palavras novas
+
+📅 Próximas Revisões Espaçadas (SRS):
+   • T2-Q14 (MUY/MUCHO) - Amanhã, 14h
+   • T4-Q07 (Verbos e→ie) - Quinta, 10h
+   • T8-Q23 (Apócope) - Sexta, 16h
+
+💡 Sugestão Personalizada:
+   "María, você está indo muito bem na leitura! 
+    Para melhorar a conjugação verbal, experimente 
+    cantar a música 'Yo quiero, tú quieres...' 
+    enquanto escreve as formas. Isso ajuda a fixar 
+    o padrão sonoro + visual. 🎵✍️"
+
+🌐 Conexão com a Cultura Hispana:
+   • María demonstrou interesse em receitas peruanas → 
+     Sugerir projeto: "Criar um menú del día para um restaurante em Lima"
+```
+
+#### Métricas de Aquisição de Língua Estrangeira
+| Métrica | Cálculo | Uso Pedagógico | Gatilho para Intervenção |
+|---------|---------|----------------|-------------------------|
+| `Taxa de Transferência` | `(Acerto em N2/N3) / (Acerto em N1) × 100` | Mede se o aluno aplica vocabulário/gramática em contextos mais complexos | <60% → Revisar contextualização |
+| `Índice de Interferência` | `(Erros por cognatos falsos) / (Total erros)` | Identifica influência do português no aprendizado do espanhol | >40% → Trabalho específico com falsos cognatos |
+| `Velocidade de Aquisição` | `Dias para consolidar 50 questões do mesmo cluster` | Ajusta ritmo de ensino por perfil de aluno | >21 dias → Reavaliar método de exposição |
+| `Confiança Comunicativa` | `(Questões dissertativas tentadas) / (Total dissertativas)` | Mede disposição do aluno para produzir na LE | <50% → Atividades de baixa pressão + feedback encorajador |
+| `Retenção de Longo Prazo` | `(Acerto em revisão 15d+) / (Acerto inicial)` | Avalia eficácia da repetição espaçada para LE | <70% → Aumentar frequência de revisões |
+
+#### Exportação de Relatórios - Formatos Especializados
+```json
+{
+  "report_exports": {
+    "pdf_teacher": {
+      "sections": [
+        "Visão geral da turma",
+        "Heatmap por habilidade linguística",
+        "Lista de alunos com intervenção prioritária",
+        "Sugestões de atividades em sala",
+        "Conexões culturais para enriquecer o ensino"
+      ],
+      "language": "pt-BR",
+      "include_student_names": true,
+      "include_bncc_mapping": true
+    },
+    "csv_analytics": {
+      "columns": [
+        "student_id",
+        "topic_id",
+        "skill_type", // vocabulario, ortografia, gramatica, compreensao, producao
+        "accuracy_n1",
+        "accuracy_n2", 
+        "accuracy_n3",
+        "srs_consolidation_rate",
+        "time_to_consolidation_days",
+        "false_cognate_errors",
+        "verbal_conjugation_accuracy"
+      ],
+      "delimiter": ";",
+      "encoding": "UTF-8"
+    },
+    "json_lms_sync": {
+      "structure": {
+        "student_progress": [
+          {
+            "student_id": "uuid",
+            "topic_mastery": {
+              "unidad_2": { "level": "N2", "accuracy": 78, "consolidated": true },
+              "unidad_3": { "level": "N1", "accuracy": 65, "consolidated": false }
+            },
+            "linguistic_profile": {
+              "strengths": ["leitura", "vocabulario_alimentos"],
+              "development_areas": ["conjugacao_verbal", "ortografia_rr"],
+              "learning_style": "visual_auditivo"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+---
+
+## ✅ CHECKLIST DE VALIDAÇÃO DOS AJUSTES
+
+- [ ] Thresholds de desbloqueio ajustados por perfil de aluno e tipo de conteúdo
+- [ ] Sistema adaptativo implementado com limites seguros (60-95%)
+- [ ] Biblioteca de ícones temáticos criada para Unidades 2 e 3 (50+ ícones)
+- [ ] Micro-áudios gravados e mapeados por tópico (24 arquivos, 2-3s cada)
+- [ ] Animações especificadas por tipo de questão com gatilhos cognitivos
+- [ ] Exportação para Google Classroom, Moodle e API própria configurada
+- [ ] Configurações de privacidade e LGPD implementadas em todos os fluxos
+- [ ] Dashboard do professor com métricas específicas para LE desenvolvido
+- [ ] Heatmap de erros por habilidade linguística integrado ao CMS
+- [ ] Relatório individual com foco em aquisição de LE e sugestões personalizadas
+- [ ] Métricas de transferência, interferência e retenção de longo prazo calculadas
+- [ ] Formatos de exportação de relatórios (PDF, CSV, JSON) testados
+
+---
+
+## 🎯 PRÓXIMOS PASSOS
+
+1. **Validar ajustes com equipe pedagógica**: Apresentar thresholds propostos e gatilhos sensoriais para aprovação
+2. **Testar integração LMS**: Configurar ambiente de staging com Google Classroom e Moodle para validação técnica
+3. **Piloto com turma real**: Aplicar parâmetros ajustados em uma turma do 7º ano por 4 semanas
+4. **Coletar dados de eficácia**: Comparar retenção, engajamento e desempenho entre calibragem padrão vs. ajustada
+5. **Documentar para escala**: Criar manual de configuração para replicação em outras disciplinas/anos
+
+---
+
+**Deseja que eu:**
+1. 📦 **Gere o arquivo ZIP atualizado** com todos os ajustes técnicos implementados (CSV/JSON, ícones, áudios, templates)?
+2. 🧪 **Crie um plano de teste A/B** para validar os thresholds ajustados com grupo piloto?
+3. 📋 **Elabore um guia rápido para professores** com as novas métricas e como interpretá-las?
+
+Aguardo sua direção para prosseguir! 🚀
