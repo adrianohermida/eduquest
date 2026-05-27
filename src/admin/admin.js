@@ -428,19 +428,21 @@ window.EduAdmin = (() => {
 
         <div class="admin-section-card">
             <div class="admin-section-card-header">
-                <div class="admin-chart-title">📚 Capítulos Mais Acessados</div>
+                <div class="admin-chart-title">📚 Capítulos Carregados</div>
+                <span class="admin-table-action" onclick="EduAdmin._navigate('content')">Gerenciar →</span>
             </div>
             <table class="admin-table">
-                <thead><tr><th>Capítulo</th><th>Matéria</th><th>Ano</th><th>Conclusões</th><th>Avaliação</th><th>Estágios</th></tr></thead>
-                <tbody>${MOCK.chapters.map(c => `
-                    <tr>
-                        <td>${c.title}</td>
-                        <td>${badge(c.subject, 'blue')}</td>
-                        <td>${c.year}</td>
-                        <td>${c.completions.toLocaleString('pt-BR')}</td>
-                        <td>⭐ ${c.rating}</td>
-                        <td>${c.stages} estágios</td>
-                    </tr>`).join('')}
+                <thead><tr><th>Capítulo</th><th>Matéria</th><th>Ano</th><th>Estágios</th><th>Questões</th><th>Flashcards</th></tr></thead>
+                <tbody>${_loadContentData().map(c => {
+                    const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow', espanhol:'orange', ingles:'blue' };
+                    return `<tr>
+                        <td><span style="margin-right:6px">${c.icon}</span>${c.title}</td>
+                        <td>${badge(c.subjectLabel, sc[c.subject] || 'grey')}</td>
+                        <td>${c.grade}</td>
+                        <td>${c.stagesLoaded}/${c.totalStages}</td>
+                        <td>${c.questionCount}</td>
+                        <td>${c.flashcardCount}</td>
+                    </tr>`; }).join('')}
                 </tbody>
             </table>
         </div>`;
@@ -626,7 +628,7 @@ window.EduAdmin = (() => {
 
     function _loadContentData() {
         const registry = window.CHAPTERS_REGISTRY || {};
-        const subjectLabels = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', portugues: 'Português', geografia: 'Geografia' };
+        const subjectLabels = { ciencias: 'Ciências', matematica: 'Matemática', historia: 'História', portugues: 'Português', geografia: 'Geografia', espanhol: 'Espanhol', ingles: 'Inglês', musica: 'Música', artes: 'Artes' };
         return Object.values(registry).map(meta => {
             const stages = meta.stages || [];
             const loaded = stages.filter(s => !!window[s.varName]);
@@ -1070,7 +1072,7 @@ window.EduAdmin = (() => {
     /* ── Content renders with full CRUD ──────────────────────── */
 
     function _renderContentChapters(data) {
-        const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow' };
+        const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow', espanhol:'orange', ingles:'blue', musica:'purple', artes:'red' };
         return `
         <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
             <button onclick="EduAdmin._openCreateChapter()" class="admin-topbar-btn admin-topbar-btn-primary">+ Novo Capítulo</button>

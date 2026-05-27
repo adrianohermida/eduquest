@@ -196,23 +196,27 @@ const SupaDB = {
      */
     async saveGameSession(userId, {
         chapterId, stageIndex, stageId, score, stars,
-        correctCount, totalQuestions, peakCombo, victory, durationMs
+        correctCount, totalQuestions, peakCombo, victory, durationMs,
+        battleLevel
     }) {
         const c = getClient(); if (!c) return { error: { message: 'offline' } };
-        return c.from('game_sessions').insert({
+        const row = {
             user_id:         userId,
             chapter_id:      chapterId,
             stage_index:     stageIndex,
             stage_id:        stageId,
-            score:           score       || 0,
-            stars:           stars       || 0,
-            correct_count:   correctCount || 0,
+            score:           score          || 0,
+            stars:           stars          || 0,
+            correct_count:   correctCount   || 0,
             total_questions: totalQuestions || 0,
-            peak_combo:      peakCombo   || 0,
+            peak_combo:      peakCombo      || 0,
             victory:         !!victory,
-            duration_ms:     durationMs  || 0,
+            duration_ms:     durationMs     || 0,
             played_at:       new Date().toISOString()
-        });
+        };
+        // Only set battle_level when explicitly provided (classic mode = null)
+        if (battleLevel) row.battle_level = battleLevel;
+        return c.from('game_sessions').insert(row);
     },
 
     /**

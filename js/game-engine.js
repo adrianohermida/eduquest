@@ -1034,7 +1034,8 @@ const GameEngine = {
                     totalQuestions: this.state.questions.length,
                     peakCombo:      this.state.peakCombo      || 0,
                     victory,
-                    durationMs
+                    durationMs,
+                    battleLevel:    this.state.battleLevel    || null
                 }).catch(() => {}); // silent — offline is OK
             }).catch(() => {});
         } catch (e) {}
@@ -1045,13 +1046,14 @@ const GameEngine = {
             if (typeof SupaAuth === 'undefined' || typeof SupaDB === 'undefined') return;
             SupaAuth.getSession().then(session => {
                 if (!session?.user?.id) return;
-                const correctAns = q.options?.[q.correctIndex] ?? q.answer ?? '';
-                const userAns    = typedValue
-                    ?? (q.options?.[this.state._lastSelectedIdx] ?? '');
+                // Question format uses `prompt` + options[].correct:true (not correctIndex)
+                const correctAns = q.options?.find(o => o.correct)?.text ?? q.answer ?? '';
+                const lastIdx    = this.state._lastSelectedIdx ?? -1;
+                const userAns    = typedValue ?? (lastIdx >= 0 ? (q.options?.[lastIdx]?.text ?? '') : '');
                 SupaDB.saveWrongAnswer(session.user.id, {
                     chapterId:     this.state.chapterId,
                     stageId:       this.state.stageId,
-                    question:      q.question      || '',
+                    question:      q.prompt        || q.question || '',
                     correctAnswer: correctAns,
                     userAnswer:    userAns
                 }).catch(() => {});
