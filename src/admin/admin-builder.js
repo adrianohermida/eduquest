@@ -273,8 +273,15 @@ window.EduBuilder = (() => {
                 <div class="admin-section-card" style="margin-bottom:16px">
                     <div class="admin-section-card-header"><div class="admin-chart-title">🎯 Contexto</div></div>
                     <div style="display:flex;flex-direction:column;gap:10px;padding-bottom:4px">
+                        <!-- Subject Presets -->
+                        <div><label class="bld-label">⚡ Preset de Disciplina</label>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+                                ${Object.entries(SUBJECT_PRESETS).map(([k,p])=>`<button onclick="EduBuilder._applyPreset('${k}')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:3px 10px;font-size:0.72rem;${_bState.subjectPreset===k?'background:#f97316;color:#fff;border-color:#f97316':''}">${p.label}</button>`).join('')}
+                            </div>
+                            ${_bState.subjectPreset?`<div style="font-size:0.72rem;color:#64748b;margin-top:4px">ℹ️ ${_e(SUBJECT_PRESETS[_bState.subjectPreset]?.note||'')}</div>`:''}
+                        </div>
                         <div><label class="bld-label">Matéria / Disciplina</label>
-                            <input type="text" value="${_e(_bState.subject)}" oninput="EduBuilder._bs('subject',this.value)" placeholder="ex: Ciências, História..."
+                            <input type="text" value="${_e(_bState.subject)}" oninput="EduBuilder._bs('subject',this.value)" placeholder="ex: Ciências, Espanhol, História..."
                             style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.85rem;box-sizing:border-box"></div>
                         <div><label class="bld-label">Ano Escolar</label>
                             <select onchange="EduBuilder._bs('grade',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
@@ -282,6 +289,22 @@ window.EduBuilder = (() => {
                         <div><label class="bld-label">Dificuldade</label>
                             <select onchange="EduBuilder._bs('difficulty',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
                             ${['easy','medium','hard'].map(d=>`<option value="${d}" ${_bState.difficulty===d?'selected':''}>${d}</option>`).join('')}</select></div>
+                        <!-- Language -->
+                        <div><label class="bld-label">🌐 Idioma de Saída</label>
+                            <select onchange="EduBuilder._bs('language',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
+                            ${[['pt','🇧🇷 Português (Brasil)'],['es','🇪🇸 Espanhol'],['en','🇬🇧 Inglês']].map(([v,l])=>`<option value="${v}" ${_bState.language===v?'selected':''}>${l}</option>`).join('')}</select></div>
+                        <!-- Adaptive Thresholds -->
+                        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px">
+                            <div style="font-size:0.75rem;font-weight:700;color:#94a3b8;margin-bottom:8px">⚔️ Limiares Adaptativos (Modo Batalha)</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                                ${[['adaptiveN1','N1 Fixação','#22c55e'],['adaptiveN2','N2 Aplicação','#f59e0b'],['adaptiveN3','N3 Vestibular','#ef4444']].map(([k,label,color])=>`
+                                <div><label style="font-size:0.7rem;color:${color};font-weight:700">${label}</label>
+                                <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
+                                <input type="number" min="50" max="100" value="${_bState[k]||85}" oninput="EduBuilder._bs('${k}',parseInt(this.value))"
+                                style="width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:4px 6px;border-radius:4px;font-size:0.82rem;font-weight:700;text-align:center">
+                                <span style="font-size:0.7rem;color:#64748b">%</span></div></div>`).join('')}
+                            </div>
+                        </div>
                         <button onclick="EduBuilder._switchTab('generate')" class="admin-topbar-btn admin-topbar-btn-primary" style="width:100%;padding:10px"
                         ${_sourceText.trim().length<20?'disabled':''}>Avançar para Gerar →</button>
                     </div>
