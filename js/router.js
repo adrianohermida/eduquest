@@ -1169,6 +1169,8 @@ const Router = {
     renderStagePrep(container, chapterId, stageId) {
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         if (!chapterId || !stageId) { this.renderHome(container); return; }
+        // Reset BattleMode level selection for each new stage prep visit
+        this._selectedLevel = 'n1';
 
         // Sync chapter metadata from registry
         if (chapterId && window.CHAPTERS_REGISTRY?.[chapterId]) {
