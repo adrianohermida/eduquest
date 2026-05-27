@@ -5179,3 +5179,118 @@ img { max-width: 100%; }
     border-radius: 99px;
     transition: width 0.4s ease;
 }
+
+/* ══════════════════════════════════════════════════════════
+   PWA INSTALL — Banner + Draggable FAB
+   ══════════════════════════════════════════════════════════ */
+#pwa-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: var(--surface);
+    border-top: 2px solid var(--brand, #f97316);
+    border-radius: 20px 20px 0 0;
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0));
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 8500;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+    transform: translateY(110%);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+#pwa-banner.pwa-banner--show { transform: translateY(0); }
+
+.pwa-banner-icon { font-size: 1.6rem; flex-shrink: 0; }
+.pwa-banner-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.pwa-banner-text strong {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pwa-banner-text span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.pwa-banner-install {
+    background: var(--brand, #f97316);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 900;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+.pwa-banner-install:hover { opacity: 0.9; }
+.pwa-banner-close {
+    background: var(--surface-3, #f1f5f9);
+    color: var(--text-muted);
+    border: none;
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pwa-banner-close:hover { background: var(--danger-light); color: var(--danger); }
+
+/* ── FAB (draggable mini button) ─────────────────────── */
+#pwa-fab {
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0));
+    right: 16px;
+    width: 52px; height: 52px;
+    background: var(--brand, #f97316);
+    color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(249,115,22,0.45);
+    cursor: pointer;
+    z-index: 8500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s, transform 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+#pwa-fab:hover { box-shadow: 0 6px 20px rgba(249,115,22,0.55); transform: scale(1.06); }
+
+.pwa-fab-icon { font-size: 1.3rem; pointer-events: none; }
+.pwa-fab-close {
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #1e293b;
+    color: #fff;
+    border: none;
+    font-size: 0.6rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+[data-theme="dark"] .pwa-banner-close { background: var(--surface-3, #1e293b); }
+[data-theme="dark"] #pwa-fab { box-shadow: 0 4px 16px rgba(249,115,22,0.3); }

@@ -699,8 +699,8 @@ const HUD = {
     },
 
     _ddHearts(u) {
-        const hearts     = u.hearts ?? 5;
-        const maxHearts  = 5;
+        const maxHearts  = (typeof CONFIG !== 'undefined' ? CONFIG.lives.max : null) || 5;
+        const hearts     = u.hearts ?? maxHearts;
         const full       = hearts >= maxHearts;
         const missing    = maxHearts - hearts;
         const refillCost = missing * 2;
@@ -1028,7 +1028,8 @@ const HUD = {
             if (!el) { this._stopHeartsTimer(); return; }
             if (typeof State === 'undefined') return;
             const u = State.data.user;
-            if ((u.hearts ?? 5) >= 5) { el.textContent = 'Cheio!'; return; }
+            const _maxH = (typeof CONFIG !== 'undefined' ? CONFIG.lives.max : null) || 5;
+            if ((u.hearts ?? _maxH) >= _maxH) { el.textContent = 'Cheio!'; return; }
             const stored = u.nextHeartAt || u.heartRegenAt;
             if (!stored) { el.textContent = '~1h 00m'; return; }
             const diff = stored - Date.now();
@@ -1088,12 +1089,13 @@ const HUD = {
 
     _refillHearts() {
         if (typeof State === 'undefined') return;
-        const u = State.data.user;
-        const missing = 5 - (u.hearts || 0);
-        const cost    = missing * 2;
+        const u         = State.data.user;
+        const maxHearts = (typeof CONFIG !== 'undefined' ? CONFIG.lives.max : null) || 5;
+        const missing   = maxHearts - (u.hearts || 0);
+        const cost      = missing * 2;
         if ((u.gems || 0) < cost) return;
         u.gems   -= cost;
-        u.hearts  = 5;
+        u.hearts  = maxHearts;
         State.save();
         this.update();
         if (typeof EduTactile !== 'undefined') EduTactile.rewardBurst(document.getElementById('hud-hearts-btn'));
@@ -1115,7 +1117,7 @@ const HUD = {
         if ($('hud-xp'))      $('hud-xp').textContent      = (u.xp || 0).toLocaleString('pt-BR');
         if ($('hud-gems'))    $('hud-gems').textContent    = u.gems   || 0;
         if ($('hud-streak'))  $('hud-streak').textContent  = u.streak || 1;
-        if ($('hud-hearts'))  $('hud-hearts').textContent  = u.hearts ?? 5;
+        if ($('hud-hearts'))  $('hud-hearts').textContent  = u.hearts ?? ((typeof CONFIG !== 'undefined' ? CONFIG.lives.max : null) || 5);
         if ($('hud-av-icon')) $('hud-av-icon').textContent = u.avatar || '🦸';
         if ($('hud-av-level'))$('hud-av-level').textContent = `Nível ${u.level || 1}`;
         this.refreshNotifBadge();

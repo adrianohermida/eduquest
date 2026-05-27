@@ -1,1 +1,204 @@
-espanhol_7A_topico_1.txt
+# 📘 TÓPICO 5: Deportes, Juegos Olímpicos y Cultura Deportiva
+*(Alinhado à Unidad 3 | pp. 53-60 | Slide de Revisão | Método Kumon → Vestibular | BNCC: EF07LE01, EF07LE04, EF07LE06, EF07LE12)*
+
+---
+
+### 🔹 NÍVEL 1 - Fixação Kumon (15 questões)
+```
+1. [MC] ¿En qué año y ciudad se celebraron los primeros Juegos Olímpicos modernos?
+a) 1900, París b) 1896, Atenas c) 1924, Chamonix d) 1880, Londres
+✅ Gab: B | 📝 Just: Pierre de Coubertin impulsó el resurgimiento en Atenas, Grecia, 1896.
+💡 DICA SLIDE: 🏟️ *1896 = renacimiento olímpico. "Atenas" cuna de los ideales deportivos.* 🎵 *Som de himno olímpico + "¡Juegos renacen!"*
+
+2. [V/F] Los cinco aros entrelazados de la bandera olímpica representan la unión de los cinco continentes. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Azul, amarillo, negro, verde y rojo simbolizan Europa, Asia, África, Oceanía y América.
+💡 DICA SLIDE: 🌍 *5 aros = 5 continentes unidos. Deporte sin fronteras.* ❤️ *Unidad en la diversidad.*
+
+3. [MC] ¿Qué fracción corresponde a "la mitad" o "medio"?
+a) 1/3 b) 1/4 c) 1/2 d) 1/5
+✅ Gab: C | 📝 Just: ½ se expresa como "medio" o "la mitad".
+💡 DICA SLIDE: 📐 *1/2 = medio/mitad. Visualiza una pizza cortada al centro.* 🧠 *Fracción = parte del todo.*
+
+4. [V/F] "Primero" y "tercero" pierden la "o" antes de sustantivo masculino singular: primer día, tercer piso. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Apócope obligatoria antes de sust. masc. sing.
+💡 DICA SLIDE: ✂️ *Primero → primer | Tercero → tercer. Solo antes de masc. sing.*
+
+5. [MC] ¿Qué deporte se clasifica como "de aventura" y se practica en montaña con bicicleta especializada?
+a) Natación b) Mountain bike c) Tenis d) Balonmano
+✅ Gab: B | 📝 Just: Bicicleta de montaña exige terreno irregular y equipo técnico.
+💡 DICA SLIDE: 🚵 *Mountain bike = naturaleza + técnica. Aventura controlada.* 🎵 *Som de cadena + respiración acelerada.*
+
+6. [V/F] La "rr" entre vocales siempre tiene sonido fuerte (perro, carro, carretera). ( ) V ( ) F
+✅ Gab: V | 📝 Just: Regla ortográfica: RR entre vocales = vibrante múltiple (fuerte).
+💡 DICA SLIDE: 🔊 *RR = vibración intensa. Pronuncia y siente la lengua vibrar.* 🧠 *Fonética en acción.*
+
+7. [MC] ¿Qué comité selecciona a los atletas para representar a un país en los Juegos?
+a) COI (Comité Olímpico Internacional) b) CON (Comité Olímpico Nacional) c) FIFA d) UNESCO
+✅ Gab: B | 📝 Just: El CON es nacional y elige la delegación. El COI supervisa a nivel global.
+💡 DICA SLIDE: 🌐 *CON = país | COI = mundo. Jerarquía olímpica clara.*
+
+8. [V/F] En el desfile olímpico, el equipo del país organizador entra primero y cierra la ceremonia. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Entra primero Grecia (origen) y cierra el país anfitrión (honor).
+💡 DICA SLIDE: 🇬🇷➡️🏠 *Grecia = inicio | Anfitrión = final. Respeto a la historia.*
+
+9. [MC] ¿Cuántos años tiene una "década" y un "siglo"?
+a) 10 y 50 b) 10 y 100 c) 100 y 1000 d) 12 y 60
+✅ Gab: B | 📝 Just: Década = 10 años | Siglo = 100 años.
+💡 DICA SLIDE: 📅 *10 = década | 100 = siglo. Línea del tiempo clara.*
+
+10. [V/F] "Cualquiera" se apocopa a "cualquier" antes de cualquier sustantivo singular (masculino o femenino). ( ) V ( ) F
+✅ Gab: V | 📝 Just: Cualquier persona, cualquier partido. No cambia ante femenino.
+💡 DICA SLIDE: ✂️ *Cualquiera → cualquier. Invariable ante singular.*
+
+11. [MC] ¿Qué deporte acuático utiliza vela para impulsarse con el viento?
+a) Natación b) Vela c) Waterpolo d) Remo
+✅ Gab: B | 📝 Just: La vela aprovecha corrientes de aire y agua.
+💡 DICA SLIDE: ⛵ *Viento + mar = vela. Naturaleza como motor.* 🎵 *Som de olas + viento suave.*
+
+12. [V/F] "Bueno" y "grande" se apocopan a "buen" y "gran" solo antes de sustantivo masculino singular. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Se apocopan antes de CUALQUIER sustantivo singular: buen día, gran mujer, gran partido.
+💡 DICA SLIDE: 📏 *Bueno → buen | Grande → gran. Válido para masc. y fem. singulares.*
+
+13. [MC] ¿Qué significa "doble" en el contexto de multiplicativos?
+a) 3 veces b) 2 veces c) 4 veces d) 12 veces
+✅ Gab: B | 📝 Just: Doble = 2x. Triple = 3x. Cuádruple = 4x.
+💡 DICA SLIDE: ✖️ *2x = doble. Visualiza dos filas idénticas.*
+
+14. [V/F] El juramento olímpico lo presta un atleta y un juez del país anfitrión. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Representan a deportistas y oficiales. Compromiso de fair play.
+💡 DICA SLIDE: 🤝 *Atleta + juez = promesa de respeto. Ética en acción.* ❤️ *Deporte limpio.*
+
+15. [MC] ¿Qué modalidad pertenece al atletismo y consiste en saltar obstáculos?
+a) Carrera de relevos b) Carrera de vallas c) Lanzamiento de peso d) Marcha atlética
+✅ Gab: B | 📝 Just: Vallas = obstáculos fijos en pista. Requiere técnica y velocidad.
+💡 DICA SLIDE: 🏃‍♂️ *Vallas = velocidad + precisión. Superar barreras.* 🎵 *Som de pasos rápidos + salto.*
+```
+
+---
+
+### 🔹 NÍVEL 2 - Aplicación Escolar (20 questões)
+```
+16. [Interpretação] En la crónica "Oler el fútbol", el autor critica que los periodistas "ya no huelen a campo de fútbol, sino a laboratorio". ¿Qué matiz expresa? → ✅ Pérdida de experiencia sensorial y subjetividad por análisis frío/digital. 💡 DICA SLIDE: 👃 *Crónica = sentidos + opinión. Laboratorio = datos fríos.*
+17. [MC] Completa con la forma apocopada correcta: "Es el ______ (primero/primer) partido de la temporada y hay ______ (bueno/buen) jugadores." → ✅ Gab: primer / buenos. 📝 Just: "Primer" antes de masc. sing.; "buenos" concuerda con plural. 💡 DICA SLIDE: ✂️ *Apócope solo en singular. Plural = forma completa.*
+18. [V/F] "El atleta corrió el tercer lugar." ¿Es gramaticalmente correcto? ( ) V ( ) F → ✅ Gab: V. 📝 Just: "Tercer" pierde "o" antes de "lugar" (masc. sing.). 💡 DICA SLIDE: 🥉 *Tercer lugar = podio. Apócope normativa.*
+19. [MC] Si un equipo gana 12 medallas, ¿qué expresión numérica es correcta? → ✅ Gab: una docena de medallas. 📝 Just: Docena = 12 unidades exactas. 💡 DICA SLIDE: 🔢 *12 = docena. Conteo preciso.*
+20. [V/F] "Cerro" (elevación) y "cero" (número) se diferencian por la presencia de "rr" vs "r". ( ) V ( ) F → ✅ Gab: V. 📝 Just: rr = sonido fuerte / elevación. r simple = número. 💡 DICA SLIDE: ⛰️0️⃣ *Cerro = montaña | Cero = vacío. Ortografía define significado.*
+21. [MC] ¿Qué acción simboliza la liberación de palomas en la ceremonia olímpica? → ✅ Gab: La paz y el espíritu universal de los Juegos. 📝 Just: Tradición desde 1920, renovada como símbolo de armonía. 💡 DICA SLIDE: 🕊️ *Palomas = paz volando. Esperanza global.* ❤️ *Deporte une, no divide.*
+22. [V/F] "Gran deportista" usa apócope correctamente, aunque "deportista" sea de género común. ( ) V ( ) F → ✅ Gab: V. 📝 Just: "Gran" se apocopa ante cualquier sust. singular, sin importar género. 💡 DICA SLIDE: 🌟 *Gran = apócope universal singular. Género no altera la regla.*
+23. [MC] Completa: "El ______ (décimo/décima) día de competencia fue histórico." → ✅ Gab: décimo. 📝 Just: Concuerda con "día" (masc.). 💡 DICA SLIDE: 📅 *Décimo día = punto de inflexión. Concordancia clara.*
+24. [V/F] En "pero" (conjunción) vs "perro" (animal), la diferencia ortográfica cambia la categoría gramatical y el significado. ( ) V ( ) F → ✅ Gab: V. 📝 Just: R suave = enlace lógico | RR fuerte = sustantivo. 💡 DICA SLIDE: 🔤 *Pero ≠ perro. Una letra cambia todo el mensaje.*
+25. [MC] ¿Qué comité tiene sede en Lausana (Suiza) y supervisa la organización global de los Juegos? → ✅ Gab: COI (Comité Olímpico Internacional). 📝 Just: Coordina, fiscaliza y elige sedes a nivel mundial. 💡 DICA SLIDE: 🏛️ *COI = cerebro global. Suiza = sede neutral.*
+26. [Interpretação] Según el texto, ¿por qué el COI permite que cada país organice los Juegos cada 4 años? → ✅ Rotación global, legado urbano, promoción cultural y financiera. 💡 DICA SLIDE: 🌍 *Cada 4 años = oportunidad única. Impacto duradero.*
+27. [V/F] "Un cuarto de kilo" equivale a 250 gramos. ( ) V ( ) F → ✅ Gab: V. 📝 Just: 1 kg = 1000g → 1/4 = 250g. 💡 DICA SLIDE: ⚖️ *1/4 = cuarto. Cálculo cotidiano.*
+28. [MC] Completa con apócope correcto: "Es un ______ (grande/gran) partido con ______ (bueno/buen) jugadores." → ✅ Gab: gran / buenos. 📝 Just: "Gran" ante singular; "buenos" ante plural. 💡 DICA SLIDE: 📏 *Singular apocopado, plural completo. Regla fija.*
+29. [V/F] "La antorcha olímpica se enciende en Olimpia (Grecia) y recorre el mundo antes de la inauguración." ( ) V ( ) F → ✅ Gab: V. 📝 Just: Tradición griega moderna, simboliza continuidad histórica. 💡 DICA SLIDE: 🔥 *Fuego ancestral → llama moderna. Herencia viva.*
+30. [MC] ¿Qué deporte de pelota se juega con manos en pista interior y 7 jugadores por equipo? → ✅ Gab: Balonmano. 📝 Just: Rápido, físico, táctico. Popular en Europa/Hispanoamérica. 💡 DICA SLIDE: 🤾 *Balonmano = manos + pista. Dinamismo puro.* 🎵 *Som de bote + pasos rápidos.*
+31. [V/F] "Siglo XXI" se lee como "siglo veintiuno", no "siglo vigésimo primero". ( ) V ( ) F → ✅ Gab: V. 📝 Just: A partir del XI, los ordinales se reemplazan por cardinales. 💡 DICA SLIDE: 📜 *Siglo XXI = veintiuno. Norma culta actual.*
+32. [MC] Si un atleta corre el doble de distancia que otro, y el primero corrió 10 km, ¿cuánto corrió el segundo? → ✅ Gab: 5 km. 📝 Just: Doble = 2x. Si 10 = 2x → x = 5. 💡 DICA SLIDE: ➗ *Doble = división inversa. Lógica matemática aplicada.*
+33. [V/F] "Cualquier niño puede soñar con ser olímpico." Usa apócope correctamente. ( ) V ( ) F → ✅ Gab: V. 📝 Just: "Cualquier" ante sust. singular masculino. 💡 DICA SLIDE: ✨ *Cualquier = puerta abierta. Sueño accesible.* ❤️ *Inspiración real.*
+34. [MC] ¿Qué sentido prioriza la crónica deportiva para transmitir la experiencia del estadio? → ✅ Gab: Audición, olfato y tacto, además de la visión. 📝 Just: Busca inmersión total, no solo datos visuales. 💡 DICA SLIDE: 🎧 *Crónica = sinfonía de sentidos. Estadio vivo.*
+35. [V/F] "El ______ (tercero/tercer) atleta en cruzar la meta recibió bronce." → ✅ Gab: tercer. 📝 Just: Apócope obligatoria antes de "atleta" (masc. sing.). 💡 DICA SLIDE: 🥉 *Tercer = podio. Precisión lingüística.*
+```
+
+---
+
+### 🔹 NÍVEL 3 - Vestibular (10 questões)
+36. [MC] La revitalización de los Juegos Olímpicos en 1896 por Pierre de Coubertin se enmarca en un contexto histórico caracterizado por:
+a) Aislamiento cultural y rechazo al deporte organizado
+b) Industrialización, búsqueda de paz internacional y revalorización de la educación física
+c) Prohibición de competencias femeninas en todo el mundo
+d) Sustitución del deporte por espectáculos circenses
+✅ Gab: B | 📝 Just: Coubertin vinculó deporte, educación y diplomacia en la era industrial.
+💡 DICA SLIDE: 🏭🕊️ *Industria + paz + cuerpo = trípode olímpico moderno.* 🧠 *Historia en el deporte.*
+
+37. [Eliminatória] Analise as afirmativas sobre apócope y numerales:
+I. "Primer" y "tercer" pierden "o" solo antes de sustantivo masculino singular.
+II. "Gran" y "buen" se apocopan ante cualquier sustantivo singular, sin importar género.
+III. A partir del siglo XI, los ordinales se sustituyen por cardinales en el lenguaje culto.
+IV. "Cualquiera" nunca se apocopa ante sustantivo femenino.
+Están correctas: a) I y II b) I, II y III c) II, III y IV d) I, III y IV
+✅ Gab: B | 📝 Just: IV es falsa. "Cualquier" se usa ante cualquier singular: cualquier mujer, cualquier idea.
+💡 DICA SLIDE: 🔍 *Eliminar absolutos ("nunca"). Apócope = regla de economía lingüística.*
+
+38. [MC] En la crónica deportiva, el uso de metáforas sensoriales ("oler el campo", "sentir el césped") cumple la función de:
+a) Sustituir datos estadísticos por ficción
+b) Humanizar el evento, conectar emocionalmente con el lector y trascender el mero resultado
+c) Exagerar hechos para vender entradas
+d) Confundir al lector con lenguaje poético innecesario
+✅ Gab: B | 📝 Just: La crónica mezcla objetividad y subjetividad para construir memoria colectiva.
+💡 DICA SLIDE: 📖 *Crónica = periodismo + literatura. Emoción + dato.* ❤️ *Palabras que laten.*
+
+39. [V/F] La apócope de "santo" a "san" ocurre antes de todos los nombres propios de santos, sin excepción. ( ) V ( ) F
+✅ Gab: F | 📝 Just: No se apocopa ante Domingo, Tomás, Toribio: Santo Domingo, Santo Tomás.
+💡 DICA SLIDE: 📿 *Excepciones históricas conservan "santo". Memoria lingüística.*
+
+40. [MC] ¿Qué política educativa se alinea con los valores olímpicos (excelencia, amistad, respeto) y su integración curricular?
+a) Competencia individualista y eliminación de perdedores
+b) Educación física inclusiva, trabajo en equipo, fair play y respeto a la diversidad
+c) Prohibición de deportes adaptados por "falta de rigor"
+d) Enfoque exclusivo en resultados y medallas
+✅ Gab: B | 📝 Just: El deporte escolar debe formar ciudadanos, no solo atletas.
+💡 DICA SLIDE: 🤝 *Deporte = escuela de vida. Valores > medallas.* 🧠 *Neuroeducación en movimiento.*
+
+41. [V/F] "La mitad de los atletas son mujeres." ¿El término "mitad" funciona como fracción o como sustantivo colectivo en esta estructura? ( ) V ( ) F
+✅ Gab: V | 📝 Just: Funciona como sustantivo partitivo que exige concordancia con el complemento (son mujeres).
+💡 DICA SLIDE: 📊 *Mitad = parte del todo. Concordancia flexible.*
+
+42. [MC] Si una crónica dice: "El estadio era un volcán de voces y sudor", ¿qué recurso estilístico predomina y qué efecto busca?
+a) Hipérbole + comicidad b) Metáfora + inmersión sensorial y emocional c) Símil + distanciamiento crítico d) Ironía + desprecio al espectáculo
+✅ Gab: B | 📝 Just: La metáfora transforma datos en experiencia vivida.
+💡 DICA SLIDE: 🌋 *Volcán = pasión desbordante. Lenguaje que quema.* ❤️ *Fútbol = emoción pura.*
+
+43. [Eliminatória] Sobre reglas ortográficas R/RR y apócope:
+I. "Carro" y "caro" difieren en significado por la presencia de rr (vehículo) vs r simple (precio).
+II. "Primer" y "buen" pueden usarse indistintamente ante sustantivo femenino singular.
+III. "Gran" se apocopa solo ante masculino singular.
+IV. La "rr" nunca aparece al inicio de palabra.
+Están correctas: a) I y IV b) II y III c) I, III y IV d) II y IV
+✅ Gab: A | 📝 Just: II y III son falsas. "Primer" no va ante femenino (primera mujer). "Gran" va ante cualquier singular.
+💡 DICA SLIDE: 🔍 *Eliminar confusiones de género. Ortografía = precisión.*
+
+44. [MC] ¿Por qué la ceremonia olímpica mantiene el orden de entrada (Grecia primero, anfitrión último) a pesar de los cambios geopolíticos?
+a) Por inercia burocrática sin significado actual
+b) Para honrar el origen histórico y celebrar la hospitalidad contemporánea, reforzando continuidad y respeto
+c) Para evitar conflictos diplomáticos por orden alfabético
+d) Para reducir el tiempo de transmisión televisiva
+✅ Gab: B | 📝 Just: Simboliza diálogo entre tradición y modernidad, base del espíritu olímpico.
+💡 DICA SLIDE: 🏛️🤝 *Pasado + presente = futuro. Ceremonia = diplomacia simbólica.*
+
+45. [MC] En "El ______ (décimo/décima) aniversario se celebró con un ______ (doble/triple) récord mundial.", ¿cuál opción es gramatical y semánticamente coherente?
+a) décima / triple b) décimo / doble c) décimo / triple d) décima / doble
+✅ Gab: B | 📝 Just: "Décimo" concuerda con "aniversario" (masc.). "Doble récord" es expresión consolidada (2 records simultáneos).
+💡 DICA SLIDE: 📈 *Décimo + doble = precisión numérica y concordancia.* 🧠 *Matemática + lengua = rigor.*
+
+---
+
+### 🔹 DISSERTATIVAS (3 questões)
+46. Explica, en español o portugués, por qué la apócope de "primero/tercero" solo ocurre ante sustantivo masculino singular, mientras que "bueno/grande/cualquiera" se apocopan ante cualquier singular. Justifica con reglas normativas y ejemplos.
+✅ **Gab Esperado:** "Primer/tercer" son ordinales que históricamente perdieron la vocal final solo ante masculino singular por evolución fonética y normativa culta. "Bueno/grande/cualquiera" son adjetivos/cuantificadores cuya apócope ("buen/gran/cualquier") se aplica ante CUALQUIER sustantivo singular, sin importar género, porque buscan economía expresiva y fluidez sintáctica. Ej: primer día, tercera vez, buen partido, gran mujer, cualquier idea.
+💡 DICA SLIDE: ✂️ *Apócope = economía lingüística. Historia + uso = regla.*
+
+47. Compara el papel del COI y del CON en la organización olímpica. ¿Cómo esta división jerárquica garantiza equilibrio entre identidad nacional y cooperación global?
+✅ **Gab Esperado:** El COI (internacional) establece reglas, elige sedes y protege valores universales. El CON (nacional) selecciona atletas, financia delegaciones y adapta el espíritu olímpico a realidades locales. Esta estructura equilibra soberanía deportiva con cooperación global, evitando centralización excesiva y promoviendo inclusión, legado local y fair play transnacional.
+💡 DICA SLIDE: 🌍🏛️ *COI = brújula | CON = motor local. Equilibrio perfecto.*
+
+48. Analiza cómo la crónica deportiva transforma un evento factual (resultado, estadísticas) en una experiencia cultural colectiva. ¿Por qué este género es esencial para la memoria histórica de un país?
+✅ **Gab Esperado:** La crónica mezcla datos objetivos con percepción subjetiva, lenguaje sensorial y contexto social. Transforma un partido en narrativa emocional, vinculando deporte con identidad, clase, región o momento histórico. Es esencial para la memoria porque captura no solo "qué pasó", sino "cómo se vivió", generando referentes culturales compartidos y reflexión social.
+💡 DICA SLIDE: 📖🏟️ *Crónica = espejo social. Deporte = cultura viva.* ❤️ *Palabras que perduran.*
+
+---
+
+### 🔹 ELIMINATÓRIAS/Vestibular (2 questões)
+49. [Gráfico Conceitual] Un país gana 2 medallas de oro, 3 de plata y 1 de bronce en una edición. ¿Qué fracción del total corresponde a oro y qué multiplicativo expresa el total si se duplica en la siguiente edición?
+✅ **Gab:** Fracción oro = 2/6 = 1/3. Multiplicativo total duplicado = doble (12 medallas). 📝 Just: Total = 6. Oro = 2. 2/6 = 1/3. Doble = 2x. 💡 DICA SLIDE: 🥇📊 *Fracción + multiplicativo = lectura crítica de datos. Precisión numérica.*
+
+50. [Análise Crítica] "Los Juegos Olímpicos son solo un espectáculo de entretenimiento y marketing, sin impacto educativo real." Esta afirmación es válida? Justifique con base en valores olímpicos, inclusión deportiva (adaptado, femenino), y rol pedagógico del deporte en escuelas.
+✅ **Gab Esperado:** No es válida. Los Juegos promueven excelencia, amistad y respeto (valores pedagógicos). El deporte adaptado y femenino democratizan el acceso, rompen estereotipos y enseñan resiliencia. En escuelas, el deporte desarrolla trabajo en equipo, salud, disciplina y ciudadanía. El marketing financia, pero no anula el impacto educativo y social comprobado por UNESCO y COI.
+💡 DICA SLIDE: 🏫🤝 *Deporte = aula sin paredes. Valores > espectáculo.* 🧠 *Educación olímpica = legado real.*
+
+---
+
+✅ **Tópico 5 concluído com 50 questões completas.**
+*(Pronto para importação CMS: tags BNCC, níveis N1-N3, dissertativas, eliminatórias, dicas do slide integradas e gatilhos neurocognitivos em todas as questões.)*
+
+Deseja que eu prossiga imediatamente com o **Tópico 6: Vocabulario Deportivo y Modalidades (Atletismo, Deportes de Pelota, Acuáticos, de Aventura)** mantendo o mesmo rigor pedagógico, calibragem vestibular e integração do slide de revisão? 🎯

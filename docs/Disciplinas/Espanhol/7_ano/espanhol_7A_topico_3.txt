@@ -1,74 +1,83 @@
+# 📘 TÓPICO 3: Ortografía I (M/N y uso de MUY vs MUCHO)
+*(Alinhado à Unidad 2 | pp. 40-44 | Slide de Revisão | Método Kumon → Vestibular | BNCC: EF07LE01, EF07LE04, EF07LP07)*
+
+---
+
+### 🔹 NÍVEL 1 - Fixação Kumon (15 questões)
+```
 1. [MC] Completa con M o N: "ca__po"
 a) m b) n c) mn d) nm
-✅ Gab: A | 📝 Just: Se usa M antes de P y B por regla ortográfica fonética.
-💡 DICA SLIDE: 🔤 *M antes de P/B | N final de palabra. "CaMpo" = labios cerrados.* | 🎵 *Som de "m" nasalizado + labial.*
+✅ Gab: A | 📝 Just: Regla ortográfica: M antes de P y B por coarticulación labial.
+💡 DICA SLIDE: 🔤 *M antes de P/B | N final. "CaMpo" = labios se cierran.* 🎵 *Som nasal suave + "¡M antes de P!"*
 
 2. [V/F] En español, la mayoría de las palabras terminan en N, S o vocal. ( ) V ( ) F
-✅ Gab: V | 📝 Just: Regla general de terminación en español (corazón, canción, común).
-💡 DICA SLIDE: 🔚 *N final: corazón, canción, álbum. Excepción: palabras latinas en -m.* | 🧠 *Visualiza la "N" como un puente al final.*
+✅ Gab: V | 📝 Just: Regla fonotáctica del español moderno (corazón, canción, común).
+💡 DICA SLIDE: 🔚 *N final: corazón, canción, álbum (excepción latina).* 🧠 *Visualiza la N como puente al final.*
 
 3. [MC] "Ella es ______ inteligente." ¿Qué cuantificador es correcto?
 a) mucho b) muy c) muchos d) mucha
 ✅ Gab: B | 📝 Just: MUY es invariable y modifica adjetivos o adverbios.
-💡 DICA SLIDE: 📊 *MUY + adj/adv | MUCHO + verbo/sustantivo. "Muy inteligente" = fijo.* | ❤️ *"¡Muy bien! Tu cerebro reconoce lo invariable."*
+💡 DICA SLIDE: 📊 *MUY + adj/adv | MUCHO + verbo/sustantivo. "Muy inteligente" = fijo.* ❤️ *"¡Muy bien! Tu cerebro reconoce lo invariable."*
 
 4. [V/F] "Mucho" concuerda en género y número con el sustantivo. ( ) V ( ) F
 ✅ Gab: V | 📝 Just: mucho/mucha/muchos/muchas según el sustantivo que acompaña.
-💡 DICA SLIDE: 🔗 *Mucho dinero (masc. sing.) | Muchas frutas (fem. plur.). Concordancia es clave.* | 🎵 *Som de "mucho" flexionando como acordeón.*
+💡 DICA SLIDE: 🔗 *Mucho dinero (masc. sing.) | Muchas frutas (fem. plur.).* 🎵 *Som de "mucho" flexionando como acordeón.*
 
 5. [MC] ¿Cuál palabra sigue la regla de N final?
 a) Álbum b) Corazón c) Inmigrante d) Columna
 ✅ Gab: B | 📝 Just: Corazón termina en N. Álbum termina en M (origen latino). Inmigrante/Columna tienen N interna.
-💡 DICA SLIDE: 🏁 *Final = N (corazón). Excepción latina = M (álbum, ídem).* | 🧠 *Regla visual: 🌹 corazón → N al final.*
+💡 DICA SLIDE: 🏁 *Final = N (corazón). Excepción latina = M (álbum, ídem).* 🧠 *Regla visual: 🌹 corazón → N al final.*
 
 6. [V/F] "Muy" puede usarse antes de verbos para indicar intensidad. ( ) V ( ) F
 ✅ Gab: F | 📝 Just: Muy solo modifica adjetivos/adverbios. Para verbos se usa MUCHO (Pedro baila mucho).
-💡 DICA SLIDE: ⚖️ *Muy alto (adj) | Corro mucho (verbo). No confundir funciones.* | ❤️ *Verbos = acción → MUCHO acompaña el movimiento.*
+💡 DICA SLIDE: ⚖️ *Muy alto (adj) | Corro mucho (verbo). No confundir funciones.* ❤️ *Verbos = acción → MUCHO acompaña el movimiento.*
 
 7. [MC] Completa: "Es ______ mejor que ayer."
 a) muy b) mucho c) muchos d) muya
 ✅ Gab: B | 📝 Just: Excepción PAMM: mucho mejor, mucho peor, mucho mayor/menor/más/menos/antes/después.
-💡 DICA SLIDE: 📈 *PAMM = MUCHO + comparativo/adv. "Mucho mejor" es regla fija.* | 🎵 *Som ascendente + "¡Mucho mejor!"*
+💡 DICA SLIDE: 📈 *PAMM = MUCHO + comparativo/adv. "Mucho mejor" es regla fija.* 🎵 *Som ascendente + "¡Mucho mejor!"*
 
 8. [V/F] "Innecesario" se escribe con NN porque el prefijo in- se une a necesario. ( ) V ( ) F
 ✅ Gab: V | 📝 Just: In- + necesario = innecesario. Se conserva la doble N.
-💡 DICA SLIDE: 🔤 *NM/NN/IN: innecesario, inmigrante, columna, alumno. Prefijo se une sin perder letra.* | 🧠 *Visualiza "IN+NE" como imán.*
+💡 DICA SLIDE: 🔤 *NM/NN/IN: innecesario, inmigrante, columna, alumno. Prefijo se une sin perder letra.* 🧠 *Visualiza "IN+NE" como imán.*
 
 9. [MC] ¿Qué forma es correcta para completar: "Tengo ______ dinero"?
 a) muy b) mucho c) muchos d) mucha
 ✅ Gab: B | 📝 Just: Dinero es sustantivo masculino singular → mucho.
-💡 DICA SLIDE: 💰 *Mucho dinero | Muchas monedas. Concordancia exacta.* | ❤️ *MUCHO cuenta lo que puedes tocar.*
+💡 DICA SLIDE: 💰 *Mucho dinero | Muchas monedas. Concordancia exacta.* ❤️ *MUCHO cuenta lo que puedes tocar.*
 
 10. [V/F] "Álbum" se escribe con M final porque proviene del latín. ( ) V ( ) F
 ✅ Gab: V | 📝 Just: Palabras de origen latino/académico mantienen -m (álbum, ídem, currículum).
-💡 DICA SLIDE: 📚 *Latinismos = -m final. Regla moderna = -n final.* | 🧠 *"ÁlbuM" = memoria antigua.*
+💡 DICA SLIDE: 📚 *Latinismos = -m final. Regla moderna = -n final.* 🧠 *"ÁlbuM" = memoria antigua.*
 
 11. [MC] "Hace ______ frío hoy." ¿Qué opción completa correctamente?
 a) muy b) mucho c) muchos d) mucha
 ✅ Gab: B | 📝 Just: Frío actúa como sustantivo aquí (hacer + sustantivo) → mucho.
-💡 DICA SLIDE: 🌡️ *Hace mucho frío | Hace mucho calor. Verbo + sustantivo = MUCHO.* | 🎵 *Som de viento frío + "mucho".*
+💡 DICA SLIDE: 🌡️ *Hace mucho frío | Hace mucho calor. Verbo + sustantivo = MUCHO.* 🎵 *Som de viento frío + "mucho".*
 
 12. [V/F] "Muy" cambia a "mucha" cuando el sustantivo es femenino. ( ) V ( ) F
 ✅ Gab: F | 📝 Just: Muy es invariable. Nunca cambia de forma.
-💡 DICA SLIDE: 🛡️ *MUY = escudo inquebrantable. Siempre "muy", nunca "muya/mucho".* | ❤️ *Constancia genera confianza.*
+💡 DICA SLIDE: 🛡️ *MUY = escudo inquebrantable. Siempre "muy", nunca "muya/mucho".* ❤️ *Constancia genera confianza.*
 
 13. [MC] Completa con M o N: "ta__bién"
 a) m b) n c) mn d) mb
 ✅ Gab: A | 📝 Just: M antes de B (también, tambor, cambio).
-💡 DICA SLIDE: 🔗 *TaMBién. Labios se cierran para M antes de B.* | 🎵 *Pronuncia "tam-bién" y siente el cierre labial.*
+💡 DICA SLIDE: 🔗 *TaMBién. Labios se cierran para M antes de B.* 🎵 *Pronuncia "tam-bién" y siente el cierre labial.*
 
 14. [V/F] "Alumno" se escribe con LM porque la L y M son compatibles fonéticamente. ( ) V ( ) F
-✅ Gab: F | 📝 Just: Se escribe ALUMNO (L + M + N). La regla es que N va antes de consonante, pero aquí es caso etimológico consolidado.
-💡 DICA SLIDE: 📖 *Alumno, columna, calumnia. Memorización visual + uso constante.* | 🧠 *Repetición espaciada fija la ortografía.*
+✅ Gab: F | 📝 Just: Se escribe ALUMNO (L + M + N). Es caso etimológico consolidado.
+💡 DICA SLIDE: 📖 *Alumno, columna, calumnia. Memorización visual + uso constante.* 🧠 *Repetición espaciada fija la ortografía.*
 
 15. [MC] ¿Cuál par sigue la regla de PAMM?
 a) muy rápido / muy lento b) mucho mejor / mucho peor c) muy casa / muy árbol d) mucho inteligente
 ✅ Gab: B | 📝 Just: PAMM usa MUCHO antes de comparativos irregulares y adverbios de tiempo/cantidad.
-💡 DICA SLIDE: 🎯 *PAMM = excepción sagrada. MUCHO mejor/peor/mayor/menor/más/menos/antes/después.* | ❤️ *Domina PAMM = 10 puntos garantizados.*
+💡 DICA SLIDE: 🎯 *PAMM = excepción sagrada. MUCHO mejor/peor/mayor/menor/más/menos/antes/después.* ❤️ *Domina PAMM = 10 puntos garantizados.*
+```
 
 ---
 
 ### 🔹 NÍVEL 2 - Aplicación Escolar (20 questões)
+```
 16. [Interpretação] En el diálogo de la p. 34, Sonia dice: "me tomo una taza de café con leche". Si quisiera decir que le gusta MUCHO, ¿cómo lo expresaría correctamente? → ✅ "Me gusta mucho el café con leche" (verbo gustar + mucho). 💡 DICA SLIDE: 📊 *Verbo = MUCHO. "Gusta mucho" ≠ "gusta muy".*
 17. [MC] "La receta de cebiche lleva ______ limones y ______ sal." Completa con mucho(s)/mucha(s)/muy. → ✅ Gab: muchos / mucha. 📝 Just: Limones (masc. plur.) → muchos. Sal (fem. sing.) → mucha. 💡 DICA SLIDE: 🔗 *Concordancia estricta con sustantivos.*
 18. [V/F] En la página 48, el texto dice: "Jamás hay que comer delante de la televisión...". Si se quisiera intensificar "delante", se diría "muy delante". ( ) V ( ) F → ✅ Gab: F. 📝 Just: Delante es adverbio de lugar, pero "muy delante" suena antinatural; se prefiere "mucho más adelante" o se evita. 💡 DICA SLIDE: 🧭 *Adverbios de lugar rara vez llevan MUY.*
@@ -89,6 +98,7 @@ a) muy rápido / muy lento b) mucho mejor / mucho peor c) muy casa / muy árbol 
 33. [MC] ¿Cuál frase usa MUY correctamente como adverbio de modo? a) Muy rápido llegó b) Muy rápidamente llegó c) Mucho rápido llegó → ✅ Gab: B. 📝 Just: Rápidamente es adverbio terminado en -mente → muy rápidamente. 💡 DICA SLIDE: 🏎️ *-mente + muy = intensidad formal.*
 34. [V/F] En español, "muy" nunca lleva tilde. ( ) V ( ) F → ✅ Gab: V. 📝 Just: Muy es monosílabo átono en este contexto → no lleva tilde (contrario a "mí", "té", "dé"). 💡 DICA SLIDE: ✍️ *Monosílabo = generalmente sin tilde.*
 35. [MC] "El examen fue ______ difícil, pero estudiamos ______." → ✅ Gab: muy / mucho. 📝 Just: Difícil (adj) → muy. Estudiamos (verbo) → mucho. 💡 DICA SLIDE: 📚 *Adj = muy | Verbo = mucho. Dualidad clara.*
+```
 
 ---
 
@@ -197,3 +207,4 @@ d) Avanzar horario de entrada
 ✅ **Tópico 3 concluído com 50 questões completas.**
 *(Pronto para importação CMS: tags BNCC, níveis N1-N3, dissertativas, eliminatórias, dicas do slide integradas e gatilhos neurocognitivos em todas as questões.)*
 
+Deseja que eu prossiga imediatamente com o **Tópico 4: Verbos Irregulares 2ª Conjugación (e→ie / o→ue)** mantendo o mesmo rigor pedagógico, calibragem vestibular e integração do slide de revisão? 🎯

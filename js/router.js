@@ -3137,7 +3137,7 @@ const Router = {
         window._aiPlaySet    = set;
         window._aiPlayIdx    = 0;
         window._aiPlayScore  = 0;
-        window._aiPlayHearts = typeof State !== 'undefined' ? (State.data.user.hearts ?? 5) : 5;
+        window._aiPlayHearts = typeof State !== 'undefined' ? (State.data.user.hearts ?? (CONFIG?.lives?.max ?? 5)) : (CONFIG?.lives?.max ?? 5);
         window._aiPlayCombo  = 0;
         this._renderEnhancedPlay(document.getElementById('app-container'));
     },
@@ -3169,13 +3169,14 @@ const Router = {
             return;
         }
 
-        const q       = set.questions[idx];
-        const hearts  = window._aiPlayHearts ?? 5;
-        const combo   = window._aiPlayCombo  || 0;
-        const letters = ['A','B','C','D'];
-        const title   = titleOverride || set.name;
+        const q         = set.questions[idx];
+        const maxH      = CONFIG?.lives?.max ?? 5;
+        const hearts    = window._aiPlayHearts ?? maxH;
+        const combo     = window._aiPlayCombo  || 0;
+        const letters   = ['A','B','C','D'];
+        const title     = titleOverride || set.name;
 
-        const heartsHTML = Array.from({length:5},(_,i) =>
+        const heartsHTML = Array.from({length:maxH},(_,i) =>
             `<span style="font-size:1rem;opacity:${i<hearts?1:.25}">❤️</span>`
         ).join('');
 
@@ -3226,12 +3227,12 @@ const Router = {
             }
         } else {
             window._aiPlayCombo = 0;
-            window._aiPlayHearts = Math.max(0, (window._aiPlayHearts??5) - 1);
+            window._aiPlayHearts = Math.max(0, (window._aiPlayHearts ?? (CONFIG?.lives?.max ?? 5)) - 1);
         }
 
         setTimeout(() => {
             window._aiPlayIdx = idx + 1;
-            if ((window._aiPlayHearts??5) <= 0) {
+            if ((window._aiPlayHearts ?? (CONFIG?.lives?.max ?? 5)) <= 0) {
                 const container = document.getElementById('app-container');
                 if (container) {
                     container.innerHTML = `

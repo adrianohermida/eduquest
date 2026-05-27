@@ -44,7 +44,7 @@ const State = {
             level:        1,
             xp:           0,
             gems:         0,
-            hearts:       5,
+            hearts:       5,   // CONFIG.lives.max
             streak:       1,
             lastPlayed:   null,
             authenticated: false,
@@ -476,7 +476,7 @@ const State = {
             'hud-streak': String(u.streak || 1),
             'hud-gems':   String(u.gems   || 0),
             'hud-xp':     (u.xp || 0).toLocaleString('pt-BR'),
-            'hud-hearts': String(u.hearts ?? 5),
+            'hud-hearts': String(u.hearts ?? (typeof CONFIG !== 'undefined' ? CONFIG.lives.max : 5)),
         };
         for (const [id, val] of Object.entries(chips)) {
             const el = document.getElementById(id);

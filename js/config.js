@@ -160,8 +160,8 @@ const CONFIG = {
     },
 
     lives: {
-        max:        3,
-        gameHearts: 3
+        max:        5,   // global HUD lives (refill over time, like Duolingo)
+        gameHearts: 3    // hearts per battle session
     },
 
     stages: {
