@@ -12,6 +12,7 @@ window.EduAdmin = (() => {
     let _container        = null;
     let _cmdOpen          = false;
     let _cmdIdx           = 0;
+    let _analyticsDays    = 30;
     let _contentTab       = 'chapters';
     let _contentChapterId = null;
     let _contentStageVar  = null;
@@ -384,68 +385,211 @@ window.EduAdmin = (() => {
 
     /* ── Analytics ───────────────────────────────────────────── */
     function _renderAnalytics() {
+        const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple',
+                     geografia:'yellow', espanhol:'orange', ingles:'blue' };
         return `
         <div class="admin-page-header">
-            <div><div class="admin-page-title">Analytics</div>
-            <div class="admin-page-sub">Aprendizagem, engajamento e retenção</div></div>
+            <div>
+                <div class="admin-page-title">Analytics</div>
+                <div class="admin-page-sub">Aprendizagem, engajamento e retenção ·
+                    <span id="analytics-period-label">Últimos ${_analyticsDays} dias</span>
+                </div>
+            </div>
+            <div class="admin-page-actions">
+                <select id="analytics-days-select" onchange="EduAdmin._changeAnalyticsPeriod(this.value)"
+                    class="admin-filter-select" style="background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:6px 10px;border-radius:6px;font-size:0.8rem">
+                    <option value="7"  ${_analyticsDays===7  ?'selected':''}>Últimos 7 dias</option>
+                    <option value="30" ${_analyticsDays===30 ?'selected':''}>Últimos 30 dias</option>
+                    <option value="90" ${_analyticsDays===90 ?'selected':''}>Últimos 90 dias</option>
+                </select>
+                <button onclick="EduAdmin._refreshAnalytics()" class="admin-topbar-btn admin-topbar-btn-ghost">↺ Atualizar</button>
+            </div>
         </div>
 
-        <div class="admin-kpi-grid">
-            ${_kpiCard('Taxa de Conclusão', { val: '68%',   trend: '+5%',  dir: 'up',   icon: '✅' }, 'accent-green')}
-            ${_kpiCard('Tempo Médio/Sessão', { val: '18min', trend: '+2min', dir: 'up',  icon: '⏱️' }, 'accent-blue')}
-            ${_kpiCard('Questões/Usuário',   { val: '142',   trend: '+22',  dir: 'up',   icon: '❓' }, 'accent-orange')}
-            ${_kpiCard('Acurácia Média',      { val: '74%',   trend: '+3%',  dir: 'up',   icon: '🎯' }, 'accent-purple')}
+        <div id="analytics-status" style="padding:6px 0;color:#94a3b8;font-size:0.82rem;min-height:20px">⏳ Carregando dados do Supabase…</div>
+
+        <div class="admin-kpi-grid" id="analytics-kpi-grid">
+            ${_kpiCard('Sessões',              { val: '…', trend: '', dir: 'up', icon: '🎮' }, 'accent-blue')}
+            ${_kpiCard('Questões Respondidas', { val: '…', trend: '', dir: 'up', icon: '❓' }, 'accent-orange')}
+            ${_kpiCard('Acurácia Média',        { val: '…', trend: '', dir: 'up', icon: '🎯' }, 'accent-purple')}
+            ${_kpiCard('Taxa de Vitória',       { val: '…', trend: '', dir: 'up', icon: '🏆' }, 'accent-green')}
         </div>
 
         <div class="admin-charts-row">
             <div class="admin-chart-card">
                 <div class="admin-chart-header">
-                    <div><div class="admin-chart-title">Distribuição por Matéria</div>
-                    <div class="admin-chart-sub">Questões respondidas este mês</div></div>
+                    <div><div class="admin-chart-title">Sessões Diárias</div>
+                    <div class="admin-chart-sub">Últimos 14 dias</div></div>
                 </div>
-                ${barChart([
-                    { label: 'Ciê', val: '42%', pct: 42 },
-                    { label: 'Mat', val: '28%', pct: 28 },
-                    { label: 'His', val: '16%', pct: 16 },
-                    { label: 'Por', val: '9%',  pct: 9 },
-                    { label: 'Geo', val: '5%',  pct: 5 },
-                ])}
+                <div id="analytics-sparkline-wrap">${sparkline([1])}</div>
             </div>
             <div class="admin-chart-card">
                 <div class="admin-chart-header">
-                    <div><div class="admin-chart-title">Funil de Retenção</div>
-                    <div class="admin-chart-sub">Cadastro → Ativo → Premium</div></div>
+                    <div><div class="admin-chart-title">Níveis de Batalha</div>
+                    <div class="admin-chart-sub">Distribuição de sessões</div></div>
                 </div>
-                ${barChart([
-                    { label: 'Cad', val: '12.847', pct: 100, color: '#3b82f6' },
-                    { label: 'D1',  val: '9.823',  pct: 76,  color: '#3b82f6' },
-                    { label: 'D7',  val: '6.118',  pct: 48,  color: '#8b5cf6' },
-                    { label: 'D30', val: '3.851',  pct: 30,  color: '#f97316' },
-                    { label: 'Prm', val: '3.820',  pct: 30,  color: '#22c55e' },
-                ])}
+                <div id="analytics-by-level-wrap">${barChart([{ label: '…', val: '…', pct: 0 }])}</div>
+            </div>
+        </div>
+
+        <div class="admin-charts-row">
+            <div class="admin-chart-card" style="flex:2">
+                <div class="admin-chart-header">
+                    <div><div class="admin-chart-title">Engajamento por Capítulo</div>
+                    <div class="admin-chart-sub">Sessões, questões e acurácia</div></div>
+                </div>
+                <table class="admin-table">
+                    <thead><tr><th>Capítulo</th><th>Sessões</th><th>Questões</th><th>Acurácia</th><th>⭐ Média</th></tr></thead>
+                    <tbody id="analytics-by-chapter-tbody">
+                        <tr><td colspan="5" style="text-align:center;color:#475569;padding:18px">Carregando…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="admin-chart-card">
+                <div class="admin-chart-header">
+                    <div><div class="admin-chart-title">Stages Mais Difíceis</div>
+                    <div class="admin-chart-sub">Por erros registrados</div></div>
+                </div>
+                <table class="admin-table">
+                    <thead><tr><th>Stage</th><th>Capítulo</th><th>Erros</th></tr></thead>
+                    <tbody id="analytics-hard-stages-tbody">
+                        <tr><td colspan="3" style="text-align:center;color:#475569;padding:18px">Carregando…</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <div class="admin-section-card">
             <div class="admin-section-card-header">
-                <div class="admin-chart-title">📚 Capítulos Carregados</div>
+                <div class="admin-chart-title">📚 Conteúdo Carregado</div>
                 <span class="admin-table-action" onclick="EduAdmin._navigate('content')">Gerenciar →</span>
             </div>
             <table class="admin-table">
                 <thead><tr><th>Capítulo</th><th>Matéria</th><th>Ano</th><th>Estágios</th><th>Questões</th><th>Flashcards</th></tr></thead>
-                <tbody>${_loadContentData().map(c => {
-                    const sc = { ciencias:'green', matematica:'blue', historia:'orange', portugues:'purple', geografia:'yellow', espanhol:'orange', ingles:'blue' };
-                    return `<tr>
+                <tbody>${_loadContentData().map(c =>
+                    `<tr>
                         <td><span style="margin-right:6px">${c.icon}</span>${c.title}</td>
                         <td>${badge(c.subjectLabel, sc[c.subject] || 'grey')}</td>
                         <td>${c.grade}</td>
                         <td>${c.stagesLoaded}/${c.totalStages}</td>
                         <td>${c.questionCount}</td>
                         <td>${c.flashcardCount}</td>
-                    </tr>`; }).join('')}
+                    </tr>`).join('')}
                 </tbody>
             </table>
         </div>`;
+    }
+
+    /* ── Analytics data loader (async, patches DOM after render) ── */
+    async function _loadAnalyticsData() {
+        const statusEl    = document.getElementById('analytics-status');
+        const kpiGrid     = document.getElementById('analytics-kpi-grid');
+        const sparkWrap   = document.getElementById('analytics-sparkline-wrap');
+        const levelWrap   = document.getElementById('analytics-by-level-wrap');
+        const chapterBody = document.getElementById('analytics-by-chapter-tbody');
+        const hardBody    = document.getElementById('analytics-hard-stages-tbody');
+
+        const setStatus = (msg) => { if (statusEl) { statusEl.style.opacity = '1'; statusEl.textContent = msg; } };
+        const hideStatus = ()   => { if (statusEl) { statusEl.style.opacity = '0'; } };
+
+        if (typeof SupaDB === 'undefined' || typeof SupaDB.getAnalytics !== 'function') {
+            setStatus('⚠️ SupaDB não disponível — dados ao vivo indisponíveis.');
+            return;
+        }
+        const session = await SupaAuth?.getSession?.();
+        if (!session?.user?.id) {
+            setStatus('⚠️ Faça login para ver analytics ao vivo.');
+            return;
+        }
+
+        setStatus('⏳ Carregando dados do Supabase…');
+        try {
+            const data = await SupaDB.getAnalytics(_analyticsDays);
+            if (!data) throw new Error('Sem dados retornados pelo servidor.');
+
+            // ── KPIs ────────────────────────────────────────────
+            const k = data.kpis || {};
+            const fmtN = (n) => n != null ? Number(n).toLocaleString('pt-BR') : '—';
+            const fmtP = (n) => n != null ? n + '%' : '—';
+            if (kpiGrid) kpiGrid.innerHTML =
+                _kpiCard('Sessões',              { val: fmtN(k.total_sessions),  trend: '', dir: 'up', icon: '🎮' }, 'accent-blue')   +
+                _kpiCard('Questões Respondidas', { val: fmtN(k.total_questions), trend: '', dir: 'up', icon: '❓' }, 'accent-orange') +
+                _kpiCard('Acurácia Média',        { val: fmtP(k.avg_accuracy),   trend: '', dir: 'up', icon: '🎯' }, 'accent-purple') +
+                _kpiCard('Taxa de Vitória',       { val: fmtP(k.victory_rate),   trend: '', dir: 'up', icon: '🏆' }, 'accent-green');
+
+            // ── Daily sparkline ──────────────────────────────────
+            if (sparkWrap) {
+                const vals = Array.isArray(data.daily) ? data.daily.map(d => d.sessions) : [];
+                sparkWrap.innerHTML = vals.length
+                    ? sparkline(vals)
+                    : '<div style="color:#475569;font-size:0.8rem;text-align:center;padding:20px">Sem sessões nos últimos 14 dias</div>';
+            }
+
+            // ── Battle level distribution ────────────────────────
+            if (levelWrap) {
+                const levels = Array.isArray(data.by_level) ? data.by_level : [];
+                if (levels.length) {
+                    const total = levels.reduce((s, l) => s + l.sessions, 0) || 1;
+                    const lbls  = { n1:'N1 Fixação', n2:'N2 Aplicação', n3:'N3 Vestibular', none:'Padrão' };
+                    const clrs  = { n1:'#22c55e', n2:'#3b82f6', n3:'#a855f7', none:'#94a3b8' };
+                    levelWrap.innerHTML = barChart(levels.map(l => ({
+                        label: lbls[l.level] || l.level,
+                        val:   l.sessions,
+                        pct:   Math.round(l.sessions / total * 100),
+                        color: clrs[l.level] || '#64748b'
+                    })));
+                } else {
+                    levelWrap.innerHTML = '<div style="color:#475569;font-size:0.8rem;text-align:center;padding:20px">Sem dados no período</div>';
+                }
+            }
+
+            // ── By chapter table ─────────────────────────────────
+            if (chapterBody) {
+                const reg = window.CHAPTERS_REGISTRY || {};
+                const rows = Array.isArray(data.by_chapter) ? data.by_chapter : [];
+                chapterBody.innerHTML = rows.length
+                    ? rows.map(r => {
+                        const meta = reg[r.chapter_id] || {};
+                        const stars = r.avg_stars != null ? Math.round(r.avg_stars) : 0;
+                        return `<tr>
+                            <td>${meta.icon || '📚'} ${meta.title || r.chapter_id}</td>
+                            <td>${r.sessions}</td>
+                            <td>${r.questions ?? '—'}</td>
+                            <td>${r.accuracy != null ? r.accuracy + '%' : '—'}</td>
+                            <td title="${r.avg_stars}">${'⭐'.repeat(stars) || '·'}</td>
+                        </tr>`;
+                    }).join('')
+                    : '<tr><td colspan="5" style="text-align:center;color:#475569;padding:18px">Sem sessões no período selecionado</td></tr>';
+            }
+
+            // ── Hard stages table ────────────────────────────────
+            if (hardBody) {
+                const rows = Array.isArray(data.hard_stages) ? data.hard_stages : [];
+                hardBody.innerHTML = rows.length
+                    ? rows.map(r => `<tr>
+                        <td style="font-family:monospace;font-size:0.78rem;color:#94a3b8">${r.stage_id}</td>
+                        <td style="font-size:0.78rem">${r.chapter_id}</td>
+                        <td>${badge(r.errors, 'red')}</td>
+                    </tr>`).join('')
+                    : '<tr><td colspan="3" style="text-align:center;color:#475569;padding:18px">Sem erros registrados</td></tr>';
+            }
+
+            hideStatus();
+        } catch(err) {
+            setStatus(`⚠️ Erro ao carregar analytics: ${err.message}`);
+            console.error('_loadAnalyticsData error:', err);
+        }
+    }
+
+    function _refreshAnalytics() {
+        _loadAnalyticsData();
+    }
+
+    function _changeAnalyticsPeriod(val) {
+        _analyticsDays = parseInt(val, 10) || 30;
+        const label = document.getElementById('analytics-period-label');
+        if (label) label.textContent = `Últimos ${_analyticsDays} dias`;
+        _loadAnalyticsData();
     }
 
     /* ── Users ───────────────────────────────────────────────── */
@@ -2200,6 +2344,7 @@ window.EduAdmin = (() => {
             const main = document.getElementById('admin-main');
             if (main) EduBuilder.render(main);
         }
+        if (_section === 'analytics') _loadAnalyticsData();
     }
 
     function _navigate(section) {
@@ -2214,6 +2359,7 @@ window.EduAdmin = (() => {
             const main = document.getElementById('admin-main');
             if (main) EduBuilder.render(main);
         }
+        if (section === 'analytics') _loadAnalyticsData();
     }
 
     function _exit() {
@@ -2454,5 +2600,6 @@ window.EduAdmin = (() => {
         _setApprovalStatus,
         _openSeedModal, _runSeed,
         _saveStageToCloud,
+        _refreshAnalytics, _changeAnalyticsPeriod,
     };
 })();

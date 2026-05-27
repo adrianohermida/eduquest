@@ -528,6 +528,21 @@ const SupaDB = {
         };
     },
 
+    // ── ANALYTICS DASHBOARD (Sprint 5) ─────────────────────
+    /**
+     * Fetches aggregated analytics from the eq_analytics_dashboard
+     * SECURITY DEFINER RPC (bypasses RLS; requires authentication).
+     * @param {number} days  lookback window (default 30)
+     * @returns {Promise<object|null>}  { kpis, by_chapter, by_level, hard_stages, daily }
+     */
+    async getAnalytics(days = 30) {
+        const c = getClient();
+        if (!c) return null;
+        const { data, error } = await c.rpc('eq_analytics_dashboard', { p_days: days });
+        if (error) { console.error('SupaDB.getAnalytics:', error); return null; }
+        return data;
+    },
+
     // ── SYNC STATUS HELPERS ─────────────────────────────────
     isStageSynced(stageId) {
         try {
