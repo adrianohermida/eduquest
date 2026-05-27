@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v17';
+const CACHE_NAME  = 'eduquest-v18';
 const CACHE_SHELL = [
     '/',
     '/index.html',

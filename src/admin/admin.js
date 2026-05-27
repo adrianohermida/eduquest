@@ -1832,14 +1832,10 @@ window.EduAdmin = (() => {
 
     /* ── AI & Builder ─────────────────────────────────────────── */
     function _renderAI() {
-        const main = document.getElementById('admin-main');
-        if (main && typeof EduBuilder !== 'undefined') {
-            EduBuilder.render(main);
-            return null;
-        }
+        const ready = typeof EduBuilder !== 'undefined';
         return `<div style="padding:40px;text-align:center;color:#64748b">
             <div style="font-size:2rem;margin-bottom:10px">⚡</div>
-            <div>Carregando AI Builder…</div>
+            <div>${ready ? 'Carregando AI Builder…' : '⚠️ AI Builder não disponível. Verifique se o script foi carregado.'}</div>
         </div>`;
     }
 
@@ -2189,6 +2185,10 @@ window.EduAdmin = (() => {
         _container = container;
         _section   = section || 'overview';
         container.innerHTML = _buildLayout();
+        if (_section === 'ai' && typeof EduBuilder !== 'undefined') {
+            const main = document.getElementById('admin-main');
+            if (main) EduBuilder.render(main);
+        }
     }
 
     function _navigate(section) {

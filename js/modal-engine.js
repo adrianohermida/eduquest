@@ -370,7 +370,7 @@ const ModalEngine = {
     },
 
     _dangerConfirmHTML({ title = 'Tem certeza?', message = '', confirmText = 'Confirmar', cancelText = 'Cancelar', icon = 'warning' }) {
-        const iconHTML = typeof icon === 'string' && icon.length < 20 && !icon.includes('\u{1F') ? this._ic(icon,{size:'xl',color:'warning'}) : icon;
+        const iconHTML = typeof icon === 'string' && icon.length < 20 && !/[^\x00-\x7F]/.test(icon) ? this._ic(icon,{size:'xl',color:'warning'}) : icon;
         return `
             <div class="modal-dialog-icon modal-danger-icon">${iconHTML}</div>
             <h2 class="modal-title modal-title-warn" id="modal-title-el">${title}</h2>
