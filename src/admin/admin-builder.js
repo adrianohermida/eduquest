@@ -689,5 +689,8 @@ window.EduBuilder = (() => {
         _openKeyModal, _saveKeyTest,
         _generate, _sendReview,
         _selectReview, _approve, _reject, _publish, _postComment,
+        _applyPreset,
+        /* Expose config objects for external use / debugging */
+        SUBJECT_PRESETS, GRAMMAR_FOCUS, CONTENT_TYPES,
     };
 })();
