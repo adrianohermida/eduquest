@@ -25,6 +25,8 @@ window.EduBuilder = (() => {
         adaptiveN3: 70,           // N3 target (%) — no gate, but sets star threshold
         sensoryTrigger: '',       // icon/color hint for topic UX (e.g. '🍳 amber' for cooking)
         subjectPreset: '',        // preset key that auto-fills language + thresholds
+        /* ── Sprint A7: Pedagogical metadata fields ── */
+        enablePedagogy: false,    // request concept_id, bncc, nivel_bloom, processo_cognitivo, justificativa_pedagogica per question
     };
 
     /* ── Subject Presets ────────────────────────────────────── */
@@ -69,6 +71,32 @@ window.EduBuilder = (() => {
         { id:'comidas',       label:'Vocabulário: Comidas del Día' },
         { id:'deportes',      label:'Vocabulário: Deportes Olímpicos' },
     ];
+
+    /* ── Bloom's Taxonomy Levels ───────────────────────────── */
+    const BLOOM_LEVELS = [
+        { id:'lembrar',     label:'Lembrar',     icon:'🔵', color:'#3b82f6', desc:'Recordar fatos, definições, listas' },
+        { id:'compreender', label:'Compreender',  icon:'🟢', color:'#22c55e', desc:'Explicar, interpretar, classificar' },
+        { id:'aplicar',     label:'Aplicar',      icon:'🟡', color:'#f59e0b', desc:'Usar em novo contexto, resolver' },
+        { id:'analisar',    label:'Analisar',     icon:'🟠', color:'#f97316', desc:'Decompor, comparar, distinguir' },
+        { id:'avaliar',     label:'Avaliar',      icon:'🔴', color:'#ef4444', desc:'Julgar, criticar, justificar' },
+        { id:'criar',       label:'Criar',        icon:'🟣', color:'#a855f7', desc:'Compor, planejar, produzir novo' },
+    ];
+
+    /* ── BNCC Code Templates ─────────────────────────────── */
+    const BNCC_TEMPLATES = {
+        'ciencias-7':   ['EF07CI01','EF07CI02','EF07CI03','EF07CI06','EF07CI07','EF07CI08'],
+        'ciencias-8':   ['EF08CI01','EF08CI02','EF08CI05','EF08CI07','EF08CI08','EF08CI09'],
+        'matematica-7': ['EF07MA01','EF07MA02','EF07MA12','EF07MA17','EF07MA19','EF07MA34'],
+        'matematica-8': ['EF08MA01','EF08MA06','EF08MA07','EF08MA10','EF08MA17','EF08MA21'],
+        'historia-7':   ['EF07HI01','EF07HI02','EF07HI03','EF07HI05','EF07HI06','EF07HI07'],
+        'historia-8':   ['EF08HI01','EF08HI02','EF08HI03','EF08HI05','EF08HI06','EF08HI07'],
+        'geografia-7':  ['EF07GE01','EF07GE02','EF07GE04','EF07GE05','EF07GE06','EF07GE07'],
+        'geografia-8':  ['EF08GE01','EF08GE03','EF08GE05','EF08GE06','EF08GE08','EF08GE11'],
+        'portugues-7':  ['EF07LP01','EF07LP02','EF07LP04','EF07LP07','EF07LP10','EF07LP11'],
+        'portugues-8':  ['EF08LP01','EF08LP02','EF08LP05','EF08LP07','EF08LP10','EF08LP13'],
+        'espanhol-7':   ['EF06LI01','EF06LI02','EF06LI03','EF07LI01','EF07LI03','EF07LI06'],
+        'ingles-7':     ['EF06LI01','EF06LI02','EF07LI01','EF07LI02','EF07LI04','EF07LI05'],
+    };
 
     /* ── Content Type Catalogue ─────────────────────────────── */
     const CONTENT_TYPES = [
@@ -169,12 +197,22 @@ window.EduBuilder = (() => {
         // Adaptive thresholds context
         const thresholdNote = `\n\nLIMIARES ADAPTATIVOS (para referência): N1=${opts.adaptiveN1||85}% | N2=${opts.adaptiveN2||80}% | N3=${opts.adaptiveN3||70}%. Calibre a dificuldade das questões proporcionalmente.`;
 
-        const ctx = `Analise o conteúdo educativo abaixo e gere material estruturado para uma plataforma gamificada.\n\nCONTEÚDO DE REFERÊNCIA:\n---\n${text.substring(0,6000)}\n---\n\nContexto: Matéria "${opts.subject||'Geral'}" | Ano: ${opts.grade||'7º Ano'} | Dificuldade: ${opts.difficulty||'medium'} | Língua de saída: ${langLabel}${langInstr}${grammarInstr}${stageInstr}${thresholdNote}\n\n`;
+        // Pedagogical metadata fields (Sprint A7)
+        const pedagogy = opts.enablePedagogy;
+        const pedFields = pedagogy ? ',"concept_id":"slug-do-conceito","bncc":"EF07XX01","nivel_bloom":"lembrar|compreender|aplicar|analisar|avaliar|criar","processo_cognitivo":"verbo de ação específico (ex: Identificar, Comparar, Aplicar, Analisar, Justificar)","justificativa_pedagogica":"por que esta questão avalia este conceito neste nível de Bloom"' : '';
+        const bloomCodes = BLOOM_LEVELS.map(b=>b.id).join('|');
+        const subjectKey = `${(opts.subject||'').toLowerCase().replace(/[^a-z]/g,'')}-${(opts.grade||'').replace(/[^0-9]/g,'')}`;
+        const bnccList = BNCC_TEMPLATES[subjectKey] || [];
+        const pedagInstr = pedagogy
+            ? `\n\nCAMPOS PEDAGÓGICOS OBRIGATÓRIOS POR QUESTÃO:\n- concept_id: slug único do conceito testado (ex: "fracao_equivalente", "celula_eucariótica")\n- bncc: código BNCC mais relevante${bnccList.length?` (use um de: ${bnccList.join(', ')})`:''}\n- nivel_bloom: nível da Taxonomia de Bloom (${bloomCodes})\n- processo_cognitivo: verbo de ação específico (ex: "Identificar", "Comparar", "Aplicar", "Deduzir", "Criticar")\n- justificativa_pedagogica: 1 frase explicando por que esta questão avalia este conceito neste nível`
+            : '';
+
+        const ctx = `Analise o conteúdo educativo abaixo e gere material estruturado para uma plataforma gamificada.\n\nCONTEÚDO DE REFERÊNCIA:\n---\n${text.substring(0,6000)}\n---\n\nContexto: Matéria "${opts.subject||'Geral'}" | Ano: ${opts.grade||'7º Ano'} | Dificuldade: ${opts.difficulty||'medium'} | Língua de saída: ${langLabel}${langInstr}${grammarInstr}${stageInstr}${thresholdNote}${pedagInstr}\n\n`;
 
         const schemas = {
-            questions:     `Gere ${opts.count||8} questões variadas (inclua múltipla escolha, V/F e lacuna quando possível). JSON:\n{"questions":[{"prompt":"","type":"multiple_choice|true_false|fill_blank|short_answer","options":[{"text":"","correct":true|false}],"answer":"(para fill_blank/short_answer)","explanation":"","topic":""}]}`,
-            full_stage:    `Gere um estágio completo de aprendizagem. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":""}],"flashcards":[{"q":"","a":""}],"mnemonics":[{"trigger":"","memory":""}]},"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":"","topic":""}]}`,
-            full_stage_es: `Gere um estágio completo de ESPANHOL. Questões em espanhol. Flashcards: frente em espanhol, verso em português. Mnemonics: macetes para regras gramaticais. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":"texto pedagógico misturando PT e ES"}],"flashcards":[{"q":"(ES)","a":"(PT)"}],"mnemonics":[{"trigger":"regra/palavra-chave","memory":"frase mnemônica pedagógica"}]},"questions":[{"prompt":"(ES)","type":"multiple_choice","options":[{"text":"(ES)","correct":false}],"explanation":"(PT pedagógico)","topic":""}]}`,
+            questions:     `Gere ${opts.count||8} questões variadas (inclua múltipla escolha, V/F e lacuna quando possível). JSON:\n{"questions":[{"prompt":"","type":"multiple_choice|true_false|fill_blank|short_answer","options":[{"text":"","correct":true|false}],"answer":"(para fill_blank/short_answer)","explanation":"","topic":""${pedFields}}]}`,
+            full_stage:    `Gere um estágio completo de aprendizagem. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":""}],"flashcards":[{"q":"","a":""}],"mnemonics":[{"trigger":"","memory":""}]},"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":"","topic":""${pedFields}}]}`,
+            full_stage_es: `Gere um estágio completo de ESPANHOL. Questões em espanhol. Flashcards: frente em espanhol, verso em português. Mnemonics: macetes para regras gramaticais. JSON:\n{"title":"","icon":"emoji","difficulty":"easy|medium|hard","estimatedTime":15,"learningObjectives":[""],"summary":{"content":[{"icon":"emoji","title":"","text":"texto pedagógico misturando PT e ES"}],"flashcards":[{"q":"(ES)","a":"(PT)"}],"mnemonics":[{"trigger":"regra/palavra-chave","memory":"frase mnemônica pedagógica"}]},"questions":[{"prompt":"(ES)","type":"multiple_choice","options":[{"text":"(ES)","correct":false}],"explanation":"(PT pedagógico)","topic":""${pedFields}}]}`,
             flashcards:    `Gere ${opts.count||10} flashcards. JSON:\n{"flashcards":[{"q":"","a":""}]}`,
             mnemonics:     `Gere ${opts.count||6} mnemônicos pedagógicos para memorização das regras/conceitos. Cada mnemônico tem: "trigger" (a regra ou palavra-chave que ativa) e "memory" (a frase/técnica de memorização). JSON:\n{"mnemonics":[{"trigger":"palavra-chave ou regra","memory":"frase mnemônica criativa e pedagógica"}]}`,
             summary:       `Gere ${opts.count||5} cards de resumo com macetes. JSON:\n{"content":[{"icon":"emoji","title":"","text":"texto longo com exemplos e macetes"}]}`,
@@ -182,7 +220,7 @@ window.EduBuilder = (() => {
             true_false:    `Gere ${opts.count||8} afirmações V/F. JSON:\n{"questions":[{"prompt":"","type":"true_false","correct":true,"explanation":""}]}`,
             fill_blank:    `Gere ${opts.count||6} questões de lacuna. Use ___ na frase. JSON:\n{"questions":[{"prompt":"frase com ___","type":"fill_blank","answer":"","options":[{"text":"","correct":false}],"explanation":""}]}`,
             matching:      `Gere ${opts.count||5} pares. JSON:\n{"pairs":[{"left":"conceito","right":"definição"}]}`,
-            n3_bonus:      `Gere 15 questões de nível VESTIBULAR (ENEM/FUVEST/UNICAMP adaptadas) sobre o conteúdo. Questões devem ser críticas, interdisciplinares e contextualizadas. Inclua dados, citações e análises. JSON:\n{"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":"pedagógica e aprofundada","topic":""}]}`,
+            n3_bonus:      `Gere 15 questões de nível VESTIBULAR (ENEM/FUVEST/UNICAMP adaptadas) sobre o conteúdo. Questões devem ser críticas, interdisciplinares e contextualizadas. Inclua dados, citações e análises. JSON:\n{"questions":[{"prompt":"","type":"multiple_choice","options":[{"text":"","correct":false}],"explanation":"pedagógica e aprofundada","topic":""${pedFields}}]}`,
             verbos_conj:   `Gere ${opts.count||5} tabelas de conjugação verbal + frases de exemplo para prática. Inclua: verbo no infinitivo, padrão de mudança (se irregular), tabela de conjugação no presente, e 2 frases de exemplo por verbo. JSON:\n{"verbs":[{"infinitive":"","pattern":"e→ie|e→i|o→ue|irregular|regular","conjugation":{"yo":"","tu":"","el":"","nosotros":"","vosotros":"","ellos":""},"examples":["",""]}]}`,
         };
         return ctx + (schemas[type]||schemas.questions) + '\n\nRetorne APENAS o JSON válido, sem markdown.';
@@ -305,6 +343,25 @@ window.EduBuilder = (() => {
                                 <span style="font-size:0.7rem;color:#64748b">%</span></div></div>`).join('')}
                             </div>
                         </div>
+                        <!-- Sprint A7: Pedagogical fields toggle -->
+                        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <div>
+                                    <div style="font-size:0.75rem;font-weight:700;color:#94a3b8">🔬 Campos Pedagógicos (BNCC/Bloom)</div>
+                                    <div style="font-size:0.68rem;color:#475569;margin-top:2px">Solicita concept_id, BNCC, Taxonomia de Bloom, processo cognitivo e justificativa por questão</div>
+                                </div>
+                                <label style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;margin-left:10px">
+                                    <input type="checkbox" ${_bState.enablePedagogy?'checked':''} onchange="EduBuilder._bs('enablePedagogy',this.checked);EduBuilder._switchTab('source')"
+                                    style="opacity:0;width:0;height:0">
+                                    <span style="position:absolute;cursor:pointer;inset:0;background:${_bState.enablePedagogy?'#f97316':'#334155'};border-radius:22px;transition:.2s"></span>
+                                    <span style="position:absolute;content:'';height:16px;width:16px;left:${_bState.enablePedagogy?'20px':'3px'};bottom:3px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none"></span>
+                                </label>
+                            </div>
+                            ${_bState.enablePedagogy?`
+                            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+                                ${BLOOM_LEVELS.map(bl=>`<span style="background:${bl.color}22;border:1px solid ${bl.color};color:${bl.color};font-size:0.65rem;font-weight:700;padding:1px 7px;border-radius:8px">${bl.icon} ${bl.label}</span>`).join('')}
+                            </div>`:''}
+                        </div>
                         <button onclick="EduBuilder._switchTab('generate')" class="admin-topbar-btn admin-topbar-btn-primary" style="width:100%;padding:10px"
                         ${_sourceText.trim().length<20?'disabled':''}>Avançar para Gerar →</button>
                     </div>
@@ -403,11 +460,23 @@ window.EduBuilder = (() => {
         if (g.title) h += `<div style="background:#0f172a;border-radius:8px;padding:12px;margin-bottom:12px"><div style="font-size:1.05rem;font-weight:700;color:#f97316">${g.icon||'📚'} ${_e(g.title)}</div><div style="font-size:0.75rem;color:#64748b;margin-top:2px">${g.difficulty||''} · ${g.estimatedTime||'?'}min</div></div>`;
         if (g.questions?.length) {
             h += `<div class="bld-preview-label">❓ Questões (${g.questions.length})</div>`;
-            h += g.questions.map((q,i)=>`<div class="bld-q-card"><div class="bld-q-num">Q${i+1} · ${q.type||'múltipla escolha'}</div>
-                <div class="bld-q-prompt">${_e(q.prompt||'')}</div>
-                ${(q.options||[]).map(o=>`<div style="font-size:0.78rem;color:${o.correct?'#22c55e':'#94a3b8'};padding:2px 0">${o.correct?'✓':'○'} ${_e(o.text||'')}</div>`).join('')}
-                ${q.answer?`<div style="font-size:0.78rem;color:#22c55e;margin-top:4px">✓ ${_e(q.answer)}</div>`:''}
-                <div class="bld-q-expl">${_e(q.explanation||'')}</div></div>`).join('');
+            h += g.questions.map((q,i)=>{
+                const bloomLv   = BLOOM_LEVELS.find(b=>b.id===q.nivel_bloom);
+                const bloomTag  = bloomLv ? `<span style="background:${bloomLv.color}22;border:1px solid ${bloomLv.color};color:${bloomLv.color};font-size:0.66rem;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:4px">${bloomLv.icon} ${bloomLv.label}</span>` : '';
+                const bnccTag   = q.bncc   ? `<span style="background:#33415533;border:1px solid #475569;color:#94a3b8;font-size:0.66rem;padding:1px 6px;border-radius:8px;margin-left:4px;font-family:monospace">${_e(q.bncc)}</span>` : '';
+                const procTag   = q.processo_cognitivo ? `<span style="background:#7c3aed22;border:1px solid #7c3aed;color:#a78bfa;font-size:0.66rem;padding:1px 6px;border-radius:8px;margin-left:4px">${_e(q.processo_cognitivo)}</span>` : '';
+                const justDiv   = q.justificativa_pedagogica ? `<div style="font-size:0.7rem;color:#64748b;margin-top:3px;font-style:italic;padding:3px 8px;border-left:2px solid #334155">📐 ${_e(q.justificativa_pedagogica)}</div>` : '';
+                return `<div class="bld-q-card">
+                    <div class="bld-q-num" style="display:flex;flex-wrap:wrap;align-items:center;gap:2px">
+                        Q${i+1} · ${q.type||'múltipla escolha'}${bloomTag}${bnccTag}${procTag}
+                    </div>
+                    <div class="bld-q-prompt">${_e(q.prompt||'')}</div>
+                    ${(q.options||[]).map(o=>`<div style="font-size:0.78rem;color:${o.correct?'#22c55e':'#94a3b8'};padding:2px 0">${o.correct?'✓':'○'} ${_e(o.text||'')}</div>`).join('')}
+                    ${q.answer?`<div style="font-size:0.78rem;color:#22c55e;margin-top:4px">✓ ${_e(q.answer)}</div>`:''}
+                    <div class="bld-q-expl">${_e(q.explanation||'')}</div>
+                    ${justDiv}
+                </div>`;
+            }).join('');
         }
         if (g.flashcards?.length) {
             h += `<div class="bld-preview-label">🃏 Flashcards (${g.flashcards.length})</div>`;
@@ -561,7 +630,7 @@ window.EduBuilder = (() => {
             const m = raw.match(/\{[\s\S]*\}/);
             if (!m) throw new Error('Resposta não contém JSON válido');
             _generated = JSON.parse(m[0]);
-            if (prev) prev.innerHTML = _htmlPreview();
+            if (prev) prev.innerHTML = _htmlPreview() + _htmlValidation();
             // Refresh header button
             const header = document.querySelector('#bld-body .admin-section-card-header button');
             if (!header) {
@@ -575,6 +644,181 @@ window.EduBuilder = (() => {
             _loading=false;
             if (btn) { btn.disabled=false; btn.textContent='✨ Gerar com Claude AI'; }
         }
+    }
+
+    /* ── Validation Engine (Sprint A7) ────────────────────── */
+
+    function _validateGenerated() {
+        const g = _generated;
+        if (!g) return [];
+        const qs = g.questions || [];
+        const checks = [];
+
+        // 1 — Questions present
+        checks.push({
+            ok: qs.length > 0,
+            label: `Questões geradas: ${qs.length}`,
+            detail: qs.length === 0 ? 'Nenhuma questão encontrada na resposta' : `${qs.length} questão(ões) no objeto gerado`
+        });
+
+        // 2 — Each MC question has exactly 1 correct answer
+        const badGabarito = qs.filter(q => {
+            if (['true_false','fill_blank','short_answer'].includes(q.type)) return false;
+            return (q.options||[]).filter(o=>o.correct).length !== 1;
+        });
+        checks.push({
+            ok: badGabarito.length === 0,
+            label: 'Gabarito válido (exatamente 1 correto/questão)',
+            detail: badGabarito.length > 0
+                ? `${badGabarito.length} questão(ões) com gabarito inválido`
+                : 'Todas as questões têm exatamente 1 gabarito'
+        });
+
+        // 3 — All options have non-empty text
+        const emptyOpt = qs.filter(q => (q.options||[]).some(o => !String(o.text||'').trim()));
+        checks.push({
+            ok: emptyOpt.length === 0,
+            label: 'Nenhuma opção em branco',
+            detail: emptyOpt.length > 0
+                ? `${emptyOpt.length} questão(ões) com opções vazias`
+                : 'Todas as opções têm texto'
+        });
+
+        // 4 — All questions have explanations
+        const noExpl = qs.filter(q => !String(q.explanation||'').trim());
+        checks.push({
+            ok: noExpl.length === 0,
+            label: 'Todas com explicação pedagógica',
+            detail: noExpl.length > 0
+                ? `${noExpl.length} questão(ões) sem explicação`
+                : 'Todas têm explicação'
+        });
+
+        // 5 — All questions have topics
+        const noTopic = qs.filter(q => !String(q.topic||'').trim());
+        checks.push({
+            ok: noTopic.length === 0,
+            label: 'Todas com tópico classificado',
+            detail: noTopic.length > 0
+                ? `${noTopic.length} questão(ões) sem tópico`
+                : 'Todos os tópicos preenchidos'
+        });
+
+        // 6 — No duplicate prompts
+        const prompts = qs.map(q => String(q.prompt||'').trim().toLowerCase());
+        const uniquePrompts = new Set(prompts);
+        checks.push({
+            ok: uniquePrompts.size === qs.length,
+            label: 'Sem questões duplicadas',
+            detail: uniquePrompts.size < qs.length
+                ? `${qs.length - uniquePrompts.size} prompt(s) duplicado(s) detectado(s)`
+                : 'Nenhum prompt repetido'
+        });
+
+        // 7 — Minimum length check
+        const tooShort = qs.filter(q => String(q.prompt||'').trim().length < 15);
+        checks.push({
+            ok: tooShort.length === 0,
+            label: 'Prompts com comprimento adequado',
+            detail: tooShort.length > 0
+                ? `${tooShort.length} questão(ões) com prompt muito curto (<15 chars)`
+                : 'Todos os prompts com comprimento OK'
+        });
+
+        // ── Pedagogical fields checks (only when enabled) ─────
+        if (_bState.enablePedagogy) {
+            // 8 — All questions have BNCC code
+            const noBncc = qs.filter(q => !String(q.bncc||'').trim());
+            checks.push({
+                ok: noBncc.length === 0,
+                label: 'Todas com código BNCC',
+                detail: noBncc.length > 0
+                    ? `${noBncc.length} questão(ões) sem código BNCC`
+                    : 'Todos os códigos BNCC preenchidos'
+            });
+
+            // 9 — All questions have Bloom level
+            const noBloom = qs.filter(q => !String(q.nivel_bloom||'').trim());
+            const bloomIds = BLOOM_LEVELS.map(b=>b.id);
+            const invalidBloom = qs.filter(q => q.nivel_bloom && !bloomIds.includes(q.nivel_bloom));
+            checks.push({
+                ok: noBloom.length === 0 && invalidBloom.length === 0,
+                label: 'Todos com nível de Bloom válido',
+                detail: noBloom.length > 0
+                    ? `${noBloom.length} questão(ões) sem nivel_bloom`
+                    : invalidBloom.length > 0
+                    ? `${invalidBloom.length} nivel_bloom inválido(s): ${invalidBloom.map(q=>q.nivel_bloom).join(', ')}`
+                    : 'Todos os níveis de Bloom válidos'
+            });
+
+            // 10 — Bloom distribution diversity (≥3 distinct levels)
+            const bloomDist = {};
+            qs.forEach(q => { const b=q.nivel_bloom||''; if(b) bloomDist[b]=(bloomDist[b]||0)+1; });
+            const distinctBloom = Object.keys(bloomDist).length;
+            checks.push({
+                ok: distinctBloom >= 3,
+                label: `Distribuição Bloom diversificada (≥3 níveis)`,
+                detail: distinctBloom < 3
+                    ? `Apenas ${distinctBloom} nível(eis): ${Object.entries(bloomDist).map(([k,v])=>`${k}×${v}`).join(', ')} — adicione questões de outros níveis`
+                    : `${distinctBloom} níveis: ${Object.entries(bloomDist).map(([k,v])=>`${k}×${v}`).join(', ')}`
+            });
+
+            // 11 — All questions have processo_cognitivo
+            const noProcCog = qs.filter(q => !String(q.processo_cognitivo||'').trim());
+            checks.push({
+                ok: noProcCog.length === 0,
+                label: 'Todos com processo cognitivo',
+                detail: noProcCog.length > 0
+                    ? `${noProcCog.length} questão(ões) sem processo_cognitivo`
+                    : 'Todos os processos cognitivos preenchidos'
+            });
+        }
+
+        return checks;
+    }
+
+    function _htmlValidation() {
+        const checks = _validateGenerated();
+        if (!checks.length) return '';
+        const pass = checks.filter(c=>c.ok).length;
+        const total = checks.length;
+        const allPass = pass === total;
+        const scoreColor = allPass ? '#22c55e' : pass >= total * 0.7 ? '#f59e0b' : '#ef4444';
+        const bloomDist = _bState.enablePedagogy ? (() => {
+            const qs = (_generated||{}).questions || [];
+            const dist = {};
+            qs.forEach(q => { const b=q.nivel_bloom||'outro'; dist[b]=(dist[b]||0)+1; });
+            return dist;
+        })() : null;
+
+        return `
+        <div style="margin-top:16px;background:#1e293b;border:1px solid ${scoreColor};border-radius:10px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="font-weight:700;font-size:0.88rem;color:#f1f5f9">🔍 Checklist de Validação</div>
+                <div style="background:${scoreColor};color:#fff;font-size:0.75rem;font-weight:800;padding:3px 10px;border-radius:12px">${pass}/${total} ${allPass?'✅ Aprovado':'⚠️ Atenção'}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+                ${checks.map(c=>`
+                <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;padding:5px 0;border-bottom:1px solid #334155">
+                    <span style="font-size:0.9rem;flex-shrink:0;margin-top:1px">${c.ok?'✅':'❌'}</span>
+                    <div>
+                        <span style="color:${c.ok?'#f1f5f9':'#fca5a5'};font-weight:${c.ok?'400':'700'}">${_e(c.label)}</span>
+                        ${c.detail?`<div style="color:#64748b;font-size:0.72rem;margin-top:1px">${_e(c.detail)}</div>`:''}
+                    </div>
+                </div>`).join('')}
+            </div>
+            ${bloomDist ? `
+            <div style="margin-top:12px">
+                <div style="font-size:0.74rem;font-weight:700;color:#94a3b8;margin-bottom:6px">📊 Distribuição Taxonomia de Bloom</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    ${BLOOM_LEVELS.map(bl=>{
+                        const cnt = bloomDist[bl.id]||0;
+                        return cnt > 0 ? `<div style="background:${bl.color}22;border:1px solid ${bl.color};border-radius:6px;padding:3px 8px;font-size:0.72rem;color:${bl.color};font-weight:700">${bl.icon} ${bl.label} ×${cnt}</div>` : '';
+                    }).join('')}
+                    ${bloomDist['outro']?`<div style="background:#33415522;border:1px solid #334155;border-radius:6px;padding:3px 8px;font-size:0.72rem;color:#64748b;font-weight:700">❓ Outro ×${bloomDist['outro']}</div>`:''}
+                </div>
+            </div>` : ''}
+        </div>`;
     }
 
     function _sendReview() {
@@ -690,7 +934,9 @@ window.EduBuilder = (() => {
         _generate, _sendReview,
         _selectReview, _approve, _reject, _publish, _postComment,
         _applyPreset,
+        /* Sprint A7: validation */
+        _validateGenerated, _htmlValidation,
         /* Expose config objects for external use / debugging */
-        SUBJECT_PRESETS, GRAMMAR_FOCUS, CONTENT_TYPES,
+        SUBJECT_PRESETS, GRAMMAR_FOCUS, CONTENT_TYPES, BLOOM_LEVELS, BNCC_TEMPLATES,
     };
 })();
