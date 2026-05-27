@@ -434,6 +434,7 @@ window.EduBuilder = (() => {
                             ⚔️ N1=${_bState.adaptiveN1}% N2=${_bState.adaptiveN2}% N3=${_bState.adaptiveN3}% |
                             📊 ${_bState.stageType}
                             ${_bState.grammarFocus?` | 🔤 ${_bState.grammarFocus}`:''}
+                            ${_bState.enablePedagogy?` | <span style="color:#f97316;font-weight:700">🔬 BNCC/Bloom ON</span>`:''}
                         </div>
                     </div>
                 </div>
@@ -448,7 +449,7 @@ window.EduBuilder = (() => {
                     <div class="admin-chart-title">👁 Preview Gerado</div>
                     ${_generated ? `<button onclick="EduBuilder._sendReview()" class="admin-topbar-btn admin-topbar-btn-primary" style="padding:4px 14px;font-size:0.78rem">Enviar para Revisão →</button>` : ''}
                 </div>
-                <div id="bld-preview">${_loading ? `<div style="text-align:center;padding:60px"><div class="bld-spin">⚡</div><div style="color:#64748b;margin-top:10px">Gerando com Claude AI…</div></div>` : _generated ? _htmlPreview() : `<div style="text-align:center;padding:60px;color:#64748b"><div style="font-size:2.5rem;margin-bottom:10px">🤖</div>Configure e clique em Gerar</div>`}</div>
+                <div id="bld-preview">${_loading ? `<div style="text-align:center;padding:60px"><div class="bld-spin">⚡</div><div style="color:#64748b;margin-top:10px">Gerando com Claude AI…</div></div>` : _generated ? _htmlPreview() + _htmlValidation() : `<div style="text-align:center;padding:60px;color:#64748b"><div style="font-size:2.5rem;margin-bottom:10px">🤖</div>Configure e clique em Gerar</div>`}</div>
             </div>
         </div>`;
     }
@@ -778,6 +779,9 @@ window.EduBuilder = (() => {
     }
 
     function _htmlValidation() {
+        // Non-question content types don't need question validation
+        const qs = (_generated||{}).questions || [];
+        if (!qs.length) return '';
         const checks = _validateGenerated();
         if (!checks.length) return '';
         const pass = checks.filter(c=>c.ok).length;
