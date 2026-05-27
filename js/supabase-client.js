@@ -299,7 +299,9 @@ const SupaDB = {
                     is_boss: !!s.isBoss, is_final: !!s.isFinal,
                     learning_objectives: sd.learningObjectives || [],
                     completion_message: sd.completionMessage || '',
-                    rewards: sd.rewards || {}, published: true
+                    rewards: sd.rewards || {}, published: true,
+                    mnemonics:   sd.summary?.mnemonics  || [],
+                    mini_review: sd.summary?.miniReview || []
                 };
                 const { error: stErr } = await c.from('stages')
                     .upsert(stRow, { onConflict: 'id' });
@@ -410,6 +412,8 @@ const SupaDB = {
             learning_objectives: stageData.learningObjectives || [],
             completion_message: stageData.completionMessage || '',
             rewards: stageData.rewards || {}, published: true,
+            mnemonics:   stageData.summary?.mnemonics  || [],
+            mini_review: stageData.summary?.miniReview || [],
             updated_at: new Date().toISOString()
         }, { onConflict: 'id' });
         if (stErr) { errors.push(`stage: ${stErr.message}`); return { ok: false, errors }; }
@@ -517,9 +521,9 @@ const SupaDB = {
             adaptiveReview:      groupQ('adaptiveReview'),
             summary: {
                 flashcards:  (flashcards || []).map(fc => ({ q: fc.question, a: fc.answer })),
-                content:     (summaryCards || []).map(c => ({ icon: c.icon, title: c.title, text: c.text })),
-                mnemonics:   [],
-                miniReview:  []
+                content:     (summaryCards || []).map(card => ({ icon: card.icon, title: card.title, text: card.text })),
+                mnemonics:   stage.mnemonics   || [],
+                miniReview:  stage.mini_review || []
             }
         };
     },

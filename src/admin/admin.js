@@ -2310,17 +2310,22 @@ window.EduAdmin = (() => {
         }
         if (!stageMeta) {
             // Fallback: build minimal meta from the buffer itself
+            const fallbackChapterId = _editBuffer.chapterId;
+            if (!fallbackChapterId) {
+                _editorToast('⚠️ Capítulo não encontrado no registro — salvar cancelado.');
+                return;
+            }
             stageMeta = { id: _editBuffer.id || _editVarName.toLowerCase(), varName: _editVarName, index: 1 };
-            chapterId = _editBuffer.chapterId || 'unknown';
+            chapterId = fallbackChapterId;
         }
 
         _editorToast('⏳ Salvando no Supabase…');
-        const btn = document.querySelector('[onclick*="_saveStageToCloud"]');
-        if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+        const btns = document.querySelectorAll('[onclick*="_saveStageToCloud"]');
+        btns.forEach(b => { b.disabled = true; b.textContent = '⏳'; });
 
         const result = await SupaDB.saveStage(chapterId, stageMeta, _editBuffer);
 
-        if (btn) { btn.disabled = false; btn.textContent = '☁️ Cloud'; }
+        btns.forEach(b => { b.disabled = false; b.textContent = '☁️ Cloud'; });
         if (result.ok) {
             _editorToast(`✅ "${_editBuffer.title}" salvo no Supabase!`);
         } else {
