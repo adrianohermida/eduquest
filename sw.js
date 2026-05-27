@@ -3,7 +3,7 @@
  * Cache-first for assets, network-first for API calls
  */
 
-const CACHE_NAME  = 'eduquest-v27';
+const CACHE_NAME  = 'eduquest-v28';
 const CACHE_SHELL = [
     '/',
     '/index.html',
@@ -175,6 +175,7 @@ const CACHE_SHELL = [
     '/js/data/espanhol/7ano/chapters/esp_gastronomia/stages/esp_gas_s04.js',
     '/js/data/espanhol/7ano/chapters/esp_gastronomia/stages/esp_gas_sboss.js',
     '/js/data/espanhol/7ano/chapters/esp_gastronomia/stages/esp_gas_sfinal.js',
+    '/js/data/espanhol/7ano/chapters/esp_gastronomia/stages/esp_gas_n3_bonus.js',
     /* Espanhol 7º Ano — Unidad 3: Deportes y Juegos Olímpicos */
     '/js/data/espanhol/7ano/chapters/esp_deportes/metadata.js',
     '/js/data/espanhol/7ano/chapters/esp_deportes/stages/esp_dep_s01.js',
@@ -184,6 +185,7 @@ const CACHE_SHELL = [
     '/js/data/espanhol/7ano/chapters/esp_deportes/stages/esp_dep_s05.js',
     '/js/data/espanhol/7ano/chapters/esp_deportes/stages/esp_dep_sboss.js',
     '/js/data/espanhol/7ano/chapters/esp_deportes/stages/esp_dep_sfinal.js',
+    '/js/data/espanhol/7ano/chapters/esp_deportes/stages/esp_dep_n3_bonus.js',
     /* Assets */
     '/assets/icons/icon-192.png',
     '/assets/icons/icon-512.png',

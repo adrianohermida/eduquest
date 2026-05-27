@@ -108,13 +108,13 @@ window.GEO_CAP6_N3_BONUS = {
             question: '(ENEM 2021 adaptado) O índice de masculinidade indica a proporção de homens para cada 100 mulheres. Em cidades do interior nordestino, esse índice costuma ser inferior a 90. Isso ocorre porque:',
             options: [
                 { text: 'A mortalidade masculina na infância é muito maior no semiárido nordestino', correct: false },
-                { text: 'Os homens migram mais para regiões industriais em busca de trabalho, deixando mais mulheres na origem', correct: true },
+                { text: 'As mulheres migram em maior proporção do campo para cidades próximas (serviço doméstico, comércio, têxtil), enquanto homens tendem a permanecer na zona rural ou migrar para destinos mais distantes', correct: true },
                 { text: 'As mulheres nordestinas têm expectativa de vida significativamente menor que as do Sudeste', correct: false },
                 { text: 'Programas sociais seletivos atraem exclusivamente mulheres para o interior nordestino', correct: false }
             ],
-            explanation: 'A migração é seletiva: jovens adultos do sexo masculino migram mais (buscam trabalho industrial e na construção). Resultado: área de origem fica com mais mulheres, crianças e idosos → índice de masculinidade < 100.',
+            explanation: 'Pesquisas do IPEA (Camarano & Abramovay, 1999) demonstram que o êxodo rural tem seletividade feminina: as mulheres migram mais do campo para cidades próximas do interior (serviço doméstico, comércio, indústria têxtil), enquanto os homens tendem a permanecer na zona rural ou migrar para destinos industriais mais distantes. O resultado é a masculinização do campo (110–120 homens por 100 mulheres na zona rural) e a feminização das cidades do interior (índice de masculinidade < 90).',
             topic: 'Estrutura por Sexo',
-            tags: ['índice de masculinidade', 'migração seletiva', 'Nordeste']
+            tags: ['índice de masculinidade', 'migração seletiva', 'seletividade feminina', 'êxodo rural']
         },
         {
             question: '(ENEM adaptado) A mortalidade infantil no Brasil caiu de 70 por mil nascidos vivos em 1990 para cerca de 12 em 2022. Qual conjunto de fatores explica melhor essa queda?',

@@ -11,7 +11,7 @@ const BattleMode = {
         n1: {
             key:        'n1',
             label:      'N1',
-            fullLabel:  'Fixação Kumon',
+            fullLabel:  'Fixação Progressiva',
             icon:       '🌱',
             color:      '#16a34a',
             timer:      60,        // 60s — feels unlimited, focus on concept
