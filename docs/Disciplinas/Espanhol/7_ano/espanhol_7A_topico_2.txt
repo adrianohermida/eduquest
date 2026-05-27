@@ -1,1 +1,261 @@
-espanhol_7A_topico_1.txt
+# 📘 TÓPICO 2: Vocabulario Gastronómico, Pesos/Medidas y Objetos de la Mesa
+*(Alinhado à Unidad 2 | pp. 34-45 | Slide de Revisão | Método Kumon → Vestibular)*
+
+---
+
+### 🔹 NÍVEL 1 - Fixação Kumon (15 questões)
+```
+1. [MC] ¿Qué utensilio se usa para cortar la carne?
+a) Cuchara b) Tenedor c) Cuchillo d) Plato
+✅ Gab: C | 📝 Just: El cuchillo tiene filo para cortar alimentos sólidos.
+💡 DICA SLIDE: 🔪 *Cuchillo = faca. "Cuch-" lembra "corte".*
+
+2. [V/F] El plato hondo se usa principalmente para sopas y cremas. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Su forma profunda evita derrames de líquidos.
+💡 DICA SLIDE: 🍲 *Plato hondo = prato fundo. Plato llano = prato raso.*
+
+3. [MC] ¿Cuál medida equivale a 12 unidades de un producto?
+a) Una decena b) Una docena c) Una centena d) Un cuarto
+✅ Gab: B | 📝 Just: Docena = 12 unidades (ej: huevos, panes).
+💡 DICA SLIDE: 📦 *12 = DOCENA. 10 = DECENA. 100 años = SIGLO.*
+
+4. [V/F] "Muy" se usa antes de sustantivos para indicar cantidad. ( ) V ( ) F
+✅ Gab: F | 📝 Just: MUY va con adjetivos/adverbios. MUCHO va con sustantivos/verbos.
+💡 DICA SLIDE: 📊 *MUY + adj/adv | MUCHO + verbo/sustantivo. PAMM: excepciones (mejor, peor, mayor, menor).*
+
+5. [MC] ¿Qué palabra se escribe con N final según la regla ortográfica?
+a) Albun b) Album c) Albuun d) Albunm
+✅ Gab: B | 📝 Just: Palabras terminadas en -um conservan N (origen latino).
+💡 DICA SLIDE: 🔤 *N final: corazón, álbum, común. M antes de P/B: campo, también.*
+
+6. [V/F] La merienda es una comida pesada que se consume después de la cena. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Es ligera, a media tarde, ANTES de la cena.
+💡 DICA SLIDE: ⏰ *Desayuno → Almuerzo → Merienda (tarde) → Cena (noche).*
+
+7. [MC] "Ella es ______ inteligente." ¿Qué cuantificador completa correctamente?
+a) mucho b) muy c) muchos d) mucha
+✅ Gab: B | 📝 Just: Inteligente es adjetivo → usa MUY (invariable).
+💡 DICA SLIDE: 🧠 *MUY es invariable: muy inteligente, muy alto, muy bien.*
+
+8. [V/F] Un "medio kilo" equivale a 250 gramos. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Medio kilo = 500 gramos. 250 g = cuarto de kilo.
+💡 DICA SLIDE: ⚖️ *1/2 kg = 500g | 1/4 kg = 250g | 1 kg = 1000g.*
+
+9. [MC] ¿Qué objeto cubre la mesa antes de poner los platos?
+a) Servilleta b) Mantel c) Vaso d) Taza
+✅ Gab: B | 📝 Just: El mantel protege y decora la superficie.
+💡 DICA SLIDE: 🟦 *Mantel = toalha de mesa. Servilleta = guardanapo.*
+
+10. [V/F] "Mucho" concuerda en género y número con el sustantivo. ( ) V ( ) F
+✅ Gab: V | 📝 Just: mucho/mucha/muchos/muchas según el sustantivo.
+💡 DICA SLIDE: 🔗 *Mucho dinero (masc. sing.) | Muchas frutas (fem. plur.)*
+
+11. [MC] ¿Qué bebida se sirve normalmente en una "taza"?
+a) Refresco b) Agua c) Café o té d) Zumo de frutas
+✅ Gab: C | 📝 Just: La taza tiene asa y es para bebidas calientes.
+💡 DICA SLIDE: ☕ *Taza = xícara. Vaso = copo.*
+
+12. [V/F] El verbo "disolver" sigue la regla de cambio O→UE en presente. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Disolver → yo disuelvo, tú disuelves (2ª conj. o→ue).
+💡 DICA SLIDE: 🔄 *2ª conj: e→ie (querer), o→ue (poder, volver, disolver).*
+
+13. [MC] ¿Qué expresión indica "el doble de algo"?
+a) Un tercio b) Un cuarto c) Doble d) Docena
+✅ Gab: C | 📝 Just: Doble = 2x. Triple = 3x.
+💡 DICA SLIDE: ✖️ *2x = DOBLE | 3x = TRIPLE | 12 = DOCENA*
+
+14. [V/F] "Inmigrante" se escribe con MN porque sigue la regla de prefijo in- + migrante. ( ) V ( ) F
+✅ Gab: V | 📝 Just: In- + migrante = inmigrante. La m se mantiene antes de m/b/p.
+💡 DICA SLIDE: 🔤 *NM/NB: innecesario, inmigrante, columna, alumno.*
+
+15. [MC] En la receta de cebiche, ¿qué ingrediente "cocina" el pescado sin fuego?
+a) Sal b) Ají limo c) Limón d) Cebolla
+✅ Gab: C | 📝 Just: El ácido cítrico del limón desnaturaliza las proteínas.
+💡 DICA SLIDE: 🍋 *Ácido + proteína = "cocina" fría. Técnica peruana ancestral.*
+
+---
+
+### 🔹 NÍVEL 2 - Aplicación Escolar (20 questões)
+```
+16. [Interpretação] Según el diálogo de la p. 34, ¿por qué la madre insiste en que Sonia desayune?
+✅ Gab: Porque el estómago vacío afecta la concentración y el rendimiento escolar.
+💡 DICA SLIDE: 🎒 *"Cole" = colegio. Ayuno prolongado = bajo rendimiento.*
+
+17. [MC] "Compramos el coche ______ después que su tío." ¿Cuál cuantificador es correcto?
+a) muy b) mucho c) muchos d) mucha
+✅ Gab: B | 📝 Just: "Después" es adverbio de tiempo → excepción PAMM usa MUCHO.
+💡 DICA SLIDE: 📜 *PAMM: mucho mejor, mucho peor, mucho más, mucho después.*
+
+18. [V/F] En España, la merienda suele incluir bocadillos, tartas o leche con galletas. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Es un hábito cultural consolidado a media tarde.
+💡 DICA SLIDE: 🥪 *Merienda ≠ cena. Es ligera, social, reparadora.*
+
+19. [MC] ¿Qué utensilio se usa para "pinchar" los alimentos y llevarlos a la boca?
+a) Cuchara b) Cuchillo c) Tenedor d) Plato llano
+✅ Gab: C | 📝 Just: El tenedor tiene púas para sujetar alimentos sólidos.
+💡 DICA SLIDE: 🍴 *Tenedor = garfo. Púas = dentes.*
+
+20. [V/F] "Muy" puede usarse antes de verbos para indicar intensidad. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Muy solo modifica adjetivos o adverbios. Para verbos: mucho.
+💡 DICA SLIDE: ⚖️ *Muy alto (adj) | Corro mucho (verbo)*
+
+21. [MC] Si una receta pide "un cuarto de kilo de azúcar", ¿cuántos gramos son?
+a) 100g b) 250g c) 500g d) 750g
+✅ Gab: B | 📝 Just: 1 kg = 1000g → 1/4 = 250g.
+💡 DICA SLIDE: 📐 *1/4 = cuarto | 1/2 = medio/mitad | 1/3 = tercio*
+
+22. [V/F] La palabra "corazón" termina en N porque sigue la regla de final de palabra. ( ) V ( ) F
+✅ Gab: V | 📝 Just: En español, la mayoría de palabras terminan en N, S o vocal.
+💡 DICA SLIDE: 🔚 *N final: corazón, canción, común, álbum.*
+
+23. [MC] En el diálogo de la p. 37, ¿quién prefiere la tortilla por ser "más ligera"?
+a) Julián b) Marcos c) Sonia d) Lucía
+✅ Gab: B | 📝 Just: Marcos opta por opción ligera para facilitar digestión nocturna.
+💡 DICA SLIDE: 🌙 *Cena ligera = respeto al ritmo biológico.*
+
+24. [V/F] "Mucho" es invariable como "muy". ( ) V ( ) F
+✅ Gab: F | 📝 Just: Mucho varía: mucho/mucha/muchos/muchas. Muy nunca cambia.
+💡 DICA SLIDE: 📊 *MUY = fijo | MUCHO = flexível.*
+
+25. [MC] ¿Qué medida se usa comúnmente para líquidos como leche o zumo?
+a) Kilo b) Litro c) Docena d) Cuarto
+✅ Gab: B | 📝 Just: Litro mide volumen de líquidos.
+💡 DICA SLIDE: 🥛 *Líquidos = litro/mililitro. Sólidos = kilo/gramo.*
+
+26. [Interpretação] Según la receta de cebiche (p. 42), ¿por qué no se debe exprimir todo el limón?
+✅ Gab: Porque la piel blanca amarga arruinaría el sabor del plato.
+💡 DICA SLIDE: 🍋 *Exprimir hasta la mitad = equilibrio ácido-amargo.*
+
+27. [V/F] El verbo "volver" cambia O→UE en todas las personas del presente. ( ) V ( ) F
+✅ Gab: F | 📝 Just: No cambia en nosotros/vosotros (volvemos, volvéis).
+💡 DICA SLIDE: 🔄 *Excepción: nosotros/vosotros NUNCA cambian en verbos irregulares.*
+
+28. [MC] "Tengo ______ relojes." ¿Cuál forma concuerda correctamente?
+a) muy b) mucho c) muchos d) mucha
+✅ Gab: C | 📝 Just: Relojes = sustantivo masc. plural → muchos.
+💡 DICA SLIDE: 🔗 *Concordancia: mucho(s)/mucha(s) + sustantivo.*
+
+29. [V/F] La servilleta se usa principalmente para cubrir la mesa. ( ) V ( ) F
+✅ Gab: F | 📝 Just: El mantel cubre la mesa. La servilleta limpia boca/manos.
+💡 DICA SLIDE: 🍽️ *Mantel (superficie) ≠ Servilleta (personal).*
+
+30. [MC] ¿Qué fracción representa "la mitad"?
+a) 1/3 b) 1/4 c) 1/2 d) 2/3
+✅ Gab: C | 📝 Just: La mitad o medio = 1/2.
+💡 DICA SLIDE: 📐 *1/2 = medio | 1/3 = tercio | 1/4 = cuarto*
+
+31. [Interpretação] En el texto "Alimentación en la pandemia" (p. 48), ¿qué recomienda Jane Ogden sobre comer frente a pantallas?
+✅ Gab: No hacerlo, porque la distracción impide que el cerebro registre saciedad.
+💡 DICA SLIDE: 📵 *Atención plena = menor ingesta calórica inconsciente.*
+
+32. [V/F] "Innecesario" se escribe con NN porque el prefijo in- se une a necesario. ( ) V ( ) F
+✅ Gab: V | 📝 Just: In- + necesario = innecesario (doble N conservada).
+💡 DICA SLIDE: 🔤 *NM/NB/NN: innecesario, inmigrante, columna, alumno.*
+
+33. [MC] ¿Qué verbo irregular significa "tener la capacidad de"?
+a) Querer b) Poder c) Volver d) Entender
+✅ Gab: B | 📝 Just: Poder = capacidad/posibilidad (o→ue).
+💡 DICA SLIDE: 🔑 *Poder = yo puedo, tú puedes, él puede.*
+
+34. [V/F] "Mucho mayor" es una excepción a la regla de muy/mucho. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Mayor es adjetivo comparativo → usa MUCHO (PAMM).
+💡 DICA SLIDE: 📈 *PAMM: mucho mejor, mucho peor, mucho mayor, mucho menor.*
+
+35. [MC] Si un plato lleva "medio kilo de patatas", ¿cuántos gramos son?
+a) 250g b) 500g c) 750g d) 1000g
+✅ Gab: B | 📝 Just: Medio = 1/2 → 500g.
+💡 DICA SLIDE: ⚖️ *Medio kilo = 500g. Cuarto = 250g.*
+
+---
+
+### 🔹 NÍVEL 3 - Vestibular (10 questões)
+36. [MC] La receta de cebiche peruano destaca que "el punto de equilibrio de los cuatro sabores... no se puede explicar en una receta". Esto revela que:
+a) La cocina es exacta como la matemática b) La gastronomía es arte y ciencia sensorial c) El cebiche no lleva limón d) El picante anula la acidez
+✅ Gab: B | 📝 Just: Armonización exige paladar, técnica y adaptación constante.
+💡 DICA SLIDE: 👅 *Cozinhar = química + arte + cultura.*
+
+37. [Eliminatória] Analise as afirmativas sobre muy/mucho:
+I. MUY es invariable y modifica adjetivos o adverbios.
+II. MUCHO concuerda en género y número con sustantivos o intensifica verbos.
+III. Las excepciones PAMM usan MUY en lugar de MUCHO.
+IV. "Mucho mejor" es correcto porque "mejor" es adjetivo comparativo.
+Están correctas: a) I y II b) I, II y IV c) II, III y IV d) I, III y IV
+✅ Gab: B | 📝 Just: III es falsa: PAMM usa MUCHO, no MUY.
+💡 DICA SLIDE: 🔍 *Eliminar absolutos. PAMM = mucho + comparativo/adv.*
+
+38. [MC] La regla ortográfica "M antes de P y B" se explica fonéticamente porque:
+a) La M es labial y facilita la pronunciación de sonidos oclusivos bilabiales b) La N suena mejor antes de P c) Es una regla aleatoria d) La B siempre va con M
+✅ Gab: A | 📝 Just: Coarticulación: labios se cierran para M → P/B requiere mismo movimiento.
+💡 DICA SLIDE: 👄 *Labios + labios = fluidez fonética.*
+
+39. [V/F] La globalización ha homogeneizado completamente los desayunos hispánicos. ( ) V ( ) F
+✅ Gab: F | 📝 Just: Tradiciones locales (pan con tomate, medialunas, arepas) resisten y se adaptan.
+💡 DICA SLIDE: 🌐 *Globalización ≠ apagar tradición. Sinergia global-local.*
+
+40. [MC] ¿Qué política escolar sería más coherente con el dato "desayuno mejora concentración en 30%"?
+a) Eliminar recreo b) Ofrecer desayuno escolar gratuito c) Prohibir meriendas d) Avanzar horario de entrada
+✅ Gab: B | 📝 Just: Evidencia científica → acción concreta de equidad educacional.
+💡 DICA SLIDE: 🎯 *Dado + necesidad + impacto social = política pública.*
+
+41. [MC] El verbo "disolver" en "El azúcar se disuelve en agua caliente" muestra que:
+a) La irregularidad o→ue es fonológica, no semántica b) El cambio ocurre en todas las personas c) Es un verbo regular d) Solo cambia en infinitivo
+✅ Gab: A | 📝 Just: Disuelvo/disuelves por razones fonéticas (diptongo), no de significado.
+💡 DICA SLIDE: 🔤 *O→UE = diptongo fonético para mantener sílaba tónica.*
+
+42. [V/F] La recomendación de "no comer delante de aparatos electrónicos" se basa en evidencias neurocognitivas sobre atención y saciedad. ( ) V ( ) F
+✅ Gab: V | 📝 Just: Distração impide que córtex pré-frontal registre ingesta calórica.
+💡 DICA SLIDE: 🧠 *Atención plena = digestión consciente.*
+
+43. [MC] ¿Qué factor histórico-social explica la diferencia de horarios de refeições entre Brasil e Espanha?
+a) Clima tropical vs temperado b) Ritmo laboral, tradición de siesta y vida social nocturna c) Religião d) Idioma
+✅ Gab: B | 📝 Just: Fatores socioeconômicos e culturais moldam rotinas.
+💡 DICA SLIDE: 🌍 *Horário = espelho da sociedade.*
+
+44. [Eliminatória] Sobre la receta de cebiche:
+I. El limón "cocina" el pescado por acción del ácido cítrico.
+II. Se recomienda exprimir todo el limón para mayor acidez.
+III. El ají limo aporta el toque picante característico.
+IV. Se sirve frío o a temperatura ambiente, no caliente.
+Están correctas: a) I, II, III b) I, III, IV c) II, III, IV d) I, II, IV
+✅ Gab: B | 📝 Just: II é falsa: texto diz "sin apretar demasiado... saldrá sabor amargo".
+💡 DICA SLIDE: 🔍 *Atenção aos detalhes técnicos.*
+
+45. [MC] "Una dieta sana, variada y rica en nutrientes siempre ha sido importante..." A palavra "siempre" indica:
+a) Uma moda passageira b) Uma verdade atemporal na saúde pública c) Uma recomendação apenas para atletas d) Uma crítica à indústria alimentícia
+✅ Gab: B | 📝 Just: Reforça continuidade histórica da alimentação saudável.
+💡 DICA SLIDE: ⏳ *"Siempre" = pilar, não tendência.*
+
+---
+
+### 🔹 DISSERTATIVAS (3 questões)
+46. Explique, en español o portugués, por qué la receta de cebiche destaca la importancia de "probar al comienzo, a la mitad y al final".
+✅ Gab Esperado: Porque cada limón, ají y pescado tiene variaciones naturales de acidez y picante. El equilibrio es dinámico y requiere ajuste sensorial continuo para garantizar armonía de sabores.
+💡 DICA SLIDE: 👅 *Probar = calibrar. Cocina = ciencia + arte.*
+
+47. Compara el uso de "muy" y "mucho" con ejemplos de la unidad. ¿Por qué "mucho mejor" es correcto y "muy mejor" es incorrecto?
+✅ Gab Esperado: MUY modifica adjetivos/adverbios puros (muy inteligente, muy rápido). MUCHO intensifica verbos o sustantivos, y en excepciones comparativas (PAMM: mejor, peor, mayor, menor, más, menos, antes, después). "Mucho mejor" es correcto porque "mejor" es comparativo irregular, no adjetivo puro.
+💡 DICA SLIDE: 📊 *MUY = puro | MUCHO = verbo/sust/comparativo.*
+
+48. Crea un menú equilibrado para un día escolar usando pesos/medidas de la unidad. Justifica cada elección según hábitos saludables del texto.
+✅ Gab Esperado: Desayuno: 1 vaso (250ml) de leche + 2 rebanadas de pan + 1 fruta (150g). Almuerzo: 1/4 kg de pollo + 1/2 kg de arroz + 1 plato de verdura. Merienda: 1 yogur + 5 galletas. Cena: 1/4 kg de sopa ligera. Justificación: equilibrio energético, hidratación, digestión nocturna facilitada.
+💡 DICA SLIDE: 📋 *Menú = proporción + ritmo biológico.*
+
+---
+
+### 🔹 ELIMINATÓRIAS/Vestibular (2 questões)
+49. [Gráfico Conceitual] Si un estudio muestra que adolescentes que desayunan tienen 30% más de concentración, ¿qué política escolar es más coherente?
+✅ Gab: B (Ofrecer desayuno escolar gratuito) | 📝 Just: Evidencia → acción concreta.
+💡 DICA SLIDE: 🎯 *Dado científico + equidade = política eficaz.*
+
+50. [Análise Crítica] "La globalización ha homogeneizado los desayunos: ya todos comen cereales y café". Esta afirmación es válida? Justifique.
+✅ Gab Esperado: No es totalmente válida. Textos muestran diversidad: pan, aceite, tomate, churros, arepas, medialunas. La globalización existe, pero las tradiciones locales resisten. Es importante valorar la diversidad cultural alimentaria.
+💡 DICA SLIDE: 🌐 *Globalización ≠ homogeneización. Tradición + innovación = diversidad viva.*
+
+---
+
+✅ **Tópico 2 concluído com 50 questões completas.**
+
+## 📦 PRÓXIMO PASSO
+Para garantir **qualidade pedagógica máxima e evitar cortes por limite de tokens**, seguirei gerando os tópicos **1 a 1**, exatamente como solicitado. 
+
+**Deseja que eu prossiga imediatamente com o Tópico 3: Ortografía I (M/N y uso de MUY vs MUCHO)** mantendo o mesmo rigor, integração das dicas do slide e calibragem vestibular? 🎯

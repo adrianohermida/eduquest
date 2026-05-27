@@ -281,46 +281,10 @@ const GameEngine = {
         const app      = document.getElementById('app-container');
         const theme    = this._getBattleTheme();
         const maxLives = CONFIG.lives.gameHearts || 3;
+        const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
+        const heartsHTML = Array.from({length: maxLives}, () => _ic('heart',{size:'xs',color:'heart'})).join('');
 
-        app.innerHTML = `
-            <div class="game-arena battle-arena ${theme.bgClass}" id="game-arena">
-                <div class="battle-topbar">
-                    <button class="btn-exit" onclick="GameEngine.exit()">✕</button>
-                    <div class="game-progress-track">
-                        <div class="game-progress-fill" id="game-progress" style="width:0%"></div>
-                    </div>
-                    <div class="game-timer" id="game-timer">${(typeof IconSystem !== 'undefined') ? IconSystem.html('warning',{size:'xs'}) : ''} 15s</div>
-                </div>
-                <div class="battle-scene">
-                    <div class="battle-entity battle-enemy-side">
-                        <div class="battle-entity-name">${theme.enemy} ${theme.name}</div>
-                        <div class="battle-hp-wrap">
-                            <div class="battle-hp-bar">
-                                <div class="battle-hp-fill hp-enemy" id="enemy-hp" style="width:100%"></div>
-                            </div>
-                            <span class="battle-hp-text" id="enemy-hp-text">100%</span>
-                        </div>
-                        <div class="battle-sprite enemy-sprite" id="enemy-sprite">${theme.enemy}</div>
-                    </div>
-                    <div class="battle-center-info">
-                        <div class="battle-combo-zone" id="battle-combo"></div>
-                    </div>
-                    <div class="battle-entity battle-player-side">
-                        ${(() => { const ic = typeof IconSystem !== 'undefined' ? IconSystem : null; const avatarCls = (typeof State !== 'undefined') ? (State.getAvatarClass() || 'guerreiro') : 'guerreiro'; const clsColor = { guerreiro:'rpg', mago:'science', ninja:'final', cientista:'science' }; return `<div class="battle-sprite player-sprite" id="player-sprite">${ic ? ic.html('avatar',{size:'3xl',color:clsColor[avatarCls]||'xp'}) : '🦸'}</div>`; })()}
-                        <div class="battle-hp-wrap">
-                            <div class="battle-hp-bar">
-                                <div class="battle-hp-fill hp-player" id="player-hp" style="width:100%"></div>
-                            </div>
-                            <span class="battle-hp-text" id="player-hp-hearts">
-                                ${Array.from({length: maxLives}, () => (typeof IconSystem !== 'undefined') ? IconSystem.html('heart',{size:'xs',color:'heart'}) : '❤️').join('')}
-                            </span>
-                        </div>
-                        <div class="battle-entity-name">${(typeof IconSystem !== 'undefined') ? IconSystem.html('avatar',{size:'xs'}) : '🦸'} Herói</div>
-                    </div>
-                </div>
-                <div class="question-container" id="question-container"></div>
-                <div class="feedback-overlay" id="feedback-overlay"></div>
-            </div>`;
+        app.innerHTML = ;
 
         this._loadQuestion();
     },
