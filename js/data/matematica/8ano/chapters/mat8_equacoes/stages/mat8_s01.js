@@ -220,9 +220,9 @@ const MAT8_S01 = {
     {
       prompt: 'A expressão 2⁻⁴ × 2⁶ ÷ 2² simplifica para:',
       options: [
-        { text: '2⁰ = 1',  correct: false },
+        { text: '2⁴',      correct: false },
         { text: '2⁸',      correct: false },
-        { text: '2¹² ',    correct: false },
+        { text: '2¹²',     correct: false },
         { text: '2⁰ = 1',  correct: true  }
       ],
       explanation: '2⁻⁴ × 2⁶ ÷ 2² = 2⁻⁴⁺⁶⁻² = 2⁰ = 1. Soma e subtrai os expoentes: -4+6-2 = 0.'
@@ -233,12 +233,12 @@ const MAT8_S01 = {
     {
       prompt: 'DIFÍCIL: Qual é o valor de (2³)² − 4² + 2⁰?',
       options: [
-        { text: '49',  correct: false },
+        { text: '17',  correct: false },
         { text: '65',  correct: false },
-        { text: '49',  correct: false },
+        { text: '48',  correct: false },
         { text: '49',  correct: true  }
       ],
-      explanation: '(2³)² = 2⁶ = 64; 4² = 16; 2⁰ = 1. Resultado: 64 − 16 + 1 = 49.'
+      explanation: '(2³)² = 2⁶ = 64; 4² = 16; 2⁰ = 1. Resultado: 64 − 16 + 1 = 49. (17 = erro: (2³)²=2⁵=32; 65 = esquece o −; 48 = trata 2⁰ como 0.)'
     },
     {
       prompt: 'DIFÍCIL: Se 2ⁿ = 128, qual é o valor de n?',

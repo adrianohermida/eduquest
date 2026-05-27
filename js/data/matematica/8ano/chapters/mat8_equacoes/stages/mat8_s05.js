@@ -105,14 +105,14 @@ const MAT8_S05 = {
 
   guidedPractice: [
     {
-      prompt: '🔍 DICA: No método de adição, ajuste os coeficientes para serem opostos.\n\nPara eliminar y em { 2x + 3y = 11 e { x − y = 2, multiplique a 2ª por 3, resultando em:',
+      prompt: '🔍 DICA: No método de adição, ajuste os coeficientes para serem opostos.\n\nPara eliminar y em { 2x + 3y = 20 e { x − y = 5, multiplique a 2ª por 3, resultando em:',
       options: [
-        { text: '3x − 3y = 6  →  adicionar com a 1ª dá 5x = 17', correct: false },
-        { text: '3x − 3y = 6  →  adicionar com a 1ª dá 5x = 17', correct: false },
-        { text: '3x − 3y = 6  →  somando: 5x = 17 → x = 17/5',   correct: false },
-        { text: '3x − 3y = 6  →  somando com 2x+3y=11: 5x = 17 → x = 17/5 ≈ 3,4', correct: true }
+        { text: '3x + 3y = 15  →  adicionando: 5x + 6y = 35 (y não é eliminado)', correct: false },
+        { text: '3x − 3y = 15  →  somando com 2x+3y=20: 5x = 5, logo x = 1',     correct: false },
+        { text: '3x − 3y = 10  →  somando com 2x+3y=20: 5x = 30 → x = 6',        correct: false },
+        { text: '3x − 3y = 15  →  somando com 2x+3y=20: 5x = 35 → x = 7. Então y = 2.', correct: true }
       ],
-      explanation: '2ª × 3: 3x−3y=6. Soma com 2x+3y=11: 5x=17 → x=3,4. De x−y=2: y=1,4.'
+      explanation: '2ª × 3: 3x−3y=15. Soma com 2x+3y=20: 5x=35 → x=7. De x−y=5: 7−y=5 → y=2. Solução: (7,2). Verificação: 2(7)+3(2)=20 ✓'
     },
     {
       prompt: '🔍 DICA: Substitua a incógnita isolada diretamente.\n\nNo sistema { y = 2x − 1 e { 3x + y = 9, substituindo y:',
@@ -158,24 +158,24 @@ const MAT8_S05 = {
       explanation: 'Para indeterminado, a 2ª equação deve ser múltiplo da 1ª: 4x+2y = 2(2x+y) = 2×5 = 10. k=10.'
     },
     {
-      prompt: 'Resolva pelo método de substituição: { x = 3y − 1 e { 2x + y = 13.',
+      prompt: 'Resolva pelo método de substituição: { x = 3y − 4 e { 2x + y = 13.',
       options: [
-        { text: 'x = 4, y = 5/3',   correct: false },
-        { text: 'x = 5, y = 2',     correct: false },
-        { text: 'x = 2, y = 1',     correct: false },
-        { text: 'x = 5, y = 2',     correct: true  }
+        { text: 'x = 8, y = 4',   correct: false },
+        { text: 'x = 5, y = 2',   correct: false },
+        { text: 'x = 2, y = 2',   correct: false },
+        { text: 'x = 5, y = 3',   correct: true  }
       ],
-      explanation: '2(3y−1)+y=13 → 6y−2+y=13 → 7y=15 → y=15/7... Recalcular: 2(3y−1)+y=13 → 7y=15. Hmm, y=15/7 não é inteiro. Verificar: x=3(2)−1=5, 2(5)+2=12≠13. Tentativa: y=1→x=2; 2(2)+1=5≠13. y=2→x=5; 2(5)+2=12≠13. Ajustar: 2x+y=13, x=3y−1. 2(3y−1)+y=13 → 7y-2=13 → 7y=15 → y não é inteiro. Esta questão tem erro — y=15/7, x=3(15/7)-1=38/7.'
+      explanation: 'Substituindo x=3y−4 na 2ª: 2(3y−4)+y=13 → 6y−8+y=13 → 7y=21 → y=3. x=3(3)−4=5. Par (5,3). Verificação: 2(5)+3=13 ✓'
     },
     {
-      prompt: 'Comprou 2 cadernos e 3 canetas por R$14. Antes, 1 caderno e 5 canetas custavam R$13. Preço do caderno:',
+      prompt: 'Comprou 2 cadernos e 3 canetas por R$16. Na loja vizinha, 1 caderno e 5 canetas custavam R$15. Qual é o preço do caderno?',
       options: [
         { text: 'R$3',   correct: false },
         { text: 'R$4',   correct: false },
         { text: 'R$5',   correct: true  },
         { text: 'R$6',   correct: false }
       ],
-      explanation: '{ 2c+3k=14 e { c+5k=13. De (2): c=13−5k. Na (1): 2(13−5k)+3k=14 → 26−10k+3k=14 → −7k=−12 → k=12/7... Alternativa: c=5, k=4/3. Verificar c=5: 2(5)+3k=14 → k=4/3. c+5k=5+20/3≠13. Ajuste: se c=5 e k=4/3 não funciona. Sistema sem solução inteira conveniente para o problema.'
+      explanation: '{ 2c+3k=16 e { c+5k=15. De (2): c=15−5k. Na (1): 2(15−5k)+3k=16 → 30−10k+3k=16 → −7k=−14 → k=2. c=15−5(2)=5. Caderno: R$5, caneta: R$2. Verificação: 2(5)+3(2)=16 ✓ e 5+5(2)=15 ✓'
     },
     {
       prompt: 'Dois números cuja soma é 15 e diferença é 3. O maior número é:',
