@@ -371,6 +371,172 @@ const SupaDB = {
             }
         }
         return report;
+    },
+
+    // ── SINGLE STAGE SAVE (Sprint 4) ────────────────────────
+    /**
+     * Saves / updates a single stage and all its sub-content to Supabase.
+     * Used by the stage editor "Save to Cloud" button.
+     * @param {string} chapterId  e.g. 'cap7_doencas'
+     * @param {object} stageMeta  { id, varName, index, isBoss, isFinal }
+     * @param {object} stageData  the full stage JS object (from window[varName])
+     * @returns {{ ok: boolean, errors: string[] }}
+     */
+    async saveStage(chapterId, stageMeta, stageData) {
+        const c = getClient();
+        if (!c) return { ok: false, errors: ['offline'] };
+        const errors = [];
+
+        // 1. Ensure chapter row exists (upsert minimal)
+        const meta = (window.CHAPTERS_REGISTRY || {})[chapterId] || {};
+        if (meta.id) {
+            await c.from('chapters').upsert({
+                id: meta.id, subject: meta.subject || '', grade: meta.grade || '',
+                title: meta.title || chapterId, icon: meta.icon || '📚',
+                color: meta.color || '#64748b',
+                total_stages: meta.totalStages || meta.stages?.length || 0,
+                description: meta.description || '', published: meta.published !== false
+            }, { onConflict: 'id' });
+        }
+
+        // 2. Upsert stage row
+        const { error: stErr } = await c.from('stages').upsert({
+            id: stageMeta.id, chapter_id: chapterId,
+            stage_index: stageMeta.index || 1, var_name: stageMeta.varName || stageMeta.id.toUpperCase(),
+            title: stageData.title || stageMeta.id, icon: stageData.icon || '⚔️',
+            difficulty: stageData.difficulty || (stageMeta.isBoss ? 'boss' : 'medium'),
+            estimated_time: stageData.estimatedTime || 10,
+            is_boss: !!stageMeta.isBoss, is_final: !!stageMeta.isFinal,
+            learning_objectives: stageData.learningObjectives || [],
+            completion_message: stageData.completionMessage || '',
+            rewards: stageData.rewards || {}, published: true,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+        if (stErr) { errors.push(`stage: ${stErr.message}`); return { ok: false, errors }; }
+
+        // 3. Replace questions
+        await c.from('questions').delete().eq('stage_id', stageMeta.id);
+        const sections = [
+            { key: 'warmup',         data: stageData.warmup         || [] },
+            { key: 'guidedPractice', data: stageData.guidedPractice || [] },
+            { key: 'questions',      data: stageData.questions      || [] },
+            { key: 'adaptiveReview', data: stageData.adaptiveReview || [] },
+        ];
+        const qRows = [];
+        sections.forEach(sec => sec.data.forEach((q, i) => qRows.push({
+            stage_id: stageMeta.id, section: sec.key, seq_index: i,
+            prompt:      (q.prompt      || '').slice(0, 2000),
+            options:     q.options      || [],
+            explanation: (q.explanation || '').slice(0, 2000),
+            difficulty:  q.difficulty   || null,
+            topic:       q.topic        || null,
+            type:        q.type         || 'multiple_choice'
+        })));
+        if (qRows.length) {
+            const { error: qErr } = await c.from('questions').insert(qRows);
+            if (qErr) errors.push(`questions: ${qErr.message}`);
+        }
+
+        // 4. Replace flashcards
+        await c.from('flashcards').delete().eq('stage_id', stageMeta.id);
+        const fcs = stageData.summary?.flashcards || [];
+        if (fcs.length) {
+            const { error: fcErr } = await c.from('flashcards').insert(
+                fcs.map((fc, i) => ({ stage_id: stageMeta.id, seq_index: i,
+                    question: (fc.q || '').slice(0, 500), answer: (fc.a || '').slice(0, 1000) }))
+            );
+            if (fcErr) errors.push(`flashcards: ${fcErr.message}`);
+        }
+
+        // 5. Replace summary cards
+        await c.from('summary_cards').delete().eq('stage_id', stageMeta.id);
+        const cards = stageData.summary?.content || [];
+        if (cards.length) {
+            const { error: cardErr } = await c.from('summary_cards').insert(
+                cards.map((card, i) => ({ stage_id: stageMeta.id, seq_index: i,
+                    icon:  card.icon  || '📌',
+                    title: (card.title || '').slice(0, 200),
+                    text:  (card.text  || '').slice(0, 3000) }))
+            );
+            if (cardErr) errors.push(`summary_cards: ${cardErr.message}`);
+        }
+
+        // 6. Mark stage as synced in localStorage
+        try {
+            const synced = JSON.parse(localStorage.getItem('eq_synced_stages') || '{}');
+            synced[stageMeta.id] = Date.now();
+            localStorage.setItem('eq_synced_stages', JSON.stringify(synced));
+        } catch(e) {}
+
+        return { ok: errors.length === 0, errors };
+    },
+
+    // ── LOAD STAGE FROM DB (Sprint 4) ───────────────────────
+    /**
+     * Reconstructs a full stage data object from Supabase tables.
+     * Returns null if not found. Used as GameEngine offline fallback.
+     */
+    async loadStageFromDB(stageId) {
+        const c = getClient();
+        if (!c) return null;
+        // Load stage metadata
+        const { data: stage, error: stErr } = await c
+            .from('stages').select('*').eq('id', stageId).single();
+        if (stErr || !stage) return null;
+
+        // Load questions grouped by section
+        const { data: questions } = await c
+            .from('questions').select('*').eq('stage_id', stageId)
+            .order('seq_index', { ascending: true });
+        const { data: flashcards } = await c
+            .from('flashcards').select('*').eq('stage_id', stageId)
+            .order('seq_index', { ascending: true });
+        const { data: summaryCards } = await c
+            .from('summary_cards').select('*').eq('stage_id', stageId)
+            .order('seq_index', { ascending: true });
+
+        const groupQ = (section) => (questions || [])
+            .filter(q => q.section === section)
+            .map(q => ({ prompt: q.prompt, options: q.options || [],
+                explanation: q.explanation, difficulty: q.difficulty, topic: q.topic, type: q.type }));
+
+        return {
+            id:                  stage.id,
+            title:               stage.title,
+            icon:                stage.icon,
+            difficulty:          stage.difficulty,
+            estimatedTime:       stage.estimated_time,
+            learningObjectives:  stage.learning_objectives || [],
+            completionMessage:   stage.completion_message,
+            rewards:             stage.rewards || {},
+            isBoss:              stage.is_boss,
+            isFinal:             stage.is_final,
+            warmup:              groupQ('warmup'),
+            guidedPractice:      groupQ('guidedPractice'),
+            questions:           groupQ('questions'),
+            adaptiveReview:      groupQ('adaptiveReview'),
+            summary: {
+                flashcards:  (flashcards || []).map(fc => ({ q: fc.question, a: fc.answer })),
+                content:     (summaryCards || []).map(c => ({ icon: c.icon, title: c.title, text: c.text })),
+                mnemonics:   [],
+                miniReview:  []
+            }
+        };
+    },
+
+    // ── SYNC STATUS HELPERS ─────────────────────────────────
+    isStageSynced(stageId) {
+        try {
+            const synced = JSON.parse(localStorage.getItem('eq_synced_stages') || '{}');
+            return !!synced[stageId];
+        } catch(e) { return false; }
+    },
+
+    getSyncedAt(stageId) {
+        try {
+            const synced = JSON.parse(localStorage.getItem('eq_synced_stages') || '{}');
+            return synced[stageId] ? new Date(synced[stageId]).toLocaleDateString('pt-BR') : null;
+        } catch(e) { return null; }
     }
 };
 

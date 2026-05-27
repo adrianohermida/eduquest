@@ -1283,14 +1283,19 @@ window.EduAdmin = (() => {
         </div>
         <div class="admin-wide-table-wrap">
             <table class="admin-table">
-                <thead><tr><th>Estágio</th><th>Dificuldade</th><th>Tempo</th><th>Total Questões</th><th>Flashcards</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Estágio</th><th>Dificuldade</th><th>Tempo</th><th>Total Questões</th><th>Flashcards</th><th>Status</th><th>☁️</th><th>Ações</th></tr></thead>
                 <tbody>${chapter.stages.map(s => {
                     const sd = window[s.varName];
-                    if (!sd) return `<tr><td colspan="7" style="color:#94a3b8;font-style:italic;padding:12px">${s.id} — não carregado</td></tr>`;
+                    if (!sd) return `<tr><td colspan="8" style="color:#94a3b8;font-style:italic;padding:12px">${s.id} — não carregado</td></tr>`;
                     const total = (sd.warmup?.length||0) + (sd.guidedPractice?.length||0) + (sd.questions?.length||0) + (sd.adaptiveReview?.length||0);
                     const fc    = sd.summary?.flashcards?.length || 0;
                     const diff  = sd.difficulty || (s.isBoss ? 'boss' : 'medium');
                     const apprBadge = hasApproval ? EduBuilder.getStatusBadge(s.varName) : badge('Publicado','green');
+                    const synced    = typeof SupaDB !== 'undefined' && SupaDB.isStageSynced(s.id);
+                    const syncAt    = synced ? SupaDB.getSyncedAt(s.id) : null;
+                    const syncBadge = synced
+                        ? `<span title="Sincronizado em ${syncAt}" style="color:#38bdf8;font-size:0.75rem;cursor:default">☁️</span>`
+                        : `<span title="Apenas local — clique ✏️ e depois ☁️ Cloud para sincronizar" style="color:#64748b;font-size:0.75rem;cursor:default">📝</span>`;
                     return `<tr>
                         <td><span style="font-size:1.1rem">${sd.icon||'📖'}</span> <strong>${sd.title}</strong>${s.isBoss?' <span style="color:#ef4444">💀</span>':''}${s.isFinal?' <span style="color:#f59e0b">🏆</span>':''}</td>
                         <td>${badge(diff, dc[diff]||'grey')}</td>
@@ -1298,6 +1303,7 @@ window.EduAdmin = (() => {
                         <td>${total}</td>
                         <td>${fc}</td>
                         <td>${apprBadge}</td>
+                        <td style="text-align:center">${syncBadge}</td>
                         <td style="display:flex;gap:4px;flex-wrap:wrap">
                             <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('questions','${chapterId}','${s.varName}')" style="padding:4px 8px;font-size:0.7rem">Ver</button>
                             <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._openStageEditor('${s.varName}')" style="padding:4px 8px;font-size:0.7rem">✏️</button>
@@ -1672,6 +1678,7 @@ window.EduAdmin = (() => {
                     ${['draft','review','approved','published'].map(s=>`<option value="${s}" ${apprStatus===s?'selected':''}>${s}</option>`).join('')}
                 </select>
                 <button onclick="EduAdmin._exportStageJS()" class="admin-topbar-btn admin-topbar-btn-ghost">⬇ Exportar .js</button>
+                <button onclick="EduAdmin._saveStageToCloud()" class="admin-topbar-btn admin-topbar-btn-ghost" style="color:#38bdf8;border-color:#38bdf8" title="Salvar no Supabase">☁️ Cloud</button>
                 <button onclick="EduAdmin._applyStageEdit()" class="admin-topbar-btn admin-topbar-btn-primary" style="background:linear-gradient(135deg,#22c55e,#16a34a)">✅ Aplicar na Sessão</button>
                 <button onclick="EduAdmin._closeStageEditor()" class="admin-topbar-btn admin-topbar-btn-ghost" style="color:#ef4444;border-color:#ef4444">✕</button>
             </div>
@@ -1703,6 +1710,7 @@ window.EduAdmin = (() => {
                 </div>
                 <div style="padding:32px 0;text-align:center;display:flex;gap:12px;justify-content:center">
                     <button onclick="EduAdmin._exportStageJS()" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:10px 28px">⬇ Exportar .js</button>
+                    <button onclick="EduAdmin._saveStageToCloud()" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:10px 28px;color:#38bdf8;border-color:#38bdf8">☁️ Salvar no Supabase</button>
                     <button onclick="EduAdmin._applyStageEdit()" class="admin-topbar-btn admin-topbar-btn-primary" style="padding:10px 28px;background:linear-gradient(135deg,#22c55e,#16a34a)">✅ Aplicar na Sessão</button>
                 </div>
             </div>
@@ -2284,6 +2292,42 @@ window.EduAdmin = (() => {
         CMD_ITEMS[idx]?.action?.();
     }
 
+    /* ── Save Single Stage to Supabase (Sprint 4) ───────────────── */
+
+    async function _saveStageToCloud() {
+        if (!_editBuffer || !_editVarName) { _editorToast('⚠️ Nenhum estágio aberto.'); return; }
+        if (typeof SupaDB === 'undefined')  { _editorToast('⚠️ SupaDB não disponível.'); return; }
+
+        const session = await SupaAuth?.getSession?.();
+        if (!session?.user?.id) { _editorToast('⚠️ Faça login antes de salvar no cloud.'); return; }
+
+        // Find stage metadata from CHAPTERS_REGISTRY
+        let stageMeta  = null;
+        let chapterId  = null;
+        for (const [cid, meta] of Object.entries(window.CHAPTERS_REGISTRY || {})) {
+            const s = (meta.stages || []).find(st => st.varName === _editVarName);
+            if (s) { stageMeta = s; chapterId = cid; break; }
+        }
+        if (!stageMeta) {
+            // Fallback: build minimal meta from the buffer itself
+            stageMeta = { id: _editBuffer.id || _editVarName.toLowerCase(), varName: _editVarName, index: 1 };
+            chapterId = _editBuffer.chapterId || 'unknown';
+        }
+
+        _editorToast('⏳ Salvando no Supabase…');
+        const btn = document.querySelector('[onclick*="_saveStageToCloud"]');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+
+        const result = await SupaDB.saveStage(chapterId, stageMeta, _editBuffer);
+
+        if (btn) { btn.disabled = false; btn.textContent = '☁️ Cloud'; }
+        if (result.ok) {
+            _editorToast(`✅ "${_editBuffer.title}" salvo no Supabase!`);
+        } else {
+            _editorToast(`⚠️ Erros: ${result.errors.join(' | ')}`);
+        }
+    }
+
     /* ── Supabase Content Seeder ─────────────────────────────────── */
 
     function _openSeedModal() {
@@ -2404,5 +2448,6 @@ window.EduAdmin = (() => {
         _bufQPair, _addQPair,
         _setApprovalStatus,
         _openSeedModal, _runSeed,
+        _saveStageToCloud,
     };
 })();

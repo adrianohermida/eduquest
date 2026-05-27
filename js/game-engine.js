@@ -36,11 +36,24 @@ const GameEngine = {
 
     // ── ENTRY POINT ─────────────────────────────────────────────
 
-    start(chapterId, stageId, stageIndex, level) {
+    async start(chapterId, stageId, stageIndex, level) {
         const stageVarName = stageId.toUpperCase();
-        const stageData    = window[stageVarName];
+        let stageData      = window[stageVarName];
+
+        // ── Supabase offline fallback ─────────────────────────────
+        if (!stageData && typeof SupaDB !== 'undefined') {
+            try {
+                stageData = await SupaDB.loadStageFromDB(stageId);
+                if (stageData) {
+                    // Cache in window global for this session
+                    window[stageVarName] = stageData;
+                    console.info(`GameEngine: ${stageVarName} loaded from Supabase.`);
+                }
+            } catch(e) { /* silent */ }
+        }
+
         if (!stageData) {
-            console.error(`GameEngine: ${stageVarName} não encontrado.`);
+            console.error(`GameEngine: ${stageVarName} não encontrado nem no Supabase.`);
             Router.navigate(`#chapter/${chapterId}`);
             return;
         }
