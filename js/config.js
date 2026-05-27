@@ -105,7 +105,7 @@ const CONFIG = {
             chapters: [
                 { id: 'geo_brasil',          title: 'Cap. 1 — Brasil',                              icon: '🇧🇷', totalStages: 8, unlocked: true,  description: 'Localização, biomas, regiões e economia do Brasil!' },
                 { id: 'geo_cap6_populacao',  title: 'Cap. 6 — População Brasileira',                icon: '👥', totalStages: 6, unlocked: true,  description: 'Distribuição, crescimento e migrações do povo brasileiro!' },
-                { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização e Dinâmicas Migratórias', icon: '🏙️',totalStages: 6, unlocked: true,  description: 'Cidades, êxodo rural, xenofobia e projeções populacionais!' },
+                { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização e Dinâmicas Migratórias', icon: '🏙️',totalStages: 7, unlocked: true,  description: 'Cidades, êxodo rural, xenofobia e projeções populacionais!' },
                 { id: 'geo_regiao',          title: 'Cap. 2 — Regiões do Brasil',                   icon: '🗺️', totalStages: 8, unlocked: false, description: 'Em breve' }
             ]
         },
@@ -139,7 +139,7 @@ const CONFIG = {
         { id: 'hist_medieval',      title: 'Idade Média',                        subject: 'História',    grade: '7º Ano', icon: '⚔️', totalStages: 8,  unlocked: true, description: 'Feudalismo, Cruzadas e o fim da Idade Média!' },
         { id: 'geo_brasil',         title: 'Brasil',                             subject: 'Geografia',   grade: '7º Ano', icon: '🇧🇷', totalStages: 8, unlocked: true, description: 'Localização, biomas, regiões e economia do Brasil!' },
         { id: 'geo_cap6_populacao', title: 'Cap. 6 — População Brasileira',      subject: 'Geografia',   grade: '7º Ano', icon: '👥', totalStages: 6,  unlocked: true, description: 'Distribuição, crescimento e migrações do povo brasileiro!' },
-        { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização',             subject: 'Geografia',   grade: '7º Ano', icon: '🏙️',totalStages: 6,  unlocked: true, description: 'Cidades, êxodo rural e projeções populacionais!' },
+        { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização',             subject: 'Geografia',   grade: '7º Ano', icon: '🏙️',totalStages: 7,  unlocked: true, description: 'Cidades, êxodo rural e projeções populacionais!' },
         { id: 'cap8_corpo',         title: 'Cap. 8 — Corpo Humano',              subject: 'Ciências',    grade: '8º Ano', icon: '🫀', totalStages: 8,  unlocked: true, description: 'Sistemas do corpo humano!' },
         { id: 'mat8_equacoes',      title: 'Potências, Raízes e Equações',       subject: 'Matemática',  grade: '8º Ano', icon: '⚡', totalStages: 8,  unlocked: true, description: 'Potenciação, radiciação e equações!' }
     ],
