@@ -347,15 +347,37 @@ window.EduBuilder = (() => {
                     </div>
                 </div>
                 <div class="admin-section-card" style="margin-bottom:16px">
-                    <div class="admin-section-card-header"><div class="admin-chart-title">📦 Destino</div></div>
+                    <div class="admin-section-card-header"><div class="admin-chart-title">📦 Destino & Parâmetros</div></div>
                     <div style="display:flex;flex-direction:column;gap:10px;padding-bottom:4px">
                         <div><label class="bld-label">Adicionar ao Capítulo</label>
                             <select onchange="EduBuilder._bs('targetChapter',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
                                 <option value="">— Criar como rascunho independente —</option>
                                 ${chapters.map(c=>`<option value="${c.id}" ${_bState.targetChapter===c.id?'selected':''}>${c.icon||'📚'} ${c.title}</option>`).join('')}
                             </select></div>
+                        <div><label class="bld-label">Tipo de Estágio</label>
+                            <select onchange="EduBuilder._bs('stageType',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
+                            ${[['normal','🎯 Normal (conteúdo padrão)'],['boss','👹 Boss (integração de tópicos)'],['final','🎓 Final (exame completo)'],['n3_bonus','🏆 N3 Bônus Vestibular (15 questões ENEM/FUVEST)']].map(([v,l])=>`<option value="${v}" ${_bState.stageType===v?'selected':''}>${l}</option>`).join('')}</select></div>
+                        <!-- Grammar Focus (visible when language is ES or EN) -->
+                        ${_bState.language!=='pt'?`
+                        <div><label class="bld-label">🔤 Foco Gramatical (LE)</label>
+                            <select onchange="EduBuilder._bs('grammarFocus',this.value)" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
+                            ${GRAMMAR_FOCUS.map(gf=>`<option value="${gf.id}" ${_bState.grammarFocus===gf.id?'selected':''}>${gf.label}</option>`).join('')}</select>
+                            ${_bState.grammarFocus?`<div style="font-size:0.7rem;color:#f97316;margin-top:3px">✓ Foco ativo: ${_e(GRAMMAR_FOCUS.find(g=>g.id===_bState.grammarFocus)?.label||'')}</div>`:''}
+                        </div>`:''}
+                        <!-- Sensory Trigger hint -->
+                        <div><label class="bld-label">🎨 Trigger Sensorial (UX hint)</label>
+                            <input type="text" value="${_e(_bState.sensoryTrigger)}" oninput="EduBuilder._bs('sensoryTrigger',this.value)" placeholder="ex: 🍳 amber (culinária), 🏅 gold (olimpíadas)..."
+                            style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:0.82rem;box-sizing:border-box"></div>
                         <div><label class="bld-label">Quantidade de itens: <strong id="bld-cv" style="color:#f97316">${_bState.count}</strong></label>
                             <input type="range" min="3" max="20" value="${_bState.count}" oninput="EduBuilder._bs('count',parseInt(this.value));document.getElementById('bld-cv').textContent=this.value" style="width:100%;accent-color:#f97316"></div>
+                        <!-- Config summary -->
+                        <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px;font-size:0.72rem;color:#64748b">
+                            <strong style="color:#94a3b8">Config atual:</strong>
+                            🌐 ${_bState.language==='es'?'🇪🇸 ES':_bState.language==='en'?'🇬🇧 EN':'🇧🇷 PT'} |
+                            ⚔️ N1=${_bState.adaptiveN1}% N2=${_bState.adaptiveN2}% N3=${_bState.adaptiveN3}% |
+                            📊 ${_bState.stageType}
+                            ${_bState.grammarFocus?` | 🔤 ${_bState.grammarFocus}`:''}
+                        </div>
                     </div>
                 </div>
                 ${hasKey ? `<button onclick="EduBuilder._generate()" id="bld-gen-btn" class="admin-topbar-btn admin-topbar-btn-primary" style="width:100%;padding:12px;font-size:0.95rem">✨ Gerar com Claude AI</button>` : `
@@ -399,6 +421,20 @@ window.EduBuilder = (() => {
         if (g.pairs?.length) {
             h += `<div class="bld-preview-label">🔗 Correspondências (${g.pairs.length})</div>`;
             h += g.pairs.map(p=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.78rem;padding:5px 0;border-bottom:1px solid #334155"><div style="color:#f1f5f9">${_e(p.left||'')}</div><div style="color:#22c55e">→ ${_e(p.right||'')}</div></div>`).join('');
+        }
+        if (g.mnemonics?.length) {
+            h += `<div class="bld-preview-label">🧠 Mnemônicos (${g.mnemonics.length})</div>`;
+            h += g.mnemonics.map(m=>`<div style="background:#0f172a;border-left:3px solid #a855f7;border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:6px"><div style="font-size:0.75rem;color:#a855f7;font-weight:700">🔑 ${_e(m.trigger||'')}</div><div style="font-size:0.82rem;color:#f1f5f9;margin-top:3px;font-style:italic">"${_e(m.memory||'')}"</div></div>`).join('');
+        }
+        if (g.verbs?.length) {
+            h += `<div class="bld-preview-label">🔄 Conjugações Verbais (${g.verbs.length})</div>`;
+            h += g.verbs.map(v=>`<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px;margin-bottom:8px">
+                <div style="font-weight:700;color:#f97316;margin-bottom:4px">${_e(v.infinitive||'')} <span style="font-size:0.72rem;color:#a855f7">[${_e(v.pattern||'')}]</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:0.75rem;margin-bottom:6px">
+                    ${Object.entries(v.conjugation||{}).map(([p,f])=>`<div><span style="color:#64748b">${p}:</span> <span style="color:#22c55e">${_e(f)}</span></div>`).join('')}
+                </div>
+                ${(v.examples||[]).map(ex=>`<div style="font-size:0.75rem;color:#94a3b8;padding:2px 0">• ${_e(ex)}</div>`).join('')}
+            </div>`).join('');
         }
         return h || `<div style="color:#94a3b8;font-style:italic;padding:20px">Nenhum conteúdo estruturado detectado na resposta. Tente novamente.</div>`;
     }
