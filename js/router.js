@@ -2508,11 +2508,49 @@ const Router = {
         setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); }, ms);
     },
 
-    // ── MISSIONS ──────────────────────────────────────────
+    // ── MERGED SUBJECTS — CONFIG + CHAPTERS_REGISTRY ─────────
+    _mergedSubjects() {
+        const base = JSON.parse(JSON.stringify(CONFIG.subjects || []));
+        const registry = window.CHAPTERS_REGISTRY || {};
+        const subjMeta = {
+            ciencias:   { name: 'Ciências',   icon: '🔬', color: '#f97316' },
+            matematica: { name: 'Matemática',  icon: '📐', color: '#3b82f6' },
+            historia:   { name: 'História',    icon: '🏛️', color: '#8b5cf6' },
+            portugues:  { name: 'Português',   icon: '📝', color: '#ec4899' },
+            geografia:  { name: 'Geografia',   icon: '🌍', color: '#16a34a' },
+            ingles:     { name: 'Inglês',      icon: '🇬🇧', color: '#0891b2' },
+        };
+        const configIds = new Set();
+        base.forEach(s => s.chapters.forEach(c => configIds.add(c.id)));
+
+        Object.values(registry).forEach(meta => {
+            if (meta.published === false) return;
+            const gradeLabel = (meta.grade || '').replace('7ano','7º Ano').replace('8ano','8º Ano').replace('9ano','9º Ano');
+            if (configIds.has(meta.id)) {
+                base.forEach(s => {
+                    const ch = s.chapters.find(c => c.id === meta.id);
+                    if (ch) ch.totalStages = meta.totalStages || ch.totalStages;
+                });
+                return;
+            }
+            let subj = base.find(s => s.id === meta.subject && s.grade === gradeLabel);
+            if (!subj) {
+                const sm = subjMeta[meta.subject] || { name: meta.subject || '📚', icon: '📚', color: '#64748b' };
+                subj = { id: meta.subject, name: sm.name, icon: sm.icon, color: sm.color, grade: gradeLabel, chapters: [] };
+                base.push(subj);
+            }
+            subj.chapters.push({ id: meta.id, title: meta.title || meta.id, icon: meta.icon || '📚',
+                totalStages: meta.totalStages || (meta.stages?.length) || 0,
+                unlocked: meta.unlocked !== false, description: meta.description || '' });
+            configIds.add(meta.id);
+        });
+        return base;
+    },
+
     // ── SUBJECT HUB ──────────────────────────────────────────
     renderSubjects(container) {
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
-        const subjects = CONFIG.subjects || [];
+        const subjects = this._mergedSubjects();
 
         const subjectCards = subjects.map(subj => {
             const unlockedChapters = subj.chapters.filter(ch => ch.unlocked);
@@ -2594,7 +2632,7 @@ const Router = {
     // ── MISSIONS ──────────────────────────────────────────
     renderMissions(container) {
         const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
-        const subjects = CONFIG.subjects || [];
+        const subjects = this._mergedSubjects();
 
         // Build chapter cards grouped by subject
         const subjectsHTML = subjects.map(subj => {

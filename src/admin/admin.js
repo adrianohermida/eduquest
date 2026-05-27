@@ -652,6 +652,12 @@ window.EduAdmin = (() => {
         if (!_contentChapterId || _contentTab === 'chapters') {
             crumbs = `Todos os capítulos`;
             body = _renderContentChapters(data);
+        } else if (_contentTab === 'expand') {
+            const cap = data.find(c => c.id === _contentChapterId);
+            crumbs = `<button onclick="EduAdmin._contentNav('chapters')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:2px 8px;font-size:0.75rem">← Capítulos</button>
+                <span style="margin:0 6px;color:#64748b">›</span><strong style="color:#f1f5f9">${cap?.title || _contentChapterId}</strong>
+                <span style="margin-left:8px;font-size:0.72rem;color:#f97316;font-weight:700">⊞ Vista Expandida</span>`;
+            body = _renderContentExpand(_contentChapterId, data);
         } else if (_contentTab === 'stages') {
             const cap = data.find(c => c.id === _contentChapterId);
             crumbs = `<button onclick="EduAdmin._contentNav('chapters')" class="admin-topbar-btn admin-topbar-btn-ghost" style="padding:2px 8px;font-size:0.75rem">← Capítulos</button>
@@ -1072,7 +1078,11 @@ window.EduAdmin = (() => {
         <div class="admin-wide-table-wrap">
             <table class="admin-table">
                 <thead><tr><th>Capítulo</th><th>Matéria</th><th>Ano</th><th>Estágios</th><th>Questões</th><th>Flashcards</th><th>Status</th><th>Ações</th></tr></thead>
-                <tbody>${data.map(c => `
+                <tbody>${data.map(c => {
+                    const reg = (window.CHAPTERS_REGISTRY || {})[c.id] || {};
+                    const published = reg.published !== false;
+                    const statusBadge = published ? badge('Publicado','green') : badge('Despublicado','red');
+                    return `
                 <tr>
                     <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">${c.icon}</span><strong>${c.title}</strong></div></td>
                     <td>${badge(c.subjectLabel, sc[c.subject] || 'grey')}</td>
@@ -1080,15 +1090,182 @@ window.EduAdmin = (() => {
                     <td>${c.stagesLoaded}/${c.totalStages}</td>
                     <td>${c.questionCount}</td>
                     <td>${c.flashcardCount}</td>
-                    <td>${badge('Publicado','green')}</td>
+                    <td>${statusBadge}</td>
                     <td style="display:flex;gap:4px;flex-wrap:wrap">
-                        <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('stages','${c.id}')" style="padding:4px 10px;font-size:0.7rem">Ver →</button>
+                        <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('stages','${c.id}')" style="padding:4px 10px;font-size:0.7rem" title="Ver estágios">Ver →</button>
+                        <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._expandChapterView('${c.id}')" style="padding:4px 10px;font-size:0.7rem" title="Expandir tudo">⊞</button>
+                        <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._openEditChapter('${c.id}')" style="padding:4px 10px;font-size:0.7rem" title="Editar capítulo">✏️</button>
+                        <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._togglePublishChapter('${c.id}')" style="padding:4px 10px;font-size:0.7rem;color:${published ? '#f59e0b' : '#22c55e'}" title="${published ? 'Despublicar' : 'Publicar'}">${published ? '⛔' : '✅'}</button>
                         <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._confirmDeleteChapter('${c.id}')" style="padding:4px 10px;font-size:0.7rem;color:#ef4444" title="Excluir">🗑</button>
                     </td>
-                </tr>`).join('')}
+                </tr>`; }).join('')}
                 </tbody>
             </table>
         </div>`;
+    }
+
+    /* ── CRUD: Edit Chapter ────────────────────────────────── */
+
+    function _openEditChapter(chapterId) {
+        const reg = (window.CHAPTERS_REGISTRY || {})[chapterId];
+        if (!reg) { _editorToast('⚠️ Capítulo não encontrado.'); return; }
+        document.getElementById('crud-modal')?.remove();
+        const m = document.createElement('div');
+        m.id = 'crud-modal';
+        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:3000;display:flex;align-items:center;justify-content:center';
+        const gradeVal = (reg.grade || '').includes('8') ? '8ano' : (reg.grade || '').includes('9') ? '9ano' : '7ano';
+        m.innerHTML = `
+        <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:28px;width:540px;max-width:95vw;max-height:85vh;overflow-y:auto">
+            <div style="font-size:1.05rem;font-weight:700;color:#f1f5f9;margin-bottom:18px">✏️ Editar Capítulo</div>
+            <div style="display:grid;gap:12px">
+                <div style="display:grid;grid-template-columns:1fr 70px;gap:12px">
+                    <div><label class="bld-label">Título</label>
+                        <input id="ec-title" type="text" value="${_esc(reg.title||'')}" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;box-sizing:border-box"></div>
+                    <div><label class="bld-label">Ícone</label>
+                        <input id="ec-icon" type="text" value="${_esc(reg.icon||'📚')}" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-size:1.3rem;text-align:center;box-sizing:border-box"></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 100px;gap:12px">
+                    <div><label class="bld-label">Cor (hex)</label>
+                        <input id="ec-color" type="text" value="${_esc(reg.color||'#64748b')}" placeholder="#f97316" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;font-family:monospace;box-sizing:border-box"></div>
+                    <div><label class="bld-label">Matéria</label>
+                        <select id="ec-subject" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
+                            ${['ciencias','matematica','historia','portugues','geografia','outro'].map(s => `<option value="${s}" ${reg.subject===s?'selected':''}>${{ciencias:'Ciências',matematica:'Matemática',historia:'História',portugues:'Português',geografia:'Geografia',outro:'Outro'}[s]}</option>`).join('')}
+                        </select></div>
+                    <div><label class="bld-label">Ano</label>
+                        <select id="ec-grade" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px">
+                            ${['6ano','7ano','8ano','9ano'].map((g,i)=>`<option value="${g}" ${gradeVal===g?'selected':''}>${['6º','7º','8º','9º'][i]} Ano</option>`).join('')}
+                        </select></div>
+                </div>
+                <div><label class="bld-label">Descrição</label>
+                    <textarea id="ec-desc" rows="2" style="width:100%;background:#0f172a;border:1px solid #334155;color:#f1f5f9;padding:8px;border-radius:6px;resize:vertical;box-sizing:border-box;font-size:0.85rem">${_esc(reg.description||'')}</textarea></div>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;color:#f1f5f9">
+                    <input type="checkbox" id="ec-unlocked" ${(reg.published!==false)?'checked':''} style="accent-color:#f97316">
+                    Publicado (visível para alunos)</label>
+            </div>
+            <input type="hidden" id="ec-id" value="${chapterId}">
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+                <button onclick="document.getElementById('crud-modal').remove()" class="admin-topbar-btn admin-topbar-btn-ghost">Cancelar</button>
+                <button onclick="EduAdmin._saveChapterEdit()" class="admin-topbar-btn admin-topbar-btn-primary">Salvar</button>
+            </div>
+        </div>`;
+        document.body.appendChild(m);
+        m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+    }
+
+    function _saveChapterEdit() {
+        const id      = document.getElementById('ec-id')?.value;
+        const reg     = (window.CHAPTERS_REGISTRY || {})[id];
+        if (!reg) return;
+        const title   = document.getElementById('ec-title')?.value?.trim() || reg.title;
+        const icon    = document.getElementById('ec-icon')?.value?.trim()  || reg.icon;
+        const color   = document.getElementById('ec-color')?.value?.trim() || reg.color;
+        const subject = document.getElementById('ec-subject')?.value        || reg.subject;
+        const grade   = document.getElementById('ec-grade')?.value          || '';
+        const desc    = document.getElementById('ec-desc')?.value?.trim()   || '';
+        const pub     = document.getElementById('ec-unlocked')?.checked;
+        const gradeLabel = { '6ano':'6º Ano','7ano':'7º Ano','8ano':'8º Ano','9ano':'9º Ano' }[grade] || grade;
+        reg.title = title; reg.icon = icon; reg.color = color;
+        reg.subject = subject; reg.grade = grade; reg.description = desc;
+        reg.published = pub;
+        // Sync into CONFIG.subjects
+        (CONFIG.subjects || []).forEach(s => {
+            const ch = s.chapters.find(c => c.id === id);
+            if (ch) { ch.title = title; ch.icon = icon; ch.description = desc; ch.unlocked = pub; }
+        });
+        document.getElementById('crud-modal')?.remove();
+        _editorToast('✅ Capítulo atualizado! Mudanças visíveis para alunos imediatamente.');
+        _contentNav('chapters');
+    }
+
+    /* ── CRUD: Toggle Publish ─────────────────────────────── */
+
+    function _togglePublishChapter(chapterId) {
+        const reg = (window.CHAPTERS_REGISTRY || {})[chapterId];
+        if (!reg) return;
+        reg.published = reg.published === false ? true : false;
+        (CONFIG.subjects || []).forEach(s => {
+            const ch = s.chapters.find(c => c.id === chapterId);
+            if (ch) ch.unlocked = reg.published !== false;
+        });
+        _editorToast(reg.published === false
+            ? `⛔ "${reg.title}" despublicado — não aparece para alunos.`
+            : `✅ "${reg.title}" publicado — visível para alunos.`);
+        _contentNav('chapters');
+    }
+
+    /* ── Expand Chapter: full content view ───────────────── */
+
+    function _expandChapterView(chapterId) {
+        _contentChapterId = chapterId;
+        _contentTab = 'expand';
+        const main = document.getElementById('admin-main');
+        if (main) main.innerHTML = _renderContent();
+    }
+
+    function _renderContentExpand(chapterId, data) {
+        const chapter = data.find(c => c.id === chapterId);
+        if (!chapter) return `<div style="padding:40px;text-align:center;color:#94a3b8">Capítulo não encontrado.</div>`;
+        const dc = { easy:'green', medium:'blue', hard:'orange', boss:'red' };
+        const stagesHTML = chapter.stages.map((s, si) => {
+            const sd = window[s.varName];
+            if (!sd) return `<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:10px;color:#94a3b8;font-style:italic">${s.id} — não carregado</div>`;
+            const totalQ = (sd.warmup?.length||0)+(sd.guidedPractice?.length||0)+(sd.questions?.length||0)+(sd.adaptiveReview?.length||0);
+            const fcs = sd.summary?.flashcards || [];
+            const mnems = sd.summary?.mnemonics || [];
+            const secs = [
+                { label:'🔥 Aquecimento',        key:'warmup',         qs: sd.warmup||[] },
+                { label:'🔍 Prática Guiada',     key:'guidedPractice', qs: sd.guidedPractice||[] },
+                { label:'⚔️ Questões',            key:'questions',      qs: sd.questions||[] },
+                { label:'🧠 Revisão Adaptativa',  key:'adaptiveReview', qs: sd.adaptiveReview||[] },
+            ].filter(sec => sec.qs.length);
+            return `
+            <details style="background:#0f172a;border:1px solid #334155;border-radius:8px;margin-bottom:10px;overflow:hidden" ${si===0?'open':''}>
+                <summary style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;list-style:none;outline:none">
+                    <span style="font-size:1.1rem">${sd.icon||'📖'}</span>
+                    <strong style="color:#f1f5f9">${sd.title}</strong>
+                    ${s.isBoss?'<span style="color:#ef4444;font-size:0.75rem">💀 CHEFE</span>':''}
+                    ${s.isFinal?'<span style="color:#f59e0b;font-size:0.75rem">🏆 FINAL</span>':''}
+                    <span style="margin-left:auto;font-size:0.72rem;color:#64748b">${badge(sd.difficulty||'medium',dc[sd.difficulty||'medium']||'grey')} · ${totalQ} questões · ${fcs.length} FC · ${sd.estimatedTime||'—'}min</span>
+                </summary>
+                <div style="padding:0 18px 18px">
+                    ${sd.learningObjectives?.length ? `
+                    <div style="margin-bottom:12px"><div style="font-size:0.72rem;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Objetivos de Aprendizagem</div>
+                    ${sd.learningObjectives.map(o=>`<div style="font-size:0.8rem;color:#94a3b8;padding:2px 0">• ${_esc(o)}</div>`).join('')}</div>` : ''}
+                    ${fcs.length ? `
+                    <div style="margin-bottom:12px"><div style="font-size:0.72rem;font-weight:700;color:#f97316;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">🃏 Flashcards (${fcs.length})</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">
+                    ${fcs.map(fc=>`<div style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:8px;font-size:0.78rem"><div style="color:#f97316;font-weight:700;margin-bottom:3px">${_esc(fc.q||'')}</div><div style="color:#94a3b8">${_esc(fc.a||'')}</div></div>`).join('')}
+                    </div></div>` : ''}
+                    ${mnems.length ? `
+                    <div style="margin-bottom:12px"><div style="font-size:0.72rem;font-weight:700;color:#8b5cf6;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">🧠 Mnemônicos (${mnems.length})</div>
+                    ${mnems.map(m=>`<div style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:8px;font-size:0.78rem;margin-bottom:4px"><strong style="color:#c4b5fd">${_esc(m.trigger||'')}</strong> → <span style="color:#94a3b8">${_esc(m.memory||'')}</span></div>`).join('')}
+                    </div>` : ''}
+                    ${secs.map(sec => `
+                    <div style="margin-bottom:10px"><div style="font-size:0.72rem;font-weight:700;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">${sec.label} — ${sec.qs.length}</div>
+                    <table class="admin-table" style="font-size:0.76rem">
+                        <thead><tr><th>#</th><th>Enunciado</th><th>Correta</th><th>Explicação</th></tr></thead>
+                        <tbody>${sec.qs.map((q,i)=>`<tr>
+                            <td style="color:#64748b;width:30px">${i+1}</td>
+                            <td style="max-width:240px">${_esc((q.prompt||'').substring(0,120))}</td>
+                            <td style="max-width:160px;color:#22c55e">${_esc((q.options||[]).find(o=>o.correct)?.text||'—')}</td>
+                            <td style="max-width:180px;color:#64748b;font-style:italic">${_esc((q.explanation||'').substring(0,90))}</td>
+                        </tr>`).join('')}</tbody>
+                    </table></div>`).join('')}
+                    <div style="display:flex;gap:8px;margin-top:10px">
+                        <button class="admin-topbar-btn admin-topbar-btn-primary" onclick="EduAdmin._openStageEditor('${s.varName}')" style="padding:5px 12px;font-size:0.75rem">✏️ Editar Stage</button>
+                        <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._contentNav('questions','${chapterId}','${s.varName}')" style="padding:5px 12px;font-size:0.75rem">Ver Questões</button>
+                    </div>
+                </div>
+            </details>`;
+        }).join('');
+        return `
+        <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.5rem">${chapter.icon}</span>
+            <strong style="font-size:1rem;color:#f1f5f9">${chapter.title}</strong>
+            <span style="font-size:0.78rem;color:#64748b">· ${chapter.stagesLoaded} estágios · ${chapter.questionCount} questões · ${chapter.flashcardCount} flashcards</span>
+            <button class="admin-topbar-btn admin-topbar-btn-ghost" onclick="EduAdmin._openEditChapter('${chapterId}')" style="padding:4px 10px;font-size:0.72rem;margin-left:auto">✏️ Editar</button>
+        </div>
+        ${stagesHTML}`;
     }
 
     function _renderContentStages(chapterId, data) {
@@ -1097,7 +1274,8 @@ window.EduAdmin = (() => {
         const dc = { easy:'green', medium:'blue', hard:'orange', boss:'red' };
         const hasApproval = typeof EduBuilder !== 'undefined';
         return `
-        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
+            <button onclick="EduAdmin._expandChapterView('${chapterId}')" class="admin-topbar-btn admin-topbar-btn-ghost">⊞ Expandir Tudo</button>
             <button onclick="EduAdmin._openCreateStage('${chapterId}')" class="admin-topbar-btn admin-topbar-btn-primary">+ Novo Estágio</button>
         </div>
         <div class="admin-wide-table-wrap">
@@ -2111,6 +2289,8 @@ window.EduAdmin = (() => {
         _editorAddQuestion, _editorRemoveQuestion, _editorAddFlashcard, _editorRemoveFlashcard,
         _confirmModal,
         _openCreateChapter, _saveNewChapter, _confirmDeleteChapter,
+        _openEditChapter, _saveChapterEdit, _togglePublishChapter,
+        _expandChapterView,
         _openCreateStage, _saveNewStage, _confirmDeleteStage,
         _bufMedia, _bufSCard, _addSummaryCard, _removeSummaryCard, _previewImage,
         _changeQType, _bufQTrueFalse, _bufQItem, _addQItem, _removeQItem,

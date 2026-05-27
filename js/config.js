@@ -103,64 +103,45 @@ const CONFIG = {
             color: '#16a34a',
             grade: '7º Ano',
             chapters: [
-                { id: 'geo_brasil',  title: 'Cap. 1 — Brasil',             icon: '🇧🇷', totalStages: 8, unlocked: true,  description: 'Localização, biomas, regiões e economia do Brasil!' },
-                { id: 'geo_regiao',  title: 'Cap. 2 — Regiões do Brasil',  icon: '🗺️', totalStages: 8, unlocked: false, description: 'Em breve' }
+                { id: 'geo_brasil',          title: 'Cap. 1 — Brasil',                              icon: '🇧🇷', totalStages: 8, unlocked: true,  description: 'Localização, biomas, regiões e economia do Brasil!' },
+                { id: 'geo_cap6_populacao',  title: 'Cap. 6 — População Brasileira',                icon: '👥', totalStages: 6, unlocked: true,  description: 'Distribuição, crescimento e migrações do povo brasileiro!' },
+                { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização e Dinâmicas Migratórias', icon: '🏙️',totalStages: 6, unlocked: true,  description: 'Cidades, êxodo rural, xenofobia e projeções populacionais!' },
+                { id: 'geo_regiao',          title: 'Cap. 2 — Regiões do Brasil',                   icon: '🗺️', totalStages: 8, unlocked: false, description: 'Em breve' }
+            ]
+        },
+        {
+            id: 'ciencias',
+            name: 'Ciências',
+            icon: '🔬',
+            color: '#f97316',
+            grade: '8º Ano',
+            chapters: [
+                { id: 'cap8_corpo', title: 'Cap. 8 — Corpo Humano', icon: '🫀', totalStages: 8, unlocked: true, description: 'Sistemas digestório, circulatório, nervoso, excretor e reprodutor!' }
+            ]
+        },
+        {
+            id: 'matematica',
+            name: 'Matemática',
+            icon: '📐',
+            color: '#3b82f6',
+            grade: '8º Ano',
+            chapters: [
+                { id: 'mat8_equacoes', title: 'Cap. 1 — Potências, Raízes e Equações', icon: '⚡', totalStages: 8, unlocked: true, description: 'Potenciação, radiciação, notação científica e equações do 1º e 2º graus!' }
             ]
         }
     ],
 
     // ── QUICK ACCESS (home screen) ────────────────────────
     chapters: [
-        {
-            id: 'cap7_doencas',
-            title: 'Doenças Transmissíveis',
-            subject: 'Ciências',
-            grade: '7º Ano',
-            icon: '🧬',
-            totalStages: 12,
-            unlocked: true,
-            description: 'Combata os vilões microscópicos!'
-        },
-        {
-            id: 'mat_racionais',
-            title: 'Números Racionais',
-            subject: 'Matemática',
-            grade: '7º Ano',
-            icon: '🔢',
-            totalStages: 8,
-            unlocked: true,
-            description: 'Domine frações, decimais e negativos!'
-        },
-        {
-            id: 'port_gram',
-            title: 'Gramática',
-            subject: 'Português',
-            grade: '7º Ano',
-            icon: '📝',
-            totalStages: 8,
-            unlocked: true,
-            description: 'Domine classes de palavras e sintaxe!'
-        },
-        {
-            id: 'hist_medieval',
-            title: 'Idade Média',
-            subject: 'História',
-            grade: '7º Ano',
-            icon: '⚔️',
-            totalStages: 8,
-            unlocked: true,
-            description: 'Feudalismo, Cruzadas e o fim da Idade Média!'
-        },
-        {
-            id: 'geo_brasil',
-            title: 'Brasil',
-            subject: 'Geografia',
-            grade: '7º Ano',
-            icon: '🇧🇷',
-            totalStages: 8,
-            unlocked: true,
-            description: 'Localização, biomas, regiões e economia do Brasil!'
-        }
+        { id: 'cap7_doencas',       title: 'Doenças Transmissíveis',             subject: 'Ciências',    grade: '7º Ano', icon: '🧬', totalStages: 12, unlocked: true, description: 'Combata os vilões microscópicos!' },
+        { id: 'mat_racionais',      title: 'Números Racionais',                  subject: 'Matemática',  grade: '7º Ano', icon: '🔢', totalStages: 8,  unlocked: true, description: 'Domine frações, decimais e negativos!' },
+        { id: 'port_gram',          title: 'Gramática',                          subject: 'Português',   grade: '7º Ano', icon: '📝', totalStages: 8,  unlocked: true, description: 'Domine classes de palavras e sintaxe!' },
+        { id: 'hist_medieval',      title: 'Idade Média',                        subject: 'História',    grade: '7º Ano', icon: '⚔️', totalStages: 8,  unlocked: true, description: 'Feudalismo, Cruzadas e o fim da Idade Média!' },
+        { id: 'geo_brasil',         title: 'Brasil',                             subject: 'Geografia',   grade: '7º Ano', icon: '🇧🇷', totalStages: 8, unlocked: true, description: 'Localização, biomas, regiões e economia do Brasil!' },
+        { id: 'geo_cap6_populacao', title: 'Cap. 6 — População Brasileira',      subject: 'Geografia',   grade: '7º Ano', icon: '👥', totalStages: 6,  unlocked: true, description: 'Distribuição, crescimento e migrações do povo brasileiro!' },
+        { id: 'geo_cap7_urbanizacao',title: 'Cap. 7 — Urbanização',             subject: 'Geografia',   grade: '7º Ano', icon: '🏙️',totalStages: 6,  unlocked: true, description: 'Cidades, êxodo rural e projeções populacionais!' },
+        { id: 'cap8_corpo',         title: 'Cap. 8 — Corpo Humano',              subject: 'Ciências',    grade: '8º Ano', icon: '🫀', totalStages: 8,  unlocked: true, description: 'Sistemas do corpo humano!' },
+        { id: 'mat8_equacoes',      title: 'Potências, Raízes e Equações',       subject: 'Matemática',  grade: '8º Ano', icon: '⚡', totalStages: 8,  unlocked: true, description: 'Potenciação, radiciação e equações!' }
     ],
 
     // ── GAMIFICATION ─────────────────────────────────────
