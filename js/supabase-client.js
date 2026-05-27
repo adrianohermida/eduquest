@@ -183,6 +183,57 @@ const SupaDB = {
             .select('id, name, level, xp, streak, avatar')
             .order('xp', { ascending: false })
             .limit(limit);
+    },
+
+    // ── GAME SESSIONS ────────────────────────────────────
+    /**
+     * Persist a completed game session.
+     * Table: game_sessions
+     *   id uuid pk, user_id uuid, chapter_id text, stage_index int,
+     *   stage_id text, score int, stars int, correct_count int,
+     *   total_questions int, peak_combo int, victory bool,
+     *   duration_ms int, played_at timestamptz
+     */
+    async saveGameSession(userId, {
+        chapterId, stageIndex, stageId, score, stars,
+        correctCount, totalQuestions, peakCombo, victory, durationMs
+    }) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.from('game_sessions').insert({
+            user_id:         userId,
+            chapter_id:      chapterId,
+            stage_index:     stageIndex,
+            stage_id:        stageId,
+            score:           score       || 0,
+            stars:           stars       || 0,
+            correct_count:   correctCount || 0,
+            total_questions: totalQuestions || 0,
+            peak_combo:      peakCombo   || 0,
+            victory:         !!victory,
+            duration_ms:     durationMs  || 0,
+            played_at:       new Date().toISOString()
+        });
+    },
+
+    /**
+     * Persist a wrong answer for spaced-repetition review.
+     * Table: wrong_answers
+     *   id uuid pk, user_id uuid, chapter_id text, stage_id text,
+     *   question text, correct_answer text, user_answer text,
+     *   reviewed_at timestamptz, review_count int
+     */
+    async saveWrongAnswer(userId, { chapterId, stageId, question, correctAnswer, userAnswer }) {
+        const c = getClient(); if (!c) return { error: { message: 'offline' } };
+        return c.from('wrong_answers').insert({
+            user_id:        userId,
+            chapter_id:     chapterId,
+            stage_id:       stageId,
+            question:       (question      || '').slice(0, 500),
+            correct_answer: (correctAnswer || '').slice(0, 200),
+            user_answer:    (userAnswer    || '').slice(0, 200),
+            reviewed_at:    new Date().toISOString(),
+            review_count:   0
+        });
     }
 };
 

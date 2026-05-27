@@ -1322,15 +1322,7 @@ const Router = {
                 </div>
                 <div class="mastery-pct">${prog.percent}%</div>
             </div>`;
-        }).join('') + `
-            <div class="mastery-item" style="opacity:0.5">
-                <div class="mastery-icon">📐</div>
-                <div class="mastery-body">
-                    <div class="mastery-name">Matemática · Em breve</div>
-                    <div class="mastery-track"><div class="mastery-fill" style="width:0%"></div></div>
-                </div>
-                <div class="mastery-pct" style="color:var(--text-muted)">${_ic('lock',{size:'sm',color:'locked'})}</div>
-            </div>`;
+        }).join('');
 
         container.innerHTML = `
         <div class="profile-screen">

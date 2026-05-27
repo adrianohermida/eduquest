@@ -264,7 +264,10 @@ const GameEngine = {
             : 'Próximo →';
     },
 
-    _startBattle() { this._renderArena(); },
+    _startBattle() {
+        this.state._startedAt = Date.now();
+        this._renderArena();
+    },
 
     // ── BATTLE ARENA ────────────────────────────────────────────
 
@@ -284,7 +287,27 @@ const GameEngine = {
         const _ic      = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const heartsHTML = Array.from({length: maxLives}, () => _ic('heart',{size:'xs',color:'heart'})).join('');
 
-        app.innerHTML = ;
+        app.innerHTML = `
+            <div class="game-arena battle-arena battle-duo ${theme.bgClass}" id="game-arena">
+                <div class="duo-topbar">
+                    <button class="duo-exit" onclick="GameEngine.exit()">✕</button>
+                    <div class="duo-progress-wrap">
+                        <div class="duo-progress-track">
+                            <div class="duo-progress-fill" id="game-progress" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div class="duo-lives" id="game-lives">${heartsHTML}</div>
+                </div>
+                <div class="duo-enemy-bar">
+                    <span class="duo-enemy-icon" id="enemy-sprite">${theme.enemy}</span>
+                    <div class="duo-hp-track">
+                        <div class="duo-hp-fill" id="enemy-hp" style="width:100%"></div>
+                    </div>
+                    <div class="duo-timer" id="game-timer">15s</div>
+                </div>
+                <div class="duo-question-area" id="question-container"></div>
+                <div class="duo-feedback-bar" id="feedback-overlay"></div>
+            </div>`;
 
         this._loadQuestion();
     },
@@ -294,22 +317,13 @@ const GameEngine = {
     _updateEnemyHP() {
         const pct = Math.max(0, Math.round(this.state.enemyHP));
         const bar = document.getElementById('enemy-hp');
-        const txt = document.getElementById('enemy-hp-text');
         if (bar) bar.style.width = `${pct}%`;
-        if (txt) txt.textContent = `${pct}%`;
     },
 
     _updatePlayerHP() {
         const maxLives = CONFIG.lives.gameHearts || 3;
-        const pct      = (this.state.lives / maxLives) * 100;
-        const bar      = document.getElementById('player-hp');
-        if (bar) {
-            bar.style.width = `${pct}%`;
-            bar.classList.remove('low', 'critical');
-            if      (this.state.lives === 1)          bar.classList.add('critical');
-            else if (this.state.lives < maxLives - 1) bar.classList.add('low');
-        }
-        const hearts = document.getElementById('player-hp-hearts');
+        // Update hearts in topbar (duo-lives)
+        const hearts = document.getElementById('game-lives') || document.getElementById('player-hp-hearts');
         if (hearts) {
             const ic = typeof IconSystem !== 'undefined' ? IconSystem : null;
             const live  = Math.max(0, this.state.lives);
@@ -382,42 +396,43 @@ const GameEngine = {
 
         const isTF      = q.type === 'tf';
         const isTyping  = q.type === 'typing';
+        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
 
         // Question type badge
         const typeBadge = isTF
             ? `<span class="qtype-badge qtype-tf">V/F</span>`
             : isTyping
-            ? `<span class="qtype-badge qtype-type">${_ic('scroll',{size:'xs'})} Digitação</span>`
+            ? `<span class="qtype-badge qtype-type">Digitação</span>`
             : `<span class="qtype-badge qtype-mc">múltipla escolha</span>`;
 
         // Options HTML
         let optionsHTML = '';
         if (isTyping) {
             optionsHTML = `
-                <div class="typing-zone">
-                    <input class="typing-input" id="typing-input" type="text"
+                <div class="duo-typing-zone">
+                    <input class="duo-typing-input" id="typing-input" type="text"
                            placeholder="Digite sua resposta..."
                            autocomplete="off" autocorrect="off" spellcheck="false"
                            onkeydown="if(event.key==='Enter') GameEngine._submitTyping()">
-                    <button class="btn-primary" style="margin-top:10px"
-                            onclick="GameEngine._submitTyping()">${_ic('check',{size:'xs'})} Confirmar</button>
+                    <button class="duo-typing-confirm"
+                            onclick="GameEngine._submitTyping()">Confirmar</button>
                 </div>`;
         } else if (isTF) {
             optionsHTML = `
-                <div class="tf-grid">
+                <div class="duo-tf-grid">
                     ${q.options.map((opt, idx) => `
-                        <button class="tf-btn" id="opt-${idx}" onclick="GameEngine.handleAnswer(${idx})">
+                        <button class="duo-tf-btn" id="opt-${idx}" onclick="GameEngine.handleAnswer(${idx})">
                             ${opt}
                         </button>
                     `).join('')}
                 </div>`;
         } else {
             optionsHTML = `
-                <div class="options-grid" id="options-grid">
+                <div class="duo-options" id="options-grid">
                     ${q.options.map((opt, idx) => `
-                        <button class="option-btn" id="opt-${idx}"
+                        <button class="duo-option" id="opt-${idx}"
                                 onclick="GameEngine.handleAnswer(${idx})">
-                            <span class="option-letter">${letters[idx] || idx + 1}</span>
+                            <span class="duo-option-letter">${letters[idx] || idx + 1}</span>
                             ${opt}
                         </button>
                     `).join('')}
@@ -425,46 +440,45 @@ const GameEngine = {
         }
 
         // Action buttons
-        const _ic = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const hintDisabled    = this.state.hintsLeft <= 0;
         const elimDisabled    = this.state.eliminationsLeft <= 0 || isTF || isTyping;
         const actionsHTML = `
-            <div class="question-actions">
-                <button class="qa-btn qa-hint ${hintDisabled ? 'qa-spent' : ''}"
+            <div class="duo-actions">
+                <button class="duo-action-btn ${hintDisabled ? 'spent' : ''}"
                         id="qa-hint-btn"
                         onclick="GameEngine.useHint()"
                         ${hintDisabled ? 'disabled' : ''}>
                     ${_ic('companion',{size:'xs'})} Dica${this.state.hintsLeft > 0 ? ` (${this.state.hintsLeft})` : ''}
                 </button>
-                <button class="qa-btn qa-elim ${elimDisabled ? 'qa-spent' : ''}"
+                <button class="duo-action-btn ${elimDisabled ? 'spent' : ''}"
                         id="qa-elim-btn"
                         onclick="GameEngine.eliminate()"
                         ${elimDisabled ? 'disabled' : ''}>
-                    ${_ic('warning',{size:'xs'})} Eliminar${this.state.eliminationsLeft > 0 ? ` (${this.state.eliminationsLeft})` : ''}
+                    Eliminar${this.state.eliminationsLeft > 0 ? ` (${this.state.eliminationsLeft})` : ''}
                 </button>
             </div>`;
 
-        // AI Tutor tip (shown for weak topics or first question)
+        // AI Tutor tip
         const tutorTip = this._getTutorTip(q);
         const tutorHTML = tutorTip ? `
-            <div class="tutor-tip" id="tutor-tip">
-                <span class="tutor-tip-face">${_ic('companion',{size:'sm',color:'xp'})}</span>
-                <span class="tutor-tip-text">${tutorTip}</span>
-                <button class="tutor-tip-close" onclick="document.getElementById('tutor-tip')?.remove()" aria-label="Fechar dica">×</button>
+            <div class="duo-tutor-tip" id="tutor-tip">
+                <span class="duo-tutor-face">${_ic('companion',{size:'sm',color:'xp'})}</span>
+                <span class="duo-tutor-text">${tutorTip}</span>
+                <button class="duo-tutor-close" onclick="document.getElementById('tutor-tip')?.remove()" aria-label="Fechar dica">×</button>
             </div>` : '';
 
         container.innerHTML = `
-            ${tutorHTML}
-            <div class="question-counter">
-                Questão ${this.state.currentIndex + 1} / ${this.state.questions.length}
-                ${typeBadge}
-            </div>
-            <div class="question-card">
-                <div class="question-text">${q.question.replace(/\n/g, '<br>')}</div>
-            </div>
-            ${optionsHTML}
-            ${actionsHTML}
-            <div class="hint-reveal" id="hint-reveal"></div>`;
+            <div class="duo-q-inner">
+                ${tutorHTML}
+                <div class="duo-question-meta">
+                    <span class="duo-q-counter">Questão ${this.state.currentIndex + 1} / ${this.state.questions.length}</span>
+                    ${typeBadge}
+                </div>
+                <div class="duo-question-text">${q.question.replace(/\n/g, '<br>')}</div>
+                ${optionsHTML}
+                ${actionsHTML}
+                <div class="duo-hint-reveal" id="hint-reveal"></div>
+            </div>`;
 
         // Focus typing input
         if (isTyping) setTimeout(() => document.getElementById('typing-input')?.focus(), 100);
@@ -513,7 +527,7 @@ const GameEngine = {
         const _ic    = (id, o) => typeof IconSystem !== 'undefined' ? IconSystem.html(id, o) : '';
         const hintEl = document.getElementById('hint-reveal');
         if (hintEl) {
-            hintEl.innerHTML = `<div class="hint-bubble">${_ic('companion',{size:'xs',color:'xp'})} ${hintText}</div>`;
+            hintEl.innerHTML = `<div class="duo-hint-bubble">${_ic('companion',{size:'xs',color:'xp'})} ${hintText}</div>`;
         }
         const btn = document.getElementById('qa-hint-btn');
         if (btn) {
@@ -544,7 +558,7 @@ const GameEngine = {
 
         const btn = document.getElementById(`opt-${toRemove}`);
         if (btn) {
-            btn.classList.add('eliminated');
+            btn.classList.add('duo-eliminated');
             btn.disabled = true;
         }
         const elimBtn = document.getElementById('qa-elim-btn');
@@ -621,8 +635,7 @@ const GameEngine = {
     _updateTimerUI() {
         const el = document.getElementById('game-timer');
         if (!el) return;
-        const ic = (typeof IconSystem !== 'undefined') ? IconSystem.html('warning',{size:'xs'}) : '';
-        el.innerHTML = `${ic} ${this.state.timer}s`;
+        el.textContent = `${this.state.timer}s`;
         el.classList.toggle('urgent', this.state.timer <= 5);
     },
 
@@ -648,14 +661,15 @@ const GameEngine = {
         if (!this.state.isPlaying || this.state.pendingFeedback) return;
 
         this._stopTimer();
-        this.state.isPlaying       = false;
-        this.state.pendingFeedback = true;
+        this.state.isPlaying          = false;
+        this.state.pendingFeedback    = true;
+        this.state._lastSelectedIdx   = selectedIndex; // for wrong-answer persistence
 
         const q         = this.state.questions[this.state.currentIndex];
         const isCorrect = selectedIndex === q.correctIndex;
 
         // Disable all option buttons
-        document.querySelectorAll('.option-btn, .tf-btn').forEach(b => b.disabled = true);
+        document.querySelectorAll('.duo-option, .duo-tf-btn').forEach(b => b.disabled = true);
         document.getElementById('qa-hint-btn')?.setAttribute('disabled', true);
         document.getElementById('qa-elim-btn')?.setAttribute('disabled', true);
 
@@ -675,7 +689,7 @@ const GameEngine = {
             this._updateEnemyHP();
 
             const btn = document.getElementById(`opt-${selectedIndex}`);
-            if (btn) { btn.classList.add('correct'); this._showXPFloat(points, btn); }
+            if (btn) { btn.classList.add('duo-correct'); this._showXPFloat(points, btn); }
 
             // Cientista class: +1 gem every 5 correct answers
             if (State.getAvatarClass() === 'cientista') {
@@ -709,9 +723,9 @@ const GameEngine = {
             this._updateLivesUI();
 
             if (selectedIndex !== -1 && selectedIndex !== -99) {
-                document.getElementById(`opt-${selectedIndex}`)?.classList.add('wrong');
+                document.getElementById(`opt-${selectedIndex}`)?.classList.add('duo-wrong');
             }
-            document.getElementById(`opt-${q.correctIndex}`)?.classList.add('correct');
+            document.getElementById(`opt-${q.correctIndex}`)?.classList.add('duo-correct');
 
             if (typeof SoundManager !== 'undefined') SoundManager.play('wrong');
             if (typeof State !== 'undefined') {
@@ -729,6 +743,8 @@ const GameEngine = {
                     q.question, q.options?.[q.correctIndex] || '', q.topic || q.tags?.[0] || 'Geral'
                 );
             }
+            // Persist wrong answer for spaced-repetition
+            this._persistWrongAnswer(q, typedValue);
             this._showBattleEffect(false);
             this._showFeedback(false, q.explanation, 0, typedValue);
 
@@ -741,33 +757,31 @@ const GameEngine = {
     // ── FEEDBACK ─────────────────────────────────────────────────
 
     _showFeedback(isCorrect, explanation, points, typedValue) {
-        const overlay = document.getElementById('feedback-overlay');
-        if (!overlay) { this._nextQuestion(isCorrect); return; }
+        const bar = document.getElementById('feedback-overlay');
+        if (!bar) { this._nextQuestion(isCorrect); return; }
 
-        const icon  = (typeof IconSystem !== 'undefined')
-            ? (isCorrect ? IconSystem.html('check',{size:'xl',color:'success'}) : IconSystem.html('warning',{size:'xl',color:'danger'}))
-            : (isCorrect ? '✅' : '❌');
-        const label = isCorrect ? `Correto! +${points} pts` : 'Incorreto!';
+        const icon  = isCorrect ? '✅' : '❌';
+        const label = isCorrect ? `Ótimo! +${points} pts` : 'Incorreto!';
         const typingNote = typedValue && !isCorrect
-            ? `<div class="feedback-typed">Você digitou: "${typedValue}"</div>`
+            ? `<div class="duo-fb-typed">Você digitou: "${typedValue}"</div>`
             : '';
 
-        overlay.className = `feedback-overlay show ${isCorrect ? 'success-fb' : 'error-fb'}`;
-        overlay.innerHTML = `
-            <div class="feedback-icon">${icon}</div>
-            <div class="feedback-body feedback-${isCorrect ? 'success' : 'error'}">
-                <div class="feedback-label">${label}</div>
-                ${explanation ? `<div class="feedback-explanation">${explanation}</div>` : ''}
-                ${typingNote}
+        bar.className = `duo-feedback-bar show ${isCorrect ? 'fb-success' : 'fb-error'}`;
+        bar.innerHTML = `
+            <div class="duo-fb-header">
+                <span class="duo-fb-icon">${icon}</span>
+                <span class="duo-fb-label">${label}</span>
             </div>
-            <button class="feedback-continue" onclick="GameEngine._dismissFeedback()">
-                ${this.state.lives <= 0 ? 'Ver resultado' : 'Continuar'}
+            ${explanation ? `<div class="duo-fb-explanation">${explanation}</div>` : ''}
+            ${typingNote}
+            <button class="duo-fb-continue" onclick="GameEngine._dismissFeedback()">
+                ${this.state.lives <= 0 ? 'VER RESULTADO' : 'CONTINUAR'}
             </button>`;
     },
 
     _dismissFeedback() {
-        const overlay = document.getElementById('feedback-overlay');
-        if (overlay) { overlay.className = 'feedback-overlay'; overlay.innerHTML = ''; }
+        const bar = document.getElementById('feedback-overlay');
+        if (bar) { bar.className = 'duo-feedback-bar'; bar.innerHTML = ''; }
         if (this.state.lives <= 0) { this._endGame(false); return; }
         this.state.currentIndex++;
         this._loadQuestion();
@@ -926,6 +940,53 @@ const GameEngine = {
         document.getElementById('top-hud')?.classList.remove('hidden');
         document.getElementById('bottom-nav')?.classList.remove('hidden');
         State.updateHUD();
+
+        // Persist session to Supabase (fire-and-forget)
+        this._persistGameSession(victory, stars, xpGain, gemGain);
+    },
+
+    // ── SUPABASE PERSISTENCE ──────────────────────────────────────
+
+    _persistGameSession(victory, stars, xpGain, gemGain) {
+        try {
+            if (typeof SupaAuth === 'undefined' || typeof SupaDB === 'undefined') return;
+            SupaAuth.getSession().then(session => {
+                if (!session?.user?.id) return;
+                const durationMs = this.state._startedAt
+                    ? Date.now() - this.state._startedAt : 0;
+                SupaDB.saveGameSession(session.user.id, {
+                    chapterId:      this.state.chapterId,
+                    stageIndex:     this.state.stageIndex,
+                    stageId:        this.state.stageId,
+                    score:          this.state.score,
+                    stars,
+                    correctCount:   this.state.correctCount   || 0,
+                    totalQuestions: this.state.questions.length,
+                    peakCombo:      this.state.peakCombo      || 0,
+                    victory,
+                    durationMs
+                }).catch(() => {}); // silent — offline is OK
+            }).catch(() => {});
+        } catch (e) {}
+    },
+
+    _persistWrongAnswer(q, typedValue) {
+        try {
+            if (typeof SupaAuth === 'undefined' || typeof SupaDB === 'undefined') return;
+            SupaAuth.getSession().then(session => {
+                if (!session?.user?.id) return;
+                const correctAns = q.options?.[q.correctIndex] ?? q.answer ?? '';
+                const userAns    = typedValue
+                    ?? (q.options?.[this.state._lastSelectedIdx] ?? '');
+                SupaDB.saveWrongAnswer(session.user.id, {
+                    chapterId:     this.state.chapterId,
+                    stageId:       this.state.stageId,
+                    question:      q.question      || '',
+                    correctAnswer: correctAns,
+                    userAnswer:    userAns
+                }).catch(() => {});
+            }).catch(() => {});
+        } catch (e) {}
     },
 
     exit() {
